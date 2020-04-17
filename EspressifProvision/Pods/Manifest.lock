@@ -1,0 +1,90 @@
+PODS:
+  - Alamofire (5.0.5)
+  - AWSAuthCore (2.12.1):
+    - AWSCore (= 2.12.1)
+  - AWSCognitoIdentityProvider (2.12.1):
+    - AWSCognitoIdentityProviderASF (= 1.0.1)
+    - AWSCore (= 2.12.1)
+  - AWSCognitoIdentityProviderASF (1.0.1)
+  - AWSCore (2.12.1)
+  - AWSMobileClient (2.12.1):
+    - AWSAuthCore (= 2.12.1)
+    - AWSCognitoIdentityProvider (= 2.12.1)
+  - CollectionViewCenteredFlowLayout (1.0.1)
+  - Curve25519 (1.1)
+  - JWTDecode (2.4.1)
+  - Keys (1.0.1)
+  - M13Checkbox (3.4.0)
+  - MBProgressHUD (1.1.0)
+  - RangeSeekSlider (1.8.0)
+  - ReachabilitySwift (5.0.0)
+  - SideMenu (6.4.6)
+  - Socket.IO-Client-Swift (15.2.0):
+    - Starscream (~> 3.1)
+  - Starscream (3.1.1)
+  - SwiftProtobuf (1.5.0)
+
+DEPENDENCIES:
+  - Alamofire (~> 5.0.0)
+  - AWSCognitoIdentityProvider
+  - AWSCore
+  - AWSMobileClient
+  - CollectionViewCenteredFlowLayout
+  - Curve25519 (~> 1.1.0)
+  - JWTDecode (~> 2.4)
+  - Keys (from `Pods/CocoaPodsKeys`)
+  - M13Checkbox
+  - MBProgressHUD (~> 1.1.0)
+  - RangeSeekSlider
+  - ReachabilitySwift
+  - SideMenu
+  - Socket.IO-Client-Swift (~> 15.2.0)
+  - SwiftProtobuf (~> 1.5.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - AWSAuthCore
+    - AWSCognitoIdentityProvider
+    - AWSCognitoIdentityProviderASF
+    - AWSCore
+    - AWSMobileClient
+    - CollectionViewCenteredFlowLayout
+    - Curve25519
+    - JWTDecode
+    - M13Checkbox
+    - MBProgressHUD
+    - RangeSeekSlider
+    - ReachabilitySwift
+    - SideMenu
+    - Socket.IO-Client-Swift
+    - Starscream
+    - SwiftProtobuf
+
+EXTERNAL SOURCES:
+  Keys:
+    :path: Pods/CocoaPodsKeys
+
+SPEC CHECKSUMS:
+  Alamofire: df2f8f826963b08b9a870791ad48e07a10090b2e
+  AWSAuthCore: fa908a4df2feb3c978dfabb9a0927dffc69b112d
+  AWSCognitoIdentityProvider: 4b453fa8ae677dd9646fe5cb137b520105f33d08
+  AWSCognitoIdentityProviderASF: f94f1a502e72ef3d0a1de93e10bf7a79c8698118
+  AWSCore: 0a4431f74d9dbf084d420b887a6a21042b423c5c
+  AWSMobileClient: b178cd21ba500030e727c6afcc00dda438b1fecd
+  CollectionViewCenteredFlowLayout: 339b935be4d8578c59e448c8906117a07c657d85
+  Curve25519: 5f595e906bd962248665978e2992a1fe96e2d831
+  JWTDecode: 4bd4da0cdf0f8154fd467fa48499f34ec057fb88
+  Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
+  M13Checkbox: 6f59404540ac98ba83a3d1afac335895a40c6a5d
+  MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
+  RangeSeekSlider: 650b11fa1edcb92e1e0ede797669d98622570fb5
+  ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
+  SideMenu: 43910eb6dc994dd59771f8e82573d04a9e776361
+  Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
+  Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
+  SwiftProtobuf: 241400280f912735c1e1b9fe675fdd2c6c4d42e2
+
+PODFILE CHECKSUM: ae7d68caa800989c70ed1f4358fbce3cef9485ea
+
+COCOAPODS: 1.8.4

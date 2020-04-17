@@ -1,0 +1,2298 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0D3C22341CC32F8CF59E7736 /* Pods_EspressifProvisionAll_EspressifProvision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FC5952F5F6F4A07A0ED190E /* Pods_EspressifProvisionAll_EspressifProvision.framework */; };
+		1431462720DE994B0017E119 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431462620DE994B0017E119 /* AppDelegate.swift */; };
+		1431462C20DE994B0017E119 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1431462A20DE994B0017E119 /* Main.storyboard */; };
+		1431462E20DE994C0017E119 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1431462D20DE994C0017E119 /* Assets.xcassets */; };
+		1431463120DE994C0017E119 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1431462F20DE994C0017E119 /* LaunchScreen.storyboard */; };
+		1431463C20DE994C0017E119 /* EspressifProvisionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431463B20DE994C0017E119 /* EspressifProvisionTests.swift */; };
+		1431464720DE994C0017E119 /* EspressifProvisionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431464620DE994C0017E119 /* EspressifProvisionUITests.swift */; };
+		1431466520DEA97C0017E119 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431466420DEA97C0017E119 /* Transport.swift */; };
+		1431466720DEAC220017E119 /* Security.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431466620DEAC220017E119 /* Security.swift */; };
+		1431466920DEAD1A0017E119 /* SoftAPTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431466820DEAD1A0017E119 /* SoftAPTransport.swift */; };
+		1431468220DEB6F50017E119 /* Security0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431468120DEB6F50017E119 /* Security0.swift */; };
+		1431468420DF69C30017E119 /* Security1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431468320DF69C30017E119 /* Security1.swift */; };
+		1431468720DFA58E0017E119 /* HexUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431468620DFA58E0017E119 /* HexUtils.swift */; };
+		1431468B20E37B980017E119 /* ESPSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431468A20E37B980017E119 /* ESPSession.swift */; };
+		1431468E20E3823F0017E119 /* Provision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431468D20E3823F0017E119 /* Provision.swift */; };
+		1431469820E387C60017E119 /* sec1.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431469020E387C60017E119 /* sec1.pb.swift */; };
+		1431469920E387C60017E119 /* sec0.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431469120E387C60017E119 /* sec0.pb.swift */; };
+		1431469B20E387C60017E119 /* constants.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431469320E387C60017E119 /* constants.pb.swift */; };
+		1431469D20E387C60017E119 /* session.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431469520E387C60017E119 /* session.pb.swift */; };
+		1431469F20E387C60017E119 /* wifi_constants.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431469720E387C60017E119 /* wifi_constants.pb.swift */; };
+		143146A320EA23150017E119 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 143146A220EA23150017E119 /* Security.framework */; };
+		143146A520EA231B0017E119 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 143146A420EA231B0017E119 /* SafariServices.framework */; };
+		143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143146B220EB22470017E119 /* ProvisionLandingViewController.swift */; };
+		143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143146B420EB273B0017E119 /* ProvisionViewController.swift */; };
+		144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144149432126AE09002AD5E1 /* SuccessViewController.swift */; };
+		14706917211050EE00F8E1D8 /* BLELandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14706916211050EE00F8E1D8 /* BLELandingViewController.swift */; };
+		149774DD210C799900022841 /* CryptoAES.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149774DC210C799900022841 /* CryptoAES.swift */; };
+		149774DF210C87AB00022841 /* DataExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149774DE210C87AB00022841 /* DataExtensions.swift */; };
+		149774E1210C89E600022841 /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149774E0210C89E600022841 /* ArrayExtensions.swift */; };
+		149774E3210C8A0000022841 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149774E2210C8A0000022841 /* StringExtensions.swift */; };
+		14A6EA0E2108DF95007F9407 /* wifi_config.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A6EA0D2108DF95007F9407 /* wifi_config.pb.swift */; };
+		14DE671E20ECD04100941522 /* BLETransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DE671D20ECD04100941522 /* BLETransport.swift */; };
+		73BFBFC2F1B254D8255A4400 /* Pods_EspressifProvisionAll_EspressifProvision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FC5952F5F6F4A07A0ED190E /* Pods_EspressifProvisionAll_EspressifProvision.framework */; };
+		7E89B3398606A35D1BCB7893 /* Pods_EspressifProvisionAll_EspressifProvision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FC5952F5F6F4A07A0ED190E /* Pods_EspressifProvisionAll_EspressifProvision.framework */; };
+		F1153F2A238E5E79009DF206 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1153F29238E5E79009DF206 /* NetworkExtension.framework */; };
+		F12261A022C61695004D049F /* DeviceAssociation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F122619F22C61695004D049F /* DeviceAssociation.swift */; };
+		F12261A222C619A0004D049F /* cloud.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12261A122C6199F004D049F /* cloud.pb.swift */; };
+		F12261A422C620ED004D049F /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12261A322C620ED004D049F /* User.swift */; };
+		F13A014023E359250067F8B8 /* DocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13A013F23E359250067F8B8 /* DocumentViewController.swift */; };
+		F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13A01B923E98B680067F8B8 /* UserInfo.swift */; };
+		F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13F273D238CF6170003AABB /* ScannerViewController.swift */; };
+		F1402AB8239677B300C989F8 /* StaticControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */; };
+		F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */; };
+		F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15EABF323E043DA008A766B /* CustomUIElements.swift */; };
+		F15EABFF23E05A51008A766B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F15EAC0123E05A51008A766B /* Localizable.strings */; };
+		F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F15EAC0C23E198FF008A766B /* Login.storyboard */; };
+		F15EAC0F23E1994E008A766B /* DeviceDetail.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F15EAC1123E1994E008A766B /* DeviceDetail.storyboard */; };
+		F15FFF882402643A00E72D01 /* NoInternetConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15FFF872402643A00E72D01 /* NoInternetConnection.swift */; };
+		F15FFF8A2402645200E72D01 /* NoInternetConnection.xib in Resources */ = {isa = PBXBuildFile; fileRef = F15FFF892402645200E72D01 /* NoInternetConnection.xib */; };
+		F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */ = {isa = PBXBuildFile; fileRef = F17581782418D1F400FF7407 /* amazonRootCA.der */; };
+		F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */; };
+		F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */; };
+		F176A41C23C8342200F2FCBC /* ClaimViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41B23C8342200F2FCBC /* ClaimViewController.swift */; };
+		F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17F1411239F96C3008326A4 /* VersionManager.swift */; };
+		F184C9E7228C4A780034C5B7 /* AESDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = F184C9E6228C4A780034C5B7 /* AESDecryptor.m */; };
+		F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */; };
+		F194B60822CDD7BD00417347 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = F194B60722CDD7BD00417347 /* Node.swift */; };
+		F194B60A22CDD83200417347 /* DeviceListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F194B60922CDD83200417347 /* DeviceListTableViewCell.swift */; };
+		F19A9D1022BB6DD800A450C3 /* MFAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19A9D0E22BB6DD800A450C3 /* MFAViewController.swift */; };
+		F19A9D1322C0D23E00A450C3 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19A9D1222C0D23E00A450C3 /* SignInViewController.swift */; };
+		F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19A9D1422C0ED4C00A450C3 /* ForgotPasswordViewController.swift */; };
+		F19A9D1922C0ED4C00A450C3 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19A9D1522C0ED4C00A450C3 /* ResetPasswordViewController.swift */; };
+		F19A9D1B22C0ED4C00A450C3 /* ConfirmSignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19A9D1722C0ED4C00A450C3 /* ConfirmSignUpViewController.swift */; };
+		F19F6FF322F02B3400C70DE3 /* SettingsPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19F6FF222F02B3400C70DE3 /* SettingsPageViewController.swift */; };
+		F19F6FF522F45A1500C70DE3 /* DeviceListTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19F6FF422F45A1500C70DE3 /* DeviceListTableView.swift */; };
+		F1A06C7622AA48E6008567D8 /* wifi_scan.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A06C7522AA48E6008567D8 /* wifi_scan.pb.swift */; };
+		F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */; };
+		F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */; };
+		F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB511A23321B7E002401F9 /* JSONParser.swift */; };
+		F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */; };
+		F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B3558823B8DC4C004552FC /* ExtensionManager.swift */; };
+		F1C8082C22CA17790098F3B4 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C8082B22CA17790098F3B4 /* NetworkManager.swift */; };
+		F1CB6086233B549F0001D509 /* BLEDeviceListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CB6085233B549F0001D509 /* BLEDeviceListViewCell.swift */; };
+		F1DB6F62232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */; };
+		F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A322A8EA140092DAB9 /* Utility.swift */; };
+		F1DD70A622A8EA2A0092DAB9 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A522A8EA2A0092DAB9 /* Constants.swift */; };
+		F1DD70AA22A9BFBE0092DAB9 /* ScanWifiList.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A822A9BFBE0092DAB9 /* ScanWifiList.swift */; };
+		F1DD70AB22A9BFBE0092DAB9 /* WifiListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A922A9BFBE0092DAB9 /* WifiListTableViewCell.swift */; };
+		F1DDA06823588B110005F982 /* NodeDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DDA06723588B110005F982 /* NodeDetailsViewController.swift */; };
+		F1DDA06A23588C890005F982 /* NodeDetailsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DDA06923588C890005F982 /* NodeDetailsTableViewCell.swift */; };
+		F1E37E9023CF3AD500A5043F /* PrimaryControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E37E8E23CF3AD500A5043F /* PrimaryControlTableViewCell.swift */; };
+		F1E37E9123CF3AD500A5043F /* PrimaryControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1E37E8F23CF3AD500A5043F /* PrimaryControlTableViewCell.xib */; };
+		F1E37E9323D6CF4800A5043F /* PasswordTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E37E9223D6CF4700A5043F /* PasswordTextField.swift */; };
+		F1E37E9523D772EC00A5043F /* ThumbTextSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E37E9423D772EC00A5043F /* ThumbTextSlider.swift */; };
+		F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAAC8B23E2078300E9A6A8 /* AppSettingsViewController.swift */; };
+		F1EAAC8E23E29D9B00E9A6A8 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAAC8D23E29D9B00E9A6A8 /* AppConstants.swift */; };
+		F1EAACA923E2A74300E9A6A8 /* ColorPickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAACA123E2A74300E9A6A8 /* ColorPickerCell.swift */; };
+		F1EAACAA23E2A74300E9A6A8 /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAACA223E2A74300E9A6A8 /* ColorPickerView.swift */; };
+		F1EAACAB23E2A74300E9A6A8 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAACA423E2A74300E9A6A8 /* UIColor+Extension.swift */; };
+		F1EAACAC23E2A74300E9A6A8 /* ColorPickerViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAACA623E2A74300E9A6A8 /* ColorPickerViewDelegate.swift */; };
+		F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAACA723E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift */; };
+		F1EAACAE23E2A74300E9A6A8 /* DefaultValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EAACA823E2A74300E9A6A8 /* DefaultValues.swift */; };
+		F1EEE0432347268900E90B1F /* BrightnessSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EEE0422347268900E90B1F /* BrightnessSlider.swift */; };
+		F1F4513A2328C5D40009DCE0 /* DevicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F451392328C5D40009DCE0 /* DevicesViewController.swift */; };
+		F1F45147232A43510009DCE0 /* SliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F45145232A43510009DCE0 /* SliderTableViewCell.swift */; };
+		F1F45148232A43510009DCE0 /* SliderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1F45146232A43510009DCE0 /* SliderTableViewCell.xib */; };
+		F1F4514B232B74510009DCE0 /* SwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F45149232B74510009DCE0 /* SwitchTableViewCell.swift */; };
+		F1F4514C232B74510009DCE0 /* SwitchTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1F4514A232B74510009DCE0 /* SwitchTableViewCell.xib */; };
+		F1F4514E232B78100009DCE0 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F4514D232B78100009DCE0 /* Device.swift */; };
+		F1F45150232B7A780009DCE0 /* DeviceTraitListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F4514F232B7A780009DCE0 /* DeviceTraitListViewController.swift */; };
+		F1F45152232B7ECB0009DCE0 /* Attribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F45151232B7ECB0009DCE0 /* Attribute.swift */; };
+		F1FB1539234C8AE20053B0ED /* ControlSectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1FB1538234C8AE20053B0ED /* ControlSectionHeaderView.xib */; };
+		F1FB153C234D91000053B0ED /* GenericSliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FB153A234D91000053B0ED /* GenericSliderTableViewCell.swift */; };
+		F1FB153D234D91000053B0ED /* GenericSliderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1FB153B234D91000053B0ED /* GenericSliderTableViewCell.xib */; };
+		F1FB153F234DED260053B0ED /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FB153E234DED260053B0ED /* Errors.swift */; };
+		F6D7C9B0F5FDCEEFFA78A8C8 /* Pods_EspressifProvisionAll_EspressifProvisionTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BEBDCCD5B5E7E9D6B8F9AE3 /* Pods_EspressifProvisionAll_EspressifProvisionTests.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1431463820DE994C0017E119 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1431461B20DE994B0017E119 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1431462220DE994B0017E119;
+			remoteInfo = EspressifProvision;
+		};
+		1431464320DE994C0017E119 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1431461B20DE994B0017E119 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1431462220DE994B0017E119;
+			remoteInfo = EspressifProvision;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		093DF57918C1F89C203A3C0F /* Pods_EspressifProvisionAll_EspressifProvision_Staging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EspressifProvisionAll_EspressifProvision_Staging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		13D5C83D216F3C1B0FFF1747 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.wifisec1-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.wifisec1-debug.xcconfig"; sourceTree = "<group>"; };
+		1431462320DE994B0017E119 /* ESP RainMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ESP RainMaker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1431462620DE994B0017E119 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1431462B20DE994B0017E119 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1431462D20DE994C0017E119 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1431463020DE994C0017E119 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1431463220DE994C0017E119 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1431463720DE994C0017E119 /* EspressifProvisionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EspressifProvisionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1431463B20DE994C0017E119 /* EspressifProvisionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EspressifProvisionTests.swift; sourceTree = "<group>"; };
+		1431463D20DE994C0017E119 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1431464220DE994C0017E119 /* EspressifProvisionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EspressifProvisionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1431464620DE994C0017E119 /* EspressifProvisionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EspressifProvisionUITests.swift; sourceTree = "<group>"; };
+		1431464820DE994C0017E119 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1431466420DEA97C0017E119 /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
+		1431466620DEAC220017E119 /* Security.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security.swift; sourceTree = "<group>"; };
+		1431466820DEAD1A0017E119 /* SoftAPTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoftAPTransport.swift; sourceTree = "<group>"; };
+		1431468120DEB6F50017E119 /* Security0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security0.swift; sourceTree = "<group>"; };
+		1431468320DF69C30017E119 /* Security1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security1.swift; sourceTree = "<group>"; };
+		1431468620DFA58E0017E119 /* HexUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexUtils.swift; sourceTree = "<group>"; };
+		1431468A20E37B980017E119 /* ESPSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPSession.swift; sourceTree = "<group>"; };
+		1431468D20E3823F0017E119 /* Provision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Provision.swift; sourceTree = "<group>"; };
+		1431469020E387C60017E119 /* sec1.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = sec1.pb.swift; sourceTree = "<group>"; };
+		1431469120E387C60017E119 /* sec0.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = sec0.pb.swift; sourceTree = "<group>"; };
+		1431469320E387C60017E119 /* constants.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = constants.pb.swift; sourceTree = "<group>"; };
+		1431469520E387C60017E119 /* session.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = session.pb.swift; sourceTree = "<group>"; };
+		1431469720E387C60017E119 /* wifi_constants.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = wifi_constants.pb.swift; sourceTree = "<group>"; };
+		143146A220EA23150017E119 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		143146A420EA231B0017E119 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
+		143146A620EA28290017E119 /* EspressifProvision-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EspressifProvision-Bridging-Header.h"; sourceTree = "<group>"; };
+		143146B020EA303C0017E119 /* EspressifProvision.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EspressifProvision.entitlements; sourceTree = "<group>"; };
+		143146B220EB22470017E119 /* ProvisionLandingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvisionLandingViewController.swift; sourceTree = "<group>"; };
+		143146B420EB273B0017E119 /* ProvisionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvisionViewController.swift; sourceTree = "<group>"; };
+		144149432126AE09002AD5E1 /* SuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessViewController.swift; sourceTree = "<group>"; };
+		14706916211050EE00F8E1D8 /* BLELandingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLELandingViewController.swift; sourceTree = "<group>"; };
+		149774DC210C799900022841 /* CryptoAES.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoAES.swift; sourceTree = "<group>"; };
+		149774DE210C87AB00022841 /* DataExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtensions.swift; sourceTree = "<group>"; };
+		149774E0210C89E600022841 /* ArrayExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
+		149774E2210C8A0000022841 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		14A6EA0D2108DF95007F9407 /* wifi_config.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = wifi_config.pb.swift; sourceTree = "<group>"; };
+		14DE671D20ECD04100941522 /* BLETransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETransport.swift; sourceTree = "<group>"; };
+		155A75482820C8AA25B59E7B /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-staging.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-staging.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-staging.xcconfig"; sourceTree = "<group>"; };
+		36E81DD1CC6F7644E23BD232 /* Pods-EspressifProvisionAll-EspressifProvision.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.debug.xcconfig"; sourceTree = "<group>"; };
+		3E2F85E1747058D90D13B2FA /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-debug.xcconfig"; sourceTree = "<group>"; };
+		461829537A950DC0CD5E3CAD /* Pods-EspressifProvisionAll-EspressifProvision Staging.blesec1-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.blesec1-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.blesec1-debug.xcconfig"; sourceTree = "<group>"; };
+		73B8C1A5BA75B23854CAC955 /* Pods-EspressifProvisionAll-EspressifProvision.blesec0-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.blesec0-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.blesec0-debug.xcconfig"; sourceTree = "<group>"; };
+		80845F3FD54E4161C643C594 /* Pods-EspressifProvisionAll-EspressifProvision.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.release.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.release.xcconfig"; sourceTree = "<group>"; };
+		82594A2ED75EE20241927EC3 /* Pods-EspressifProvisionAll-EspressifProvisionTests.blesec0-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.blesec0-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.blesec0-debug.xcconfig"; sourceTree = "<group>"; };
+		82ECC73D5F6285205C5D6B5C /* Pods-EspressifProvisionAll-EspressifProvisionTests.blesec1-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.blesec1-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.blesec1-debug.xcconfig"; sourceTree = "<group>"; };
+		8E1E6D22052EA3913BB30ABA /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-staging.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-staging.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-staging.xcconfig"; sourceTree = "<group>"; };
+		8FDFA8FBBD58F6A4BB2F3B58 /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec0-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec0-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec0-debug.xcconfig"; sourceTree = "<group>"; };
+		993F912B9268263E402700A3 /* Pods-EspressifProvisionAll-EspressifProvision Staging.blesec0-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.blesec0-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.blesec0-debug.xcconfig"; sourceTree = "<group>"; };
+		9BEBDCCD5B5E7E9D6B8F9AE3 /* Pods_EspressifProvisionAll_EspressifProvisionTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EspressifProvisionAll_EspressifProvisionTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F088A3EDAF9DEA78D22346C /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-release.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-release.xcconfig"; sourceTree = "<group>"; };
+		9FC5952F5F6F4A07A0ED190E /* Pods_EspressifProvisionAll_EspressifProvision.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EspressifProvisionAll_EspressifProvision.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B90EB42C67277C477D78C7B2 /* Pods-EspressifProvisionAll-EspressifProvision.blesec1-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.blesec1-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.blesec1-debug.xcconfig"; sourceTree = "<group>"; };
+		BA2555F901660FD681DEF837 /* Pods-EspressifProvisionAll-EspressifProvision Staging.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.release.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.release.xcconfig"; sourceTree = "<group>"; };
+		BC3DF191A3F77BDF0EE1FC71 /* Pods-EspressifProvisionAll-EspressifProvisionTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.debug.xcconfig"; sourceTree = "<group>"; };
+		BFEF838029D37DB64314D93F /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-debug.xcconfig"; sourceTree = "<group>"; };
+		C285865721D96C24054F1647 /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec0-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec0-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec0-debug.xcconfig"; sourceTree = "<group>"; };
+		C9117C2DB5F3354B7BF0BA25 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.wifisec1-release.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.wifisec1-release.xcconfig"; sourceTree = "<group>"; };
+		D2B4EC5704D46C3EA9A47720 /* Pods-EspressifProvisionAll-EspressifProvisionTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvisionTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests.release.xcconfig"; sourceTree = "<group>"; };
+		D3AC08D4A7C235C633D9048A /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-staging.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.wifisec1-staging.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.wifisec1-staging.xcconfig"; sourceTree = "<group>"; };
+		D854C8A3BE3C61EAAD826FA5 /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-release.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-release.xcconfig"; sourceTree = "<group>"; };
+		F1153F29238E5E79009DF206 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		F122619F22C61695004D049F /* DeviceAssociation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAssociation.swift; sourceTree = "<group>"; };
+		F12261A122C6199F004D049F /* cloud.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = cloud.pb.swift; sourceTree = "<group>"; };
+		F12261A322C620ED004D049F /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		F13A013F23E359250067F8B8 /* DocumentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewController.swift; sourceTree = "<group>"; };
+		F13A01B923E98B680067F8B8 /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
+		F13A023523F2D0390067F8B8 /* EspressifProvision staging-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "EspressifProvision staging-Info.plist"; path = "/Users/vikaschandra/esp-idf-provisioning-ios/EspressifProvision/EspressifProvision staging-Info.plist"; sourceTree = "<absolute>"; };
+		F13F273D238CF6170003AABB /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
+		F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticControlTableViewCell.swift; sourceTree = "<group>"; };
+		F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StaticControlTableViewCell.xib; sourceTree = "<group>"; };
+		F15EABF323E043DA008A766B /* CustomUIElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIElements.swift; sourceTree = "<group>"; };
+		F15EABFD23E05A16008A766B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		F15EABFE23E05A16008A766B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		F15EAC0023E05A51008A766B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		F15EAC0223E05A59008A766B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F15EAC0B23E198FF008A766B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Login.storyboard; sourceTree = "<group>"; };
+		F15EAC0E23E19909008A766B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Login.strings"; sourceTree = "<group>"; };
+		F15EAC1023E1994E008A766B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DeviceDetail.storyboard; sourceTree = "<group>"; };
+		F15EAC1323E19976008A766B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DeviceDetail.strings"; sourceTree = "<group>"; };
+		F15FFF872402643A00E72D01 /* NoInternetConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoInternetConnection.swift; sourceTree = "<group>"; };
+		F15FFF892402645200E72D01 /* NoInternetConnection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoInternetConnection.xib; sourceTree = "<group>"; };
+		F17581782418D1F400FF7407 /* amazonRootCA.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = amazonRootCA.der; sourceTree = "<group>"; };
+		F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListCollectionReusableView.swift; sourceTree = "<group>"; };
+		F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCollectionViewLayout.swift; sourceTree = "<group>"; };
+		F176A41B23C8342200F2FCBC /* ClaimViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimViewController.swift; sourceTree = "<group>"; };
+		F17F1411239F96C3008326A4 /* VersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionManager.swift; sourceTree = "<group>"; };
+		F184C9E5228C4A780034C5B7 /* AESDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AESDecryptor.h; sourceTree = "<group>"; };
+		F184C9E6228C4A780034C5B7 /* AESDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AESDecryptor.m; sourceTree = "<group>"; };
+		F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssociationConfig.swift; sourceTree = "<group>"; };
+		F194B60722CDD7BD00417347 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		F194B60922CDD83200417347 /* DeviceListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListTableViewCell.swift; sourceTree = "<group>"; };
+		F19A9D0E22BB6DD800A450C3 /* MFAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MFAViewController.swift; sourceTree = "<group>"; };
+		F19A9D1222C0D23E00A450C3 /* SignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
+		F19A9D1422C0ED4C00A450C3 /* ForgotPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForgotPasswordViewController.swift; sourceTree = "<group>"; };
+		F19A9D1522C0ED4C00A450C3 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
+		F19A9D1722C0ED4C00A450C3 /* ConfirmSignUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmSignUpViewController.swift; sourceTree = "<group>"; };
+		F19F6FF222F02B3400C70DE3 /* SettingsPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageViewController.swift; sourceTree = "<group>"; };
+		F19F6FF422F45A1500C70DE3 /* DeviceListTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListTableView.swift; sourceTree = "<group>"; };
+		F1A06C7522AA48E6008567D8 /* wifi_scan.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = wifi_scan.pb.swift; sourceTree = "<group>"; };
+		F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericControlTableViewCell.swift; sourceTree = "<group>"; };
+		F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericControlTableViewCell.xib; sourceTree = "<group>"; };
+		F1AB511A23321B7E002401F9 /* JSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
+		F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewController.swift; sourceTree = "<group>"; };
+		F1B3558823B8DC4C004552FC /* ExtensionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionManager.swift; sourceTree = "<group>"; };
+		F1C8082B22CA17790098F3B4 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		F1CB6085233B549F0001D509 /* BLEDeviceListViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceListViewCell.swift; sourceTree = "<group>"; };
+		F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesCollectionViewCell.swift; sourceTree = "<group>"; };
+		F1DD70A322A8EA140092DAB9 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		F1DD70A522A8EA2A0092DAB9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		F1DD70A822A9BFBE0092DAB9 /* ScanWifiList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanWifiList.swift; sourceTree = "<group>"; };
+		F1DD70A922A9BFBE0092DAB9 /* WifiListTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WifiListTableViewCell.swift; sourceTree = "<group>"; };
+		F1DDA06723588B110005F982 /* NodeDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeDetailsViewController.swift; sourceTree = "<group>"; };
+		F1DDA06923588C890005F982 /* NodeDetailsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeDetailsTableViewCell.swift; sourceTree = "<group>"; };
+		F1E37E8E23CF3AD500A5043F /* PrimaryControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryControlTableViewCell.swift; sourceTree = "<group>"; };
+		F1E37E8F23CF3AD500A5043F /* PrimaryControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PrimaryControlTableViewCell.xib; sourceTree = "<group>"; };
+		F1E37E9223D6CF4700A5043F /* PasswordTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordTextField.swift; sourceTree = "<group>"; };
+		F1E37E9423D772EC00A5043F /* ThumbTextSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbTextSlider.swift; sourceTree = "<group>"; };
+		F1EAAC8B23E2078300E9A6A8 /* AppSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsViewController.swift; sourceTree = "<group>"; };
+		F1EAAC8D23E29D9B00E9A6A8 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		F1EAACA123E2A74300E9A6A8 /* ColorPickerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerCell.swift; sourceTree = "<group>"; };
+		F1EAACA223E2A74300E9A6A8 /* ColorPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
+		F1EAACA423E2A74300E9A6A8 /* UIColor+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
+		F1EAACA623E2A74300E9A6A8 /* ColorPickerViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerViewDelegate.swift; sourceTree = "<group>"; };
+		F1EAACA723E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerViewDelegateFlowLayout.swift; sourceTree = "<group>"; };
+		F1EAACA823E2A74300E9A6A8 /* DefaultValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultValues.swift; sourceTree = "<group>"; };
+		F1EEE0422347268900E90B1F /* BrightnessSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessSlider.swift; sourceTree = "<group>"; };
+		F1F451392328C5D40009DCE0 /* DevicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesViewController.swift; sourceTree = "<group>"; };
+		F1F45145232A43510009DCE0 /* SliderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderTableViewCell.swift; sourceTree = "<group>"; };
+		F1F45146232A43510009DCE0 /* SliderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SliderTableViewCell.xib; sourceTree = "<group>"; };
+		F1F45149232B74510009DCE0 /* SwitchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchTableViewCell.swift; sourceTree = "<group>"; };
+		F1F4514A232B74510009DCE0 /* SwitchTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SwitchTableViewCell.xib; sourceTree = "<group>"; };
+		F1F4514D232B78100009DCE0 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		F1F4514F232B7A780009DCE0 /* DeviceTraitListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTraitListViewController.swift; sourceTree = "<group>"; };
+		F1F45151232B7ECB0009DCE0 /* Attribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attribute.swift; sourceTree = "<group>"; };
+		F1FB1538234C8AE20053B0ED /* ControlSectionHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ControlSectionHeaderView.xib; sourceTree = "<group>"; };
+		F1FB153A234D91000053B0ED /* GenericSliderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericSliderTableViewCell.swift; sourceTree = "<group>"; };
+		F1FB153B234D91000053B0ED /* GenericSliderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericSliderTableViewCell.xib; sourceTree = "<group>"; };
+		F1FB153E234DED260053B0ED /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		F69752FA1E35B222D7A513B2 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec0-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision.wifisec0-debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision.wifisec0-debug.xcconfig"; sourceTree = "<group>"; };
+		FEE3BF04840CF3E025667620 /* Pods-EspressifProvisionAll-EspressifProvision Staging.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EspressifProvisionAll-EspressifProvision Staging.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision Staging/Pods-EspressifProvisionAll-EspressifProvision Staging.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1431462020DE994B0017E119 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				143146A520EA231B0017E119 /* SafariServices.framework in Frameworks */,
+				F1153F2A238E5E79009DF206 /* NetworkExtension.framework in Frameworks */,
+				143146A320EA23150017E119 /* Security.framework in Frameworks */,
+				7E89B3398606A35D1BCB7893 /* Pods_EspressifProvisionAll_EspressifProvision.framework in Frameworks */,
+				0D3C22341CC32F8CF59E7736 /* Pods_EspressifProvisionAll_EspressifProvision.framework in Frameworks */,
+				73BFBFC2F1B254D8255A4400 /* Pods_EspressifProvisionAll_EspressifProvision.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1431463420DE994C0017E119 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6D7C9B0F5FDCEEFFA78A8C8 /* Pods_EspressifProvisionAll_EspressifProvisionTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1431463F20DE994C0017E119 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1431461A20DE994B0017E119 = {
+			isa = PBXGroup;
+			children = (
+				1431462520DE994B0017E119 /* EspressifProvision */,
+				1431463A20DE994C0017E119 /* EspressifProvisionTests */,
+				1431464520DE994C0017E119 /* EspressifProvisionUITests */,
+				1431462420DE994B0017E119 /* Products */,
+				56A4FE6F186D17F2A0F189AC /* Pods */,
+				CAE64040D79003E04BA4A14C /* Frameworks */,
+				F13A023523F2D0390067F8B8 /* EspressifProvision staging-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		1431462420DE994B0017E119 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1431462320DE994B0017E119 /* ESP RainMaker.app */,
+				1431463720DE994C0017E119 /* EspressifProvisionTests.xctest */,
+				1431464220DE994C0017E119 /* EspressifProvisionUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1431462520DE994B0017E119 /* EspressifProvision */ = {
+			isa = PBXGroup;
+			children = (
+				F17581782418D1F400FF7407 /* amazonRootCA.der */,
+				F1EAAC8F23E2A55100E9A6A8 /* ColorPicker */,
+				F1F4513B2328C8F10009DCE0 /* Resources */,
+				F194B60622CDD79D00417347 /* Models */,
+				F122619E22C6166A004D049F /* AWSCognito */,
+				F1DD70A222A8EA140092DAB9 /* Utilities */,
+				143146B020EA303C0017E119 /* EspressifProvision.entitlements */,
+				1431468F20E387C60017E119 /* proto */,
+				143146B120EB221E0017E119 /* Interface */,
+				1431466320DEA9690017E119 /* provision */,
+				1431462620DE994B0017E119 /* AppDelegate.swift */,
+				F15EAC1123E1994E008A766B /* DeviceDetail.storyboard */,
+				F15EAC0C23E198FF008A766B /* Login.storyboard */,
+				1431462A20DE994B0017E119 /* Main.storyboard */,
+				1431462D20DE994C0017E119 /* Assets.xcassets */,
+				1431462F20DE994C0017E119 /* LaunchScreen.storyboard */,
+				1431463220DE994C0017E119 /* Info.plist */,
+				143146A620EA28290017E119 /* EspressifProvision-Bridging-Header.h */,
+			);
+			path = EspressifProvision;
+			sourceTree = "<group>";
+		};
+		1431463A20DE994C0017E119 /* EspressifProvisionTests */ = {
+			isa = PBXGroup;
+			children = (
+				1431463B20DE994C0017E119 /* EspressifProvisionTests.swift */,
+				1431463D20DE994C0017E119 /* Info.plist */,
+			);
+			path = EspressifProvisionTests;
+			sourceTree = "<group>";
+		};
+		1431464520DE994C0017E119 /* EspressifProvisionUITests */ = {
+			isa = PBXGroup;
+			children = (
+				1431464620DE994C0017E119 /* EspressifProvisionUITests.swift */,
+				1431464820DE994C0017E119 /* Info.plist */,
+			);
+			path = EspressifProvisionUITests;
+			sourceTree = "<group>";
+		};
+		1431466320DEA9690017E119 /* provision */ = {
+			isa = PBXGroup;
+			children = (
+				F1DD70A722A9BFBE0092DAB9 /* wifi */,
+				149774D5210C711500022841 /* crypto */,
+				1431468C20E382250017E119 /* transport */,
+				1431468920E37B8B0017E119 /* session */,
+				1431468820E37B470017E119 /* security */,
+				1431468520DFA5810017E119 /* utils */,
+				1431468D20E3823F0017E119 /* Provision.swift */,
+			);
+			path = provision;
+			sourceTree = "<group>";
+		};
+		1431468520DFA5810017E119 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				1431468620DFA58E0017E119 /* HexUtils.swift */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+		1431468820E37B470017E119 /* security */ = {
+			isa = PBXGroup;
+			children = (
+				1431466620DEAC220017E119 /* Security.swift */,
+				1431468120DEB6F50017E119 /* Security0.swift */,
+				1431468320DF69C30017E119 /* Security1.swift */,
+			);
+			path = security;
+			sourceTree = "<group>";
+		};
+		1431468920E37B8B0017E119 /* session */ = {
+			isa = PBXGroup;
+			children = (
+				1431468A20E37B980017E119 /* ESPSession.swift */,
+				14DE671D20ECD04100941522 /* BLETransport.swift */,
+			);
+			path = session;
+			sourceTree = "<group>";
+		};
+		1431468C20E382250017E119 /* transport */ = {
+			isa = PBXGroup;
+			children = (
+				1431466820DEAD1A0017E119 /* SoftAPTransport.swift */,
+				1431466420DEA97C0017E119 /* Transport.swift */,
+			);
+			path = transport;
+			sourceTree = "<group>";
+		};
+		1431468F20E387C60017E119 /* proto */ = {
+			isa = PBXGroup;
+			children = (
+				F12261A122C6199F004D049F /* cloud.pb.swift */,
+				F1A06C7522AA48E6008567D8 /* wifi_scan.pb.swift */,
+				14A6EA0D2108DF95007F9407 /* wifi_config.pb.swift */,
+				1431469020E387C60017E119 /* sec1.pb.swift */,
+				1431469120E387C60017E119 /* sec0.pb.swift */,
+				1431469320E387C60017E119 /* constants.pb.swift */,
+				1431469520E387C60017E119 /* session.pb.swift */,
+				1431469720E387C60017E119 /* wifi_constants.pb.swift */,
+			);
+			path = proto;
+			sourceTree = "<group>";
+		};
+		143146B120EB221E0017E119 /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				F132F753244985F200CA713B /* Node Addition */,
+				F132F752244985B100CA713B /* Settings */,
+				F15EABF223E04386008A766B /* Generic Views */,
+				F1F451382328C5B80009DCE0 /* Devices */,
+				F194B60522CDD6AD00417347 /* Device List */,
+				F19A9D0D22BB6DD800A450C3 /* User Management */,
+				F1CB6085233B549F0001D509 /* BLEDeviceListViewCell.swift */,
+				F13A013F23E359250067F8B8 /* DocumentViewController.swift */,
+			);
+			path = Interface;
+			sourceTree = "<group>";
+		};
+		149774D5210C711500022841 /* crypto */ = {
+			isa = PBXGroup;
+			children = (
+				F184C9E5228C4A780034C5B7 /* AESDecryptor.h */,
+				F184C9E6228C4A780034C5B7 /* AESDecryptor.m */,
+				149774DC210C799900022841 /* CryptoAES.swift */,
+				149774DE210C87AB00022841 /* DataExtensions.swift */,
+				149774E0210C89E600022841 /* ArrayExtensions.swift */,
+				149774E2210C8A0000022841 /* StringExtensions.swift */,
+			);
+			path = crypto;
+			sourceTree = "<group>";
+		};
+		56A4FE6F186D17F2A0F189AC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D2B4EC5704D46C3EA9A47720 /* Pods-EspressifProvisionAll-EspressifProvisionTests.release.xcconfig */,
+				C285865721D96C24054F1647 /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec0-debug.xcconfig */,
+				3E2F85E1747058D90D13B2FA /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-debug.xcconfig */,
+				82594A2ED75EE20241927EC3 /* Pods-EspressifProvisionAll-EspressifProvisionTests.blesec0-debug.xcconfig */,
+				82ECC73D5F6285205C5D6B5C /* Pods-EspressifProvisionAll-EspressifProvisionTests.blesec1-debug.xcconfig */,
+				BC3DF191A3F77BDF0EE1FC71 /* Pods-EspressifProvisionAll-EspressifProvisionTests.debug.xcconfig */,
+				9F088A3EDAF9DEA78D22346C /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-release.xcconfig */,
+				155A75482820C8AA25B59E7B /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-staging.xcconfig */,
+				36E81DD1CC6F7644E23BD232 /* Pods-EspressifProvisionAll-EspressifProvision.debug.xcconfig */,
+				F69752FA1E35B222D7A513B2 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec0-debug.xcconfig */,
+				73B8C1A5BA75B23854CAC955 /* Pods-EspressifProvisionAll-EspressifProvision.blesec0-debug.xcconfig */,
+				13D5C83D216F3C1B0FFF1747 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-debug.xcconfig */,
+				C9117C2DB5F3354B7BF0BA25 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-release.xcconfig */,
+				D3AC08D4A7C235C633D9048A /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-staging.xcconfig */,
+				B90EB42C67277C477D78C7B2 /* Pods-EspressifProvisionAll-EspressifProvision.blesec1-debug.xcconfig */,
+				80845F3FD54E4161C643C594 /* Pods-EspressifProvisionAll-EspressifProvision.release.xcconfig */,
+				FEE3BF04840CF3E025667620 /* Pods-EspressifProvisionAll-EspressifProvision Staging.debug.xcconfig */,
+				8FDFA8FBBD58F6A4BB2F3B58 /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec0-debug.xcconfig */,
+				993F912B9268263E402700A3 /* Pods-EspressifProvisionAll-EspressifProvision Staging.blesec0-debug.xcconfig */,
+				BFEF838029D37DB64314D93F /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-debug.xcconfig */,
+				D854C8A3BE3C61EAAD826FA5 /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-release.xcconfig */,
+				8E1E6D22052EA3913BB30ABA /* Pods-EspressifProvisionAll-EspressifProvision Staging.wifisec1-staging.xcconfig */,
+				461829537A950DC0CD5E3CAD /* Pods-EspressifProvisionAll-EspressifProvision Staging.blesec1-debug.xcconfig */,
+				BA2555F901660FD681DEF837 /* Pods-EspressifProvisionAll-EspressifProvision Staging.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CAE64040D79003E04BA4A14C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F1153F29238E5E79009DF206 /* NetworkExtension.framework */,
+				143146A420EA231B0017E119 /* SafariServices.framework */,
+				143146A220EA23150017E119 /* Security.framework */,
+				9FC5952F5F6F4A07A0ED190E /* Pods_EspressifProvisionAll_EspressifProvision.framework */,
+				9BEBDCCD5B5E7E9D6B8F9AE3 /* Pods_EspressifProvisionAll_EspressifProvisionTests.framework */,
+				093DF57918C1F89C203A3C0F /* Pods_EspressifProvisionAll_EspressifProvision_Staging.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F122619E22C6166A004D049F /* AWSCognito */ = {
+			isa = PBXGroup;
+			children = (
+				F122619F22C61695004D049F /* DeviceAssociation.swift */,
+				F1C8082B22CA17790098F3B4 /* NetworkManager.swift */,
+			);
+			path = AWSCognito;
+			sourceTree = "<group>";
+		};
+		F132F752244985B100CA713B /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				F1EAAC8B23E2078300E9A6A8 /* AppSettingsViewController.swift */,
+				F19F6FF222F02B3400C70DE3 /* SettingsPageViewController.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		F132F753244985F200CA713B /* Node Addition */ = {
+			isa = PBXGroup;
+			children = (
+				F13F273D238CF6170003AABB /* ScannerViewController.swift */,
+				14706916211050EE00F8E1D8 /* BLELandingViewController.swift */,
+				143146B220EB22470017E119 /* ProvisionLandingViewController.swift */,
+				F176A41B23C8342200F2FCBC /* ClaimViewController.swift */,
+				143146B420EB273B0017E119 /* ProvisionViewController.swift */,
+				144149432126AE09002AD5E1 /* SuccessViewController.swift */,
+			);
+			path = "Node Addition";
+			sourceTree = "<group>";
+		};
+		F15EABF223E04386008A766B /* Generic Views */ = {
+			isa = PBXGroup;
+			children = (
+				F1E37E9223D6CF4700A5043F /* PasswordTextField.swift */,
+				F15EABF323E043DA008A766B /* CustomUIElements.swift */,
+				F15FFF872402643A00E72D01 /* NoInternetConnection.swift */,
+				F15FFF892402645200E72D01 /* NoInternetConnection.xib */,
+			);
+			path = "Generic Views";
+			sourceTree = "<group>";
+		};
+		F194B60522CDD6AD00417347 /* Device List */ = {
+			isa = PBXGroup;
+			children = (
+				F194B60922CDD83200417347 /* DeviceListTableViewCell.swift */,
+				F19F6FF422F45A1500C70DE3 /* DeviceListTableView.swift */,
+			);
+			path = "Device List";
+			sourceTree = "<group>";
+		};
+		F194B60622CDD79D00417347 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F194B60722CDD7BD00417347 /* Node.swift */,
+				F1F4514D232B78100009DCE0 /* Device.swift */,
+				F1F45151232B7ECB0009DCE0 /* Attribute.swift */,
+				F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */,
+				F13A01B923E98B680067F8B8 /* UserInfo.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F19A9D0D22BB6DD800A450C3 /* User Management */ = {
+			isa = PBXGroup;
+			children = (
+				F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */,
+				F19A9D1522C0ED4C00A450C3 /* ResetPasswordViewController.swift */,
+				F19A9D1722C0ED4C00A450C3 /* ConfirmSignUpViewController.swift */,
+				F19A9D1422C0ED4C00A450C3 /* ForgotPasswordViewController.swift */,
+				F19A9D1222C0D23E00A450C3 /* SignInViewController.swift */,
+				F19A9D0E22BB6DD800A450C3 /* MFAViewController.swift */,
+			);
+			path = "User Management";
+			sourceTree = "<group>";
+		};
+		F1DD70A222A8EA140092DAB9 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F1DD70A322A8EA140092DAB9 /* Utility.swift */,
+				F1DD70A522A8EA2A0092DAB9 /* Constants.swift */,
+				F12261A322C620ED004D049F /* User.swift */,
+				F1AB511A23321B7E002401F9 /* JSONParser.swift */,
+				F1FB153E234DED260053B0ED /* Errors.swift */,
+				F17F1411239F96C3008326A4 /* VersionManager.swift */,
+				F1B3558823B8DC4C004552FC /* ExtensionManager.swift */,
+				F1EAAC8D23E29D9B00E9A6A8 /* AppConstants.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		F1DD70A722A9BFBE0092DAB9 /* wifi */ = {
+			isa = PBXGroup;
+			children = (
+				F1DD70A822A9BFBE0092DAB9 /* ScanWifiList.swift */,
+				F1DD70A922A9BFBE0092DAB9 /* WifiListTableViewCell.swift */,
+			);
+			path = wifi;
+			sourceTree = "<group>";
+		};
+		F1EAAC8F23E2A55100E9A6A8 /* ColorPicker */ = {
+			isa = PBXGroup;
+			children = (
+				F1EAACA823E2A74300E9A6A8 /* DefaultValues.swift */,
+				F1EAACA323E2A74300E9A6A8 /* Extension */,
+				F1EAACA523E2A74300E9A6A8 /* Protocol */,
+				F1EAACA023E2A74300E9A6A8 /* View */,
+			);
+			path = ColorPicker;
+			sourceTree = "<group>";
+		};
+		F1EAACA023E2A74300E9A6A8 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F1EAACA123E2A74300E9A6A8 /* ColorPickerCell.swift */,
+				F1EAACA223E2A74300E9A6A8 /* ColorPickerView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F1EAACA323E2A74300E9A6A8 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				F1EAACA423E2A74300E9A6A8 /* UIColor+Extension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		F1EAACA523E2A74300E9A6A8 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				F1EAACA623E2A74300E9A6A8 /* ColorPickerViewDelegate.swift */,
+				F1EAACA723E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+		F1F451382328C5B80009DCE0 /* Devices */ = {
+			isa = PBXGroup;
+			children = (
+				F1F45142232A424C0009DCE0 /* Controls */,
+				F1F451392328C5D40009DCE0 /* DevicesViewController.swift */,
+				F1F4514F232B7A780009DCE0 /* DeviceTraitListViewController.swift */,
+				F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */,
+				F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */,
+				F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */,
+				F1DDA06723588B110005F982 /* NodeDetailsViewController.swift */,
+				F1DDA06923588C890005F982 /* NodeDetailsTableViewCell.swift */,
+			);
+			path = Devices;
+			sourceTree = "<group>";
+		};
+		F1F4513B2328C8F10009DCE0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F15EAC0123E05A51008A766B /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		F1F45142232A424C0009DCE0 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				F1F45145232A43510009DCE0 /* SliderTableViewCell.swift */,
+				F1F45146232A43510009DCE0 /* SliderTableViewCell.xib */,
+				F1F45149232B74510009DCE0 /* SwitchTableViewCell.swift */,
+				F1F4514A232B74510009DCE0 /* SwitchTableViewCell.xib */,
+				F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */,
+				F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */,
+				F1EEE0422347268900E90B1F /* BrightnessSlider.swift */,
+				F1FB1538234C8AE20053B0ED /* ControlSectionHeaderView.xib */,
+				F1FB153A234D91000053B0ED /* GenericSliderTableViewCell.swift */,
+				F1FB153B234D91000053B0ED /* GenericSliderTableViewCell.xib */,
+				F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */,
+				F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */,
+				F1E37E8E23CF3AD500A5043F /* PrimaryControlTableViewCell.swift */,
+				F1E37E8F23CF3AD500A5043F /* PrimaryControlTableViewCell.xib */,
+				F1E37E9423D772EC00A5043F /* ThumbTextSlider.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1431462220DE994B0017E119 /* EspressifProvision */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1431464B20DE994C0017E119 /* Build configuration list for PBXNativeTarget "EspressifProvision" */;
+			buildPhases = (
+				00DB2C32147AC4521007D2AB /* [CP] Check Pods Manifest.lock */,
+				14E4319221118AD000A76D62 /* Generate Swift Proto files */,
+				1431461F20DE994B0017E119 /* Sources */,
+				1431462020DE994B0017E119 /* Frameworks */,
+				1431462120DE994B0017E119 /* Resources */,
+				67053E87E3FA0F38C5C8376F /* [CP] Embed Pods Frameworks */,
+				1487EBE92123D8C4007F44A6 /* Format code */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EspressifProvision;
+			productName = EspressifProvision;
+			productReference = 1431462320DE994B0017E119 /* ESP RainMaker.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1431463620DE994C0017E119 /* EspressifProvisionTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1431464E20DE994C0017E119 /* Build configuration list for PBXNativeTarget "EspressifProvisionTests" */;
+			buildPhases = (
+				D282A8FC0F41CD28BF8F6877 /* [CP] Check Pods Manifest.lock */,
+				1431463320DE994C0017E119 /* Sources */,
+				1431463420DE994C0017E119 /* Frameworks */,
+				1431463520DE994C0017E119 /* Resources */,
+				BC6043E63EC0B0F301552320 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1431463920DE994C0017E119 /* PBXTargetDependency */,
+			);
+			name = EspressifProvisionTests;
+			productName = EspressifProvisionTests;
+			productReference = 1431463720DE994C0017E119 /* EspressifProvisionTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		1431464120DE994C0017E119 /* EspressifProvisionUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1431465120DE994C0017E119 /* Build configuration list for PBXNativeTarget "EspressifProvisionUITests" */;
+			buildPhases = (
+				1431463E20DE994C0017E119 /* Sources */,
+				1431463F20DE994C0017E119 /* Frameworks */,
+				1431464020DE994C0017E119 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1431464420DE994C0017E119 /* PBXTargetDependency */,
+			);
+			name = EspressifProvisionUITests;
+			productName = EspressifProvisionUITests;
+			productReference = 1431464220DE994C0017E119 /* EspressifProvisionUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1431461B20DE994B0017E119 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0940;
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = Espressif;
+				TargetAttributes = {
+					1431462220DE994B0017E119 = {
+						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1020;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 0;
+							};
+						};
+					};
+					1431463620DE994C0017E119 = {
+						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1020;
+						TestTargetID = 1431462220DE994B0017E119;
+					};
+					1431464120DE994C0017E119 = {
+						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1020;
+						TestTargetID = 1431462220DE994B0017E119;
+					};
+				};
+			};
+			buildConfigurationList = 1431461E20DE994B0017E119 /* Build configuration list for PBXProject "EspressifProvision" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 1431461A20DE994B0017E119;
+			productRefGroup = 1431462420DE994B0017E119 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1431462220DE994B0017E119 /* EspressifProvision */,
+				1431463620DE994C0017E119 /* EspressifProvisionTests */,
+				1431464120DE994C0017E119 /* EspressifProvisionUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1431462120DE994B0017E119 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */,
+				F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */,
+				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
+				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
+				F15EABFF23E05A51008A766B /* Localizable.strings in Resources */,
+				F1FB153D234D91000053B0ED /* GenericSliderTableViewCell.xib in Resources */,
+				1431463120DE994C0017E119 /* LaunchScreen.storyboard in Resources */,
+				F1FB1539234C8AE20053B0ED /* ControlSectionHeaderView.xib in Resources */,
+				F15EAC0F23E1994E008A766B /* DeviceDetail.storyboard in Resources */,
+				1431462E20DE994C0017E119 /* Assets.xcassets in Resources */,
+				F15FFF8A2402645200E72D01 /* NoInternetConnection.xib in Resources */,
+				F1E37E9123CF3AD500A5043F /* PrimaryControlTableViewCell.xib in Resources */,
+				F1F4514C232B74510009DCE0 /* SwitchTableViewCell.xib in Resources */,
+				F1F45148232A43510009DCE0 /* SliderTableViewCell.xib in Resources */,
+				1431462C20DE994B0017E119 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1431463520DE994C0017E119 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1431464020DE994C0017E119 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		00DB2C32147AC4521007D2AB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-EspressifProvisionAll-EspressifProvision-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1487EBE92123D8C4007F44A6 /* Format code */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Format code";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "swiftformat .\n";
+		};
+		14E4319221118AD000A76D62 /* Generate Swift Proto files */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Swift Proto files";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ../\nprotoc -I=proto --swift_out=$SRCROOT/EspressifProvision/proto proto/*.proto\n";
+		};
+		67053E87E3FA0F38C5C8376F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EspressifProvisionAll-EspressifProvision/Pods-EspressifProvisionAll-EspressifProvision-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BC6043E63EC0B0F301552320 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EspressifProvisionAll-EspressifProvisionTests/Pods-EspressifProvisionAll-EspressifProvisionTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D282A8FC0F41CD28BF8F6877 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-EspressifProvisionAll-EspressifProvisionTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1431461F20DE994B0017E119 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F13A014023E359250067F8B8 /* DocumentViewController.swift in Sources */,
+				1431468220DEB6F50017E119 /* Security0.swift in Sources */,
+				F1F45150232B7A780009DCE0 /* DeviceTraitListViewController.swift in Sources */,
+				F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */,
+				F1DD70AA22A9BFBE0092DAB9 /* ScanWifiList.swift in Sources */,
+				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
+				F176A41C23C8342200F2FCBC /* ClaimViewController.swift in Sources */,
+				F19A9D1B22C0ED4C00A450C3 /* ConfirmSignUpViewController.swift in Sources */,
+				F1F45152232B7ECB0009DCE0 /* Attribute.swift in Sources */,
+				F1F45147232A43510009DCE0 /* SliderTableViewCell.swift in Sources */,
+				F1DDA06A23588C890005F982 /* NodeDetailsTableViewCell.swift in Sources */,
+				F1DD70AB22A9BFBE0092DAB9 /* WifiListTableViewCell.swift in Sources */,
+				F19F6FF322F02B3400C70DE3 /* SettingsPageViewController.swift in Sources */,
+				1431469820E387C60017E119 /* sec1.pb.swift in Sources */,
+				F1FB153F234DED260053B0ED /* Errors.swift in Sources */,
+				14DE671E20ECD04100941522 /* BLETransport.swift in Sources */,
+				F194B60822CDD7BD00417347 /* Node.swift in Sources */,
+				F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */,
+				149774DF210C87AB00022841 /* DataExtensions.swift in Sources */,
+				F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */,
+				1431468E20E3823F0017E119 /* Provision.swift in Sources */,
+				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
+				1431469920E387C60017E119 /* sec0.pb.swift in Sources */,
+				F1EAACAA23E2A74300E9A6A8 /* ColorPickerView.swift in Sources */,
+				F1EEE0432347268900E90B1F /* BrightnessSlider.swift in Sources */,
+				F19A9D1922C0ED4C00A450C3 /* ResetPasswordViewController.swift in Sources */,
+				F1EAACAC23E2A74300E9A6A8 /* ColorPickerViewDelegate.swift in Sources */,
+				1431468420DF69C30017E119 /* Security1.swift in Sources */,
+				F12261A022C61695004D049F /* DeviceAssociation.swift in Sources */,
+				F1F4513A2328C5D40009DCE0 /* DevicesViewController.swift in Sources */,
+				F1EAACAE23E2A74300E9A6A8 /* DefaultValues.swift in Sources */,
+				F1EAACAB23E2A74300E9A6A8 /* UIColor+Extension.swift in Sources */,
+				F1E37E9523D772EC00A5043F /* ThumbTextSlider.swift in Sources */,
+				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
+				149774DD210C799900022841 /* CryptoAES.swift in Sources */,
+				1431466920DEAD1A0017E119 /* SoftAPTransport.swift in Sources */,
+				F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */,
+				F1F4514B232B74510009DCE0 /* SwitchTableViewCell.swift in Sources */,
+				F1DD70A622A8EA2A0092DAB9 /* Constants.swift in Sources */,
+				F1DB6F62232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift in Sources */,
+				F12261A422C620ED004D049F /* User.swift in Sources */,
+				F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */,
+				F1E37E9323D6CF4800A5043F /* PasswordTextField.swift in Sources */,
+				F1EAACA923E2A74300E9A6A8 /* ColorPickerCell.swift in Sources */,
+				1431469B20E387C60017E119 /* constants.pb.swift in Sources */,
+				149774E1210C89E600022841 /* ArrayExtensions.swift in Sources */,
+				F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */,
+				1431466720DEAC220017E119 /* Security.swift in Sources */,
+				1431468720DFA58E0017E119 /* HexUtils.swift in Sources */,
+				143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */,
+				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
+				1431468B20E37B980017E119 /* ESPSession.swift in Sources */,
+				F1DDA06823588B110005F982 /* NodeDetailsViewController.swift in Sources */,
+				F1EAAC8E23E29D9B00E9A6A8 /* AppConstants.swift in Sources */,
+				1431469F20E387C60017E119 /* wifi_constants.pb.swift in Sources */,
+				F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */,
+				149774E3210C8A0000022841 /* StringExtensions.swift in Sources */,
+				14A6EA0E2108DF95007F9407 /* wifi_config.pb.swift in Sources */,
+				F1C8082C22CA17790098F3B4 /* NetworkManager.swift in Sources */,
+				F15FFF882402643A00E72D01 /* NoInternetConnection.swift in Sources */,
+				F19A9D1322C0D23E00A450C3 /* SignInViewController.swift in Sources */,
+				F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */,
+				F1F4514E232B78100009DCE0 /* Device.swift in Sources */,
+				1431466520DEA97C0017E119 /* Transport.swift in Sources */,
+				144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */,
+				F12261A222C619A0004D049F /* cloud.pb.swift in Sources */,
+				F1A06C7622AA48E6008567D8 /* wifi_scan.pb.swift in Sources */,
+				F19A9D1022BB6DD800A450C3 /* MFAViewController.swift in Sources */,
+				F19F6FF522F45A1500C70DE3 /* DeviceListTableView.swift in Sources */,
+				F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */,
+				F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */,
+				F184C9E7228C4A780034C5B7 /* AESDecryptor.m in Sources */,
+				14706917211050EE00F8E1D8 /* BLELandingViewController.swift in Sources */,
+				F1402AB8239677B300C989F8 /* StaticControlTableViewCell.swift in Sources */,
+				F1FB153C234D91000053B0ED /* GenericSliderTableViewCell.swift in Sources */,
+				1431462720DE994B0017E119 /* AppDelegate.swift in Sources */,
+				1431469D20E387C60017E119 /* session.pb.swift in Sources */,
+				F1CB6086233B549F0001D509 /* BLEDeviceListViewCell.swift in Sources */,
+				F1E37E9023CF3AD500A5043F /* PrimaryControlTableViewCell.swift in Sources */,
+				F194B60A22CDD83200417347 /* DeviceListTableViewCell.swift in Sources */,
+				F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */,
+				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1431463320DE994C0017E119 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1431463C20DE994C0017E119 /* EspressifProvisionTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1431463E20DE994C0017E119 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1431464720DE994C0017E119 /* EspressifProvisionUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1431463920DE994C0017E119 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1431462220DE994B0017E119 /* EspressifProvision */;
+			targetProxy = 1431463820DE994C0017E119 /* PBXContainerItemProxy */;
+		};
+		1431464420DE994C0017E119 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1431462220DE994B0017E119 /* EspressifProvision */;
+			targetProxy = 1431464320DE994C0017E119 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1431462A20DE994B0017E119 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1431462B20DE994B0017E119 /* Base */,
+				F15EABFD23E05A16008A766B /* zh-Hans */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		1431462F20DE994C0017E119 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1431463020DE994C0017E119 /* Base */,
+				F15EABFE23E05A16008A766B /* zh-Hans */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		F15EAC0123E05A51008A766B /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F15EAC0023E05A51008A766B /* zh-Hans */,
+				F15EAC0223E05A59008A766B /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		F15EAC0C23E198FF008A766B /* Login.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F15EAC0B23E198FF008A766B /* Base */,
+				F15EAC0E23E19909008A766B /* zh-Hans */,
+			);
+			name = Login.storyboard;
+			sourceTree = "<group>";
+		};
+		F15EAC1123E1994E008A766B /* DeviceDetail.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F15EAC1023E1994E008A766B /* Base */,
+				F15EAC1323E19976008A766B /* zh-Hans */,
+			);
+			name = DeviceDetail.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1431464920DE994C0017E119 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1431464A20DE994C0017E119 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1431464C20DE994C0017E119 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36E81DD1CC6F7644E23BD232 /* Pods-EspressifProvisionAll-EspressifProvision.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
+				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1431464D20DE994C0017E119 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 80845F3FD54E4161C643C594 /* Pods-EspressifProvisionAll-EspressifProvision.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
+				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1431464F20DE994C0017E119 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BC3DF191A3F77BDF0EE1FC71 /* Pods-EspressifProvisionAll-EspressifProvisionTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = Debug;
+		};
+		1431465020DE994C0017E119 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D2B4EC5704D46C3EA9A47720 /* Pods-EspressifProvisionAll-EspressifProvisionTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = Release;
+		};
+		1431465220DE994C0017E119 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = Debug;
+		};
+		1431465320DE994C0017E119 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = Release;
+		};
+		14BB0D7E211C112400326DD9 /* WifiSec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "WifiSec0-Debug";
+		};
+		14BB0D7F211C112400326DD9 /* WifiSec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F69752FA1E35B222D7A513B2 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec0-debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC0 -DWIFI";
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
+				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "WifiSec0-Debug";
+		};
+		14BB0D80211C112400326DD9 /* WifiSec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C285865721D96C24054F1647 /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec0-debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = "WifiSec0-Debug";
+		};
+		14BB0D81211C112400326DD9 /* WifiSec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = "WifiSec0-Debug";
+		};
+		14BB0D82211C113300326DD9 /* WifiSec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "WifiSec1-Debug";
+		};
+		14BB0D83211C113300326DD9 /* WifiSec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 13D5C83D216F3C1B0FFF1747 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DWIFI";
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
+				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "WifiSec1-Debug";
+		};
+		14BB0D84211C113300326DD9 /* WifiSec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3E2F85E1747058D90D13B2FA /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = "WifiSec1-Debug";
+		};
+		14BB0D85211C113300326DD9 /* WifiSec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = "WifiSec1-Debug";
+		};
+		14BB0D8A211C12FF00326DD9 /* BLESec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "BLESec0-Debug";
+		};
+		14BB0D8B211C12FF00326DD9 /* BLESec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 73B8C1A5BA75B23854CAC955 /* Pods-EspressifProvisionAll-EspressifProvision.blesec0-debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC0 -DBLE";
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
+				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "BLESec0-Debug";
+		};
+		14BB0D8C211C12FF00326DD9 /* BLESec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 82594A2ED75EE20241927EC3 /* Pods-EspressifProvisionAll-EspressifProvisionTests.blesec0-debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = "BLESec0-Debug";
+		};
+		14BB0D8D211C12FF00326DD9 /* BLESec0-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = "BLESec0-Debug";
+		};
+		14BB0D92211C131500326DD9 /* BLESec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "BLESec1-Debug";
+		};
+		14BB0D93211C131500326DD9 /* BLESec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B90EB42C67277C477D78C7B2 /* Pods-EspressifProvisionAll-EspressifProvision.blesec1-debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DBLE";
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
+				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "BLESec1-Debug";
+		};
+		14BB0D94211C131500326DD9 /* BLESec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 82ECC73D5F6285205C5D6B5C /* Pods-EspressifProvisionAll-EspressifProvisionTests.blesec1-debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = "BLESec1-Debug";
+		};
+		14BB0D95211C131500326DD9 /* BLESec1-Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = "BLESec1-Debug";
+		};
+		F155A31D2397C37E007EEC33 /* WifiSec1-Staging */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "WifiSec1-Staging";
+		};
+		F155A31E2397C37E007EEC33 /* WifiSec1-Staging */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D3AC08D4A7C235C633D9048A /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-staging.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DWIFI";
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.intsoftap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "RainMaker Beta App Development Profile";
+				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "WifiSec1-Staging";
+		};
+		F155A31F2397C37E007EEC33 /* WifiSec1-Staging */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 155A75482820C8AA25B59E7B /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-staging.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = "WifiSec1-Staging";
+		};
+		F155A3202397C37E007EEC33 /* WifiSec1-Staging */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = "WifiSec1-Staging";
+		};
+		F172D298234352D3005F687A /* WifiSec1-Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "WifiSec1-Release";
+		};
+		F172D299234352D3005F687A /* WifiSec1-Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C9117C2DB5F3354B7BF0BA25 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BASE_API_URL_ENDPOINT = "https://api.rainmaker.espressif.com/";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QWXF6GB4AV;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GITHUB_URL = "https://rainmaker-prod.auth.us-east-1.amazoncognito.com/oauth2/";
+				INFOPLIST_FILE = EspressifProvision/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DWIFI -DPROD";
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
+				PRODUCT_NAME = "ESP RainMaker";
+				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
+				REDIRECT_URL = "com.espressif.rainmaker.softap://success";
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_OBJC_BRIDGING_HEADER = "EspressifProvision/EspressifProvision-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "WifiSec1-Release";
+		};
+		F172D29A234352D3005F687A /* WifiSec1-Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F088A3EDAF9DEA78D22346C /* Pods-EspressifProvisionAll-EspressifProvisionTests.wifisec1-release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EspressifProvision.app/EspressifProvision";
+			};
+			name = "WifiSec1-Release";
+		};
+		F172D29B234352D3005F687A /* WifiSec1-Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y9ZJ436PPN;
+				INFOPLIST_FILE = EspressifProvisionUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.EspressifProvisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EspressifProvision;
+			};
+			name = "WifiSec1-Release";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1431461E20DE994B0017E119 /* Build configuration list for PBXProject "EspressifProvision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1431464920DE994C0017E119 /* Debug */,
+				14BB0D7E211C112400326DD9 /* WifiSec0-Debug */,
+				14BB0D8A211C12FF00326DD9 /* BLESec0-Debug */,
+				14BB0D82211C113300326DD9 /* WifiSec1-Debug */,
+				F172D298234352D3005F687A /* WifiSec1-Release */,
+				F155A31D2397C37E007EEC33 /* WifiSec1-Staging */,
+				14BB0D92211C131500326DD9 /* BLESec1-Debug */,
+				1431464A20DE994C0017E119 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1431464B20DE994C0017E119 /* Build configuration list for PBXNativeTarget "EspressifProvision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1431464C20DE994C0017E119 /* Debug */,
+				14BB0D7F211C112400326DD9 /* WifiSec0-Debug */,
+				14BB0D8B211C12FF00326DD9 /* BLESec0-Debug */,
+				14BB0D83211C113300326DD9 /* WifiSec1-Debug */,
+				F172D299234352D3005F687A /* WifiSec1-Release */,
+				F155A31E2397C37E007EEC33 /* WifiSec1-Staging */,
+				14BB0D93211C131500326DD9 /* BLESec1-Debug */,
+				1431464D20DE994C0017E119 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1431464E20DE994C0017E119 /* Build configuration list for PBXNativeTarget "EspressifProvisionTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1431464F20DE994C0017E119 /* Debug */,
+				14BB0D80211C112400326DD9 /* WifiSec0-Debug */,
+				14BB0D8C211C12FF00326DD9 /* BLESec0-Debug */,
+				14BB0D84211C113300326DD9 /* WifiSec1-Debug */,
+				F172D29A234352D3005F687A /* WifiSec1-Release */,
+				F155A31F2397C37E007EEC33 /* WifiSec1-Staging */,
+				14BB0D94211C131500326DD9 /* BLESec1-Debug */,
+				1431465020DE994C0017E119 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1431465120DE994C0017E119 /* Build configuration list for PBXNativeTarget "EspressifProvisionUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1431465220DE994C0017E119 /* Debug */,
+				14BB0D81211C112400326DD9 /* WifiSec0-Debug */,
+				14BB0D8D211C12FF00326DD9 /* BLESec0-Debug */,
+				14BB0D85211C113300326DD9 /* WifiSec1-Debug */,
+				F172D29B234352D3005F687A /* WifiSec1-Release */,
+				F155A3202397C37E007EEC33 /* WifiSec1-Staging */,
+				14BB0D95211C131500326DD9 /* BLESec1-Debug */,
+				1431465320DE994C0017E119 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1431461B20DE994B0017E119 /* Project object */;
+}

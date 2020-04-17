@@ -1,0 +1,5 @@
+#import <Foundation/Foundation.h>
+@interface PodsDummy_Pods_EspressifProvisionAll_EspressifProvisionTests : NSObject
+@end
+@implementation PodsDummy_Pods_EspressifProvisionAll_EspressifProvisionTests
+@end

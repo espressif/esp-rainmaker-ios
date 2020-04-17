@@ -1,0 +1,6 @@
+framework module Pods_EspressifProvisionAll_EspressifProvisionTests {
+  umbrella header "Pods-EspressifProvisionAll-EspressifProvisionTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
