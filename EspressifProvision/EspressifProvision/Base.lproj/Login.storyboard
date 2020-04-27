@@ -379,7 +379,7 @@
                                     <constraint firstAttribute="height" constant="60" id="D3f-Yf-mqH"/>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="350" id="OOS-aY-tX0"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="KIl-sx-Or1" id="J5n-ys-xYF"/>
@@ -511,7 +511,7 @@
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="15" maxX="40" maxY="15"/>
-                                        <state key="normal" title="Sign in with Github">
+                                        <state key="normal" title="Sign in with GitHub">
                                             <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>

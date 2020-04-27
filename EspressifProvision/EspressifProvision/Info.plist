@@ -4,6 +4,8 @@
 <dict>
 	<key>APP_THEME_COLOR</key>
 	<string>#FFFFFF</string>
+	<key>AUTH_URL</key>
+	<string>$(AUTH_URL)</string>
 	<key>AWS</key>
 	<dict>
 		<key>CognitoUserPool</key>
@@ -71,8 +73,6 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>DeviceNamePrefix</key>
 	<string>PROV_</string>
-	<key>GITHUB_URL</key>
-	<string>$(GITHUB_URL)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>itms-apps</string>

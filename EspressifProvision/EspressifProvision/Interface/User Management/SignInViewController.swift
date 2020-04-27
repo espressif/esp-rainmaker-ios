@@ -192,20 +192,17 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     }
 
     @IBAction func loginWithGithub(_: Any) {
-        loginWith(idProvider: "Github")
+        loginWith(idProvider: "GitHub")
     }
 
     func loginWith(idProvider: String) {
         let currentKeys = Keys.current
-        let githubLoginURL = Constants.githubURL + "authorize" + "?identity_provider=" + idProvider + "&redirect_uri=" + Constants.redirectURL + "&response_type=CODE&client_id="
-        session = SFAuthenticationSession(url: URL(string: githubLoginURL + currentKeys.clientID!)!, callbackURLScheme: Constants.redirectURL) { url, error in
+        let loginURL = Constants.authURL + "authorize" + "?identity_provider=" + idProvider + "&redirect_uri=" + Constants.redirectURL + "&response_type=CODE&client_id="
+        session = SFAuthenticationSession(url: URL(string: loginURL + currentKeys.clientID!)!, callbackURLScheme: Constants.redirectURL) { url, error in
             if error != nil {
-                self.showAlert()
                 return
             }
-            let dict = [String: String]()
             if let responseURL = url?.absoluteString {
-                print(responseURL)
                 let components = responseURL.components(separatedBy: "#")
                 for item in components {
                     if item.contains("code") {
@@ -216,7 +213,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                                 if idTokenInfo.count > 1 {
                                     let code = idTokenInfo[1]
                                     self.requestToken(code: code)
-                                    // self.dismiss(animated: true, completion: nil)
                                     return
                                 }
                             }
@@ -230,7 +226,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     }
 
     func requestToken(code: String) {
-        let url = Constants.githubURL + "token"
+        let url = Constants.authURL + "token"
         let currentKeys = Keys.current
         let parameters = ["grant_type": "authorization_code", "client_id": currentKeys.clientID!, "code": code, "redirect_uri": Constants.redirectURL]
         let headers: HTTPHeaders = ["Content-Type": "application/x-www-form-urlencoded"]
@@ -247,7 +243,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                         self.dismiss(animated: true, completion: nil)
                     }
                 }
-                print(response)
             }
         }
     }

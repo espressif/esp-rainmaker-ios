@@ -61,7 +61,7 @@ struct Constants {
 
     static let AWSCognitoUserPoolsSignInProviderKey = "UserPool"
     static let baseURL = Bundle.main.infoDictionary!["BASE_API_URL_ENDPOINT"] as? String ?? ""
-    static let githubURL = Bundle.main.infoDictionary!["GITHUB_URL"] as? String ?? ""
+    static let authURL = Bundle.main.infoDictionary!["AUTH_URL"] as? String ?? ""
     static let redirectURL = Bundle.main.infoDictionary!["REDIRECT_URL"] as? String ?? ""
     static let clientID = Bundle.main.infoDictionary!["APP_CLIENT_ID"] as? String ?? ""
     static let idProvider = "Github"

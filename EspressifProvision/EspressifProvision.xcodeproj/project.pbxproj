@@ -1243,6 +1243,7 @@
 			baseConfigurationReference = 36E81DD1CC6F7644E23BD232 /* Pods-EspressifProvisionAll-EspressifProvision.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -1254,13 +1255,12 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
 				PRODUCT_NAME = "ESP RainMaker";
 				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
@@ -1278,6 +1278,7 @@
 			baseConfigurationReference = 80845F3FD54E4161C643C594 /* Pods-EspressifProvisionAll-EspressifProvision.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -1289,13 +1290,12 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
 				PRODUCT_NAME = "ESP RainMaker";
 				PROVISIONING_PROFILE_SPECIFIER = "ESP RainMaker SoftAp Provisioning Development";
@@ -1458,6 +1458,7 @@
 			baseConfigurationReference = F69752FA1E35B222D7A513B2 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec0-debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -1469,13 +1470,12 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC0 -DWIFI";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
@@ -1598,6 +1598,7 @@
 			baseConfigurationReference = 13D5C83D216F3C1B0FFF1747 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -1609,13 +1610,12 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DWIFI";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
@@ -1739,6 +1739,7 @@
 			baseConfigurationReference = 73B8C1A5BA75B23854CAC955 /* Pods-EspressifProvisionAll-EspressifProvision.blesec0-debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -1750,13 +1751,12 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC0 -DBLE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
 				PRODUCT_NAME = "ESP RainMaker";
@@ -1879,6 +1879,7 @@
 			baseConfigurationReference = B90EB42C67277C477D78C7B2 /* Pods-EspressifProvisionAll-EspressifProvision.blesec1-debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -1890,13 +1891,12 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DBLE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
 				PRODUCT_NAME = "ESP RainMaker";
@@ -2015,6 +2015,7 @@
 			baseConfigurationReference = D3AC08D4A7C235C633D9048A /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-staging.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -2027,13 +2028,12 @@
 					"$(PROJECT_DIR)",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				GITHUB_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DWIFI";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.intsoftap;
@@ -2154,6 +2154,7 @@
 			baseConfigurationReference = C9117C2DB5F3354B7BF0BA25 /* Pods-EspressifProvisionAll-EspressifProvision.wifisec1-release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTH_URL = "https://auth.rainmaker.espressif.com/oauth2/";
 				BASE_API_URL_ENDPOINT = "https://api.rainmaker.espressif.com/";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EspressifProvision/EspressifProvision.entitlements;
@@ -2166,13 +2167,12 @@
 					"$(PROJECT_DIR)",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				GITHUB_URL = "https://rainmaker-prod.auth.us-east-1.amazoncognito.com/oauth2/";
 				INFOPLIST_FILE = EspressifProvision/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DSEC1 -DWIFI -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;

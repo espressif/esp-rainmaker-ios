@@ -19,7 +19,7 @@ class NetworkManager {
         // Validate api calls with server certificate
         let certificate = [NetworkManager.certificate(filename: "amazonRootCA")]
         let trustManager = ServerTrustManager(evaluators: [
-            "api.staging.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-staging.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-prod.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "api.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate),
+            "api.staging.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-staging.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-prod.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "api.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "auth.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate),
         ])
         session = Session(serverTrustManager: trustManager)
     }
