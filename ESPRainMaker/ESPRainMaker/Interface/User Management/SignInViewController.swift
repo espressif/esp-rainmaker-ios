@@ -27,7 +27,9 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     @IBOutlet var checkBox: UIButton!
     @IBOutlet var signInTopSpace: NSLayoutConstraint!
     @IBOutlet var signUpTopView: NSLayoutConstraint!
+    @IBOutlet var signInButton: PrimaryButton!
     @IBOutlet var username: UITextField!
+    @IBOutlet var signUpButton: PrimaryButton!
     @IBOutlet var password: UITextField!
     @IBOutlet var topView: UIView!
     @IBOutlet var signUpView: UIView!
@@ -36,6 +38,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     @IBOutlet var githubLoginButton: UIButton!
     @IBOutlet var googleLoginButton: UIButton!
     @IBOutlet var appleLoginButton: UIButton!
+    @IBOutlet var appVersionLabel: UILabel!
     //    let passwordButtonRightView = UIButton(frame: CGRect(x: 0, y: 0, width: 22.0, height: 16.0))
 
     var pool: AWSCognitoIdentityUserPool?
@@ -80,7 +83,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
         googleLoginButton.layer.shadowOpacity = 0.5
         googleLoginButton.layer.masksToBounds = false
 
-//        appleLoginButton.layer.backgroundColor = UIColor.lightGray.cgColor
         appleLoginButton.layer.shadowColor = UIColor.lightGray.cgColor
         appleLoginButton.layer.shadowOffset = CGSize(width: 0.5, height: 1.0)
         appleLoginButton.layer.shadowRadius = 0.5
@@ -142,6 +144,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
             // Fallback on earlier versions
         }
         segmentControl.addUnderlineForSelectedSegment()
+        appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
     }
 
     override func viewDidLayoutSubviews() {
@@ -253,6 +256,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
 
     @IBAction func signInPressed(_: AnyObject) {
         dismissKeyboard()
+        signInButton.isEnabled = false
         if Utility.isConnected(view: view) {
             guard let usernameValue = username.text, !usernameValue.isEmpty, let password = password.text, !password.isEmpty else {
                 let alertController = UIAlertController(title: "Missing information",
@@ -261,6 +265,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                 let retryAction = UIAlertAction(title: "Retry", style: .default, handler: nil)
                 alertController.addAction(retryAction)
                 present(alertController, animated: true, completion: nil)
+                signInButton.isEnabled = true
                 return
             }
             signIn(username: usernameValue, password: password)
@@ -320,6 +325,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                 present(alertController, animated: true, completion: nil)
                 return
             }
+            signUpButton.isEnabled = false
             Utility.showLoader(message: "", view: view)
 
             var attributes = [AWSCognitoIdentityUserAttributeType]()
@@ -336,6 +342,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                 guard let strongSelf = self else { return nil }
                 DispatchQueue.main.async {
                     Utility.hideLoader(view: strongSelf.view)
+                    strongSelf.signUpButton.isEnabled = true
                     if let error = task.error as NSError? {
                         let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
                                                                 message: error.userInfo["message"] as? String,
@@ -471,6 +478,7 @@ extension SignInViewController: AWSCognitoIdentityPasswordAuthentication {
     public func didCompleteStepWithError(_ error: Error?) {
         DispatchQueue.main.async {
             Utility.hideLoader(view: self.view)
+            self.signInButton.isEnabled = true
             if let error = error as NSError? {
                 if error.code == 33 {
                     self.resendConfirmationCode()

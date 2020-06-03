@@ -18,11 +18,7 @@
 
 import Foundation
 
-class Device: Equatable {
-    static func == (lhs: Device, rhs: Device) -> Bool {
-        return lhs.attributes == rhs.attributes && lhs.params == rhs.params && lhs.name == rhs.name
-    }
-
+class Device {
     var name: String?
     var type: String?
     var attributes: [Attribute]?

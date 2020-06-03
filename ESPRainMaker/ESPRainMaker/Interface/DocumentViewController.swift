@@ -22,14 +22,38 @@ import WebKit
 class DocumentViewController: UIViewController {
     var documentLink: String!
     @IBOutlet var webView: WKWebView!
+    @IBOutlet var backButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        webView.navigationDelegate = self
         webView.load(URLRequest(url: URL(string: documentLink)!))
         // Do any additional setup after loading the view.
     }
 
+    @IBAction func backButtonPressed(_: Any) {
+        webView.goBack()
+    }
+
     @IBAction func closeWebView(_: Any) {
         dismiss(animated: true, completion: nil)
+    }
+}
+
+extension DocumentViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if navigationAction.navigationType == .linkActivated {
+            guard let url = navigationAction.request.url else { return }
+            webView.load(URLRequest(url: url))
+        }
+        decisionHandler(.allow)
+    }
+
+    func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
+        if webView.canGoBack {
+            backButton.isHidden = false
+        } else {
+            backButton.isHidden = true
+        }
     }
 }

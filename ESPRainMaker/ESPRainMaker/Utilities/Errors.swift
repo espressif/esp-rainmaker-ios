@@ -48,7 +48,7 @@ enum ESPNetworkError: Error {
         case .keyNotPresent:
             return "Key not present."
         case .emptyToken:
-            return "No access token found. Please signout and login then try again!!"
+            return "Authorization Error. Please Refresh. If it does not work, please sign-in again."
         case .emptyConfigData:
             return "Node info is not present"
         }

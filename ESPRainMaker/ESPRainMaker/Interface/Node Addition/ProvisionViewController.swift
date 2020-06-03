@@ -97,9 +97,10 @@ class ProvisionViewController: UIViewController {
         device.scanWifiList { wifiList, _ in
             DispatchQueue.main.async {
                 self.tableView.isHidden = false
+                self.headerView.isHidden = false
                 Utility.hideLoader(view: self.view)
-                if wifiList != nil {
-                    self.wifiDetailList = wifiList!
+                if let list = wifiList {
+                    self.wifiDetailList = list.sorted { $0.rssi > $1.rssi }
                 }
                 self.tableView.reloadData()
             }
@@ -333,16 +334,23 @@ extension ProvisionViewController: UITableViewDataSource {
 }
 
 extension ProvisionViewController: DeviceAssociationProtocol {
-    func deviceAssociationFinishedWith(success: Bool, nodeID: String?) {
+    func deviceAssociationFinishedWith(success: Bool, nodeID: String?, error: AssociationError?) {
         User.shared.currentAssociationInfo!.associationInfoDelievered = success
         DispatchQueue.main.async {
             Utility.hideLoader(view: self.view)
-        }
-        if success {
-            if let deviceSecret = nodeID {
-                User.shared.currentAssociationInfo!.nodeID = deviceSecret
+            if success {
+                if let deviceSecret = nodeID {
+                    User.shared.currentAssociationInfo!.nodeID = deviceSecret
+                }
+                self.showStatusScreen()
+            } else {
+                let alertController = UIAlertController(title: "Error", message: error?.description, preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .default) { _ in
+                    self.navigationController?.popToRootViewController(animated: false)
+                }
+                alertController.addAction(action)
+                self.present(alertController, animated: true, completion: nil)
             }
-            showStatusScreen()
         }
     }
 }

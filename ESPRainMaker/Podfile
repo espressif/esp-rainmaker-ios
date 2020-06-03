@@ -6,20 +6,18 @@ plugin 'cocoapods-keys', {
   :keys => ["UserPoolId","UserPoolAppClientId","Staging_UserPoolId","Staging_UserPoolAppClientId"]
 }
 
-abstract_target 'ESPRainMakerAll' do
+target 'ESPRainMaker' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
 
   # Pods for ESPRainMaker
 
   pod 'MBProgressHUD', '~> 1.1.0'
-  pod 'AWSCognitoIdentityProvider', '~> 2.13.0'
-  pod 'AWSMobileClient'
+  pod 'AWSMobileClient', '~> 2.13.4'
   pod 'Alamofire', '~> 5.0.0'
   pod 'ReachabilitySwift'
   pod 'JWTDecode', '~> 2.4'
   pod 'M13Checkbox'
   pod 'ESPProvision'
 
-  target 'ESPRainMaker'
 end

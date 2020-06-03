@@ -34,7 +34,7 @@ class SettingsPageViewController: UIViewController {
 
         emailLabel.text = User.shared.userInfo.email
         NotificationCenter.default.addObserver(self, selector: #selector(updateUIView), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
-        appVersionLabel.text = "App Version - v" + Constants.appVersion
+        appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
     }
 
     override func viewDidLayoutSubviews() {
