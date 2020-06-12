@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7xV-BH-yep">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7xV-BH-yep">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -504,7 +504,7 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NOm-gh-05c">
-                                <rect key="frame" x="0.0" y="133.5" width="375" height="533.5"/>
+                                <rect key="frame" x="0.0" y="133.5" width="375" height="503.5"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rD6-gP-i6F">
                                         <rect key="frame" x="32" y="20" width="311" height="41.5"/>
@@ -646,7 +646,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nte-Hn-u6r">
-                                        <rect key="frame" x="37.5" y="479.5" width="110" height="28"/>
+                                        <rect key="frame" x="37.5" y="449.5" width="110" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="110" id="SBl-e0-oFz"/>
                                         </constraints>
@@ -659,7 +659,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UHd-4C-Y0a">
-                                        <rect key="frame" x="157.5" y="479.5" width="60" height="28"/>
+                                        <rect key="frame" x="157.5" y="449.5" width="60" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="D5w-Yu-wdG"/>
                                         </constraints>
@@ -672,7 +672,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bdv-Bv-ccB">
-                                        <rect key="frame" x="217.5" y="479.5" width="140" height="28"/>
+                                        <rect key="frame" x="217.5" y="449.5" width="140" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="140" id="1Yy-xT-6lD"/>
                                         </constraints>
@@ -731,7 +731,7 @@
                                 </constraints>
                             </view>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Atr-3P-rUd">
-                                <rect key="frame" x="0.0" y="133.5" width="375" height="533.5"/>
+                                <rect key="frame" x="0.0" y="133.5" width="375" height="503.5"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="h4Y-lz-Rgy">
                                         <rect key="frame" x="12.5" y="32" width="350" height="60"/>
@@ -858,13 +858,20 @@
                                     <constraint firstItem="8mB-EP-5Ss" firstAttribute="top" secondItem="iHL-JY-aSZ" secondAttribute="bottom" constant="4" id="yFl-Vh-kqR"/>
                                 </constraints>
                             </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="App Version - v1.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F4a-1m-dcP">
+                                <rect key="frame" x="136" y="632.5" width="103.5" height="14.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="trailing" secondItem="QPE-t6-ANk" secondAttribute="trailing" id="4Nz-3K-pkd"/>
+                            <constraint firstItem="F4a-1m-dcP" firstAttribute="centerX" secondItem="Seu-in-CWQ" secondAttribute="centerX" id="5MG-Oj-Ten"/>
                             <constraint firstItem="FkL-Cb-9Ck" firstAttribute="top" secondItem="Seu-in-CWQ" secondAttribute="top" id="7pY-Vj-6ZA"/>
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="top" secondItem="FkL-Cb-9Ck" secondAttribute="bottom" id="Ps0-BG-k6p"/>
-                            <constraint firstAttribute="bottom" secondItem="Atr-3P-rUd" secondAttribute="bottom" id="RKq-rL-r5U"/>
+                            <constraint firstAttribute="bottom" secondItem="Atr-3P-rUd" secondAttribute="bottom" constant="30" id="RKq-rL-r5U"/>
                             <constraint firstItem="dkG-ck-a8M" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" multiplier="0.062" id="Xd8-ZK-CvV"/>
                             <constraint firstItem="FkL-Cb-9Ck" firstAttribute="leading" secondItem="QPE-t6-ANk" secondAttribute="leading" id="XlX-wf-yoc"/>
                             <constraint firstItem="rD6-gP-i6F" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" multiplier="0.062" id="aIa-Ho-9u8"/>
@@ -872,16 +879,18 @@
                             <constraint firstItem="FkL-Cb-9Ck" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" multiplier="0.2" id="eBa-9h-jOR"/>
                             <constraint firstItem="QPE-t6-ANk" firstAttribute="trailing" secondItem="NOm-gh-05c" secondAttribute="trailing" id="fSK-OO-x7U"/>
                             <constraint firstItem="FkL-Cb-9Ck" firstAttribute="trailing" secondItem="QPE-t6-ANk" secondAttribute="trailing" id="j3W-xz-Ghc"/>
-                            <constraint firstAttribute="bottom" secondItem="NOm-gh-05c" secondAttribute="bottom" id="k1Q-cv-JT1"/>
+                            <constraint firstAttribute="bottom" secondItem="NOm-gh-05c" secondAttribute="bottom" constant="30" id="k1Q-cv-JT1"/>
                             <constraint firstItem="NOm-gh-05c" firstAttribute="leading" secondItem="QPE-t6-ANk" secondAttribute="leading" id="oQv-5W-fLp"/>
                             <constraint firstItem="NOm-gh-05c" firstAttribute="top" secondItem="FkL-Cb-9Ck" secondAttribute="bottom" id="pS5-Bf-PEY"/>
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="leading" secondItem="QPE-t6-ANk" secondAttribute="leading" id="vB8-Yi-d2u"/>
+                            <constraint firstAttribute="bottom" secondItem="F4a-1m-dcP" secondAttribute="bottom" constant="20" id="zJy-0W-HUP"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="QPE-t6-ANk"/>
                     </view>
                     <navigationItem key="navigationItem" id="Bei-DQ-UZk"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
+                        <outlet property="appVersionLabel" destination="F4a-1m-dcP" id="zEu-ax-uba"/>
                         <outlet property="appleLoginButton" destination="xFD-Uk-9IC" id="m1X-3y-Obk"/>
                         <outlet property="checkBox" destination="0zy-Lk-qHe" id="tFO-fl-w1r"/>
                         <outlet property="confirmPassword" destination="8mB-EP-5Ss" id="O5x-DV-7rO"/>
@@ -891,8 +900,10 @@
                         <outlet property="password" destination="9ju-xn-L6Y" id="f4a-ME-kj8"/>
                         <outlet property="registerPassword" destination="iHL-JY-aSZ" id="lUE-NH-P08"/>
                         <outlet property="segmentControl" destination="88g-vZ-6Pe" id="Azc-uX-6sh"/>
+                        <outlet property="signInButton" destination="dkG-ck-a8M" id="69Y-ys-fhO"/>
                         <outlet property="signInTopSpace" destination="pS5-Bf-PEY" id="lMd-11-Wmb"/>
                         <outlet property="signInView" destination="NOm-gh-05c" id="qWL-tY-oT5"/>
+                        <outlet property="signUpButton" destination="GPM-zl-nF5" id="cLa-m9-Vce"/>
                         <outlet property="signUpTopView" destination="Ps0-BG-k6p" id="cjs-yE-yQl"/>
                         <outlet property="signUpView" destination="Atr-3P-rUd" id="U8f-tk-uhf"/>
                         <outlet property="username" destination="HT5-AL-XVD" id="RlB-mZ-Dxs"/>
@@ -912,7 +923,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VvT-Zr-VFS">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="48" width="375" height="619"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -920,31 +931,41 @@
                                 </wkWebViewConfiguration>
                             </wkWebView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EK2-tY-Ire">
-                                <rect key="frame" x="320" y="16" width="39" height="30"/>
+                                <rect key="frame" x="326" y="10" width="39" height="30"/>
                                 <state key="normal" title="Close"/>
                                 <connections>
                                     <action selector="closeWebView:" destination="wXr-Ub-V7p" eventType="touchUpInside" id="R70-GQ-0tG"/>
                                 </connections>
                             </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wvO-yc-hIb">
+                                <rect key="frame" x="10" y="10" width="34" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="backButtonPressed:" destination="wXr-Ub-V7p" eventType="touchUpInside" id="2ha-Nw-chQ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="VvT-Zr-VFS" firstAttribute="top" secondItem="V28-tt-vRP" secondAttribute="top" id="4xT-jz-xn6"/>
                             <constraint firstItem="VvT-Zr-VFS" firstAttribute="trailing" secondItem="7JE-6N-vH6" secondAttribute="trailing" id="A8a-xu-XyV"/>
-                            <constraint firstItem="EK2-tY-Ire" firstAttribute="top" secondItem="V28-tt-vRP" secondAttribute="top" constant="16" id="CmP-dI-tmA"/>
+                            <constraint firstItem="wvO-yc-hIb" firstAttribute="leading" secondItem="7JE-6N-vH6" secondAttribute="leading" constant="10" id="BLL-hl-1AM"/>
+                            <constraint firstItem="EK2-tY-Ire" firstAttribute="top" secondItem="V28-tt-vRP" secondAttribute="top" constant="10" id="CmP-dI-tmA"/>
+                            <constraint firstItem="VvT-Zr-VFS" firstAttribute="top" secondItem="EK2-tY-Ire" secondAttribute="bottom" constant="8" id="Cq5-B1-IuX"/>
+                            <constraint firstItem="wvO-yc-hIb" firstAttribute="top" secondItem="7JE-6N-vH6" secondAttribute="top" constant="10" id="GCQ-uv-XN4"/>
                             <constraint firstAttribute="bottom" secondItem="VvT-Zr-VFS" secondAttribute="bottom" id="UfQ-jk-eMq"/>
                             <constraint firstItem="VvT-Zr-VFS" firstAttribute="leading" secondItem="7JE-6N-vH6" secondAttribute="leading" id="jmY-Ri-VYQ"/>
-                            <constraint firstItem="7JE-6N-vH6" firstAttribute="trailing" secondItem="EK2-tY-Ire" secondAttribute="trailing" constant="16" id="u5I-yS-cq3"/>
+                            <constraint firstItem="7JE-6N-vH6" firstAttribute="trailing" secondItem="EK2-tY-Ire" secondAttribute="trailing" constant="10" id="u5I-yS-cq3"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="7JE-6N-vH6"/>
                     </view>
                     <connections>
+                        <outlet property="backButton" destination="wvO-yc-hIb" id="D2G-5E-46e"/>
                         <outlet property="webView" destination="VvT-Zr-VFS" id="I82-Ga-AzL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KWq-yb-HiX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2479" y="-1280"/>
+            <point key="canvasLocation" x="-2479.1999999999998" y="-1280.5097451274364"/>
         </scene>
     </scenes>
     <resources>

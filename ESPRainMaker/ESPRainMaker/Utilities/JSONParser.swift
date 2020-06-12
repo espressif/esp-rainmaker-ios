@@ -30,6 +30,8 @@ struct JSONParser {
     /// - Parameters:
     ///   - data: node information in the form of JSON.
     static func parseNodeArray(data: [[String: Any]]) -> [Node]? {
+        var singleDeviceNodeList: [Node] = []
+        var multiDeviceNodeList: [Node] = []
         var nodeList: [Node] = []
         for node_details in data {
             var result: [Device] = []
@@ -88,7 +90,7 @@ struct JSONParser {
                         result.append(newDevice)
                     }
                 }
-                node.devices = result
+                node.devices = result.sorted { $0.name! < $1.name! }
             }
 
             if let statusInfo = node_details["status"] as? [String: Any], let connectivity = statusInfo["connectivity"] as? [String: Any], let status = connectivity["connected"] as? Bool {
@@ -110,11 +112,13 @@ struct JSONParser {
                 }
             }
             if node.devices?.count == 1 {
-                nodeList.insert(node, at: 0)
+                singleDeviceNodeList.append(node)
             } else {
-                nodeList.append(node)
+                multiDeviceNodeList.append(node)
             }
         }
+        nodeList.append(contentsOf: singleDeviceNodeList.sorted { $0.node_id! < $1.node_id! })
+        nodeList.append(contentsOf: multiDeviceNodeList.sorted { $0.node_id! < $1.node_id! })
         if nodeList.isEmpty {
             return nil
         }

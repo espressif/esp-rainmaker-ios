@@ -20,8 +20,19 @@ import ESPProvision
 import Foundation
 import SwiftProtobuf
 
+enum AssociationError: Error {
+    case runtimeError(String)
+
+    var description: String {
+        switch self {
+        case let .runtimeError(message):
+            return message
+        }
+    }
+}
+
 protocol DeviceAssociationProtocol {
-    func deviceAssociationFinishedWith(success: Bool, nodeID: String?)
+    func deviceAssociationFinishedWith(success: Bool, nodeID: String?, error: AssociationError?)
 }
 
 class DeviceAssociation {
@@ -51,16 +62,16 @@ class DeviceAssociation {
             if let data = payloadData {
                 device.sendData(path: Constants.associationPath, data: data) { response, error in
                     guard error == nil, response != nil else {
-                        self.delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil)
+                        self.delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil, error: AssociationError.runtimeError(error!.localizedDescription))
                         return
                     }
                     self.processResponse(responseData: response!)
                 }
             } else {
-                delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil)
+                delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil, error: AssociationError.runtimeError("Unable to fetch request payload."))
             }
         } catch {
-            delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil)
+            delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil, error: AssociationError.runtimeError("Unable to fetch request payload."))
         }
     }
 
@@ -70,16 +81,15 @@ class DeviceAssociation {
     /// - Parameters:
     ///   - responseData: Response recieved from device after sending mapping payload
     func processResponse(responseData: Data) {
-        let decryptedResponse = (device.securityLayer.decrypt(data: responseData))!
         do {
-            let response = try Rainmaker_RMakerConfigPayload(serializedData: decryptedResponse)
+            let response = try Rainmaker_RMakerConfigPayload(serializedData: responseData)
             if response.respSetUserMapping.status == .success {
-                delegate?.deviceAssociationFinishedWith(success: true, nodeID: response.respSetUserMapping.nodeID)
+                delegate?.deviceAssociationFinishedWith(success: true, nodeID: response.respSetUserMapping.nodeID, error: nil)
             } else {
-                delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil)
+                delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil, error: AssociationError.runtimeError("User node mapping failed."))
             }
         } catch {
-            delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil)
+            delegate?.deviceAssociationFinishedWith(success: false, nodeID: nil, error: AssociationError.runtimeError(error.localizedDescription))
         }
     }
 
@@ -93,6 +103,6 @@ class DeviceAssociation {
         var payload = Rainmaker_RMakerConfigPayload()
         payload.msg = Rainmaker_RMakerConfigMsgType.typeCmdSetUserMapping
         payload.cmdSetUserMapping = configRequest
-        return try device.securityLayer.encrypt(data: payload.serializedData())
+        return try payload.serializedData()
     }
 }

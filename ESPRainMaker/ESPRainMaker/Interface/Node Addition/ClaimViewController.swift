@@ -72,7 +72,7 @@ class ClaimViewController: UIViewController {
             case let .failedToConnect(error):
                 DispatchQueue.main.async {
                     let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
-                    self.showAlert(error: error.description, action: action)
+                    self.showAlert(error: error.description + "\nCheck if POP is correct.", action: action)
                 }
             default:
                 DispatchQueue.main.async {

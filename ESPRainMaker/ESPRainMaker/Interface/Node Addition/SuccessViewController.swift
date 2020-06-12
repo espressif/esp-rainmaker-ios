@@ -66,9 +66,20 @@ class SuccessViewController: UIViewController {
         espDevice.provision(ssid: ssid, passPhrase: passphrase) { status in
             switch status {
             case .success:
-                self.step2applyConfigurations()
+                self.step3SendRequestToAddDevice()
             case let .failure(error):
-                self.step1FailedWithMessage(message: error.description)
+                switch error {
+                case .configurationError:
+                    self.step1FailedWithMessage(message: "Failed to apply network configuration to device")
+                case .sessionError:
+                    self.step1FailedWithMessage(message: "Session is not established")
+                case .wifiStatusDisconnected:
+                    self.step3SendRequestToAddDevice()
+                default:
+                    self.step2FailedWithMessage(error: error)
+                }
+            case .configApplied:
+                self.step2applyConfigurations()
             }
         }
     }
@@ -81,19 +92,20 @@ class SuccessViewController: UIViewController {
             self.step2Image.isHidden = true
             self.step2Indicator.isHidden = false
             self.step2Indicator.startAnimating()
-            self.step2Indicator.stopAnimating()
-            self.step2Image.image = UIImage(named: "checkbox_checked")
-            self.step2Image.isHidden = false
-            self.step3SendRequestToAddDevice()
         }
     }
 
     private func step3SendRequestToAddDevice() {
-        step3Image.isHidden = true
-        step3Indicator.isHidden = false
-        step3Indicator.startAnimating()
-        count = 5
-        sendRequestToAddDevice()
+        DispatchQueue.main.async {
+            self.step2Indicator.stopAnimating()
+            self.step2Image.image = UIImage(named: "checkbox_checked")
+            self.step2Image.isHidden = false
+            self.step3Image.isHidden = true
+            self.step3Indicator.isHidden = false
+            self.step3Indicator.startAnimating()
+            self.count = 5
+            self.sendRequestToAddDevice()
+        }
     }
 
     private func step4ConfirmNodeAssociation(requestID: String) {
@@ -150,12 +162,21 @@ class SuccessViewController: UIViewController {
         }
     }
 
-    func step2FailedWithMessage(message: String) {
+    func step2FailedWithMessage(error: ESPProvisionError) {
         DispatchQueue.main.async {
             self.step2Indicator.stopAnimating()
             self.step2Image.image = UIImage(named: "error_icon")
             self.step2Image.isHidden = false
-            self.step2ErrorLabel.text = message
+            var errorMessage = ""
+            switch error {
+            case .wifiStatusUnknownError, .wifiStatusDisconnected, .wifiStatusNetworkNotFound, .wifiStatusAuthenticationError:
+                errorMessage = error.description
+            case .wifiStatusError:
+                errorMessage = "Unable to fetch Wi-Fi state."
+            default:
+                errorMessage = "Unknown error."
+            }
+            self.step2ErrorLabel.text = errorMessage
             self.step2ErrorLabel.isHidden = false
             self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
         }
