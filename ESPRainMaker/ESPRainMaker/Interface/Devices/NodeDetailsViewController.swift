@@ -36,6 +36,11 @@ class NodeDetailsViewController: UIViewController {
         typeLabel.text = currentNode.info?.type ?? ""
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = true
+    }
+
     @IBAction func deleteNode(_: Any) {
         Utility.showLoader(message: "Deleting node", view: view)
         let parameters = ["user_id": User.shared.userInfo.userID, "node_id": currentNode.node_id!, "secret_key": "", "operation": "remove"]

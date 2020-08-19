@@ -167,7 +167,6 @@ class ProvisionLandingViewController: UIViewController {
                 DispatchQueue.main.async {
                     self.checkForAssistedClaiming(device: espDevice)
                 }
-                print("Connected to device")
             default:
                 DispatchQueue.main.async {
                     self.retry(message: "Device could not be connected. Please try again")

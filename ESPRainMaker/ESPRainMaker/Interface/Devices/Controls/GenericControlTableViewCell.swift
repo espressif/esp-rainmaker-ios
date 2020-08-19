@@ -147,6 +147,10 @@ class GenericControlTableViewCell: UITableViewCell {
                 }
                 NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]])
                 controlValueLabel.text = value
+
+                #if SCHEDULE
+                    ESPScheduler.shared.updateDeviceName(for: device.node?.node_id, name: device.name ?? "", deviceName: value)
+                #endif
             }
             attribute?.value = controlValue as Any
         }

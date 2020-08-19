@@ -27,6 +27,8 @@ enum CustomError: Error {
     case emptyToken
     case userIDNotPresent
     case emptyNodeList
+    case success
+    case failure
 }
 
 enum InputValidationError: String {

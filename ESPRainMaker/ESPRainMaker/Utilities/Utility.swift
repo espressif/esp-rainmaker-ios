@@ -20,6 +20,7 @@ import CoreBluetooth
 import Foundation
 import MBProgressHUD
 import Reachability
+import Toast_Swift
 import UIKit
 
 class Utility {
@@ -86,6 +87,12 @@ class Utility {
     class func hideLoader(view: UIView) {
         DispatchQueue.main.async {
             MBProgressHUD.hide(for: view, animated: true)
+        }
+    }
+
+    class func showToastMessage(view: UIView, message: String = "") {
+        DispatchQueue.main.async {
+            view.makeToast(message)
         }
     }
 

@@ -60,7 +60,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             } else {
                 DispatchQueue.main.async {
                     self.retry(message: "Device could not be scanned. Please try again")
-                    print("Failed to scane")
+                    print("Failed to scan")
                 }
             }
         }

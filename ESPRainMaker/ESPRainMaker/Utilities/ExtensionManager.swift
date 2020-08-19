@@ -259,3 +259,15 @@ extension UIView {
         layer.add(rotateAnimation, forKey: nil)
     }
 }
+
+extension UIDatePicker {
+    func setDate(from string: String, format: String, animated: Bool = true) {
+        let formater = DateFormatter()
+
+        formater.dateFormat = format
+
+        let date = formater.date(from: string) ?? Date()
+
+        setDate(date, animated: animated)
+    }
+}

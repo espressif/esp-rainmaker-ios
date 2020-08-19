@@ -50,6 +50,11 @@ class SettingsPageViewController: UIViewController {
         }
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = true
+    }
+
     @IBAction func signOut(_: Any) {
         User.shared.currentUser()?.signOut()
         UserDefaults.standard.removeObject(forKey: Constants.userInfoKey)

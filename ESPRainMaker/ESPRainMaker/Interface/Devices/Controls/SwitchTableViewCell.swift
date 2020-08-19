@@ -23,6 +23,7 @@ class SwitchTableViewCell: UITableViewCell {
     @IBOutlet var controlName: UILabel!
     @IBOutlet var toggleSwitch: UISwitch!
     @IBOutlet var controlStateLabel: UILabel!
+    @IBOutlet var leadingConstraint: NSLayoutConstraint!
 
     var attributeKey = ""
     var param: Param!

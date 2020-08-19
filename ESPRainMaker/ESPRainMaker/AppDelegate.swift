@@ -39,6 +39,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         storyboard = UIStoryboard(name: "Login", bundle: nil)
         User.shared.pool.delegate = self
         VersionManager.shared.checkForAppUpdate()
+        let credentialsProvider = AWSCognitoCredentialsProvider(
+            regionType: AWSRegionType.USEast1,
+            identityPoolId: Keys.current.poolID!
+        )
+        let configuration = AWSServiceConfiguration(
+            region: AWSRegionType.USEast1,
+            credentialsProvider: credentialsProvider
+        )
+        AWSServiceManager.default().defaultServiceConfiguration = configuration
         // Uncomment the next line to see library related logs.
 //        ESPProvisionManager.shared.enableLogs(true)
         return true

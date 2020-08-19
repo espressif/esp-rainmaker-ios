@@ -58,6 +58,7 @@ class DevicesViewController: UIViewController {
         pickerView.layer.cornerRadius = 10.0
         pickerView.layer.borderWidth = 1.0
         pickerView.layer.borderColor = UIColor(hexString: "#F2F1FC").cgColor
+        _ = User.shared.currentUser()
         pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
         if user == nil {
             user = pool?.currentUser()
@@ -74,6 +75,7 @@ class DevicesViewController: UIViewController {
         refreshControl.addTarget(self, action: #selector(refreshDeviceList), for: .valueChanged)
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         collectionView.refreshControl = refreshControl
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -140,6 +142,9 @@ class DevicesViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        #if SCHEDULE
+            tabBarController?.tabBar.isHidden = false
+        #endif
     }
 
     @objc func appEnterForeground() {
@@ -173,29 +178,35 @@ class DevicesViewController: UIViewController {
         if Utility.isConnected(view: view) {
             collectionView.isUserInteractionEnabled = false
             User.shared.updateDeviceList = false
+            #if SCHEDULE
+                ESPScheduler.shared.refreshScheduleList()
+            #endif
             NetworkManager.shared.getNodes { nodes, error in
-                Utility.hideLoader(view: self.view)
-                self.refreshControl.endRefreshing()
-                if error != nil {
-                    self.unhideInitialView(error: error)
-                    return
-                }
-                User.shared.associatedNodeList = nodes
-                if nodes == nil || nodes?.count == 0 {
-                    self.unhideInitialView(error: nil)
-                } else {
-                    self.initialView.isHidden = true
-                    self.collectionView.isHidden = false
-                    self.addButton.isHidden = false
-                    self.singleDeviceNodeCount = 0
-                    for item in User.shared.associatedNodeList! {
-                        if item.devices?.count == 1 {
-                            self.singleDeviceNodeCount += 1
-                        }
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    self.refreshControl.endRefreshing()
+                    User.shared.associatedNodeList = nil
+                    if error != nil {
+                        self.unhideInitialView(error: error)
+                        return
                     }
-                    self.collectionView.reloadData()
+                    User.shared.associatedNodeList = nodes
+                    if nodes == nil || nodes?.count == 0 {
+                        self.unhideInitialView(error: nil)
+                    } else {
+                        self.initialView.isHidden = true
+                        self.collectionView.isHidden = false
+                        self.addButton.isHidden = false
+                        self.singleDeviceNodeCount = 0
+                        for item in User.shared.associatedNodeList! {
+                            if item.devices?.count == 1 {
+                                self.singleDeviceNodeCount += 1
+                            }
+                        }
+                        self.collectionView.reloadData()
+                    }
+                    self.collectionView.isUserInteractionEnabled = true
                 }
-                self.collectionView.isUserInteractionEnabled = true
             }
         } else {
             Utility.hideLoader(view: view)
@@ -209,20 +220,19 @@ class DevicesViewController: UIViewController {
     }
 
     func unhideInitialView(error: ESPNetworkError?) {
-        DispatchQueue.main.async {
-            if error == nil {
-                self.infoLabel.text = "No Device Added"
-                self.emptyListIcon.image = UIImage(named: "no_device_icon")
-                self.infoLabel.textColor = .black
-            } else {
-                self.infoLabel.text = "No devices to show\n" + (error?.description ?? "Something went wrong!!")
-                self.emptyListIcon.image = UIImage(named: "api_error_icon")
-                self.infoLabel.textColor = .red
-            }
-            self.initialView.isHidden = false
-            self.collectionView.isHidden = true
-            self.addButton.isHidden = true
+        if error == nil {
+            infoLabel.text = "No Device Added"
+            emptyListIcon.image = UIImage(named: "no_device_icon")
+            infoLabel.textColor = .black
+        } else {
+            infoLabel.text = "No devices to show\n" + (error?.description ?? "Something went wrong!!")
+            emptyListIcon.image = UIImage(named: "api_error_icon")
+            infoLabel.textColor = .red
         }
+
+        initialView.isHidden = false
+        collectionView.isHidden = true
+        addButton.isHidden = true
     }
 
     func preparePopover(contentController: UIViewController,
@@ -255,6 +265,10 @@ class DevicesViewController: UIViewController {
             index = index + singleDeviceNodeCount - 1
         }
         return User.shared.associatedNodeList![index]
+    }
+
+    override func prepare(for _: UIStoryboardSegue, sender _: Any?) {
+        tabBarController?.tabBar.isHidden = true
     }
 }
 

@@ -26,6 +26,7 @@ class Node {
     var attributes: [Attribute]?
     var isConnected = true
     var timestamp: Int = 0
+    var isSchedulingSupported = false
 }
 
 struct Info {

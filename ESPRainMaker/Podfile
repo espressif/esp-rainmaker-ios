@@ -13,8 +13,9 @@ target 'ESPRainMaker' do
   # Pods for ESPRainMaker
 
   pod 'MBProgressHUD', '~> 1.1.0'
-  pod 'AWSMobileClient', '~> 2.13.4'
+  pod 'AWSMobileClient'
   pod 'Alamofire', '~> 5.0.0'
+  pod 'Toast-Swift'
   pod 'ReachabilitySwift'
   pod 'JWTDecode', '~> 2.4'
   pod 'M13Checkbox'

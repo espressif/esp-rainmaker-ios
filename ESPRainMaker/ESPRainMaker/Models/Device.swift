@@ -25,6 +25,10 @@ class Device {
     var params: [Param]?
     weak var node: Node?
     var primary: String?
+    var collapsed: Bool = true
+    var selectedParams = 0
+    var deviceName = ""
+    var deviceNameParam = ""
 
     func getDeviceName() -> String? {
         if let deviceNameParam = self.params?.first(where: { param -> Bool in
@@ -35,5 +39,18 @@ class Device {
             }
         }
         return name
+    }
+
+    init() {}
+
+    required init(name: String?, type: String?, node: Node?, deviceName: String?) {
+        self.name = name
+        self.type = type
+        self.node = node
+        self.deviceName = deviceName ?? name ?? ""
+    }
+
+    convenience init(device: Device) {
+        self.init(name: device.name, type: device.type, node: device.node, deviceName: device.deviceName)
     }
 }

@@ -49,6 +49,8 @@ struct Constants {
     static let nodeDetailSegue = "nodeDetailSegue"
     static let claimVCIdentifier = "claimVC"
     static let connectVCIdentifier = "connectVC"
+    static let addScheduleSegue = "addScheduleSegue"
+    static let addNewScheduleSegue = "addNewScheduleSegue"
 
     // JSON keys
     static let userID = "user_id"
@@ -120,6 +122,8 @@ struct Constants {
 
     static let uiViewUpdateNotification = "com.espressif.updateuiview"
     static let paramUpdateNotification = "com.espressif.paramUpdate"
+    static let scheduleParamNotification = "com.espressif.scheduleParamNotification"
+    static let scheduleChangeNotification = "com.espressif.scheduleChangeNotification"
 
     // Claim APIs
     static let claimInitPath = Constants.claimBaseURL + "/claim/initiate"
@@ -127,9 +131,14 @@ struct Constants {
 
     static let boolTypeValidValues: [String: Bool] = ["true": true, "false": false, "yes": true, "no": false, "0": false, "1": true]
 
-    static func log(message: String) {
-        print(message)
-    }
+    #if SCHEDULE
+        // Schedule related constants
+        // TODO: Read service/param key from node config.
+        static let scheduleServiceType = "esp.service.schedule"
+        static let scheduleParamType = "esp.param.schedules"
+        static let scheduleKey = "Schedule"
+        static let schedulesKey = "Schedules"
+    #endif
 }
 
 struct Keys {
