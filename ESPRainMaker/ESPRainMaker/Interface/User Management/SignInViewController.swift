@@ -51,7 +51,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
 
     var passwordAuthenticationCompletion: AWSTaskCompletionSource<AWSCognitoIdentityPasswordAuthenticationDetails>?
     var usernameText: String?
-    var auth: AWSCognitoAuth = AWSCognitoAuth.default()
     var session: SFAuthenticationSession!
     var checked = false
 
