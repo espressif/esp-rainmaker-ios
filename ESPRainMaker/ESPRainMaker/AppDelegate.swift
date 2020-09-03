@@ -73,20 +73,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: AWSCognitoIdentityInteractiveAuthenticationDelegate {
     func startPasswordAuthentication() -> AWSCognitoIdentityPasswordAuthentication {
         if navigationController == nil {
-            navigationController = storyboard?.instantiateViewController(withIdentifier: "signInController") as? UINavigationController
+            if !Thread.isMainThread {
+                DispatchQueue.main.sync {
+                    navigationController = storyboard?.instantiateViewController(withIdentifier: "signInController") as? UINavigationController
+                }
+            } else {
+                navigationController = storyboard?.instantiateViewController(withIdentifier: "signInController") as? UINavigationController
+            }
         }
+        if !Thread.isMainThread {
+            DispatchQueue.main.sync {
+                if signInViewController == nil {
+                    signInViewController = navigationController?.viewControllers[0] as? SignInViewController
+                    navigationController?.modalPresentationStyle = .fullScreen
+                }
 
-        if signInViewController == nil {
-            signInViewController = navigationController?.viewControllers[0] as? SignInViewController
-            navigationController?.modalPresentationStyle = .fullScreen
-        }
+                navigationController!.popToRootViewController(animated: true)
+                if !navigationController!.isViewLoaded
+                    || navigationController!.view.window == nil {
+                    window?.rootViewController?.present(navigationController!,
+                                                        animated: true,
+                                                        completion: nil)
+                }
+            }
+        } else {
+            if signInViewController == nil {
+                signInViewController = navigationController?.viewControllers[0] as? SignInViewController
+                navigationController?.modalPresentationStyle = .fullScreen
+            }
 
-        navigationController!.popToRootViewController(animated: true)
-        if !navigationController!.isViewLoaded
-            || navigationController!.view.window == nil {
-            window?.rootViewController?.present(navigationController!,
-                                                animated: true,
-                                                completion: nil)
+            navigationController!.popToRootViewController(animated: true)
+            if !navigationController!.isViewLoaded
+                || navigationController!.view.window == nil {
+                window?.rootViewController?.present(navigationController!,
+                                                    animated: true,
+                                                    completion: nil)
+            }
         }
         return signInViewController!
     }
