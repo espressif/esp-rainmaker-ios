@@ -45,6 +45,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CLAIM_BASE_URL</key>
+	<string>$(CLAIM_BASE_URL)</string>
 	<key>DeviceNamePrefix</key>
 	<string>PROV_</string>
 	<key>LSApplicationQueriesSchemes</key>

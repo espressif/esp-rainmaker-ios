@@ -28,7 +28,6 @@ import UIKit
 class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer?
-    var provisionConfig: [String: String] = [:]
     @IBOutlet var scannerView: UIView!
     @IBOutlet var addManuallyButton: PrimaryButton!
     @IBOutlet var scannerHeading: UILabel!
@@ -71,18 +70,33 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         espDevice.connect(delegate: self) { status in
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
-            }
-            switch status {
-            case .connected:
-                DispatchQueue.main.async {
-                    self.goToProvision(device: espDevice)
-                }
-                print("Connected to device")
-            default:
-                DispatchQueue.main.async {
+                switch status {
+                case .connected:
+                    self.checkForAssistedClaiming(device: espDevice)
+                default:
                     self.retry(message: "Device could not be connected. Please try again")
-                    print("Failed to connect")
                 }
+            }
+        }
+    }
+
+    func checkForAssistedClaiming(device: ESPDevice) {
+        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo["rmaker"] as? NSDictionary, let rmaikerCap = rmaikerInfo["cap"] as? [String], rmaikerCap.contains("claim") {
+            if device.transport == .ble {
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    self.goToClaimVC(device: device)
+                }
+            } else {
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    self.retry(message: "Assisted Claiming not supported for SoftAP. Cannot Proceed.")
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.goToProvision(device: device)
             }
         }
     }
@@ -103,16 +117,18 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         present(alertController, animated: true, completion: nil)
     }
 
+    func goToClaimVC(device: ESPDevice) {
+        let claimVC = storyboard?.instantiateViewController(withIdentifier: Constants.claimVCIdentifier) as! ClaimViewController
+        claimVC.device = device
+        navigationController?.pushViewController(claimVC, animated: true)
+    }
+
     func goToProvision(device: ESPDevice) {
-        DispatchQueue.main.async {
-            Utility.hideLoader(view: self.view)
-            let provisionVC = self.storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
-            provisionVC.connectAutomatically = true
-            provisionVC.isScanFlow = true
-            provisionVC.device = device
-            provisionVC.provisionConfig = self.provisionConfig
-            self.navigationController?.pushViewController(provisionVC, animated: true)
-        }
+        let provisionVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
+        provisionVC.connectAutomatically = true
+        provisionVC.isScanFlow = true
+        provisionVC.device = device
+        navigationController?.pushViewController(provisionVC, animated: true)
     }
 
     /*

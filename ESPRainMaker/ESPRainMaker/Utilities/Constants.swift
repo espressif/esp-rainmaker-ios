@@ -42,11 +42,13 @@ struct Constants {
     static let scanPath = "prov-scan"
     static let sessionPath = "prov-session"
     static let associationPath = "cloud_user_assoc"
+    static let claimPath = "rmaker_claim"
 
     // Segue identifiers
     static let deviceTraitListVCIdentifier = "deviceTrailListVC"
     static let nodeDetailSegue = "nodeDetailSegue"
     static let claimVCIdentifier = "claimVC"
+    static let connectVCIdentifier = "connectVC"
 
     // JSON keys
     static let userID = "user_id"
@@ -74,18 +76,19 @@ struct Constants {
     static let authURL = Bundle.main.infoDictionary!["AUTH_URL"] as? String ?? ""
     static let redirectURL = Bundle.main.infoDictionary!["REDIRECT_URL"] as? String ?? ""
     static let clientID = Bundle.main.infoDictionary!["APP_CLIENT_ID"] as? String ?? ""
+    static let claimBaseURL = Bundle.main.infoDictionary!["CLAIM_BASE_URL"] as? String ?? ""
     static let idProvider = "Github"
 
     // AWS cognito APIs
-    static let addDevice = Constants.baseURL + Constants.apiVersion + "/user/nodes/mapping"
-    static let getUserId = Constants.baseURL + Constants.apiVersion + "/user"
-    static let getNodes = Constants.baseURL + Constants.apiVersion + "/user/nodes"
-    static let getNodeConfig = Constants.baseURL + Constants.apiVersion + "/user/nodes/config"
-    static let getNodeStatus = Constants.baseURL + Constants.apiVersion + "/user/nodes/status"
-    static let checkStatus = Constants.baseURL + Constants.apiVersion + "/user/nodes/mapping"
+    static let addDevice = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping"
+    static let getUserId = Constants.baseURL + "/" + Constants.apiVersion + "/user"
+    static let getNodes = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes"
+    static let getNodeConfig = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/config"
+    static let getNodeStatus = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/status"
+    static let checkStatus = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping"
 
-    static let updateThingsShadow = Constants.baseURL + Constants.apiVersion + "/user/nodes/params"
-    static let getDeviceShadow = Constants.baseURL + Constants.apiVersion + "/user/nodes/params"
+    static let updateThingsShadow = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
+    static let getDeviceShadow = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
 
     // UserDefault keys
     static let newDeviceAdded = Constants.bundleIdentifier + ".newDeviceAdded"
@@ -117,6 +120,10 @@ struct Constants {
 
     static let uiViewUpdateNotification = "com.espressif.updateuiview"
     static let paramUpdateNotification = "com.espressif.paramUpdate"
+
+    // Claim APIs
+    static let claimInitPath = Constants.claimBaseURL + "/claim/initiate"
+    static let claimVerifyPath = Constants.claimBaseURL + "/claim/verify"
 
     static let boolTypeValidValues: [String: Bool] = ["true": true, "false": false, "yes": true, "no": false, "0": false, "1": true]
 

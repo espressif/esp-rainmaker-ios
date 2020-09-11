@@ -28,7 +28,6 @@ class ProvisionViewController: UIViewController {
     @IBOutlet var provisionButton: UIButton!
     @IBOutlet var tableView: UITableView!
 
-    var provisionConfig: [String: String] = [:]
     var activityView: UIActivityIndicatorView?
     var grayView: UIView?
     var wifiDetailList: [ESPWifiNetwork] = []
@@ -108,6 +107,7 @@ class ProvisionViewController: UIViewController {
     }
 
     @IBAction func cancelClicked(_: Any) {
+        device.disconnect()
         navigationController?.popToRootViewController(animated: false)
     }
 

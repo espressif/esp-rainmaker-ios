@@ -29,7 +29,7 @@ class NetworkManager {
         // Validate api calls with server certificate
         let certificate = [NetworkManager.certificate(filename: "amazonRootCA")]
         let trustManager = ServerTrustManager(evaluators: [
-            "api.staging.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-staging.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-prod.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "api.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "auth.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate),
+            "api.staging.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-staging.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-prod.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "api.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "auth.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "esp-claiming.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate),
         ])
         session = Session(serverTrustManager: trustManager)
     }
@@ -309,5 +309,31 @@ class NetworkManager {
             }
             completionHandler(nil)
         }
+    }
+
+    /// Method to make generic authorized request
+    ///
+    /// - Parameters:
+    ///   - url: URL of the api
+    ///   - parameters: Parameter to be included in the api call
+    ///   - completionHandler: Callback invoked after api response is recieved
+    func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, completionHandler: @escaping (Data?) -> Void) {
+        User.shared.getAccessToken(completionHandler: { accessToken in
+            if accessToken != nil {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+                self.session.request(url, method: .post, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseData { response in
+                    switch response.result {
+                    case let .success(value):
+                        completionHandler(value)
+                        return
+                    case .failure:
+                        completionHandler(nil)
+                        return
+                    }
+                }
+            } else {
+                completionHandler(nil)
+            }
+        })
     }
 }

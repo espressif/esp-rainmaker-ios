@@ -22,12 +22,11 @@
 import ESPProvision
 import UIKit
 
-class ClaimViewController: UIViewController {
+class ConnectViewController: UIViewController {
     @IBOutlet var popTextField: UITextField!
     @IBOutlet var headerLabel: UILabel!
     @IBOutlet var nextButton: UIButton!
     var currentWifiSSID = ""
-    var provisionConfig: [String: String] = [:]
     var capabilities: [String]?
     var espDevice: ESPDevice!
     var pop = ""
@@ -68,7 +67,9 @@ class ClaimViewController: UIViewController {
             }
             switch status {
             case .connected:
-                self.goToProvision()
+                DispatchQueue.main.async {
+                    self.checkForAssistedClaiming(device: self.espDevice)
+                }
             case let .failedToConnect(error):
                 DispatchQueue.main.async {
                     let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
@@ -80,6 +81,15 @@ class ClaimViewController: UIViewController {
                     self.showAlert(error: "Device disconnected", action: action)
                 }
             }
+        }
+    }
+
+    func checkForAssistedClaiming(device: ESPDevice) {
+        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo["rmaker"] as? NSDictionary, let rmaikerCap = rmaikerInfo["cap"] as? [String], rmaikerCap.contains("claim") {
+            let action = UIAlertAction(title: "Okay", style: .default, handler: nil)
+            showAlert(error: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", action: action)
+        } else {
+            goToProvision()
         }
     }
 
@@ -103,12 +113,11 @@ class ClaimViewController: UIViewController {
         let destination = segue.destination as! ProvisionViewController
         destination.isScanFlow = false
         destination.pop = popTextField.text ?? ""
-        destination.provisionConfig = provisionConfig
         destination.capabilities = capabilities
     }
 }
 
-extension ClaimViewController: ESPDeviceConnectionDelegate {
+extension ConnectViewController: ESPDeviceConnectionDelegate {
     func getProofOfPossesion(forDevice _: ESPDevice) -> String? {
         return pop
     }

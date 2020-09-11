@@ -247,3 +247,15 @@ extension Int {
         return dataFormatter.string(from: date)
     }
 }
+
+extension UIView {
+    func rotate360Degrees(duration: CFTimeInterval = 6) {
+        let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
+        rotateAnimation.fromValue = 0.0
+        rotateAnimation.toValue = CGFloat(Double.pi * 2)
+        rotateAnimation.isRemovedOnCompletion = false
+        rotateAnimation.duration = duration
+        rotateAnimation.repeatCount = Float.infinity
+        layer.add(rotateAnimation, forKey: nil)
+    }
+}

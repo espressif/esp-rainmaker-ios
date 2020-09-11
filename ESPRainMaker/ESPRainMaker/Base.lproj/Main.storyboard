@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="mgC-Sj-4EB">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="mgC-Sj-4EB">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -239,7 +239,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="55T-vs-eK8" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2318" y="70"/>
+            <point key="canvasLocation" x="3696" y="52"/>
         </scene>
         <!--Espressif-->
         <scene sceneID="vP2-nv-Q6V">
@@ -1053,6 +1053,133 @@
             </objects>
             <point key="canvasLocation" x="-1061" y="996"/>
         </scene>
+        <!--Claim View Controller-->
+        <scene sceneID="S51-XH-WFc">
+            <objects>
+                <viewController storyboardIdentifier="claimVC" id="fQP-XP-0eU" customClass="ClaimViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Dzm-rG-6Tb">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aH7-Tm-l6h" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Claiming" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1SZ-WH-UON" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="174" y="62.5" width="66" height="19.5"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oVj-AG-KT6" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="338" y="47" width="70" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="fl7-KG-qWs"/>
+                                            <constraint firstAttribute="width" constant="70" id="pTM-0T-cTl"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="Cancel">
+                                            <color key="titleColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="backButtonPressed:" destination="WJ1-o6-tnt" eventType="touchUpInside" id="POW-w1-Fjd"/>
+                                            <action selector="backClicked:" destination="Mpb-P7-MIc" eventType="touchUpInside" id="zVb-9u-Ojr"/>
+                                            <action selector="cancelPressed:" destination="fQP-XP-0eU" eventType="touchUpInside" id="ou8-h8-j7X"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="96" id="96R-eQ-BRl"/>
+                                    <constraint firstItem="1SZ-WH-UON" firstAttribute="centerX" secondItem="aH7-Tm-l6h" secondAttribute="centerX" id="DVP-Aa-kxJ"/>
+                                    <constraint firstAttribute="bottom" secondItem="1SZ-WH-UON" secondAttribute="bottom" constant="14" id="XaG-x5-MMw"/>
+                                    <constraint firstAttribute="trailing" secondItem="oVj-AG-KT6" secondAttribute="trailing" constant="6" id="uBk-5S-KUg"/>
+                                    <constraint firstItem="1SZ-WH-UON" firstAttribute="centerY" secondItem="oVj-AG-KT6" secondAttribute="centerY" id="wHb-HP-oga"/>
+                                </constraints>
+                            </view>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1nW-eg-eoR" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                <rect key="frame" x="32" y="716" width="350" height="56"/>
+                                <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="350" id="aLu-gm-GTg"/>
+                                    <constraint firstAttribute="height" constant="56" id="w4U-aA-t8v"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <inset key="imageEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal" title="Ok">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="doneButtonPressed:" destination="fQP-XP-0eU" eventType="touchUpInside" id="6J1-cs-pwf"/>
+                                    <action selector="goToFirstView:" destination="kI4-hk-B8X" eventType="touchUpInside" id="I5Q-Xf-KKB"/>
+                                </connections>
+                            </button>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Claiming failed. Please reboot the device and restart provisioning." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3jR-GZ-T23">
+                                <rect key="frame" x="32" y="665" width="350" height="41"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Claiming in progress ..." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Jj-wB-BuT">
+                                <rect key="frame" x="32" y="494.5" width="350" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Claim Init failed" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RXe-4f-eJx">
+                                <rect key="frame" x="32" y="525" width="350" height="18"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
+                                <color key="textColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="claimIcon" translatesAutoresizingMaskIntoConstraints="NO" id="t6B-j1-JjW">
+                                <rect key="frame" x="147" y="349.5" width="120" height="120"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="120" id="5gg-YV-8Sp"/>
+                                    <constraint firstAttribute="height" constant="120" id="ndW-Tv-y5f"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="3Jj-wB-BuT" firstAttribute="top" secondItem="t6B-j1-JjW" secondAttribute="bottom" constant="25" id="29s-su-QfX"/>
+                            <constraint firstItem="1nW-eg-eoR" firstAttribute="top" secondItem="3jR-GZ-T23" secondAttribute="bottom" constant="10" id="2ck-DB-2tm"/>
+                            <constraint firstItem="x4H-aS-XTh" firstAttribute="trailing" secondItem="1nW-eg-eoR" secondAttribute="trailing" constant="32" id="50u-UU-YXi"/>
+                            <constraint firstItem="RXe-4f-eJx" firstAttribute="leading" secondItem="x4H-aS-XTh" secondAttribute="leading" constant="32" id="BKw-Hl-deI"/>
+                            <constraint firstItem="x4H-aS-XTh" firstAttribute="trailing" secondItem="RXe-4f-eJx" secondAttribute="trailing" constant="32" id="DLG-MZ-pvD"/>
+                            <constraint firstItem="1nW-eg-eoR" firstAttribute="leading" secondItem="x4H-aS-XTh" secondAttribute="leading" constant="32" id="GRj-ok-i4N"/>
+                            <constraint firstItem="RXe-4f-eJx" firstAttribute="top" secondItem="3Jj-wB-BuT" secondAttribute="bottom" constant="10" id="Qbq-EU-tdw"/>
+                            <constraint firstItem="aH7-Tm-l6h" firstAttribute="trailing" secondItem="x4H-aS-XTh" secondAttribute="trailing" id="Tns-Xh-Az1"/>
+                            <constraint firstItem="3jR-GZ-T23" firstAttribute="top" secondItem="3Jj-wB-BuT" secondAttribute="bottom" constant="150" id="XGq-Ka-t1X"/>
+                            <constraint firstItem="1nW-eg-eoR" firstAttribute="leading" secondItem="3jR-GZ-T23" secondAttribute="leading" id="aUZ-TF-lTa"/>
+                            <constraint firstItem="x4H-aS-XTh" firstAttribute="trailing" secondItem="3Jj-wB-BuT" secondAttribute="trailing" constant="32" id="bUo-e7-hgN"/>
+                            <constraint firstItem="x4H-aS-XTh" firstAttribute="bottom" secondItem="1nW-eg-eoR" secondAttribute="bottom" constant="90" id="gE0-OL-xAH"/>
+                            <constraint firstItem="aH7-Tm-l6h" firstAttribute="height" secondItem="Dzm-rG-6Tb" secondAttribute="height" multiplier="0.107" priority="999" id="lDI-oT-KBx"/>
+                            <constraint firstItem="aH7-Tm-l6h" firstAttribute="leading" secondItem="x4H-aS-XTh" secondAttribute="leading" id="pLL-Fi-CGe"/>
+                            <constraint firstItem="aH7-Tm-l6h" firstAttribute="top" secondItem="Dzm-rG-6Tb" secondAttribute="top" id="q38-tf-NSn"/>
+                            <constraint firstItem="t6B-j1-JjW" firstAttribute="centerX" secondItem="Dzm-rG-6Tb" secondAttribute="centerX" id="sPA-Rb-Dr0"/>
+                            <constraint firstItem="3Jj-wB-BuT" firstAttribute="leading" secondItem="x4H-aS-XTh" secondAttribute="leading" constant="32" id="tWF-Kn-WX5"/>
+                            <constraint firstItem="1nW-eg-eoR" firstAttribute="trailing" secondItem="3jR-GZ-T23" secondAttribute="trailing" id="vSb-uP-iII"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="x4H-aS-XTh"/>
+                    </view>
+                    <connections>
+                        <outlet property="cancelButton" destination="oVj-AG-KT6" id="npL-hg-YPI"/>
+                        <outlet property="centralIcon" destination="t6B-j1-JjW" id="XnG-zT-osu"/>
+                        <outlet property="failureLabel" destination="RXe-4f-eJx" id="aPM-Tb-7es"/>
+                        <outlet property="okButton" destination="1nW-eg-eoR" id="EAW-78-ZQZ"/>
+                        <outlet property="progressIndicator" destination="3Jj-wB-BuT" id="oIl-Xd-DLb"/>
+                        <outlet property="statusLabel" destination="3jR-GZ-T23" id="Gdr-JM-yLd"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iaH-BB-Vu1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1338" y="40"/>
+        </scene>
         <!--Provision-->
         <scene sceneID="2ha-RX-ZtH">
             <objects>
@@ -1193,8 +1320,8 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lW2-FA-tWT" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="338" y="40" width="60" height="40"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lW2-FA-tWT" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="338" y="52" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="v4J-KF-djX"/>
                                             <constraint firstAttribute="width" constant="60" id="vb1-Rm-cHD"/>
@@ -1214,9 +1341,8 @@
                                     <constraint firstItem="8cR-TX-8uW" firstAttribute="centerX" secondItem="BWq-JL-gi6" secondAttribute="centerX" id="6uh-ii-xb7"/>
                                     <constraint firstAttribute="bottom" secondItem="8cR-TX-8uW" secondAttribute="bottom" constant="14" id="EjW-Jc-Ej6"/>
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="96" id="NQm-7b-Vni"/>
+                                    <constraint firstItem="lW2-FA-tWT" firstAttribute="centerY" secondItem="8cR-TX-8uW" secondAttribute="centerY" id="gB1-H7-DsB"/>
                                     <constraint firstAttribute="trailing" secondItem="lW2-FA-tWT" secondAttribute="trailing" constant="16" id="rSB-P6-00y"/>
-                                    <constraint firstAttribute="bottom" secondItem="lW2-FA-tWT" secondAttribute="bottom" constant="16" id="s5f-rq-H8e"/>
-                                    <constraint firstItem="lW2-FA-tWT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="8cR-TX-8uW" secondAttribute="trailing" constant="8" symbolic="YES" id="zvm-1x-JsX"/>
                                 </constraints>
                             </view>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qYF-JW-4bB">
@@ -1305,7 +1431,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1398" y="52"/>
+            <point key="canvasLocation" x="2571" y="52"/>
         </scene>
         <!--Espressif-->
         <scene sceneID="7GO-57-yej">
@@ -1588,7 +1714,7 @@ Connect your mobile phone to the Wi-Fi network with a name like PROV_XXXXXX</str
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <inset key="imageEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="Connect" image="right_arrow">
+                                <state key="normal" title="Connect">
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
@@ -1638,10 +1764,10 @@ Connect your mobile phone to the Wi-Fi network with a name like PROV_XXXXXX</str
             </objects>
             <point key="canvasLocation" x="1467" y="-877"/>
         </scene>
-        <!--Claim View Controller-->
+        <!--Connect View Controller-->
         <scene sceneID="Qqi-j1-iNj">
             <objects>
-                <viewController storyboardIdentifier="claimVC" id="zSA-RH-jsX" customClass="ClaimViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="connectVC" id="zSA-RH-jsX" customClass="ConnectViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="oXz-g7-dtA">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1698,7 +1824,7 @@ PROV_XXXX</string>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3wc-0X-oGh">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3wc-0X-oGh" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="32" y="253.5" width="350" height="56"/>
                                 <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -1707,7 +1833,7 @@ PROV_XXXX</string>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <inset key="imageEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="Next" image="right_arrow">
+                                <state key="normal" title="Next">
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
@@ -2288,8 +2414,8 @@ PROV_XXXX</string>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nWm-Ki-gaO" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="338" y="40" width="60" height="40"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nWm-Ki-gaO" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="338" y="52" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="A3x-vg-2m3"/>
                                             <constraint firstAttribute="height" constant="40" id="tMb-gL-rP3"/>
@@ -2307,8 +2433,8 @@ PROV_XXXX</string>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="Ny5-uF-did" secondAttribute="bottom" constant="14" id="KNr-qs-IcY"/>
                                     <constraint firstItem="Ny5-uF-did" firstAttribute="centerX" secondItem="jMD-Of-QSn" secondAttribute="centerX" id="Txq-gx-Clb"/>
+                                    <constraint firstItem="nWm-Ki-gaO" firstAttribute="centerY" secondItem="Ny5-uF-did" secondAttribute="centerY" id="opy-Da-K9U"/>
                                     <constraint firstAttribute="trailing" secondItem="nWm-Ki-gaO" secondAttribute="trailing" constant="16" id="rwD-GA-XPd"/>
-                                    <constraint firstAttribute="bottom" secondItem="nWm-Ki-gaO" secondAttribute="bottom" constant="16" id="w8T-ys-WZg"/>
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="96" id="ych-TG-byC"/>
                                 </constraints>
                             </view>
@@ -2395,6 +2521,7 @@ PROV_XXXX</string>
         <image name="add_icon" width="36" height="36"/>
         <image name="bluetooth_icon" width="128" height="128"/>
         <image name="checkbox_unchecked" width="24" height="24"/>
+        <image name="claimIcon" width="128" height="128"/>
         <image name="cross_icon" width="14" height="14"/>
         <image name="dummy_device_icon" width="48" height="48"/>
         <image name="dummy_profile_image" width="36" height="36"/>
@@ -2402,7 +2529,6 @@ PROV_XXXX</string>
         <image name="no_device_icon" width="98" height="100"/>
         <image name="provision_icon" width="100" height="92"/>
         <image name="refresh_icon" width="128" height="128"/>
-        <image name="right_arrow" width="16" height="16"/>
         <image name="status_icon" width="100" height="90"/>
         <image name="switch_icon_enabled_on" width="32" height="32"/>
         <image name="wifi_symbol_weak" width="18" height="14"/>

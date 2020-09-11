@@ -23,7 +23,6 @@ import SystemConfiguration.CaptiveNetwork
 import UIKit
 
 class ProvisionLandingViewController: UIViewController {
-    var provisionConfig: [String: String] = [:]
     var deviceList: [Node]?
     var deviceStatusTimer: Timer?
     var task: URLSessionDataTask?
@@ -99,7 +98,7 @@ class ProvisionLandingViewController: UIViewController {
                     }
                     if self.deviceStatusTimer!.isValid {
                         self.deviceStatusTimer?.invalidate()
-                        self.goToClaimVC(ssid: self.verifyConnection() ?? "")
+                        self.goToConnectVC(ssid: self.verifyConnection() ?? "")
                     }
                 } else {
                     Utility.hideLoader(view: self.view)
@@ -166,7 +165,7 @@ class ProvisionLandingViewController: UIViewController {
             switch status {
             case .connected:
                 DispatchQueue.main.async {
-                    self.goToProvision(device: espDevice)
+                    self.checkForAssistedClaiming(device: espDevice)
                 }
                 print("Connected to device")
             default:
@@ -184,27 +183,27 @@ class ProvisionLandingViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
 
-    func goToClaimVC(ssid: String) {
-        let claimVC = storyboard?.instantiateViewController(withIdentifier: Constants.claimVCIdentifier) as! ClaimViewController
-        claimVC.provisionConfig = provisionConfig
-        claimVC.currentWifiSSID = ssid
-        claimVC.capabilities = capabilities
-        navigationController?.pushViewController(claimVC, animated: true)
+    func goToConnectVC(ssid: String) {
+        let connectVC = storyboard?.instantiateViewController(withIdentifier: Constants.connectVCIdentifier) as! ConnectViewController
+        connectVC.currentWifiSSID = ssid
+        connectVC.capabilities = capabilities
+        navigationController?.pushViewController(connectVC, animated: true)
+    }
+
+    func checkForAssistedClaiming(device: ESPDevice) {
+        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo["rmaker"] as? NSDictionary, let rmaikerCap = rmaikerInfo["cap"] as? [String], rmaikerCap.contains("claim") {
+            retry(message: "Assisted Claiming not supported for SoftAP. Cannot Proceed.")
+        } else {
+            goToProvision(device: device)
+        }
     }
 
     func goToProvision(device: ESPDevice) {
         let provVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
         provVC.isScanFlow = false
-        provVC.provisionConfig = provisionConfig
         provVC.device = device
         provVC.capabilities = capabilities
         navigationController?.pushViewController(provVC, animated: true)
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
-        if let vc = segue.destination as? ProvisionViewController {
-            vc.provisionConfig = provisionConfig
-        }
     }
 
     func attributedString(from string: String, nonBoldRange: NSRange?) -> NSAttributedString {
