@@ -199,7 +199,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
 
     func loginWith(idProvider: String) {
         let currentKeys = Keys.current
-        let loginURL = Constants.authURL + "authorize" + "?identity_provider=" + idProvider + "&redirect_uri=" + Constants.redirectURL + "&response_type=CODE&client_id="
+        let loginURL = Constants.authURL + "/authorize" + "?identity_provider=" + idProvider + "&redirect_uri=" + Constants.redirectURL + "&response_type=CODE&client_id="
         session = SFAuthenticationSession(url: URL(string: loginURL + currentKeys.clientID!)!, callbackURLScheme: Constants.redirectURL) { url, error in
             if error != nil {
                 return
@@ -228,7 +228,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     }
 
     func requestToken(code: String) {
-        let url = Constants.authURL + "token"
+        let url = Constants.authURL + "/token"
         let currentKeys = Keys.current
         let parameters = ["grant_type": "authorization_code", "client_id": currentKeys.clientID!, "code": code, "redirect_uri": Constants.redirectURL]
         let headers: HTTPHeaders = ["Content-Type": "application/x-www-form-urlencoded"]

@@ -94,7 +94,7 @@ class User {
                 if Int(difference) > expire {
                     let parameter = ["user_name": User.shared.userInfo.username, "refreshtoken": refreshTokenInfo["token"] as! String]
                     let header: HTTPHeaders = ["Content-Type": "application/json"]
-                    let url = Constants.baseURL + Constants.apiVersion + "/login"
+                    let url = Constants.baseURL + "/" + Constants.apiVersion + "/login"
                     NetworkManager.shared.genericRequest(url: url, method: .post, parameters: parameter, encoding: JSONEncoding.default, headers: header) { response in
                         if let json = response {
                             if let accessToken = json["accesstoken"] as? String {
