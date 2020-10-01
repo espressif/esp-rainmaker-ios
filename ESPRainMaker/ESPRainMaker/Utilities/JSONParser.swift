@@ -33,6 +33,11 @@ struct JSONParser {
         var singleDeviceNodeList: [Node] = []
         var multiDeviceNodeList: [Node] = []
         var nodeList: [Node] = []
+
+        #if SCHEDULE
+            ESPScheduler.shared.refreshScheduleList()
+        #endif
+
         for node_details in data {
             var result: [Device] = []
             // Saving node related information
@@ -40,6 +45,21 @@ struct JSONParser {
             node.node_id = node_details["id"] as? String
 
             if let config = node_details["config"] as? [String: Any] {
+                #if SCHEDULE
+                    // Check whether scheduling is supported in the node
+                    if let services = config["services"] as? [[String: Any]] {
+                        for service in services {
+                            if let type = service["type"] as? String, type == Constants.scheduleServiceType, let params = service["params"] as? [[String: Any]] {
+                                for param in params {
+                                    if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
+                                        node.isSchedulingSupported = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                #endif
+
                 if let nodeInfo = config["info"] as? [String: String] {
                     node.info = Info(name: nodeInfo["name"], fw_version: nodeInfo["fw_version"], type: nodeInfo["type"])
                 }
@@ -61,6 +81,7 @@ struct JSONParser {
                         newDevice.type = item["type"] as? String
                         newDevice.primary = item["primary"] as? String
                         newDevice.node = node
+
                         if let dynamicParams = item["params"] as? [[String: Any]] {
                             newDevice.params = []
                             for attr in dynamicParams {
@@ -75,9 +96,17 @@ struct JSONParser {
                                 dynamicAttr.properties = attr["properties"] as? [String]
                                 dynamicAttr.bounds = attr["bounds"] as? [String: Any]
                                 dynamicAttr.type = attr["type"] as? String
+
+                                if dynamicAttr.properties?.contains("write") ?? false {
+                                    if dynamicAttr.type != Constants.deviceNameParam {
+                                        dynamicAttr.canBeScheduled = true
+                                    }
+                                }
+
                                 newDevice.params?.append(dynamicAttr)
                             }
                         }
+
                         if let staticParams = item["attributes"] as? [[String: Any]] {
                             newDevice.attributes = []
                             for attr in staticParams {
@@ -101,15 +130,27 @@ struct JSONParser {
             if let paramInfo = node_details["params"] as? [String: Any], let devices = node.devices {
                 for device in devices {
                     if let deviceName = device.name, let attributes = paramInfo[deviceName] as? [String: Any] {
+                        device.deviceName = deviceName
                         if let params = device.params {
                             for index in params.indices {
                                 if let reportedValue = attributes[params[index].name ?? ""] {
+                                    if params[index].type == Constants.deviceNameParam {
+                                        device.deviceName = reportedValue as? String ?? deviceName
+                                    }
                                     params[index].value = reportedValue
                                 }
                             }
                         }
                     }
                 }
+
+                #if SCHEDULE
+                    if let schedule = paramInfo[Constants.scheduleKey] as? [String: Any], let schedules = schedule[Constants.schedulesKey] as? [[String: Any]] {
+                        for scheduleJSON in schedules {
+                            ESPScheduler.shared.saveScheduleListFromJSON(nodeID: node.node_id ?? "", scheduleJSON: scheduleJSON)
+                        }
+                    }
+                #endif
             }
             if node.devices?.count == 1 {
                 singleDeviceNodeList.append(node)
@@ -122,6 +163,10 @@ struct JSONParser {
         if nodeList.isEmpty {
             return nil
         }
+        #if SCHEDULE
+            ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+        #endif
+
         return nodeList
     }
 }

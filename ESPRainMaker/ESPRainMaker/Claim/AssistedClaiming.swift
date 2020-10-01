@@ -158,7 +158,6 @@ class AssistedClaiming {
     private func sendCSRToAPI(completionHandler: @escaping (Bool, String?) -> Void) {
         do {
             let response = try JSONSerialization.jsonObject(with: csrData, options: .allowFragments) as? [String: String] ?? [:]
-            print(response.description)
             NetworkManager.shared.genericAuthorizedDataRequest(url: Constants.claimVerifyPath, parameter: response) { data in
                 if data == nil {
                     completionHandler(false, ClaimError.initClaimFailed.rawValue)

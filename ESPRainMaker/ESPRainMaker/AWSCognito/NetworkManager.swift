@@ -62,7 +62,8 @@ class NetworkManager {
                     case let .success(value):
                         if let json = value as? [String: Any] {
                             if let nodeArray = json["node_details"] as? [[String: Any]] {
-                                completionHandler(JSONParser.parseNodeArray(data: nodeArray), nil)
+                                let nodes = JSONParser.parseNodeArray(data: nodeArray)
+                                completionHandler(nodes, nil)
                                 return
                             } else if let status = json["status"] as? String, let description = json["description"] as? String {
                                 if status == "failure" {
@@ -236,7 +237,7 @@ class NetworkManager {
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
     ///   - completionHandler: handler called when response to updateThingShadow is recieved
-    func updateThingShadow(nodeID: String?, parameter: [String: Any]) {
+    func updateThingShadow(nodeID: String?, parameter: [String: Any], completionHandler: ((CustomError) -> Void)? = nil) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if let nodeid = nodeID {
             User.shared.getAccessToken(completionHandler: { idToken in
@@ -245,10 +246,20 @@ class NetworkManager {
                     let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": idToken!]
                     self.session.request(url, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                         switch response.result {
-                        case .success:
+                        case let .success(value):
+                            if let json = value as? [String: Any] {
+                                if let status = json["status"] as? String {
+                                    if status == "success" {
+                                        completionHandler?(.success)
+                                        return
+                                    }
+                                }
+                                completionHandler?(.failure)
+                            }
                             return
                         case let .failure(error):
                             print(error)
+                            completionHandler?(.failure)
                         }
                     }
                 } else {}

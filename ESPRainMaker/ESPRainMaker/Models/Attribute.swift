@@ -30,4 +30,22 @@ class Param: Attribute {
     var attributeKey: String?
     var dataType: String?
     var type: String?
+    var selected = false
+    var canBeScheduled = false
+
+    override init() {}
+
+    init(param: Param) {
+        super.init()
+        name = param.name
+        value = param.value
+        uiType = param.uiType
+        properties = param.properties
+        bounds = param.bounds
+        attributeKey = param.attributeKey
+        dataType = param.dataType
+        type = param.type
+        selected = param.selected
+        canBeScheduled = param.canBeScheduled
+    }
 }
