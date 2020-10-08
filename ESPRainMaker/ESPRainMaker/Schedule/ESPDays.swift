@@ -33,10 +33,14 @@
     /// LSB is Monday. [ N/A | Sunday | Saturday | Friday | Tuesday | Wednesday | Tuesday | Monday ].
     /// Eg. 0b00011111 (31) means all weekdays. A value of zero means trigger just once.
     /// ESPWeek class provide properties and methods to do these conversion.
-    class ESPWeek {
+    class ESPWeek: Codable {
         let daysInWeek: [ESPDay] = [ESPDay(day: "Monday"), ESPDay(day: "Tuesday"), ESPDay(day: "Wednesday"), ESPDay(day: "Thursday"), ESPDay(day: "Friday"), ESPDay(day: "Saturday"), ESPDay(day: "Sunday")]
 
         init(number: Int) {
+            configureWeek(number: number)
+        }
+
+        func configureWeek(number: Int) {
             let binaryString = String(number, radix: 2)
             let paddedString = pad(string: binaryString, toSize: 8)
             // Reverse the 8 bit converted string to match with the position of days.
@@ -49,6 +53,21 @@
                     daysInWeek[i].selected = false
                 }
             }
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case week
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(getDecimalConversionOfSelectedDays(), forKey: .week)
+        }
+
+        required init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let weekInInt = try container.decodeIfPresent(Int.self, forKey: .week) ?? 0
+            configureWeek(number: weekInInt)
         }
 
         /// Method to convert the selected days into integer.

@@ -19,7 +19,12 @@
 import MBProgressHUD
 import UIKit
 
-class GenericSliderTableViewCell: UITableViewCell {
+///  Protocol to update listeners about failure in updating params
+protocol ParamUpdateProtocol {
+    func failureInUpdatingParam()
+}
+
+class GenericSliderTableViewCell: UITableViewCell, ParamUpdateProtocol {
     @IBOutlet var slider: UISlider!
     @IBOutlet var minLabel: UILabel!
     @IBOutlet var maxLabel: UILabel!
@@ -30,6 +35,7 @@ class GenericSliderTableViewCell: UITableViewCell {
     var device: Device!
     var dataType: String!
     var sliderValue = ""
+    var delegate: ParamUpdateProtocol?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -56,14 +62,38 @@ class GenericSliderTableViewCell: UITableViewCell {
     }
 
     @IBAction func sliderValueChanged(_ sender: UISlider) {
-        if Utility.isConnected(view: parentViewController!.view) {
-            if dataType.lowercased() == "int" {
-                sliderValue = paramName + ": \(Int(slider.value))"
-                NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]])
-            } else {
-                sliderValue = paramName + ": \(slider.value)"
-                NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: sender.value]])
+        if dataType.lowercased() == "int" {
+            sliderValue = paramName + ": \(Int(slider.value))"
+            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]]) { result in
+                switch result {
+                case .failure:
+                    self.failureInUpdatingParam()
+                default:
+                    break
+                }
+            }
+            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]]) { result in
+                switch result {
+                case .failure:
+                    self.failureInUpdatingParam()
+                default:
+                    break
+                }
+            }
+        } else {
+            sliderValue = paramName + ": \(slider.value)"
+            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: sender.value]]) { result in
+                switch result {
+                case .failure:
+                    self.failureInUpdatingParam()
+                default:
+                    break
+                }
             }
         }
+    }
+
+    func failureInUpdatingParam() {
+        delegate?.failureInUpdatingParam()
     }
 }

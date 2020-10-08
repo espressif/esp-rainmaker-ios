@@ -27,6 +27,7 @@
         @IBOutlet var editButton: BarButton!
         @IBOutlet var addScheduleButton: PrimaryButton!
         @IBOutlet var initialLabel: UILabel!
+        @IBOutlet var networkIndicator: UIView!
 
         private let refreshControl = UIRefreshControl()
         var scheduleList: [String] = []
@@ -49,21 +50,43 @@
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
             tabBarController?.tabBar.isHidden = false
+        }
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
             tableView.isEditing = false
             editButton.setTitle("Edit", for: .normal)
             // Show UI based on scheudle list count
             if User.shared.updateDeviceList {
                 User.shared.updateDeviceList = false
+                Utility.showLoader(message: "", view: view)
                 refreshScheduleList(self)
             } else {
                 showScheduleList()
             }
+            checkNetworkUpdate()
+            NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        }
+
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillDisappear(animated)
+            NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.networkUpdateNotification), object: nil)
         }
 
         override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
             if segue.identifier == Constants.addScheduleSegue || segue.identifier == Constants.addNewScheduleSegue {
                 ESPScheduler.shared.addSchedule()
                 ESPScheduler.shared.configureDeviceForCurrentSchedule()
+            }
+        }
+
+        @objc func checkNetworkUpdate() {
+            DispatchQueue.main.async {
+                if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                    self.networkIndicator.isHidden = true
+                } else {
+                    self.networkIndicator.isHidden = false
+                }
             }
         }
 
@@ -79,21 +102,19 @@
         }
 
         @IBAction func refreshScheduleList(_: Any) {
-            if Utility.isConnected(view: view) {
-                Utility.showLoader(message: "", view: view)
-                view.isUserInteractionEnabled = false
-                NetworkManager.shared.getNodes { nodes, _ in
+            refreshControl.endRefreshing()
+            NetworkManager.shared.getNodes { nodes, error in
+                Utility.hideLoader(view: self.view)
+                if error != nil {
+                    DispatchQueue.main.async {
+                        Utility.showToastMessage(view: self.view, message: "Network error: \(error?.description ?? "Something went wrong!!")")
+                    }
+                } else {
                     User.shared.associatedNodeList = nodes
                     DispatchQueue.main.async {
                         self.showScheduleList()
-                        Utility.hideLoader(view: self.view)
-                        self.view.isUserInteractionEnabled = true
                         self.refreshControl.endRefreshing()
                     }
-                }
-            } else {
-                DispatchQueue.main.async {
-                    self.refreshControl.endRefreshing()
                 }
             }
         }
@@ -159,6 +180,7 @@
                     DispatchQueue.main.async {
                         ESPScheduler.shared.deleteScheduleAt(key: self.scheduleList[indexPath.section], onView: self.view) { result in
                             if result {
+                                Utility.showLoader(message: "", view: self.view)
                                 self.refreshScheduleList(self)
                             }
                         }

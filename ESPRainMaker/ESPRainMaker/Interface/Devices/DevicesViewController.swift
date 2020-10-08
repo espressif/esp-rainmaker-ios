@@ -22,16 +22,16 @@ import AWSCognitoIdentityProvider
 import Foundation
 import JWTDecode
 import MBProgressHUD
-import Reachability
 import UIKit
 
 class DevicesViewController: UIViewController {
     @IBOutlet var collectionView: UICollectionView!
     @IBOutlet var addButton: UIButton!
     @IBOutlet var initialView: UIView!
-    @IBOutlet var pickerView: UIView!
     @IBOutlet var emptyListIcon: UIImageView!
     @IBOutlet var infoLabel: UILabel!
+    @IBOutlet var networkIndicator: UIView!
+    @IBOutlet var loadingIndicator: SpinnerView!
 
 //    var currentNode: Node!
     let controlStoryBoard = UIStoryboard(name: "DeviceDetail", bundle: nil)
@@ -41,7 +41,6 @@ class DevicesViewController: UIViewController {
     private let baseUrl = Bundle.main.infoDictionary?["WifiBaseUrl"] as! String
     private let networkNamePrefix = Bundle.main.infoDictionary?["WifiNetworkNamePrefix"] as! String
 
-    var response: AWSCognitoIdentityUserGetDetailsResponse?
     var user: AWSCognitoIdentityUser?
     var pool: AWSCognitoIdentityUserPool?
     var checkDeviceAssociation = false
@@ -50,69 +49,51 @@ class DevicesViewController: UIViewController {
     var singleDeviceNodeCount = 0
     var flag = false
 
-    let reachability = try! Reachability()
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        pickerView.layer.cornerRadius = 10.0
-        pickerView.layer.borderWidth = 1.0
-        pickerView.layer.borderColor = UIColor(hexString: "#F2F1FC").cgColor
         _ = User.shared.currentUser()
         pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
         if user == nil {
             user = pool?.currentUser()
         }
-        if let userInfo = UserDefaults.standard.value(forKey: Constants.userInfoKey) as? [String: Any] {
-            Utility.showLoader(message: "Fetching Device List", view: view)
+
+        if (UserDefaults.standard.value(forKey: Constants.userInfoKey) as? [String: Any]) != nil {
+            collectionView.isUserInteractionEnabled = false
+            collectionView.isHidden = false
+            User.shared.associatedNodeList = ESPLocalStorage.shared.fetchNodeDetails()
             refreshDeviceList()
         } else {
             refresh()
         }
 
-        NotificationCenter.default.addObserver(self, selector: #selector(refreshDeviceList), name: Notification.Name(Constants.newDeviceAdded), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateUIView), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
+
         refreshControl.addTarget(self, action: #selector(refreshDeviceList), for: .valueChanged)
-        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl.tintColor = .clear
         collectionView.refreshControl = refreshControl
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        do {
-            try reachability.startNotifier()
-        } catch {
-            print("could not start reachability notifier")
-        }
-        singleDeviceNodeCount = 0
-        if let nodeList = User.shared.associatedNodeList {
-            for item in nodeList {
-                if item.devices?.count == 1 {
-                    singleDeviceNodeCount += 1
-                }
-            }
-        }
+
+        checkNetworkUpdate()
+        getSingleDeviceNodeCount()
         collectionView.reloadData()
+
         if User.shared.updateUserInfo {
-            Utility.showLoader(message: "Fetching Device List", view: view)
             User.shared.updateUserInfo = false
-            User.shared.getcognitoIdToken { idToken in
-                if idToken != nil {
-                    self.getUserInfo(token: idToken!, provider: .cognito)
-                } else {
-                    Utility.hideLoader(view: self.view)
-                }
+            updateUserInfo()
+        }
+
+        if (UserDefaults.standard.value(forKey: Constants.userInfoKey) as? [String: Any]) != nil {
+            if User.shared.updateDeviceList {
+                refreshDeviceList()
             }
-        } else if User.shared.updateDeviceList {
-            Utility.showLoader(message: "Fetching Device List", view: view)
-            refreshDeviceList()
         }
-        if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
-            initialView.isHidden = false
-            collectionView.isHidden = true
-            addButton.isHidden = true
-        }
+
+        setViewForNoNodes()
         flag = false
     }
 
@@ -130,12 +111,23 @@ class DevicesViewController: UIViewController {
         refreshDeviceList()
     }
 
+    func setViewForNoNodes() {
+        if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
+            infoLabel.text = "No Device Added"
+            emptyListIcon.image = UIImage(named: "no_device_icon")
+            infoLabel.textColor = .black
+            initialView.isHidden = false
+            collectionView.isHidden = true
+            addButton.isHidden = true
+        }
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        reachability.stopNotifier()
-        pickerView.isHidden = true
         addButton.setImage(UIImage(named: "add_icon"), for: .normal)
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -145,27 +137,57 @@ class DevicesViewController: UIViewController {
         #if SCHEDULE
             tabBarController?.tabBar.isHidden = false
         #endif
+
+        NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(localNetworkUpdate), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
     }
 
     @objc func appEnterForeground() {
-        Utility.showLoader(message: "Fetching Device List", view: view)
         refreshDeviceList()
     }
 
+    @objc func checkNetworkUpdate() {
+        DispatchQueue.main.async {
+            if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                self.networkIndicator.isHidden = true
+            } else {
+                self.networkIndicator.isHidden = false
+            }
+        }
+    }
+
+    @objc func localNetworkUpdate() {
+        getSingleDeviceNodeCount()
+        collectionView.reloadData()
+    }
+
     func refresh() {
-        user?.getDetails().continueOnSuccessWith { (task) -> AnyObject? in
+        user?.getDetails().continueOnSuccessWith { (_) -> AnyObject? in
             DispatchQueue.main.async {
-                self.response = task.result
+                self.updateUserInfo()
             }
             return nil
         }
     }
 
-    @IBAction func refreshClicked(_: Any) {
-        if Utility.isConnected(view: view) {
-            Utility.showLoader(message: "Fetching Device List", view: view)
-            refreshDeviceList()
+    func updateUserInfo() {
+        User.shared.getcognitoIdToken { idToken in
+            if idToken != nil {
+                self.getUserInfo(token: idToken!, provider: .cognito)
+            } else {
+                Utility.hideLoader(view: self.view)
+                self.refreshDeviceList()
+            }
         }
+    }
+
+    @IBAction func refreshClicked(_: Any) {
+        refreshDeviceList()
+    }
+
+    func showLoader() {
+        loadingIndicator.isHidden = false
+        loadingIndicator.animate()
     }
 
     @objc func updateUIView() {
@@ -175,64 +197,69 @@ class DevicesViewController: UIViewController {
     }
 
     @objc func refreshDeviceList() {
-        if Utility.isConnected(view: view) {
-            collectionView.isUserInteractionEnabled = false
-            User.shared.updateDeviceList = false
-            #if SCHEDULE
-                ESPScheduler.shared.refreshScheduleList()
-            #endif
-            NetworkManager.shared.getNodes { nodes, error in
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                    self.refreshControl.endRefreshing()
-                    User.shared.associatedNodeList = nil
-                    if error != nil {
-                        self.unhideInitialView(error: error)
-                        return
-                    }
-                    User.shared.associatedNodeList = nodes
-                    if nodes == nil || nodes?.count == 0 {
-                        self.unhideInitialView(error: nil)
-                    } else {
-                        self.initialView.isHidden = true
-                        self.collectionView.isHidden = false
-                        self.addButton.isHidden = false
-                        self.singleDeviceNodeCount = 0
-                        for item in User.shared.associatedNodeList! {
-                            if item.devices?.count == 1 {
-                                self.singleDeviceNodeCount += 1
-                            }
-                        }
-                        self.collectionView.reloadData()
-                    }
+        showLoader()
+        refreshControl.endRefreshing()
+        collectionView.isUserInteractionEnabled = false
+        User.shared.updateDeviceList = false
+
+        NetworkManager.shared.getNodes { nodes, error in
+            DispatchQueue.main.async {
+                self.loadingIndicator.isHidden = true
+                User.shared.associatedNodeList = nil
+                if error != nil {
+                    self.unhideInitialView(error: error)
+                    #if LOCAL_CONTROL
+                        User.shared.startServiceDiscovery()
+                    #endif
                     self.collectionView.isUserInteractionEnabled = true
+                    return
                 }
+                User.shared.associatedNodeList = nodes
+                #if LOCAL_CONTROL
+                    User.shared.startServiceDiscovery()
+                #endif
+                if nodes == nil || nodes?.count == 0 {
+                    self.setViewForNoNodes()
+                } else {
+                    self.initialView.isHidden = true
+                    self.collectionView.isHidden = false
+                    self.addButton.isHidden = false
+                    self.getSingleDeviceNodeCount()
+                    self.collectionView.reloadData()
+                }
+                self.collectionView.isUserInteractionEnabled = true
             }
-        } else {
-            Utility.hideLoader(view: view)
-            refreshControl.endRefreshing()
-            if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
-                initialView.isHidden = false
-                collectionView.isHidden = true
-                addButton.isHidden = true
+        }
+    }
+
+    private func getSingleDeviceNodeCount() {
+        singleDeviceNodeCount = 0
+        if let nodeList = User.shared.associatedNodeList {
+            for item in nodeList {
+                if item.devices?.count == 1 {
+                    singleDeviceNodeCount += 1
+                }
             }
         }
     }
 
     func unhideInitialView(error: ESPNetworkError?) {
-        if error == nil {
-            infoLabel.text = "No Device Added"
-            emptyListIcon.image = UIImage(named: "no_device_icon")
-            infoLabel.textColor = .black
-        } else {
+        User.shared.associatedNodeList = ESPLocalStorage.shared.fetchNodeDetails()
+        if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
             infoLabel.text = "No devices to show\n" + (error?.description ?? "Something went wrong!!")
             emptyListIcon.image = UIImage(named: "api_error_icon")
             infoLabel.textColor = .red
+            initialView.isHidden = false
+            collectionView.isHidden = true
+            addButton.isHidden = true
+        } else {
+            getSingleDeviceNodeCount()
+            collectionView.reloadData()
+            initialView.isHidden = true
+            collectionView.isHidden = false
+            addButton.isHidden = false
+            Utility.showToastMessage(view: view, message: "Network error: \(error?.description ?? "Something went wrong!!")")
         }
-
-        initialView.isHidden = false
-        collectionView.isHidden = true
-        addButton.isHidden = true
     }
 
     func preparePopover(contentController: UIViewController,
@@ -338,12 +365,15 @@ extension DevicesViewController: UICollectionViewDataSource {
         cell.layer.shadowOpacity = 0.5
         cell.layer.masksToBounds = false
 
-        if device.node?.isConnected ?? false {
+        if device.node?.localNetwork ?? false {
+            cell.statusView.isHidden = false
+        } else if device.node?.isConnected ?? false {
             cell.statusView.isHidden = true
         } else {
             cell.statusView.isHidden = false
-            cell.offlineLabel.text = "Offline at " + (device.node?.timestamp.getShortDate() ?? "")
         }
+
+        cell.offlineLabel.text = device.node?.getNodeStatus() ?? ""
 
         var primaryKeyFound = false
 
@@ -353,7 +383,7 @@ extension DevicesViewController: UICollectionViewDataSource {
             }) {
                 primaryKeyFound = true
                 if primaryParam.dataType?.lowercased() == "bool" {
-                    if device.node?.isConnected ?? false, primaryParam.properties?.contains("write") ?? false {
+                    if device.isReachable(), primaryParam.properties?.contains("write") ?? false {
                         cell.switchButton.alpha = 1.0
                         cell.switchButton.backgroundColor = UIColor.white
                         cell.switchButton.isEnabled = true
@@ -491,56 +521,6 @@ extension DevicesViewController: DeviceListHeaderProtocol {
             let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
             destination.currentNode = node
             navigationController?.pushViewController(destination, animated: true)
-        }
-    }
-}
-
-class Colors {
-    var gl: CAGradientLayer!
-
-    init() {
-        let colorTop = UIColor.clear.cgColor
-        let colorBottom = UIColor.black.cgColor
-
-        gl = CAGradientLayer()
-        gl.colors = [colorTop, colorBottom]
-        gl.locations = [0.0, 1.0]
-    }
-}
-
-@IBDesignable
-class GradientView: UIView {
-    @IBInspectable var firstColor: UIColor = UIColor.clear {
-        didSet {
-            updateView()
-        }
-    }
-
-    @IBInspectable var secondColor: UIColor = UIColor.clear {
-        didSet {
-            updateView()
-        }
-    }
-
-    @IBInspectable var isHorizontal: Bool = true {
-        didSet {
-            updateView()
-        }
-    }
-
-    override class var layerClass: AnyClass {
-        return CAGradientLayer.self
-    }
-
-    func updateView() {
-        let layer = self.layer as! CAGradientLayer
-        layer.colors = [firstColor, secondColor].map { $0.cgColor }
-        if isHorizontal {
-            layer.startPoint = CGPoint(x: 0, y: 0.5)
-            layer.endPoint = CGPoint(x: 1, y: 0.5)
-        } else {
-            layer.startPoint = CGPoint(x: 0.75, y: 0)
-            layer.endPoint = CGPoint(x: 0.75, y: 1)
         }
     }
 }

@@ -48,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             credentialsProvider: credentialsProvider
         )
         AWSServiceManager.default().defaultServiceConfiguration = configuration
+        ESPNetworkMonitor.shared.startMonitoring()
         // Uncomment the next line to see library related logs.
 //        ESPProvisionManager.shared.enableLogs(true)
         return true

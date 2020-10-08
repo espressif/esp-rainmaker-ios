@@ -129,7 +129,6 @@ class SuccessViewController: UIViewController {
     func fetchDeviceAssociationStatus(nodeID: String, requestID: String) {
         NetworkManager.shared.deviceAssociationStatus(nodeID: nodeID, requestID: requestID) { status in
             if status == "confirmed" {
-                NotificationCenter.default.post(name: Notification.Name(Constants.newDeviceAdded), object: nil)
                 User.shared.updateDeviceList = true
                 self.step4Indicator.stopAnimating()
                 self.step4Image.image = UIImage(named: "checkbox_checked")

@@ -125,6 +125,9 @@ struct Constants {
     static let scheduleParamNotification = "com.espressif.scheduleParamNotification"
     static let scheduleChangeNotification = "com.espressif.scheduleChangeNotification"
 
+    static let networkUpdateNotification = "com.espressif.networkUpdateNotification"
+    static let localNetworkUpdateNotification = "com.espressif.localNetworkUpdateNotification"
+
     // Claim APIs
     static let claimInitPath = Constants.claimBaseURL + "/claim/initiate"
     static let claimVerifyPath = Constants.claimBaseURL + "/claim/verify"
@@ -139,6 +142,11 @@ struct Constants {
         static let scheduleKey = "Schedule"
         static let schedulesKey = "Schedules"
     #endif
+
+    static let serviceType = "_esp_local_ctrl._tcp."
+    static let serviceDomain = "local"
+    static let nodeDetails = "com.espressif.node.details"
+    static let scheduleDetails = "com.espressif.schedule.details"
 }
 
 struct Keys {

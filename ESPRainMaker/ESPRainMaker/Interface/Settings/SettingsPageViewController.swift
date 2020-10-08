@@ -60,6 +60,8 @@ class SettingsPageViewController: UIViewController {
         UserDefaults.standard.removeObject(forKey: Constants.userInfoKey)
         UserDefaults.standard.removeObject(forKey: Constants.refreshTokenKey)
         UserDefaults.standard.removeObject(forKey: Constants.accessTokenKey)
+        UserDefaults.standard.removeObject(forKey: Constants.nodeDetails)
+        UserDefaults.standard.removeObject(forKey: Constants.scheduleDetails)
         User.shared.accessToken = nil
         User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
         User.shared.associatedNodeList = nil
@@ -75,13 +77,13 @@ class SettingsPageViewController: UIViewController {
     }
 
     @IBAction func openPrivacy(_: Any) {
-        if Utility.isConnected(view: view) {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
             showDocumentVC(url: "https://rainmaker.espressif.com/docs/privacy-policy.html")
         }
     }
 
     @IBAction func openTC(_: Any) {
-        if Utility.isConnected(view: view) {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
             showDocumentVC(url: "https://rainmaker.espressif.com/docs/terms-of-use.html")
         }
     }

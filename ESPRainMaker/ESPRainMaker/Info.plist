@@ -55,12 +55,23 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Connect with BLE Compatible devices for Provisioning.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Connect with BLE Compatible devices for Provisioning</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_esp_local_ctrl._tcp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Reading QR code</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>App requires access to local network in order to control your devices locally.</string>
 	<key>ProofOfPossession</key>
 	<string>abcd1234</string>
 	<key>REDIRECT_URL</key>

@@ -25,7 +25,7 @@
     }
 
     /// Instance of this class contain a single Schedule.
-    class ESPSchedule {
+    class ESPSchedule: Codable {
         var id: String!
         var name: String?
         var actions: [String: [Device]] = [:]
@@ -33,11 +33,41 @@
         var operation: ESPOperation?
         var week = ESPWeek(number: 0)
         var enabled = true
-        var scheduleJSON: [String: Any] = [:]
+
+        enum CodingKeys: String, CodingKey {
+            case id
+            case name
+            case actions
+            case trigger
+            case week
+            case enabled
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(id, forKey: .id)
+            try container.encode(name, forKey: .name)
+            try container.encode(actions, forKey: .actions)
+            try container.encode(trigger, forKey: .trigger)
+            try container.encode(week, forKey: .week)
+            try container.encode(enabled, forKey: .enabled)
+        }
+
+        required init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(String.self, forKey: .id)
+            name = try container.decodeIfPresent(String.self, forKey: .name)
+            trigger = try container.decodeIfPresent(ESPTrigger.self, forKey: .trigger) ?? ESPTrigger()
+            week = try container.decodeIfPresent(ESPWeek.self, forKey: .week) ?? ESPWeek(number: 0)
+            actions = try container.decodeIfPresent([String: [Device]].self, forKey: .actions) ?? [:]
+            enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled) ?? true
+        }
+
+        init() {}
     }
 
     /// Contain information about the time of Schedule.
-    class ESPTrigger {
+    class ESPTrigger: Codable {
         var days: Int?
         var minutes: Int?
 

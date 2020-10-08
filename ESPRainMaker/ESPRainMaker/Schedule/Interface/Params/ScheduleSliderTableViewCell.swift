@@ -59,7 +59,7 @@
         }
 
         @IBAction func sliderValueChanged(slider: UISlider) {
-            if Utility.isConnected(view: parentViewController!.view) {
+            if ESPNetworkMonitor.shared.isConnectedToNetwork {
                 if param.dataType?.lowercased() ?? "" == "int" {
                     param.value = Int(slider.value)
                 } else {

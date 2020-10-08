@@ -18,9 +18,26 @@
 
 import Foundation
 
-class Attribute {
+class Attribute: Codable {
     var name: String?
     var value: Any?
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case value
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+    }
+
+    init() {}
 }
 
 class Param: Attribute {
@@ -33,7 +50,70 @@ class Param: Attribute {
     var selected = false
     var canBeScheduled = false
 
-    override init() {}
+    enum CodingKeys: String, CodingKey {
+        case uiType = "ui_type"
+        case properties
+        case bounds
+        case attributeKey
+        case dataType = "data_type"
+        case type
+        case canBeScheduled
+        case value
+    }
+
+    override func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(uiType, forKey: .uiType)
+        try container.encode(properties, forKey: .properties)
+        try container.encode(bounds as? [String: Float], forKey: .bounds)
+        try container.encode(dataType, forKey: .dataType)
+        try container.encode(type, forKey: .type)
+        try container.encode(canBeScheduled, forKey: .canBeScheduled)
+        try container.encode(attributeKey, forKey: .attributeKey)
+
+        if let primitiveDataType = dataType {
+            if primitiveDataType.lowercased() == "int" {
+                try container.encode(value as? Int, forKey: .value)
+            } else if primitiveDataType.lowercased() == "float" {
+                try container.encode(value as? Float, forKey: .value)
+            } else if primitiveDataType.lowercased() == "bool" {
+                try container.encode(value as? Bool, forKey: .value)
+            } else {
+                try container.encode(value as? String, forKey: .value)
+            }
+        }
+
+        try super.encode(to: encoder)
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        properties = try container.decode([String]?.self, forKey: .properties)
+        dataType = try container.decode(String?.self, forKey: .dataType)
+        type = try container.decode(String?.self, forKey: .type)
+        bounds = try container.decodeIfPresent([String: Float].self, forKey: .bounds)
+        uiType = try container.decodeIfPresent(String.self, forKey: .uiType)
+        attributeKey = try container.decodeIfPresent(String.self, forKey: .attributeKey)
+        canBeScheduled = try container.decodeIfPresent(Bool.self, forKey: .canBeScheduled) ?? false
+
+        try super.init(from: decoder)
+
+        if let primitiveDataType = dataType {
+            if primitiveDataType.lowercased() == "int" {
+                value = try container.decodeIfPresent(Int.self, forKey: .value)
+            } else if primitiveDataType.lowercased() == "float" {
+                value = try container.decodeIfPresent(Float.self, forKey: .value)
+            } else if primitiveDataType.lowercased() == "bool" {
+                value = try container.decodeIfPresent(Bool.self, forKey: .value)
+            } else {
+                value = try container.decodeIfPresent(String.self, forKey: .value)
+            }
+        }
+    }
+
+    override init() {
+        super.init()
+    }
 
     init(param: Param) {
         super.init()
