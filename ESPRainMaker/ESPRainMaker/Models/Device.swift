@@ -18,17 +18,53 @@
 
 import Foundation
 
-class Device {
+class Device: Codable {
     var name: String?
     var type: String?
     var attributes: [Attribute]?
     var params: [Param]?
-    weak var node: Node?
+    var node: Node?
     var primary: String?
     var collapsed: Bool = true
     var selectedParams = 0
     var deviceName = ""
     var deviceNameParam = ""
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case type
+        case primary
+        case params
+        case attributes
+        case deviceName
+        case deviceNameParam
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(name, forKey: .name)
+        try container.encode(type, forKey: .type)
+
+        try container.encode(primary, forKey: .primary)
+        try container.encode(params, forKey: .params)
+        try container.encode(attributes, forKey: .attributes)
+        // Additional properties
+        try container.encode(deviceName, forKey: .deviceName)
+        try container.encode(deviceNameParam, forKey: .deviceNameParam)
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        type = try container.decode(String?.self, forKey: .type)
+        primary = try container.decode(String?.self, forKey: .primary)
+        params = try container.decode([Param]?.self, forKey: .params)
+        attributes = try container.decodeIfPresent([Attribute].self, forKey: .attributes)
+        //  Additional params
+        deviceName = try container.decodeIfPresent(String.self, forKey: .deviceName) ?? ""
+        deviceNameParam = try container.decodeIfPresent(String.self, forKey: .deviceNameParam) ?? ""
+    }
 
     func getDeviceName() -> String? {
         if let deviceNameParam = self.params?.first(where: { param -> Bool in
@@ -39,6 +75,13 @@ class Device {
             }
         }
         return name
+    }
+
+    func isReachable() -> Bool {
+        if node?.isConnected ?? false || node?.localNetwork ?? false {
+            return true
+        }
+        return false
     }
 
     init() {}

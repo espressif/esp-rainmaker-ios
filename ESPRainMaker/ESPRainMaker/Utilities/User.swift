@@ -34,6 +34,11 @@ class User {
     var updateDeviceList = false
     var currentAssociationInfo: AssociationConfig?
     var updateUserInfo = false
+    #if LOCAL_CONTROL
+        var localServices: [String: ESPLocalService] = [:]
+
+        private var localControl = ESPLocalControl()
+    #endif
 
     private init() {
         // setup service configuration
@@ -128,4 +133,79 @@ class User {
             completionHandler(nil)
         }
     }
+
+    #if LOCAL_CONTROL
+
+        /// Update information of local network for existing nodes.
+        ///
+        private func updateNodeLocalNetworkInfo() {
+            var notifyLocalNetworkUpdate = true
+            if let nodeList = User.shared.associatedNodeList {
+                let group = DispatchGroup()
+                var localNodeList: [Node] = []
+                for node in nodeList {
+                    if localServices.keys.contains(node.node_id ?? "") {
+                        node.localNetwork = true
+                        notifyLocalNetworkUpdate = false
+                        group.enter()
+                        NetworkManager.shared.getNodeInfo(nodeId: node.node_id ?? "") { node, _ in
+                            if node != nil {
+                                localNodeList.append(node!)
+                            }
+                            group.leave()
+                        }
+                    } else {
+                        node.localNetwork = false
+                    }
+                }
+                group.notify(queue: DispatchQueue.main) {
+                    self.processNodeInfoResponse(nodeList: localNodeList)
+                }
+            }
+            if notifyLocalNetworkUpdate {
+                NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
+            }
+        }
+
+        private func processNodeInfoResponse(nodeList: [Node]) {
+            for localNode in nodeList {
+                if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
+                    node.node_id == localNode.node_id
+                }) {
+                    localNode.localNetwork = true
+                    User.shared.associatedNodeList![index] = localNode
+                }
+            }
+            if nodeList.count > 0 {
+                NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
+            }
+        }
+
+        /// Start search for services on local network.
+        ///
+        func startServiceDiscovery() {
+            DispatchQueue.main.async {
+                self.localControl.delegate = self
+                self.localControl.searchForServicesOfType(type: Constants.serviceType, domain: Constants.serviceDomain)
+            }
+        }
+
+    #endif
 }
+
+#if LOCAL_CONTROL
+    extension User: ESPLocalControlDelegate {
+        func updateInAvailableLocalServices(services: [ESPLocalService]) {
+            localServices.removeAll()
+            for service in services {
+                var hostname = service.hostname
+                if hostname.contains(".") {
+                    let endIndex = hostname.range(of: ".")!.lowerBound
+                    hostname = String(hostname[..<endIndex])
+                }
+                localServices[hostname] = service
+            }
+            updateNodeLocalNetworkInfo()
+        }
+    }
+#endif

@@ -12,7 +12,7 @@
         <!--Schedule List View Controller-->
         <scene sceneID="VLI-7o-Ccb">
             <objects>
-                <viewController id="fBc-jc-CiE" customClass="ScheduleListViewController" customModule="ESP_Schedule" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="fBc-jc-CiE" customClass="ScheduleListViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="eCH-W1-yIz">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -37,7 +37,7 @@
                                         <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dPU-RE-kQw" customClass="PrimaryButton" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dPU-RE-kQw" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="32" y="660" width="350" height="56"/>
                                         <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -74,16 +74,16 @@
                                     <constraint firstAttribute="trailing" secondItem="dPU-RE-kQw" secondAttribute="trailing" constant="32" id="zg5-eA-1i3"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="26j-fn-qGr" customClass="TopBarView" customModule="ESP_Schedule" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="26j-fn-qGr" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Schedules" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TpS-vb-cSC" customClass="BarTitle" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Schedules" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TpS-vb-cSC" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="168.5" y="59.5" width="77.5" height="22.5"/>
                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="17"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="geT-ql-XUZ" customClass="BarButton" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="geT-ql-XUZ" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="16" y="45" width="50" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="9rc-Ql-VOp"/>
@@ -146,7 +146,7 @@
                                 <rect key="frame" x="20" y="116" width="374" height="746"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="scheduleListTVC" rowHeight="60" id="ETe-oV-C0t" customClass="ScheduleListTableViewCell" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="scheduleListTVC" rowHeight="60" id="ETe-oV-C0t" customClass="ScheduleListTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="374" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ETe-oV-C0t" id="w6y-NZ-f94">
@@ -217,6 +217,38 @@
                                     <outlet property="delegate" destination="fBc-jc-CiE" id="cDJ-u9-oey"/>
                                 </connections>
                             </tableView>
+                            <view hidden="YES" alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Kt5-pJ-v8H">
+                                <rect key="frame" x="0.0" y="832" width="414" height="30"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="info.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="oNU-FL-fSY">
+                                        <rect key="frame" x="10" y="7" width="17" height="16"/>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="17" id="rO0-kx-UUD"/>
+                                            <constraint firstAttribute="height" constant="17" id="xla-Z9-WnL"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Internet connection" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x3b-h0-h8F">
+                                        <rect key="frame" x="37" y="5.5" width="166.5" height="19.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="x3b-h0-h8F" firstAttribute="centerY" secondItem="Kt5-pJ-v8H" secondAttribute="centerY" id="H53-ft-YeT"/>
+                                    <constraint firstItem="x3b-h0-h8F" firstAttribute="leading" secondItem="oNU-FL-fSY" secondAttribute="trailing" constant="10" id="X5c-Ee-EYc"/>
+                                    <constraint firstAttribute="height" constant="30" id="kXh-CN-WGc"/>
+                                    <constraint firstItem="oNU-FL-fSY" firstAttribute="leading" secondItem="Kt5-pJ-v8H" secondAttribute="leading" constant="10" id="nIH-ce-HbW"/>
+                                    <constraint firstItem="oNU-FL-fSY" firstAttribute="centerY" secondItem="Kt5-pJ-v8H" secondAttribute="centerY" id="yU7-0g-Efg"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="r49-KS-bCR"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -226,7 +258,10 @@
                             <constraint firstItem="7hp-EQ-RqF" firstAttribute="leading" secondItem="r49-KS-bCR" secondAttribute="leading" id="KGW-cL-PGG"/>
                             <constraint firstItem="r49-KS-bCR" firstAttribute="bottom" secondItem="7hp-EQ-RqF" secondAttribute="bottom" id="MtV-U0-fnH"/>
                             <constraint firstItem="26j-fn-qGr" firstAttribute="leading" secondItem="r49-KS-bCR" secondAttribute="leading" id="NDQ-KW-3mZ"/>
+                            <constraint firstItem="Kt5-pJ-v8H" firstAttribute="leading" secondItem="r49-KS-bCR" secondAttribute="leading" id="OR8-XK-EEX"/>
+                            <constraint firstAttribute="trailing" secondItem="Kt5-pJ-v8H" secondAttribute="trailing" id="R5f-hu-vFm"/>
                             <constraint firstItem="l3U-zi-Gof" firstAttribute="bottom" secondItem="r49-KS-bCR" secondAttribute="bottom" id="RLv-VV-fPp"/>
+                            <constraint firstItem="r49-KS-bCR" firstAttribute="bottom" secondItem="Kt5-pJ-v8H" secondAttribute="bottom" id="Sqb-Fg-bQh"/>
                             <constraint firstItem="r49-KS-bCR" firstAttribute="trailing" secondItem="l3U-zi-Gof" secondAttribute="trailing" constant="20" id="bWO-m0-mWK"/>
                             <constraint firstItem="l3U-zi-Gof" firstAttribute="top" secondItem="26j-fn-qGr" secondAttribute="bottom" constant="20" id="d8U-hZ-98S"/>
                             <constraint firstAttribute="trailing" secondItem="26j-fn-qGr" secondAttribute="trailing" id="sjQ-Bx-FcI"/>
@@ -243,6 +278,7 @@
                         <outlet property="editButton" destination="geT-ql-XUZ" id="ECI-Gg-R6Q"/>
                         <outlet property="initialLabel" destination="Vgb-hb-gfD" id="E1J-PV-KMh"/>
                         <outlet property="initialView" destination="7hp-EQ-RqF" id="gd7-N8-TwB"/>
+                        <outlet property="networkIndicator" destination="Kt5-pJ-v8H" id="z0I-Li-27z"/>
                         <outlet property="tableView" destination="l3U-zi-Gof" id="VWb-SD-y49"/>
                     </connections>
                 </viewController>
@@ -253,15 +289,15 @@
         <!--Select Days View Controller-->
         <scene sceneID="5Cj-bJ-Nam">
             <objects>
-                <viewController id="7Mu-lf-BK6" customClass="SelectDaysViewController" customModule="ESP_Schedule" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="7Mu-lf-BK6" customClass="SelectDaysViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5qY-pp-9T8">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LBW-h8-7yP" customClass="TopBarView" customModule="ESP_Schedule" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LBW-h8-7yP" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XkB-Ac-fLz" customClass="BarButton" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XkB-Ac-fLz" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="16" y="11.5" width="50" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="50" id="DhM-eg-Ixu"/>
@@ -275,7 +311,7 @@
                                             <action selector="backButtonTapped:" destination="7Mu-lf-BK6" eventType="touchUpInside" id="n2g-85-Ymp"/>
                                         </connections>
                                     </button>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Select Days" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xIN-Lh-B7D" customClass="BarTitle" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Select Days" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xIN-Lh-B7D" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="162.5" y="26.5" width="89" height="19.5"/>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -343,15 +379,15 @@
         <!--Schedule View Controller-->
         <scene sceneID="3dl-8x-eHr">
             <objects>
-                <viewController storyboardIdentifier="scheduleVC" id="1Y2-5C-N78" customClass="ScheduleViewController" customModule="ESP_Schedule" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="scheduleVC" id="1Y2-5C-N78" customClass="ScheduleViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="QVu-zH-r4p">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2nH-fa-0R5" customClass="TopBarView" customModule="ESP_Schedule" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2nH-fa-0R5" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="phF-HA-gka" customClass="BarButton" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="phF-HA-gka" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="16" y="47" width="50" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="6sI-bb-m0Z"/>
@@ -365,7 +401,7 @@
                                             <action selector="backButtonPressed:" destination="1Y2-5C-N78" eventType="touchUpInside" id="3V4-Tb-3X5"/>
                                         </connections>
                                     </button>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Schedule" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="233-PB-Uwy" customClass="BarTitle" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Schedule" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="233-PB-Uwy" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="172" y="62.5" width="70.5" height="19.5"/>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -735,21 +771,21 @@
         <!--Select Devices View Controller-->
         <scene sceneID="MJu-RD-0Tp">
             <objects>
-                <viewController storyboardIdentifier="selecDevicesVC" id="ufg-D2-eNo" customClass="SelectDevicesViewController" customModule="ESP_Schedule" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="selecDevicesVC" id="ufg-D2-eNo" customClass="SelectDevicesViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="dh2-oP-EKK">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5xZ-ON-TIq" customClass="TopBarView" customModule="ESP_Schedule" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5xZ-ON-TIq" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Actions" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ljm-iI-53Y" customClass="BarTitle" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Actions" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ljm-iI-53Y" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="179" y="59.5" width="56" height="22.5"/>
                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="17"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Qa-d8-2wF" customClass="BarButton" customModule="ESP_Schedule" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Qa-d8-2wF" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="16" y="50" width="60" height="46"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="ozJ-bQ-S5v"/>
@@ -866,6 +902,7 @@
         <image name="add_icon" width="36" height="36"/>
         <image name="checkmark" catalog="system" width="128" height="114"/>
         <image name="cross_icon" width="14" height="14"/>
+        <image name="info.circle" catalog="system" width="128" height="121"/>
         <image name="refresh_icon" width="128" height="128"/>
         <image name="right_arrow" width="6.5" height="12"/>
         <image name="schedule" width="24" height="24"/>

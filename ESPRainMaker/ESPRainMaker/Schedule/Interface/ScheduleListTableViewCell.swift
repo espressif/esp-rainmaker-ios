@@ -34,15 +34,17 @@
 
         @IBAction func switchStateChanged(_ sender: UISwitch) {
             ESPScheduler.shared.currentSchedule = schedule
+            let currentState = ESPScheduler.shared.currentSchedule.enabled
             ESPScheduler.shared.currentSchedule.enabled = sender.isOn
             ESPScheduler.shared.currentSchedule.operation = .edit
-            let view = parentViewController?.view ?? contentView
+            let view = parentViewController?.parent?.view ?? contentView
             Utility.showLoader(message: "", view: view)
             ESPScheduler.shared.shouldEnableSchedule(onView: view) { result in
                 Utility.hideLoader(view: view)
                 DispatchQueue.main.async {
                     if !result {
                         self.scheduleSwitch.isOn = !sender.isOn
+                        ESPScheduler.shared.currentSchedule.enabled = currentState
                     } else {}
                 }
             }

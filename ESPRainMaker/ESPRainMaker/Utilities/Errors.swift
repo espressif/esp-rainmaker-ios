@@ -42,6 +42,11 @@ enum ESPNetworkError: Error {
     case emptyToken
     case serverError(_ description: String = "Oops!! Something went bad. Please try again after sometime")
     case emptyConfigData
+    #if LOCAL_CONTROL
+        case localServerError(ESPLocalServiceError)
+    #endif
+    case noNetwork
+    case unknownError
 
     var description: String {
         switch self {
@@ -53,6 +58,14 @@ enum ESPNetworkError: Error {
             return "Authorization Error. Please Refresh. If it does not work, please sign-in again."
         case .emptyConfigData:
             return "Node info is not present"
+        #if LOCAL_CONTROL
+            case let .localServerError(localError):
+                return localError.description
+        #endif
+        case .noNetwork:
+            return "Not connected to network."
+        case .unknownError:
+            return "Unknown error."
         }
     }
 }

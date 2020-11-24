@@ -52,7 +52,16 @@ class NodeDetailsViewController: UIViewController {
             }
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
-                self.navigationController?.popToRootViewController(animated: false)
+                guard let removeNodeError = error else {
+                    User.shared.updateDeviceList = true
+                    self.navigationController?.popToRootViewController(animated: false)
+                    return
+                }
+                if !ESPNetworkMonitor.shared.isConnectedToNetwork {
+                    Utility.showToastMessage(view: self.view, message: "Unable to remove node. Please check your internet connection.")
+                } else {
+                    Utility.showToastMessage(view: self.view, message: removeNodeError.description)
+                }
             }
         }
     }

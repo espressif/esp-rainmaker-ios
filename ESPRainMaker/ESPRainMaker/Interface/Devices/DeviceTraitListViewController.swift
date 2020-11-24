@@ -28,6 +28,7 @@ class DeviceTraitListViewController: UIViewController {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var tableView: UITableView!
     @IBOutlet var offlineLabel: UILabel!
+    @IBOutlet var networkIndicator: UIView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,17 +43,27 @@ class DeviceTraitListViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         let insets = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
         tableView.contentInset = insets
-        showLoader(message: "Getting info")
-        updateDeviceAttributes()
+
+        if device?.isReachable() ?? false {
+            if ESPNetworkMonitor.shared.isConnectedToWifi || ESPNetworkMonitor.shared.isConnectedToNetwork {
+                showLoader(message: "Getting info")
+                updateDeviceAttributes()
+            }
+        }
+
+        checkOfflineStatus()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        checkNetworkUpdate()
         tabBarController?.tabBar.isHidden = true
-        pollingTimer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(fetchNodeInfo), userInfo: nil, repeats: true)
+        pollingTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(fetchNodeInfo), userInfo: nil, repeats: true)
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(paramUpdated), name: Notification.Name(Constants.paramUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkOfflineStatus), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -81,71 +92,94 @@ class DeviceTraitListViewController: UIViewController {
         skipNextAttributeUpdate = true
     }
 
+    @objc func checkNetworkUpdate() {
+        DispatchQueue.main.async {
+            if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                self.networkIndicator.isHidden = true
+            } else {
+                self.networkIndicator.isHidden = false
+            }
+        }
+    }
+
     func refreshDeviceAttributes() {
+        if device?.isReachable() ?? false {
+            tableView.alpha = 1.0
+            tableView.isUserInteractionEnabled = true
+            if device?.node?.node_id == nil {
+                print("nil")
+            }
+            NetworkManager.shared.getNodeInfo(nodeId: (device?.node?.node_id)!) { node, error in
+                if error != nil {
+                    return
+                }
+                if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
+                    node.node_id == (self.device?.node?.node_id)!
+                }) {
+                    let oldNode = User.shared.associatedNodeList![index]
+                    node?.localNetwork = oldNode.localNetwork
+                    User.shared.associatedNodeList![index] = node!
+                    if let currentDevice = node!.devices?.first(where: { nodeDevice -> Bool in
+                        nodeDevice.name == self.device?.name
+                    }) {
+                        self.device = currentDevice
+                    } else {
+                        print("Device with no node.")
+                    }
+                }
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    self.tableView.reloadData()
+                }
+            }
+        } else {
+            tableView.alpha = 0.5
+            tableView.isUserInteractionEnabled = false
+        }
+    }
+
+    func updateDeviceAttributes() {
         NetworkManager.shared.getNodeInfo(nodeId: (device?.node?.node_id)!) { node, error in
             if error != nil {
-                return
-            }
-            if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
-                node.node_id == (self.device?.node?.node_id)!
-            }) {
-                User.shared.associatedNodeList![index] = node!
-                if let currentDevice = node!.devices?.first(where: { nodeDevice -> Bool in
-                    nodeDevice.name == self.device?.name
+                DispatchQueue.main.async {
+                    let alertController = UIAlertController(title: "Error!!",
+                                                            message: error?.description,
+                                                            preferredStyle: .alert)
+                    let retryAction = UIAlertAction(title: "Ok", style: .default) { _ in
+                        Utility.hideLoader(view: self.view)
+                    }
+                    alertController.addAction(retryAction)
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            } else {
+                if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
+                    node.node_id == (self.device?.node?.node_id)!
                 }) {
-                    self.device = currentDevice
+                    let oldNode = User.shared.associatedNodeList![index]
+                    node?.localNetwork = oldNode.localNetwork
+                    User.shared.associatedNodeList![index] = node!
+                    if let currentDevice = node!.devices?.first(where: { nodeDevice -> Bool in
+                        nodeDevice.name == self.device?.name
+                    }) {
+                        self.device = currentDevice
+                    }
                 }
             }
             DispatchQueue.main.async {
-                self.checkOfflineStatus()
                 Utility.hideLoader(view: self.view)
                 self.tableView.reloadData()
             }
         }
     }
 
-    func updateDeviceAttributes() {
-        if Utility.isConnected(view: view) {
-            NetworkManager.shared.getNodeInfo(nodeId: (device?.node?.node_id)!) { node, error in
-                if error != nil {
-                    DispatchQueue.main.async {
-                        let alertController = UIAlertController(title: "Error!!",
-                                                                message: error?.description,
-                                                                preferredStyle: .alert)
-                        let retryAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                            Utility.hideLoader(view: self.view)
-                        }
-                        alertController.addAction(retryAction)
-                        self.present(alertController, animated: true, completion: nil)
-                    }
-                } else {
-                    if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
-                        node.node_id == (self.device?.node?.node_id)!
-                    }) {
-                        User.shared.associatedNodeList![index] = node!
-                        if let currentDevice = node!.devices?.first(where: { nodeDevice -> Bool in
-                            nodeDevice.name == self.device?.name
-                        }) {
-                            self.device = currentDevice
-                        }
-                    }
-                }
-                DispatchQueue.main.async {
-                    self.checkOfflineStatus()
-                    Utility.hideLoader(view: self.view)
-                    self.tableView.reloadData()
-                }
-            }
-        } else {
-            Utility.hideLoader(view: view)
-        }
-    }
-
-    func checkOfflineStatus() {
-        if device?.node?.isConnected ?? true {
+    @objc func checkOfflineStatus() {
+        if device?.node?.localNetwork ?? false {
+            offlineLabel.text = "Reachable on WLAN"
+            offlineLabel.isHidden = false
+        } else if device?.node?.isConnected ?? true {
             offlineLabel.isHidden = true
         } else {
-            offlineLabel.text = "Offline at " + (device?.node?.timestamp.getShortDate() ?? "")
+            offlineLabel.text = device?.node?.getNodeStatus() ?? ""
             offlineLabel.isHidden = false
         }
     }
@@ -178,6 +212,7 @@ class DeviceTraitListViewController: UIViewController {
     func getTableViewGenericCell(attribute: Param, indexPath: IndexPath) -> GenericControlTableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
         cell.controlName.text = attribute.name
+        cell.delegate = self
         if let value = attribute.value {
             cell.controlValue = "\(value)"
         }
@@ -207,6 +242,7 @@ class DeviceTraitListViewController: UIViewController {
                     let minValue = bounds["min"] as? Float ?? 0
                     if minValue < maxValue {
                         let cell = tableView.dequeueReusableCell(withIdentifier: "GenericSliderTableViewCell", for: indexPath) as! GenericSliderTableViewCell
+                        cell.delegate = self
                         if let bounds = dynamicAttribute.bounds {
                             cell.slider.minimumValue = bounds["min"] as? Float ?? 0
                             cell.slider.maximumValue = bounds["max"] as? Float ?? 100
@@ -226,7 +262,7 @@ class DeviceTraitListViewController: UIViewController {
                         if let attributeName = dynamicAttribute.name {
                             cell.paramName = attributeName
                         }
-                        if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false {
+                        if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
                             cell.slider.isEnabled = true
                         } else {
                             cell.slider.isEnabled = false
@@ -238,6 +274,7 @@ class DeviceTraitListViewController: UIViewController {
             }
         } else if dynamicAttribute.uiType == "esp.ui.toggle", dynamicAttribute.dataType?.lowercased() == "bool" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
+            cell.delegate = self
             cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
             cell.device = device
             cell.param = dynamicAttribute
@@ -252,7 +289,7 @@ class DeviceTraitListViewController: UIViewController {
                 }
                 cell.toggleSwitch.setOn(switchState, animated: true)
             }
-            if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false {
+            if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
                 cell.toggleSwitch.isEnabled = true
             } else {
                 cell.toggleSwitch.isEnabled = false
@@ -302,16 +339,31 @@ extension DeviceTraitListViewController: UITableViewDataSource {
     }
 
     func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        var paramCell: UITableViewCell!
         if indexPath.section >= device?.params?.count ?? 0 {
             let staticControl = device?.attributes![indexPath.section - (device?.params?.count ?? 0)]
             let cell = tableView.dequeueReusableCell(withIdentifier: "staticControlTableViewCell", for: indexPath) as! StaticControlTableViewCell
             cell.controlNameLabel.text = staticControl?.name ?? ""
             cell.controlValueLabel.text = staticControl?.value as? String ?? ""
-            return cell
-
+            paramCell = cell as UITableViewCell
         } else {
             let control = device?.params![indexPath.section]
-            return getTableViewCellBasedOn(dynamicAttribute: control!, indexPath: indexPath)
+            paramCell = getTableViewCellBasedOn(dynamicAttribute: control!, indexPath: indexPath)
+        }
+
+        if device?.isReachable() ?? false {
+            paramCell.isUserInteractionEnabled = true
+        } else {
+            paramCell.isUserInteractionEnabled = false
+        }
+        return paramCell
+    }
+}
+
+extension DeviceTraitListViewController: ParamUpdateProtocol {
+    func failureInUpdatingParam() {
+        DispatchQueue.main.async {
+            Utility.showToastMessage(view: self.view, message: "Fail to update parameter. Please check you network connection!!")
         }
     }
 }

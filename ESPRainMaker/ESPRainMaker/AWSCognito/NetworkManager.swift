@@ -24,27 +24,7 @@ class NetworkManager {
     /// A singleton class that manages Network call for this application
     static let shared = NetworkManager()
     var session: Session!
-
-    private init() {
-        // Validate api calls with server certificate
-        let certificate = [NetworkManager.certificate(filename: "amazonRootCA")]
-        let trustManager = ServerTrustManager(evaluators: [
-            "api.staging.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-staging.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-prod.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "api.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "auth.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "esp-claiming.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate),
-        ])
-        session = Session(serverTrustManager: trustManager)
-    }
-
-    /// Method to get security certificate from bundle resource
-    ///
-    /// - Parameters:
-    ///   - filename: name of the certificate file
-    private static func certificate(filename: String) -> SecCertificate {
-        let filePath = Bundle.main.path(forResource: filename, ofType: "der")!
-        let data = try! Data(contentsOf: URL(fileURLWithPath: filePath))
-        let certificate = SecCertificateCreateWithData(nil, data as CFData)!
-
-        return certificate
-    }
+    let apiManager = ESPAPIManager()
 
     // MARK: - Node APIs
 
@@ -53,36 +33,7 @@ class NetworkManager {
     /// - Parameters:
     ///   - completionHandler: after response is parsed this block will be called with node array and error(if any) as argument
     func getNodes(completionHandler: @escaping ([Node]?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                let url = Constants.getNodes + "?node_details=true"
-                self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-                    switch response.result {
-                    case let .success(value):
-                        if let json = value as? [String: Any] {
-                            if let nodeArray = json["node_details"] as? [[String: Any]] {
-                                let nodes = JSONParser.parseNodeArray(data: nodeArray)
-                                completionHandler(nodes, nil)
-                                return
-                            } else if let status = json["status"] as? String, let description = json["description"] as? String {
-                                if status == "failure" {
-                                    completionHandler(nil, ESPNetworkError.serverError(description))
-                                    return
-                                }
-                            }
-                        }
-                        completionHandler(nil, nil)
-                        return
-                    case let .failure(error):
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
-                        return
-                    }
-                }
-            } else {
-                completionHandler(nil, .emptyToken)
-            }
-        })
+        apiManager.getNodes(completionHandler: completionHandler)
     }
 
     /// Get node info like device list, param list and online/offline status
@@ -90,38 +41,41 @@ class NetworkManager {
     /// - Parameters:
     ///   - completionHandler: handler called when response to get node info is recieved
     func getNodeInfo(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                let url = Constants.getNodes + "?node_id=" + nodeId
-                self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-                    switch response.result {
-                    case let .success(value):
-                        if let json = value as? [String: Any] {
-                            if let nodeArray = json["node_details"] as? [[String: Any]] {
-                                if let node = JSONParser.parseNodeArray(data: nodeArray)?[0] {
-                                    completionHandler(node, nil)
-                                    return
-                                }
-                                completionHandler(nil, ESPNetworkError.emptyConfigData)
-                                return
-                            } else if let status = json["status"] as? String, let description = json["description"] as? String {
-                                if status == "failure" {
-                                    completionHandler(nil, ESPNetworkError.serverError(description))
-                                    return
-                                }
-                            }
+        #if LOCAL_CONTROL
+            if let availableService = User.shared.localServices[nodeId] {
+                availableService.getPropertyInfo { response, error in
+                    if error != nil {
+                        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                            self.getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
+                        } else {
+                            completionHandler(nil, .localServerError(error!))
                         }
-                        completionHandler(nil, ESPNetworkError.emptyConfigData)
-                        return
-                    case let .failure(error):
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
                         return
                     }
+                    if let node = JSONParser.parseNodeArray(data: [response!], forSingleNode: true)?[0] {
+                        node.node_id = nodeId
+                        if node.devices?.count ?? 0 < 1 {
+                            completionHandler(nil, .unknownError)
+                        } else {
+                            completionHandler(node, nil)
+                        }
+                        return
+                    }
+                    completionHandler(nil, .emptyConfigData)
                 }
             } else {
-                completionHandler(nil, ESPNetworkError.emptyToken)
+                getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
             }
+        #else
+            getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
+        #endif
+    }
+
+    private func getNodeInfoPrivate(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+            apiManager.getNodeInfo(nodeId: nodeId, completionHandler: completionHandler)
+        } else {
+            completionHandler(nil, .noNetwork)
         }
     }
 
@@ -130,31 +84,7 @@ class NetworkManager {
     /// - Parameters:
     ///   - completionHandler: handler called when response to get node status is recieved
     func getNodeStatus(node: Node, completionHandler: @escaping (Node?, Error?) -> Void) {
-        User.shared.getAccessToken { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                let url = Constants.getNodeStatus + "?nodeid=" + (node.node_id ?? "")
-                self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-                    // Parse the connected status of the node
-                    switch response.result {
-                    case let .success(value):
-                        if let json = value as? [String: Any], let connectivity = json["connectivity"] as? [String: Any] {
-                            if let status = connectivity["connected"] as? Bool {
-                                let newNode = node
-                                newNode.isConnected = status
-                                completionHandler(newNode, nil)
-                                return
-                            }
-                        }
-                    case let .failure(error):
-                        print(error)
-                    }
-                    completionHandler(node, nil)
-                }
-            } else {
-                completionHandler(node, nil)
-            }
-        }
+        apiManager.getNodeStatus(node: node, completionHandler: completionHandler)
     }
 
     // MARK: - Device Association
@@ -164,41 +94,7 @@ class NetworkManager {
     /// - Parameters:
     ///   - completionHandler: handler called when response to add device to user is recieved with id of the request
     func addDeviceToUser(parameter: [String: String], completionHandler: @escaping (String?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                self.session.sessionConfiguration.timeoutIntervalForResource = 5
-                self.session.sessionConfiguration.timeoutIntervalForRequest = 5
-                self.session.request(Constants.addDevice, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-                    self.session.sessionConfiguration.timeoutIntervalForResource = 60
-                    self.session.sessionConfiguration.timeoutIntervalForRequest = 60
-                    switch response.result {
-                    case let .success(value):
-                        if let json = value as? [String: String] {
-                            // Get request id for add device request
-                            // This request id will be used for getting the status of add request
-                            if let requestId = json[Constants.requestID] {
-                                completionHandler(requestId, nil)
-                                return
-                            } else if let status = json["status"], let description = json["description"] {
-                                if status == "failure" {
-                                    completionHandler(nil, ESPNetworkError.serverError(description))
-                                    return
-                                }
-                            }
-                        }
-                    case let .failure(error):
-                        // Check for any error on response
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
-                        return
-                    }
-
-                    completionHandler(nil, ESPNetworkError.emptyConfigData)
-                }
-            } else {
-                completionHandler(nil, ESPNetworkError.emptyToken)
-            }
-        })
+        apiManager.addDeviceToUser(parameter: parameter, completionHandler: completionHandler)
     }
 
     /// Method to fetch device assoication staus
@@ -207,26 +103,7 @@ class NetworkManager {
     ///   - nodeID: Id of the node for which association status is fetched
     ///   - completionHandler: handler called when response to deviceAssociationStatus is recieved
     func deviceAssociationStatus(nodeID: String, requestID: String, completionHandler: @escaping (String) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let url = Constants.checkStatus + "?node_id=" + nodeID
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                self.session.request(url + "&request_id=" + requestID + "&user_request=true", method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-                    switch response.result {
-                    case let .success(value):
-                        if let json = value as? [String: String], let status = json["request_status"] {
-                            completionHandler(status)
-                            return
-                        }
-                    case let .failure(error):
-                        print(error)
-                    }
-                    completionHandler("error")
-                }
-            } else {
-                completionHandler("error")
-            }
-        })
+        apiManager.deviceAssociationStatus(nodeID: nodeID, requestID: requestID, completionHandler: completionHandler)
     }
 
     // MARK: - Thing Shadow
@@ -237,63 +114,31 @@ class NetworkManager {
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
     ///   - completionHandler: handler called when response to updateThingShadow is recieved
-    func updateThingShadow(nodeID: String?, parameter: [String: Any], completionHandler: ((CustomError) -> Void)? = nil) {
-        NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
-        if let nodeid = nodeID {
-            User.shared.getAccessToken(completionHandler: { idToken in
-                if idToken != nil {
-                    let url = Constants.updateThingsShadow + "?nodeid=" + nodeid
-                    let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": idToken!]
-                    self.session.request(url, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-                        switch response.result {
-                        case let .success(value):
-                            if let json = value as? [String: Any] {
-                                if let status = json["status"] as? String {
-                                    if status == "success" {
-                                        completionHandler?(.success)
-                                        return
-                                    }
-                                }
-                                completionHandler?(.failure)
-                            }
-                            return
-                        case let .failure(error):
-                            print(error)
-                            completionHandler?(.failure)
+    func updateThingShadow(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
+        #if LOCAL_CONTROL
+            NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
+            if let nodeid = nodeID {
+                if let availableService = User.shared.localServices[nodeid] {
+                    availableService.setProperty(json: parameter) { success, _ in
+                        if !success {
+                            self.updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
                         }
                     }
-                } else {}
-            })
-        }
+                } else {
+                    updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+                }
+            }
+        #else
+            updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+        #endif
     }
 
-    /// Method to get device thing shadow
-    /// Gives the current status of the device params for a node
-    ///
-    /// - Parameters:
-    ///   - nodeID: Id of the node for which thing shadow is requested
-    ///   - completionHandler: handler called when response to getDeviceThingShadow is recieved
-    func getDeviceThingShadow(nodeID: String, completionHandler: @escaping ([String: Any]?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let url = Constants.getDeviceShadow + "?nodeid=" + nodeID
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-                    switch response.result {
-                    case let .success(value):
-                        if let json = value as? [String: Any] {
-                            completionHandler(json)
-                            return
-                        }
-                    case let .failure(error):
-                        print(error)
-                    }
-                    completionHandler(nil)
-                }
-            } else {
-                completionHandler(nil)
-            }
-        })
+    private func updateThingShadowprivate(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+            apiManager.updateThingShadow(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+        } else {
+            completionHandler(.failure)
+        }
     }
 
     // MARK: - Generic Request
@@ -308,18 +153,7 @@ class NetworkManager {
     ///   - header: HTTp headers
     ///   - completionHandler: Callback invoked after api response is recieved
     func genericRequest(url: URLConvertible, method: HTTPMethod, parameters: Parameters, encoding: ParameterEncoding, headers: HTTPHeaders, completionHandler: @escaping ([String: Any]?) -> Void) {
-        session.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers).responseJSON { response in
-            switch response.result {
-            case let .success(value):
-                if let json = value as? [String: Any] {
-                    completionHandler(json)
-                    return
-                }
-            case let .failure(error):
-                print(error)
-            }
-            completionHandler(nil)
-        }
+        apiManager.genericRequest(url: url, method: method, parameters: parameters, encoding: encoding, headers: headers, completionHandler: completionHandler)
     }
 
     /// Method to make generic authorized request
@@ -329,22 +163,6 @@ class NetworkManager {
     ///   - parameters: Parameter to be included in the api call
     ///   - completionHandler: Callback invoked after api response is recieved
     func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, completionHandler: @escaping (Data?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                self.session.request(url, method: .post, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseData { response in
-                    switch response.result {
-                    case let .success(value):
-                        completionHandler(value)
-                        return
-                    case .failure:
-                        completionHandler(nil)
-                        return
-                    }
-                }
-            } else {
-                completionHandler(nil)
-            }
-        })
+        apiManager.genericAuthorizedDataRequest(url: url, parameter: parameter, completionHandler: completionHandler)
     }
 }

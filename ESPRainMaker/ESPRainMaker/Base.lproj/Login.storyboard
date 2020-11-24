@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7xV-BH-yep">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7xV-BH-yep">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -41,7 +42,7 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f29-Y5-riN" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f29-Y5-riN" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="299" y="52.5" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="NvG-iQ-1Fw"/>
@@ -93,6 +94,7 @@
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="Zm8-2Y-Coy"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="vbf-DW-tCX" firstAttribute="centerX" secondItem="Jn3-Gc-aDK" secondAttribute="centerX" id="A8g-0i-Hl1"/>
@@ -109,7 +111,6 @@
                             <constraint firstItem="FGx-IB-54K" firstAttribute="top" secondItem="vbf-DW-tCX" secondAttribute="bottom" constant="16" id="rk7-t7-6TY"/>
                             <constraint firstItem="uco-WI-bQ6" firstAttribute="leading" secondItem="Jn3-Gc-aDK" secondAttribute="leading" id="uSa-Qy-up7"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="Zm8-2Y-Coy"/>
                     </view>
                     <navigationItem key="navigationItem" id="fAB-ij-84d"/>
                     <nil key="simulatedTopBarMetrics"/>
@@ -147,7 +148,7 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Js-sE-gsW" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Js-sE-gsW" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="299" y="52.5" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="ZdJ-dx-bg1"/>
@@ -203,7 +204,7 @@
                                     <outlet property="delegate" destination="0hd-Au-BpE" id="FhD-wl-M2F"/>
                                 </connections>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0mh-6Y-WXI" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0mh-6Y-WXI" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="85" y="270" width="205" height="50"/>
                                 <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -222,7 +223,7 @@
                                     <action selector="confirm:" destination="0hd-Au-BpE" eventType="touchUpInside" id="BA4-t9-exA"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ERk-vr-Ven">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ERk-vr-Ven">
                                 <rect key="frame" x="101" y="328" width="173" height="30"/>
                                 <state key="normal" title="Resend Verification Code">
                                     <color key="titleColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
@@ -232,6 +233,7 @@
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="F01-qi-RCX"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="Mzs-oO-38O" firstAttribute="top" secondItem="crK-FR-DP8" secondAttribute="top" id="2rw-4j-h8W"/>
@@ -255,7 +257,6 @@
                             <constraint firstItem="F01-qi-RCX" firstAttribute="trailing" secondItem="0mh-6Y-WXI" secondAttribute="trailing" constant="85" id="m3G-NN-cJ0"/>
                             <constraint firstItem="GY2-R0-Wzu" firstAttribute="top" secondItem="5Lk-o1-eQs" secondAttribute="bottom" constant="10" id="vay-Ii-wIO"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="F01-qi-RCX"/>
                     </view>
                     <navigationItem key="navigationItem" id="nzL-uK-mkL"/>
                     <nil key="simulatedTopBarMetrics"/>
@@ -326,7 +327,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eBJ-5n-hTK" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQe-69-CWe" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="bottom" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQe-69-CWe" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="16" y="30" width="50" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="50" id="1DJ-2W-N2d"/>
@@ -346,7 +347,7 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ss1-4G-4US" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ss1-4G-4US" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="299" y="52.5" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="WEd-f0-54L"/>
@@ -422,6 +423,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="pUA-Gx-pVq"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="YPd-xb-bfy" firstAttribute="top" secondItem="lw9-JZ-Vz6" secondAttribute="bottom" constant="8" id="4tF-ns-AtF"/>
@@ -447,7 +449,6 @@
                             <constraint firstItem="pUA-Gx-pVq" firstAttribute="trailing" secondItem="zpl-bT-SzX" secondAttribute="trailing" priority="999" constant="32" id="vV8-c5-1Tn"/>
                             <constraint firstItem="eBJ-5n-hTK" firstAttribute="leading" secondItem="pUA-Gx-pVq" secondAttribute="leading" id="zUC-xa-Ec9"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="pUA-Gx-pVq"/>
                     </view>
                     <navigationItem key="navigationItem" id="Rh2-7L-GFK"/>
                     <nil key="simulatedTopBarMetrics"/>
@@ -598,7 +599,7 @@
                                         <color key="textColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="HT5-AL-XVD">
+                                    <textField opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="HT5-AL-XVD">
                                         <rect key="frame" x="32" y="217" width="311" height="44.5"/>
                                         <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -635,7 +636,7 @@
                                             <action selector="signInPressed:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="OND-zQ-fkw"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N0c-II-QAS" customClass="SecondaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N0c-II-QAS" customClass="SecondaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="122.5" y="391.5" width="130" height="32"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                         <state key="normal" title="Forgot password?">
@@ -645,7 +646,7 @@
                                             <segue destination="cgZ-yV-zRs" kind="show" id="r3c-0g-D1p"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nte-Hn-u6r">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nte-Hn-u6r">
                                         <rect key="frame" x="37.5" y="449.5" width="110" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="110" id="SBl-e0-oFz"/>
@@ -658,7 +659,7 @@
                                             <action selector="openDocumentation:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="tGQ-UL-exd"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UHd-4C-Y0a">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UHd-4C-Y0a">
                                         <rect key="frame" x="157.5" y="449.5" width="60" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="D5w-Yu-wdG"/>
@@ -671,7 +672,7 @@
                                             <action selector="openPrivacy:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="iPg-3U-Hmr"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bdv-Bv-ccB">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bdv-Bv-ccB">
                                         <rect key="frame" x="217.5" y="449.5" width="140" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="140" id="1Yy-xT-6lD"/>
@@ -685,7 +686,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="S77-dl-nOK" firstAttribute="bottom" secondItem="rD6-gP-i6F" secondAttribute="bottom" id="4WY-xu-wVS"/>
                                     <constraint firstItem="UHd-4C-Y0a" firstAttribute="centerX" secondItem="NOm-gh-05c" secondAttribute="centerX" id="5gb-BM-KZZ"/>
@@ -798,7 +799,7 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TTe-Mf-ssw">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TTe-Mf-ssw">
                                         <rect key="frame" x="147.5" y="275" width="89" height="29"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <state key="normal" title="Terms Of Use"/>
@@ -826,7 +827,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="iHL-JY-aSZ" firstAttribute="leading" secondItem="h4Y-lz-Rgy" secondAttribute="leading" id="4P8-pk-0qB"/>
                                     <constraint firstItem="GPM-zl-nF5" firstAttribute="trailing" secondItem="iHL-JY-aSZ" secondAttribute="trailing" id="86X-iC-mJq"/>
@@ -865,7 +866,8 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="QPE-t6-ANk"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="trailing" secondItem="QPE-t6-ANk" secondAttribute="trailing" id="4Nz-3K-pkd"/>
                             <constraint firstItem="F4a-1m-dcP" firstAttribute="centerX" secondItem="Seu-in-CWQ" secondAttribute="centerX" id="5MG-Oj-Ten"/>
@@ -885,7 +887,6 @@
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="leading" secondItem="QPE-t6-ANk" secondAttribute="leading" id="vB8-Yi-d2u"/>
                             <constraint firstAttribute="bottom" secondItem="F4a-1m-dcP" secondAttribute="bottom" constant="20" id="zJy-0W-HUP"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="QPE-t6-ANk"/>
                     </view>
                     <navigationItem key="navigationItem" id="Bei-DQ-UZk"/>
                     <nil key="simulatedTopBarMetrics"/>
@@ -930,14 +931,14 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EK2-tY-Ire">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EK2-tY-Ire">
                                 <rect key="frame" x="326" y="10" width="39" height="30"/>
                                 <state key="normal" title="Close"/>
                                 <connections>
                                     <action selector="closeWebView:" destination="wXr-Ub-V7p" eventType="touchUpInside" id="R70-GQ-0tG"/>
                                 </connections>
                             </button>
-                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wvO-yc-hIb">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wvO-yc-hIb">
                                 <rect key="frame" x="10" y="10" width="34" height="30"/>
                                 <state key="normal" title="Back"/>
                                 <connections>
@@ -945,7 +946,8 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="7JE-6N-vH6"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="VvT-Zr-VFS" firstAttribute="trailing" secondItem="7JE-6N-vH6" secondAttribute="trailing" id="A8a-xu-XyV"/>
                             <constraint firstItem="wvO-yc-hIb" firstAttribute="leading" secondItem="7JE-6N-vH6" secondAttribute="leading" constant="10" id="BLL-hl-1AM"/>
@@ -956,7 +958,6 @@
                             <constraint firstItem="VvT-Zr-VFS" firstAttribute="leading" secondItem="7JE-6N-vH6" secondAttribute="leading" id="jmY-Ri-VYQ"/>
                             <constraint firstItem="7JE-6N-vH6" firstAttribute="trailing" secondItem="EK2-tY-Ire" secondAttribute="trailing" constant="10" id="u5I-yS-cq3"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="7JE-6N-vH6"/>
                     </view>
                     <connections>
                         <outlet property="backButton" destination="wvO-yc-hIb" id="D2G-5E-46e"/>
@@ -974,5 +975,8 @@
         <image name="checkbox_unchecked" width="24" height="24"/>
         <image name="github_logo" width="24" height="24"/>
         <image name="google_logo" width="32" height="32"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

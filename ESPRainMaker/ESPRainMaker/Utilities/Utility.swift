@@ -19,6 +19,7 @@
 import CoreBluetooth
 import Foundation
 import MBProgressHUD
+import Network
 import Reachability
 import Toast_Swift
 import UIKit
@@ -27,7 +28,6 @@ class Utility {
     static var deviceNamePrefix = UserDefaults.standard.value(forKey: Constants.prefixKey) as? String ?? (Bundle.main.infoDictionary?[Constants.deviceNamePrefix] as? String ?? Constants.devicePrefixDefault)
     static let allowPrefixFilter = Bundle.main.infoDictionary?[Constants.allowFilteringByPrefix] as? Bool ?? false
     static let baseUrl = Bundle.main.infoDictionary?[Constants.wifiBaseUrl] as? String ?? Constants.wifiBaseUrlDefault
-    static let reachability = try! Reachability()
 
     var deviceName = ""
     var configPath: String = Constants.configPath
@@ -94,28 +94,5 @@ class Utility {
         DispatchQueue.main.async {
             view.makeToast(message)
         }
-    }
-
-    class func isConnected(view _: UIView) -> Bool {
-        if let currentWindow = UIApplication.shared.keyWindow {
-            for subView in currentWindow.subviews {
-                if subView.isKind(of: NoInternetConnection.self) {
-                    subView.removeFromSuperview()
-                }
-            }
-            do {
-                try reachability.startNotifier()
-            } catch {
-                return true
-            }
-            if reachability.connection == .unavailable {
-                let noConnectionView = NoInternetConnection.instanceFromNib()
-                noConnectionView.frame = UIScreen.main.bounds
-                currentWindow.addSubview(noConnectionView)
-                return false
-            }
-            return true
-        }
-        return false
     }
 }

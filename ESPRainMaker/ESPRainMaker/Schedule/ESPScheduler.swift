@@ -24,6 +24,7 @@
         var schedules: [String: ESPSchedule] = [:]
         var availableDevices: [String: Device] = [:]
         var currentSchedule: ESPSchedule!
+        let apiManager = ESPAPIManager()
 
         // MARK: - Schedule Operations
 
@@ -33,7 +34,7 @@
         ///   - onView:UIView to show message in case of failure.
         ///   - completionHandler: Callback invoked after api response is recieved
         func saveSchedule(onView: UIView, completionHandler: @escaping (Bool) -> Void) {
-            if Utility.isConnected(view: onView) {
+            if ESPNetworkMonitor.shared.isConnectedToNetwork {
                 var jsonString: [String: Any] = [:]
                 jsonString["name"] = currentSchedule.name
                 jsonString["id"] = currentSchedule.id
@@ -57,7 +58,7 @@
                             deviceJSON[device.name ?? ""] = actionJSON
                         }
                         jsonString["action"] = deviceJSON
-                        NetworkManager.shared.updateThingShadow(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
+                        apiManager.updateThingShadow(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
                             switch result {
                             case .success:
                                 finalResult = finalResult || true
@@ -84,7 +85,7 @@
         ///   - onView:UIView to show message in case of failure.
         ///   - completionHandler: Callback invoked after api response is recieved
         func shouldEnableSchedule(onView: UIView, completionHandler: @escaping (Bool) -> Void) {
-            if Utility.isConnected(view: onView) {
+            if ESPNetworkMonitor.shared.isConnectedToNetwork {
                 configureDeviceForCurrentSchedule()
                 var jsonString: [String: Any] = [:]
                 jsonString["id"] = currentSchedule.id
@@ -95,7 +96,7 @@
                 if actions.keys.count > 0 {
                     for key in actions.keys {
                         i += 1
-                        NetworkManager.shared.updateThingShadow(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
+                        apiManager.updateThingShadow(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
                             switch result {
                             case .success:
                                 finalResult = finalResult || true
@@ -122,7 +123,7 @@
         ///   - onView:UIView to show message in case of failure.
         ///   - completionHandler: Callback invoked after api response is recieved
         func deleteScheduleAt(key: String, onView: UIView, completionHandler: @escaping (Bool) -> Void) {
-            if Utility.isConnected(view: onView) {
+            if ESPNetworkMonitor.shared.isConnectedToNetwork {
                 currentSchedule = ESPScheduler.shared.schedules[key]!
                 configureDeviceForCurrentSchedule()
                 var jsonString: [String: Any] = [:]
@@ -134,7 +135,7 @@
                 let actions = createActionsFromDeviceList()
                 for nodeID in actions.keys {
                     i += 1
-                    NetworkManager.shared.updateThingShadow(nodeID: nodeID, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
+                    apiManager.updateThingShadow(nodeID: nodeID, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
                         switch result {
                         case .success:
                             finalResult = finalResult || true

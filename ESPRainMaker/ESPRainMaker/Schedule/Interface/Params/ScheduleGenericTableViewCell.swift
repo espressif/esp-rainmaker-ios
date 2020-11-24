@@ -44,7 +44,7 @@
         }
 
         @IBAction func editButtonTapped(_: Any) {
-            if Utility.isConnected(view: parentViewController!.view) {
+            if ESPNetworkMonitor.shared.isConnectedToNetwork {
                 let input = UIAlertController(title: param?.attributeKey, message: "Enter new value", preferredStyle: .alert)
                 input.addTextField { textField in
                     textField.text = self.controlValue ?? ""

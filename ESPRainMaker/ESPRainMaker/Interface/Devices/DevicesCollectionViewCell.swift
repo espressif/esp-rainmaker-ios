@@ -31,7 +31,15 @@ class DevicesCollectionViewCell: UICollectionViewCell {
     @IBOutlet var offlineLabel: UILabel!
     @IBAction func switchButtonPressed(_: Any) {
         switchValue = !switchValue
-        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [device.primary ?? "": switchValue]])
+        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [device.primary ?? "": switchValue]]) { result in
+            switch result {
+            case .failure:
+                let view = self.parentViewController?.view ?? self.contentView
+                Utility.showToastMessage(view: view, message: "Fail to update parameter. Please check you network connection!!")
+            default:
+                break
+            }
+        }
 
         if switchValue {
             switchButton.setImage(UIImage(named: "switch_icon_enabled_on"), for: .normal)

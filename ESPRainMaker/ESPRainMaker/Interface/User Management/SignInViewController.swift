@@ -256,7 +256,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     @IBAction func signInPressed(_: AnyObject) {
         dismissKeyboard()
         signInButton.isEnabled = false
-        if Utility.isConnected(view: view) {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
             guard let usernameValue = username.text, !usernameValue.isEmpty, let password = password.text, !password.isEmpty else {
                 let alertController = UIAlertController(title: "Missing information",
                                                         message: "Please enter a valid user name and password",
@@ -290,7 +290,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
 
     @IBAction func signUp(_ sender: AnyObject) {
         dismissKeyboard()
-        if Utility.isConnected(view: view) {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
             guard let userNameValue = self.email.text, !userNameValue.isEmpty,
                 let passwordValue = self.registerPassword.text, !passwordValue.isEmpty else {
                 let alertController = UIAlertController(title: "Missing Required Fields",
@@ -515,10 +515,6 @@ extension SignInViewController: ASWebAuthenticationPresentationContextProviding 
 }
 
 extension SignInViewController: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        textField.text = ""
-    }
-
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         switch textField {
         case username:

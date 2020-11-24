@@ -18,7 +18,7 @@
 
 import UIKit
 
-class GenericControlTableViewCell: UITableViewCell {
+class GenericControlTableViewCell: UITableViewCell, ParamUpdateProtocol {
     @IBOutlet var backView: UIView!
     @IBOutlet var controlName: UILabel!
     @IBOutlet var controlValueLabel: UILabel!
@@ -29,6 +29,7 @@ class GenericControlTableViewCell: UITableViewCell {
     var device: Device!
     var boolTypeValidValues: [String: Int] = ["true": 1, "false": 0, "yes": 1, "no": 0, "0": 0, "1": 1]
     var attribute: Param?
+    var delegate: ParamUpdateProtocol?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -54,27 +55,25 @@ class GenericControlTableViewCell: UITableViewCell {
     }
 
     @IBAction func editButtonTapped(_: Any) {
-        if Utility.isConnected(view: parentViewController!.view) {
-            var input: UIAlertController!
-            if attribute?.type == "esp.param.name" {
-                input = UIAlertController(title: attributeKey, message: "Enter device name of length 1-32 characters", preferredStyle: .alert)
-            } else {
-                input = UIAlertController(title: attributeKey, message: "Enter new value", preferredStyle: .alert)
-            }
-            input.addTextField { textField in
-                textField.text = self.controlValue ?? ""
-                self.addHeightConstraint(textField: textField)
-            }
-
-            input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
-            }))
-            input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
-                let valueTextField = input?.textFields![0]
-                self.controlValue = valueTextField?.text
-                self.doneButtonAction()
-            }))
-            parentViewController?.present(input, animated: true, completion: nil)
+        var input: UIAlertController!
+        if attribute?.type == "esp.param.name" {
+            input = UIAlertController(title: attributeKey, message: "Enter device name of length 1-32 characters", preferredStyle: .alert)
+        } else {
+            input = UIAlertController(title: attributeKey, message: "Enter new value", preferredStyle: .alert)
         }
+        input.addTextField { textField in
+            textField.text = self.controlValue ?? ""
+            self.addHeightConstraint(textField: textField)
+        }
+
+        input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
+        }))
+        input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
+            let valueTextField = input?.textFields![0]
+            self.controlValue = valueTextField?.text
+            self.doneButtonAction()
+        }))
+        parentViewController?.present(input, animated: true, completion: nil)
     }
 
     private func addHeightConstraint(textField: UITextField) {
@@ -97,13 +96,27 @@ class GenericControlTableViewCell: UITableViewCell {
                 if let intValue = Int(value) {
                     if let bounds = attribute?.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int {
                         if intValue >= min, intValue <= max {
-                            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]])
+                            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]]) { result in
+                                switch result {
+                                case .failure:
+                                    self.failureInUpdatingParam()
+                                default:
+                                    break
+                                }
+                            }
                             controlValueLabel.text = value
                         } else {
                             showAlert(message: "Value out of bound.")
                         }
                     } else {
-                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]])
+                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]]) { result in
+                            switch result {
+                            case .failure:
+                                self.failureInUpdatingParam()
+                            default:
+                                break
+                            }
+                        }
                         controlValueLabel.text = value
                     }
                 } else {
@@ -113,13 +126,27 @@ class GenericControlTableViewCell: UITableViewCell {
                 if let floatValue = Float(value) {
                     if let bounds = attribute?.bounds, let max = bounds["max"] as? Float, let min = bounds["min"] as? Float {
                         if floatValue >= min, floatValue <= max {
-                            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]])
+                            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]]) { result in
+                                switch result {
+                                case .failure:
+                                    self.failureInUpdatingParam()
+                                default:
+                                    break
+                                }
+                            }
                             controlValueLabel.text = value
                         } else {
                             showAlert(message: "Value out of bound.")
                         }
                     } else {
-                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]])
+                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]]) { result in
+                            switch result {
+                            case .failure:
+                                self.failureInUpdatingParam()
+                            default:
+                                break
+                            }
+                        }
                         controlValueLabel.text = value
                     }
                 } else {
@@ -129,10 +156,24 @@ class GenericControlTableViewCell: UITableViewCell {
                 if boolTypeValidValues.keys.contains(value) {
                     let validValue = boolTypeValidValues[value]!
                     if validValue == 0 {
-                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: false]])
+                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: false]]) { result in
+                            switch result {
+                            case .failure:
+                                self.failureInUpdatingParam()
+                            default:
+                                break
+                            }
+                        }
                         controlValueLabel.text = value
                     } else {
-                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: true]])
+                        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: true]]) { result in
+                            switch result {
+                            case .failure:
+                                self.failureInUpdatingParam()
+                            default:
+                                break
+                            }
+                        }
                         controlValueLabel.text = value
                     }
                 } else {
@@ -145,7 +186,14 @@ class GenericControlTableViewCell: UITableViewCell {
                         return
                     }
                 }
-                NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]])
+                NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]]) { result in
+                    switch result {
+                    case .failure:
+                        self.failureInUpdatingParam()
+                    default:
+                        break
+                    }
+                }
                 controlValueLabel.text = value
 
                 #if SCHEDULE
@@ -154,5 +202,9 @@ class GenericControlTableViewCell: UITableViewCell {
             }
             attribute?.value = controlValue as Any
         }
+    }
+
+    func failureInUpdatingParam() {
+        delegate?.failureInUpdatingParam()
     }
 }

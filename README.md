@@ -75,7 +75,16 @@ For more details :
 
 - Allow user to change and monitor parameters of devices.
 
-  
+
+### Local Control
+
+
+- This feature allows discovering devices on local Wi-Fi network using Bonjour (mDNS) and controlling them using HTTP as per the [ESP Local Control](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/protocols/esp_local_ctrl.html) specifications.
+
+- Local Control ensures your devices are reachable even when your internet connection is poor or there is no internet over connected Wi-Fi
+
+Local Control feature is optional but enabled by default. It can be disabled from the build settings by removing `Local_Control` keyword from `Active Compilation Condition` under `Swift Compiler - Custom Flags`.
+
 
 ### Personalisation
 
@@ -101,7 +110,7 @@ Schedule feature is optional but enabled by default. Schedule can be disabled fr
 
   
 
-- iOS 11.0 or greater.
+- iOS 12.0 or greater.
 
 - Xcode 12.0
 

@@ -29,13 +29,15 @@ struct JSONParser {
     ///
     /// - Parameters:
     ///   - data: node information in the form of JSON.
-    static func parseNodeArray(data: [[String: Any]]) -> [Node]? {
+    static func parseNodeArray(data: [[String: Any]], forSingleNode: Bool) -> [Node]? {
         var singleDeviceNodeList: [Node] = []
         var multiDeviceNodeList: [Node] = []
         var nodeList: [Node] = []
 
         #if SCHEDULE
-            ESPScheduler.shared.refreshScheduleList()
+            if !forSingleNode {
+                ESPScheduler.shared.refreshScheduleList()
+            }
         #endif
 
         for node_details in data {
@@ -46,13 +48,15 @@ struct JSONParser {
 
             if let config = node_details["config"] as? [String: Any] {
                 #if SCHEDULE
-                    // Check whether scheduling is supported in the node
-                    if let services = config["services"] as? [[String: Any]] {
-                        for service in services {
-                            if let type = service["type"] as? String, type == Constants.scheduleServiceType, let params = service["params"] as? [[String: Any]] {
-                                for param in params {
-                                    if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
-                                        node.isSchedulingSupported = true
+                    if !forSingleNode {
+                        // Check whether scheduling is supported in the node
+                        if let services = config["services"] as? [[String: Any]] {
+                            for service in services {
+                                if let type = service["type"] as? String, type == Constants.scheduleServiceType, let params = service["params"] as? [[String: Any]] {
+                                    for param in params {
+                                        if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
+                                            node.isSchedulingSupported = true
+                                        }
                                     }
                                 }
                             }
@@ -145,9 +149,11 @@ struct JSONParser {
                 }
 
                 #if SCHEDULE
-                    if let schedule = paramInfo[Constants.scheduleKey] as? [String: Any], let schedules = schedule[Constants.schedulesKey] as? [[String: Any]] {
-                        for scheduleJSON in schedules {
-                            ESPScheduler.shared.saveScheduleListFromJSON(nodeID: node.node_id ?? "", scheduleJSON: scheduleJSON)
+                    if !forSingleNode {
+                        if let schedule = paramInfo[Constants.scheduleKey] as? [String: Any], let schedules = schedule[Constants.schedulesKey] as? [[String: Any]] {
+                            for scheduleJSON in schedules {
+                                ESPScheduler.shared.saveScheduleListFromJSON(nodeID: node.node_id ?? "", scheduleJSON: scheduleJSON)
+                            }
                         }
                     }
                 #endif
@@ -164,9 +170,10 @@ struct JSONParser {
             return nil
         }
         #if SCHEDULE
-            ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+            if !forSingleNode {
+                ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+            }
         #endif
-
         return nodeList
     }
 }

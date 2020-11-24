@@ -18,7 +18,7 @@
 
 import UIKit
 
-class SwitchTableViewCell: UITableViewCell {
+class SwitchTableViewCell: UITableViewCell, ParamUpdateProtocol {
     @IBOutlet var backView: UIView!
     @IBOutlet var controlName: UILabel!
     @IBOutlet var toggleSwitch: UISwitch!
@@ -28,6 +28,7 @@ class SwitchTableViewCell: UITableViewCell {
     var attributeKey = ""
     var param: Param!
     var device: Device!
+    var delegate: ParamUpdateProtocol?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -52,13 +53,22 @@ class SwitchTableViewCell: UITableViewCell {
     }
 
     @IBAction func switchStateChanged(_ sender: UISwitch) {
-        if Utility.isConnected(view: parentViewController!.view) {
-            if sender.isOn {
-                controlStateLabel.text = "On"
-            } else {
-                controlStateLabel.text = "Off"
-            }
-            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]])
+        if sender.isOn {
+            controlStateLabel.text = "On"
+        } else {
+            controlStateLabel.text = "Off"
         }
+        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]]) { result in
+            switch result {
+            case .failure:
+                self.failureInUpdatingParam()
+            default:
+                break
+            }
+        }
+    }
+
+    func failureInUpdatingParam() {
+        delegate?.failureInUpdatingParam()
     }
 }
