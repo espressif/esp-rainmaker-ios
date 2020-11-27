@@ -32,7 +32,6 @@ class ProvisionViewController: UIViewController {
     var grayView: UIView?
     var wifiDetailList: [ESPWifiNetwork] = []
     var versionInfo: String?
-    var capabilities: [String]?
     var alertTextField: UITextField?
     var showPasswordImageView: UIImageView!
     var connectAutomatically = false

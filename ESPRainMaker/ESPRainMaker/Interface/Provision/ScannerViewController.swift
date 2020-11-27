@@ -105,6 +105,20 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         navigationController?.popToRootViewController(animated: false)
     }
 
+    @IBAction func selectManualProvisioning(_: Any) {
+        let actionSheet = UIAlertController(title: "", message: "Choose Provisioning Transport", preferredStyle: .actionSheet)
+        let bleAction = UIAlertAction(title: "BLE", style: .default) { _ in
+            self.goToBleProvision()
+        }
+        let softapAction = UIAlertAction(title: "SoftAP", style: .default) { _ in
+            self.goToSoftAPProvision()
+        }
+        actionSheet.addAction(bleAction)
+        actionSheet.addAction(softapAction)
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(actionSheet, animated: true, completion: nil)
+    }
+
     func retry(message: String) {
         Utility.hideLoader(view: view)
         addManuallyButton.isEnabled = true
@@ -129,6 +143,16 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         provisionVC.isScanFlow = true
         provisionVC.device = device
         navigationController?.pushViewController(provisionVC, animated: true)
+    }
+
+    func goToBleProvision() {
+        let bleLandingVC = storyboard?.instantiateViewController(withIdentifier: "bleLandingVC") as! BLELandingViewController
+        navigationController?.pushViewController(bleLandingVC, animated: true)
+    }
+
+    func goToSoftAPProvision() {
+        let bleLandingVC = storyboard?.instantiateViewController(withIdentifier: "provisionLanding") as! ProvisionLandingViewController
+        navigationController?.pushViewController(bleLandingVC, animated: true)
     }
 
     /*

@@ -138,7 +138,7 @@ class ProvisionLandingViewController: UIViewController {
     }
 
     func getESPDevice() {
-        ESPProvisionManager.shared.createESPDevice(deviceName: verifyConnection() ?? "", transport: .softap, completionHandler: { device, _ in
+        ESPProvisionManager.shared.createESPDevice(deviceName: verifyConnection() ?? "", transport: .softap, security: Utility.espProvSetting.securityMode, completionHandler: { device, _ in
             if device != nil {
                 self.connectDevice(espDevice: device!)
 
@@ -184,8 +184,7 @@ class ProvisionLandingViewController: UIViewController {
 
     func goToConnectVC(ssid: String) {
         let connectVC = storyboard?.instantiateViewController(withIdentifier: Constants.connectVCIdentifier) as! ConnectViewController
-        connectVC.currentWifiSSID = ssid
-        connectVC.capabilities = capabilities
+        connectVC.currentDeviceName = ssid
         navigationController?.pushViewController(connectVC, animated: true)
     }
 
@@ -201,7 +200,6 @@ class ProvisionLandingViewController: UIViewController {
         let provVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
         provVC.isScanFlow = false
         provVC.device = device
-        provVC.capabilities = capabilities
         navigationController?.pushViewController(provVC, animated: true)
     }
 

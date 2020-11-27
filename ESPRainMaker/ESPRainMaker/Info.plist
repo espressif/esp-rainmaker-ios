@@ -49,6 +49,13 @@
 	<string>$(CLAIM_BASE_URL)</string>
 	<key>DeviceNamePrefix</key>
 	<string>PROV_</string>
+	<key>ESP Provision Settings</key>
+	<dict>
+		<key>ESP Allow Prefix Search</key>
+		<string>YES</string>
+		<key>ESP Securtiy Mode</key>
+		<string>Secure</string>
+	</dict>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>itms-apps</string>
