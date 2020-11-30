@@ -21,6 +21,7 @@
 		F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */; };
 		F1072BC6256F9BD400D7CE2C /* BLEDeviceListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */; };
 		F1072BCA256FC19800D7CE2C /* ESPProvSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */; };
+		F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1084204257103BC009F1AC3 /* GradientSlider.swift */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
 		F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */; };
 		F1110429252D8E2D0030A1D3 /* ESPLocalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */; };
@@ -150,6 +151,7 @@
 		F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEDeviceListViewCell.swift; sourceTree = "<group>"; };
 		F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPProvSettings.swift; sourceTree = "<group>"; };
 		F107AB3624CEC979008DB9CD /* ESPScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScheduler.swift; sourceTree = "<group>"; };
+		F1084204257103BC009F1AC3 /* GradientSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientSlider.swift; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
 		F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalStorage.swift; sourceTree = "<group>"; };
 		F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalService.swift; sourceTree = "<group>"; };
@@ -506,6 +508,7 @@
 				F1AB511A23321B7E002401F9 /* JSONParser.swift */,
 				F1FB153E234DED260053B0ED /* Errors.swift */,
 				F17F1411239F96C3008326A4 /* VersionManager.swift */,
+				F1084204257103BC009F1AC3 /* GradientSlider.swift */,
 				F1B3558823B8DC4C004552FC /* ExtensionManager.swift */,
 				F1EAAC8D23E29D9B00E9A6A8 /* AppConstants.swift */,
 				F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */,
@@ -898,6 +901,7 @@
 				F1FB153C234D91000053B0ED /* GenericSliderTableViewCell.swift in Sources */,
 				F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */,
 				F190B9C624C0D842006D136D /* DeviceHeaderView.swift in Sources */,
+				F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */,
 				F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */,
 				1431462720DE994B0017E119 /* AppDelegate.swift in Sources */,
 				F1E37E9023CF3AD500A5043F /* PrimaryControlTableViewCell.swift in Sources */,

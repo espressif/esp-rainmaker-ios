@@ -10,7 +10,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="scheduleSliderTableViewCell" rowHeight="75" id="KGk-i7-Jjw" customClass="ScheduleSliderTableViewCell" customModule="ESP_Schedule" customModuleProvider="target">
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="scheduleSliderTableViewCell" rowHeight="75" id="KGk-i7-Jjw" customClass="ScheduleSliderTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="290" height="75"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
@@ -20,7 +20,7 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AX0-vZ-YOa">
                         <rect key="frame" x="0.0" y="0.0" width="290" height="75"/>
                         <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AdO-VM-Un3" customClass="ThumbTextSlider" customModule="ESP_Schedule" customModuleProvider="target">
+                            <slider opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AdO-VM-Un3" customClass="ThumbTextSlider" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="54.5" y="29.5" width="221.5" height="31"/>
                                 <color key="minimumTrackTintColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="maximumTrackTintColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -71,13 +71,29 @@
                                     <constraint firstAttribute="width" constant="0.5" id="yCm-SO-8aL"/>
                                 </constraints>
                             </view>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qfy-Ov-a7f" customClass="GradientSlider" customModule="ESP_RainMaker" customModuleProvider="target">
+                                <rect key="frame" x="56.5" y="30.5" width="217.5" height="28"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="thickness">
+                                        <real key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="hasRainbow" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="hueSliderValueChanged:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="HXO-ba-z8C"/>
+                                    <action selector="hueSliderValueDragged:" destination="KGk-i7-Jjw" eventType="valueChanged" id="XIt-hD-cTR"/>
+                                </connections>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="OUJ-Lp-LSH" firstAttribute="top" secondItem="AX0-vZ-YOa" secondAttribute="top" id="0JS-4b-md5"/>
+                            <constraint firstItem="AdO-VM-Un3" firstAttribute="leading" secondItem="Qfy-Ov-a7f" secondAttribute="leading" id="0TZ-kC-SUs"/>
                             <constraint firstItem="AdO-VM-Un3" firstAttribute="centerY" secondItem="AX0-vZ-YOa" secondAttribute="centerY" constant="7" id="7Ry-of-69s"/>
                             <constraint firstItem="AdO-VM-Un3" firstAttribute="leading" secondItem="7jR-sT-96C" secondAttribute="trailing" constant="16" id="A7U-HH-GRI"/>
                             <constraint firstAttribute="height" constant="75" id="C0g-zo-oP0"/>
+                            <constraint firstItem="AdO-VM-Un3" firstAttribute="centerY" secondItem="Qfy-Ov-a7f" secondAttribute="centerY" id="CY5-7o-KEX"/>
                             <constraint firstAttribute="bottom" secondItem="xzl-HG-HxJ" secondAttribute="bottom" constant="2" id="Dug-Z4-su9"/>
                             <constraint firstItem="OJe-O7-d6H" firstAttribute="top" secondItem="AX0-vZ-YOa" secondAttribute="top" constant="4" id="Ggg-Fb-vLm"/>
                             <constraint firstAttribute="trailing" secondItem="AdO-VM-Un3" secondAttribute="trailing" constant="16" id="H5N-DS-QDe"/>
@@ -90,7 +106,9 @@
                             <constraint firstItem="xzl-HG-HxJ" firstAttribute="leading" secondItem="7jR-sT-96C" secondAttribute="trailing" constant="8" id="gj3-w1-PYI"/>
                             <constraint firstAttribute="trailing" secondItem="OUJ-Lp-LSH" secondAttribute="trailing" id="oY8-Go-FFn"/>
                             <constraint firstItem="eK1-Z0-BxG" firstAttribute="centerY" secondItem="xzl-HG-HxJ" secondAttribute="centerY" id="pB7-Bg-Mhu"/>
+                            <constraint firstItem="AdO-VM-Un3" firstAttribute="centerX" secondItem="Qfy-Ov-a7f" secondAttribute="centerX" id="t3O-Lc-uj4"/>
                             <constraint firstItem="4hX-tg-Yy1" firstAttribute="leading" secondItem="AX0-vZ-YOa" secondAttribute="leading" id="uDC-u9-cEq"/>
+                            <constraint firstItem="AdO-VM-Un3" firstAttribute="trailing" secondItem="Qfy-Ov-a7f" secondAttribute="trailing" id="v9N-8J-swq"/>
                             <constraint firstItem="7jR-sT-96C" firstAttribute="top" secondItem="AX0-vZ-YOa" secondAttribute="top" id="x0P-0V-aji"/>
                             <constraint firstAttribute="bottom" secondItem="7jR-sT-96C" secondAttribute="bottom" id="zzY-v4-7kn"/>
                         </constraints>
@@ -108,6 +126,7 @@
             <connections>
                 <outlet property="backView" destination="AX0-vZ-YOa" id="AAD-lk-fCZ"/>
                 <outlet property="checkButton" destination="7jR-sT-96C" id="pAD-3s-a6B"/>
+                <outlet property="hueSlider" destination="Qfy-Ov-a7f" id="R7O-NN-4WR"/>
                 <outlet property="maxLabel" destination="eK1-Z0-BxG" id="axo-w4-Orn"/>
                 <outlet property="minLabel" destination="xzl-HG-HxJ" id="0OT-1a-ZhL"/>
                 <outlet property="slider" destination="AdO-VM-Un3" id="mCR-fc-N2v"/>
@@ -116,7 +135,12 @@
             <point key="canvasLocation" x="163.768115942029" y="41.183035714285715"/>
         </tableViewCell>
     </objects>
+    <designables>
+        <designable name="Qfy-Ov-a7f">
+            <size key="intrinsicContentSize" width="-1" height="28"/>
+        </designable>
+    </designables>
     <resources>
-        <image name="unselected" width="16" height="16"/>
+        <image name="unselected" width="20" height="20"/>
     </resources>
 </document>

@@ -67,6 +67,8 @@
                         let minValue = bounds["min"] as? Float ?? 0
                         if minValue < maxValue {
                             let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleSliderTableViewCell", for: indexPath) as! ScheduleSliderTableViewCell
+                            cell.hueSlider.isHidden = true
+                            cell.slider.isHidden = false
                             if let bounds = param.bounds {
                                 cell.slider.minimumValue = bounds["min"] as? Float ?? 0
                                 cell.slider.maximumValue = bounds["max"] as? Float ?? 100
@@ -121,6 +123,54 @@
                 cell.device = device
                 cell.delegate = self
                 cell.indexPath = indexPath
+                return cell
+            } else if param.uiType == "esp.ui.hue-slider" {
+                var minValue = 0
+                var maxValue = 360
+                if let bounds = param.bounds {
+                    minValue = bounds["min"] as? Int ?? 0
+                    maxValue = bounds["max"] as? Int ?? 360
+                }
+
+                let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleSliderTableViewCell", for: indexPath) as! ScheduleSliderTableViewCell
+                cell.delegate = self
+                cell.indexPath = indexPath
+                cell.slider.isHidden = true
+                cell.hueSlider.isHidden = false
+                cell.param = param
+                cell.hueSlider.minimumValue = CGFloat(minValue)
+                cell.hueSlider.maximumValue = CGFloat(maxValue)
+
+                if minValue == 0 && maxValue == 360 {
+                    cell.hueSlider.hasRainbow = true
+                    cell.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
+                } else {
+                    cell.hueSlider.hasRainbow = false
+                    cell.hueSlider.minColor = UIColor(hue: CGFloat(minValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                    cell.hueSlider.maxColor = UIColor(hue: CGFloat(maxValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                }
+
+                let value = CGFloat(param.value as? Int ?? 0)
+                cell.hueSlider.value = CGFloat(value)
+                cell.minLabel.text = "\(minValue)"
+                cell.maxLabel.text = "\(maxValue)"
+                cell.hueSlider.thumbColor = UIColor(hue: value / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                cell.device = device
+                if param.properties?.contains("write") ?? false, device.node?.isConnected ?? false || device.node?.localNetwork ?? false {
+                    cell.hueSlider.isEnabled = true
+                } else {
+                    cell.hueSlider.isEnabled = false
+                }
+                cell.title.text = param.name ?? ""
+
+                if param.selected {
+                    cell.checkButton.setImage(UIImage(named: "selected"), for: .normal)
+                    cell.hueSlider.isEnabled = true
+                } else {
+                    cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+                    cell.hueSlider.isEnabled = false
+                }
+
                 return cell
             }
 
