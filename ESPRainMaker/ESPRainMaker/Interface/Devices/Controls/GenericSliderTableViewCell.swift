@@ -30,12 +30,14 @@ class GenericSliderTableViewCell: UITableViewCell, ParamUpdateProtocol {
     @IBOutlet var maxLabel: UILabel!
     @IBOutlet var backView: UIView!
     @IBOutlet var title: UILabel!
+    @IBOutlet var hueSlider: GradientSlider!
 
     var paramName: String = ""
     var device: Device!
     var dataType: String!
     var sliderValue = ""
     var delegate: ParamUpdateProtocol?
+    var currentHueValue: CGFloat = 0
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -90,6 +92,26 @@ class GenericSliderTableViewCell: UITableViewCell, ParamUpdateProtocol {
                     break
                 }
             }
+        }
+    }
+
+    @IBAction func hueSliderValueDragged(_ sender: GradientSlider) {
+        hueSlider.thumbColor = UIColor(hue: CGFloat(sender.value / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+    }
+
+    @IBAction func hueSliderValueChanged(_ sender: GradientSlider) {
+        if currentHueValue != sender.value {
+            hueSlider.thumbColor = UIColor(hue: CGFloat(sender.value / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+            print("hue value changed \(sender.value)")
+            NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]]) { result in
+                switch result {
+                case .failure:
+                    self.failureInUpdatingParam()
+                default:
+                    break
+                }
+            }
+            currentHueValue = sender.value
         }
     }
 
