@@ -28,6 +28,7 @@ class Utility {
     static var deviceNamePrefix = UserDefaults.standard.value(forKey: Constants.prefixKey) as? String ?? (Bundle.main.infoDictionary?[Constants.deviceNamePrefix] as? String ?? Constants.devicePrefixDefault)
     static let allowPrefixFilter = Bundle.main.infoDictionary?[Constants.allowFilteringByPrefix] as? Bool ?? false
     static let baseUrl = Bundle.main.infoDictionary?[Constants.wifiBaseUrl] as? String ?? Constants.wifiBaseUrlDefault
+    static let espProvSetting = ESPProvSettings()
 
     var deviceName = ""
     var configPath: String = Constants.configPath

@@ -26,32 +26,36 @@ class ConnectViewController: UIViewController {
     @IBOutlet var popTextField: UITextField!
     @IBOutlet var headerLabel: UILabel!
     @IBOutlet var nextButton: UIButton!
-    var currentWifiSSID = ""
-    var capabilities: [String]?
+    var currentDeviceName = ""
     var espDevice: ESPDevice!
     var pop = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-        headerLabel.text = "Enter your proof of possession PIN for \n" + currentWifiSSID
-        ESPProvisionManager.shared.createESPDevice(deviceName: currentWifiSSID, transport: .softap, completionHandler: { device, error in
-            if device != nil {
-                self.espDevice = device
-                DispatchQueue.main.async {
-                    self.nextButton.isHidden = false
-                }
-
-            } else {
-                DispatchQueue.main.async {
-                    let action = UIAlertAction(title: "Retry", style: .default) { _ in
-                        self.navigationController?.popToRootViewController(animated: false)
+        if espDevice == nil {
+            ESPProvisionManager.shared.createESPDevice(deviceName: currentDeviceName, transport: .softap, completionHandler: { device, error in
+                if device != nil {
+                    self.espDevice = device
+                    DispatchQueue.main.async {
+                        self.nextButton.isHidden = false
                     }
-                    self.showAlert(error: error!.description, action: action)
+
+                } else {
+                    DispatchQueue.main.async {
+                        let action = UIAlertAction(title: "Retry", style: .default) { _ in
+                            self.navigationController?.popToRootViewController(animated: false)
+                        }
+                        self.showAlert(error: error!.description, action: action)
+                    }
                 }
-            }
-        })
+            })
+        } else {
+            nextButton.isHidden = false
+            currentDeviceName = espDevice.name
+        }
+
+        headerLabel.text = "Enter your proof of possession PIN for \n" + currentDeviceName
     }
 
     @IBAction func cancelClicked(_: Any) {
@@ -86,8 +90,12 @@ class ConnectViewController: UIViewController {
 
     func checkForAssistedClaiming(device: ESPDevice) {
         if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo["rmaker"] as? NSDictionary, let rmaikerCap = rmaikerInfo["cap"] as? [String], rmaikerCap.contains("claim") {
-            let action = UIAlertAction(title: "Okay", style: .default, handler: nil)
-            showAlert(error: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", action: action)
+            if device.transport == .ble {
+                goToClaimVC(device: device)
+            } else {
+                let action = UIAlertAction(title: "Okay", style: .default, handler: nil)
+                showAlert(error: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", action: action)
+            }
         } else {
             goToProvision()
         }
@@ -103,6 +111,12 @@ class ConnectViewController: UIViewController {
         }
     }
 
+    func goToClaimVC(device: ESPDevice) {
+        let claimVC = storyboard?.instantiateViewController(withIdentifier: "claimVC") as! ClaimViewController
+        claimVC.device = device
+        navigationController?.pushViewController(claimVC, animated: true)
+    }
+
     func showAlert(error: String, action: UIAlertAction) {
         let alertController = UIAlertController(title: "Error!", message: error, preferredStyle: .alert)
         alertController.addAction(action)
@@ -113,7 +127,6 @@ class ConnectViewController: UIViewController {
         let destination = segue.destination as! ProvisionViewController
         destination.isScanFlow = false
         destination.pop = popTextField.text ?? ""
-        destination.capabilities = capabilities
     }
 }
 

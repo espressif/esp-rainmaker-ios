@@ -18,6 +18,9 @@
 		144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144149432126AE09002AD5E1 /* SuccessViewController.swift */; };
 		2145B87F01D00671F6028FCC /* Pods_ESPRainMaker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E78E823824B7739458B5136 /* Pods_ESPRainMaker.framework */; };
 		F1012F62251110B300839F06 /* Schedule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F1012F61251110B300839F06 /* Schedule.storyboard */; };
+		F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */; };
+		F1072BC6256F9BD400D7CE2C /* BLEDeviceListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */; };
+		F1072BCA256FC19800D7CE2C /* ESPProvSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
 		F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */; };
 		F1110429252D8E2D0030A1D3 /* ESPLocalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */; };
@@ -82,7 +85,6 @@
 		F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B3558823B8DC4C004552FC /* ExtensionManager.swift */; };
 		F1BBD465255C1EE900CB0F42 /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */; };
 		F1C8082C22CA17790098F3B4 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C8082B22CA17790098F3B4 /* NetworkManager.swift */; };
-		F1CB6086233B549F0001D509 /* BLEDeviceListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CB6085233B549F0001D509 /* BLEDeviceListViewCell.swift */; };
 		F1DB6F62232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */; };
 		F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A322A8EA140092DAB9 /* Utility.swift */; };
 		F1DD70A622A8EA2A0092DAB9 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A522A8EA2A0092DAB9 /* Constants.swift */; };
@@ -144,6 +146,9 @@
 		BEE7825EF97282B6DCBD38F8 /* Pods-ESPRainMakerAll-ESPRainMaker.esprainmaker-release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ESPRainMakerAll-ESPRainMaker.esprainmaker-release.xcconfig"; path = "Target Support Files/Pods-ESPRainMakerAll-ESPRainMaker/Pods-ESPRainMakerAll-ESPRainMaker.esprainmaker-release.xcconfig"; sourceTree = "<group>"; };
 		EF8004A653E60197A67C5A7F /* Pods-ESPRainMakerAll-ESPRainMaker.esprainmaker-debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ESPRainMakerAll-ESPRainMaker.esprainmaker-debug.xcconfig"; path = "Target Support Files/Pods-ESPRainMakerAll-ESPRainMaker/Pods-ESPRainMakerAll-ESPRainMaker.esprainmaker-debug.xcconfig"; sourceTree = "<group>"; };
 		F1012F61251110B300839F06 /* Schedule.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Schedule.storyboard; sourceTree = "<group>"; };
+		F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLELandingViewController.swift; sourceTree = "<group>"; };
+		F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEDeviceListViewCell.swift; sourceTree = "<group>"; };
+		F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPProvSettings.swift; sourceTree = "<group>"; };
 		F107AB3624CEC979008DB9CD /* ESPScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScheduler.swift; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
 		F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalStorage.swift; sourceTree = "<group>"; };
@@ -215,7 +220,6 @@
 		F1C611A324F79804007EEFC6 /* ESP ScheduleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ESP ScheduleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1C77F1124911FD4000CE2FE /* GitVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GitVersion.h; sourceTree = "<group>"; };
 		F1C8082B22CA17790098F3B4 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		F1CB6085233B549F0001D509 /* BLEDeviceListViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceListViewCell.swift; sourceTree = "<group>"; };
 		F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesCollectionViewCell.swift; sourceTree = "<group>"; };
 		F1DD70A322A8EA140092DAB9 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		F1DD70A522A8EA2A0092DAB9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -328,14 +332,12 @@
 		143146B120EB221E0017E119 /* Interface */ = {
 			isa = PBXGroup;
 			children = (
-				F151FF1D24827343006F514E /* WifiListTableViewCell.swift */,
-				F132F753244985F200CA713B /* Node Addition */,
+				F1072BBB256F9B2C00D7CE2C /* Provision */,
 				F132F752244985B100CA713B /* Settings */,
 				F15EABF223E04386008A766B /* Generic Views */,
 				F1F451382328C5B80009DCE0 /* Devices */,
 				F194B60522CDD6AD00417347 /* Device List */,
 				F19A9D0D22BB6DD800A450C3 /* User Management */,
-				F1CB6085233B549F0001D509 /* BLEDeviceListViewCell.swift */,
 				F13A013F23E359250067F8B8 /* DocumentViewController.swift */,
 			);
 			path = Interface;
@@ -366,6 +368,38 @@
 				0E78E823824B7739458B5136 /* Pods_ESPRainMaker.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F1072BBB256F9B2C00D7CE2C /* Provision */ = {
+			isa = PBXGroup;
+			children = (
+				F191CD452511231C00BDCEF1 /* ClaimViewController.swift */,
+				F191CD442511231C00BDCEF1 /* ConnectViewController.swift */,
+				F13F273D238CF6170003AABB /* ScannerViewController.swift */,
+				143146B420EB273B0017E119 /* ProvisionViewController.swift */,
+				144149432126AE09002AD5E1 /* SuccessViewController.swift */,
+				F151FF1D24827343006F514E /* WifiListTableViewCell.swift */,
+				F1072BC2256F9BA800D7CE2C /* SoftAP */,
+				F1072BBE256F9B3D00D7CE2C /* BLE */,
+			);
+			path = Provision;
+			sourceTree = "<group>";
+		};
+		F1072BBE256F9B3D00D7CE2C /* BLE */ = {
+			isa = PBXGroup;
+			children = (
+				F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */,
+				F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */,
+			);
+			path = BLE;
+			sourceTree = "<group>";
+		};
+		F1072BC2256F9BA800D7CE2C /* SoftAP */ = {
+			isa = PBXGroup;
+			children = (
+				143146B220EB22470017E119 /* ProvisionLandingViewController.swift */,
+			);
+			path = SoftAP;
 			sourceTree = "<group>";
 		};
 		F117CDED252C758800ADB856 /* LocalControl */ = {
@@ -408,19 +442,6 @@
 				F19F6FF222F02B3400C70DE3 /* SettingsPageViewController.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		F132F753244985F200CA713B /* Node Addition */ = {
-			isa = PBXGroup;
-			children = (
-				F191CD452511231C00BDCEF1 /* ClaimViewController.swift */,
-				F191CD442511231C00BDCEF1 /* ConnectViewController.swift */,
-				F13F273D238CF6170003AABB /* ScannerViewController.swift */,
-				143146B220EB22470017E119 /* ProvisionLandingViewController.swift */,
-				143146B420EB273B0017E119 /* ProvisionViewController.swift */,
-				144149432126AE09002AD5E1 /* SuccessViewController.swift */,
-			);
-			path = "Node Addition";
 			sourceTree = "<group>";
 		};
 		F15EABF223E04386008A766B /* Generic Views */ = {
@@ -489,6 +510,7 @@
 				F1EAAC8D23E29D9B00E9A6A8 /* AppConstants.swift */,
 				F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */,
 				F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */,
+				F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -649,7 +671,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = Espressif;
 				TargetAttributes = {
 					1431462220DE994B0017E119 = {
@@ -864,6 +886,7 @@
 				F19A9D1022BB6DD800A450C3 /* MFAViewController.swift in Sources */,
 				F190B9B824BF5208006D136D /* ScheduleListTableViewCell.swift in Sources */,
 				F190B9BE24C07CB5006D136D /* SelectDaysViewController.swift in Sources */,
+				F1072BC6256F9BD400D7CE2C /* BLEDeviceListViewCell.swift in Sources */,
 				F1BBD465255C1EE900CB0F42 /* SpinnerView.swift in Sources */,
 				F18BADCE24CAC1EE00A696AE /* ESPSchedule.swift in Sources */,
 				F191CD492511235700BDCEF1 /* esp_rmaker_claim.pb.swift in Sources */,
@@ -875,10 +898,11 @@
 				F1FB153C234D91000053B0ED /* GenericSliderTableViewCell.swift in Sources */,
 				F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */,
 				F190B9C624C0D842006D136D /* DeviceHeaderView.swift in Sources */,
+				F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */,
 				1431462720DE994B0017E119 /* AppDelegate.swift in Sources */,
-				F1CB6086233B549F0001D509 /* BLEDeviceListViewCell.swift in Sources */,
 				F1E37E9023CF3AD500A5043F /* PrimaryControlTableViewCell.swift in Sources */,
 				F194B60A22CDD83200417347 /* DeviceListTableViewCell.swift in Sources */,
+				F1072BCA256FC19800D7CE2C /* ESPProvSettings.swift in Sources */,
 				F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */,
 				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
 			);
@@ -972,6 +996,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -982,7 +1007,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -994,9 +1019,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -1031,7 +1056,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.2.0;
+				MARKETING_VERSION = 2.2.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.intsoftap;
@@ -1075,6 +1100,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1097,11 +1123,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 			};
@@ -1134,7 +1161,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.2.0;
+				MARKETING_VERSION = 2.2.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
