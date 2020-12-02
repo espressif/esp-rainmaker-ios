@@ -41,16 +41,13 @@ struct JSONParser {
             node.node_id = node_details["id"] as? String
 
             if let config = node_details["config"] as? [String: Any] {
-                if Configuration.shared.appConfiguration.supportLocalControl {
-                    if !forSingleNode {
-                        // Check whether scheduling is supported in the node
-                        if let services = config["services"] as? [[String: Any]] {
-                            for service in services {
-                                if let type = service["type"] as? String, type == Constants.scheduleServiceType, let params = service["params"] as? [[String: Any]] {
-                                    for param in params {
-                                        if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
-                                            node.isSchedulingSupported = true
-                                        }
+                if Configuration.shared.appConfiguration.supportSchedule { // Check whether scheduling is supported in the node
+                    if let services = config["services"] as? [[String: Any]] {
+                        for service in services {
+                            if let type = service["type"] as? String, type == Constants.scheduleServiceType, let params = service["params"] as? [[String: Any]] {
+                                for param in params {
+                                    if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
+                                        node.isSchedulingSupported = true
                                     }
                                 }
                             }
@@ -94,6 +91,7 @@ struct JSONParser {
                                 dynamicAttr.properties = attr["properties"] as? [String]
                                 dynamicAttr.bounds = attr["bounds"] as? [String: Any]
                                 dynamicAttr.type = attr["type"] as? String
+                                dynamicAttr.valid_strs = attr["valid_strs"] as? [String]
 
                                 if dynamicAttr.properties?.contains("write") ?? false {
                                     if dynamicAttr.type != Constants.deviceNameParam {
@@ -143,11 +141,9 @@ struct JSONParser {
                 }
 
                 if Configuration.shared.appConfiguration.supportSchedule {
-                    if !forSingleNode {
-                        if let schedule = paramInfo[Constants.scheduleKey] as? [String: Any], let schedules = schedule[Constants.schedulesKey] as? [[String: Any]] {
-                            for scheduleJSON in schedules {
-                                ESPScheduler.shared.saveScheduleListFromJSON(nodeID: node.node_id ?? "", scheduleJSON: scheduleJSON)
-                            }
+                    if let schedule = paramInfo[Constants.scheduleKey] as? [String: Any], let schedules = schedule[Constants.schedulesKey] as? [[String: Any]] {
+                        for scheduleJSON in schedules {
+                            ESPScheduler.shared.saveScheduleListFromJSON(nodeID: node.node_id ?? "", scheduleJSON: scheduleJSON)
                         }
                     }
                 }

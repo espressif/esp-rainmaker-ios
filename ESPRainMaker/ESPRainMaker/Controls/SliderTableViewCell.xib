@@ -10,7 +10,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="GenericSliderTableViewCell" rowHeight="115" id="KGk-i7-Jjw" customClass="GenericSliderTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="SliderTableViewCell" rowHeight="115" id="KGk-i7-Jjw" customClass="SliderTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="320" height="115"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
@@ -80,22 +80,38 @@
                             <constraint firstAttribute="height" constant="115" id="vBm-Nh-mmq"/>
                         </constraints>
                     </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wef-GD-gJS">
+                        <rect key="frame" x="0.0" y="0.0" width="40" height="115"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="40" id="HGm-rc-D80"/>
+                        </constraints>
+                        <state key="normal" image="unselected"/>
+                        <connections>
+                            <action selector="checkBoxPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="65Y-u2-Wok"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="bottom" secondItem="wef-GD-gJS" secondAttribute="bottom" id="2CP-vC-CS2"/>
                     <constraint firstItem="Xz9-78-Glk" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2" id="5He-qC-Teg"/>
                     <constraint firstAttribute="trailing" secondItem="Xz9-78-Glk" secondAttribute="trailing" constant="15" id="H5o-9f-a4e"/>
+                    <constraint firstItem="wef-GD-gJS" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="MfP-CM-g41"/>
                     <constraint firstItem="Xz9-78-Glk" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="hbk-xt-zZq"/>
+                    <constraint firstItem="wef-GD-gJS" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="k4C-gH-cVN"/>
                     <constraint firstAttribute="bottom" secondItem="Xz9-78-Glk" secondAttribute="bottom" constant="-2" id="kdF-2f-ekI"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="backView" destination="Xz9-78-Glk" id="p3C-HX-ziF"/>
+                <outlet property="checkButton" destination="wef-GD-gJS" id="6Kv-Eu-HNc"/>
                 <outlet property="hueSlider" destination="G14-oz-y4f" id="4WB-Uw-cUg"/>
+                <outlet property="leadingSpaceConstraint" destination="hbk-xt-zZq" id="Jkt-vR-nQs"/>
                 <outlet property="maxLabel" destination="oTi-8G-sPl" id="Y25-Cy-fwc"/>
                 <outlet property="minLabel" destination="fv6-kj-hye" id="ijG-gk-jOB"/>
                 <outlet property="slider" destination="gau-RP-e10" id="Ktl-Di-6zT"/>
                 <outlet property="title" destination="jNI-VA-cqz" id="LAg-Co-G9z"/>
+                <outlet property="trailingSpaceConstraint" destination="H5o-9f-a4e" id="aYZ-cH-8mk"/>
             </connections>
             <point key="canvasLocation" x="47.826086956521742" y="56.584821428571423"/>
         </tableViewCell>
@@ -105,4 +121,7 @@
             <size key="intrinsicContentSize" width="-1" height="28"/>
         </designable>
     </designables>
+    <resources>
+        <image name="unselected" width="20" height="20"/>
+    </resources>
 </document>

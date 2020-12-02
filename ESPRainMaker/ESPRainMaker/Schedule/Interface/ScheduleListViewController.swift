@@ -74,7 +74,6 @@ class ScheduleListViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if segue.identifier == Constants.addScheduleSegue || segue.identifier == Constants.addNewScheduleSegue {
             ESPScheduler.shared.addSchedule()
-            ESPScheduler.shared.configureDeviceForCurrentSchedule()
         }
     }
 
@@ -161,7 +160,6 @@ extension ScheduleListViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: false)
         let scheduleVC = storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController
         ESPScheduler.shared.currentSchedule = ESPScheduler.shared.schedules[scheduleList[indexPath.section]]!
-        ESPScheduler.shared.configureDeviceForCurrentSchedule()
         navigationController?.pushViewController(scheduleVC, animated: true)
     }
 

@@ -322,6 +322,7 @@ class ESPScheduler {
     private func resetAvailableDeviceStatus() {
         for device in availableDevices.values {
             device.selectedParams = 0
+            device.collapsed = true
             if let params = device.params {
                 for param in params {
                     param.selected = false

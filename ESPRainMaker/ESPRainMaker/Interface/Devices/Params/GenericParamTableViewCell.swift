@@ -12,25 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ScheduleGenericTableViewCell.swift
+//  GenericParamTableViewCell.swift
 //  ESPRainMaker
 //
+
 import UIKit
 
-class ScheduleGenericTableViewCell: GenericControlTableViewCell {
-    var delegate: ScheduleActionDelegate?
-    var indexPath: IndexPath!
+class GenericParamTableViewCell: GenericControlTableViewCell {
+    var attributeKey = ""
+    var delegate: ParamUpdateProtocol?
 
     override func layoutSubviews() {
+        // Customise switch element for param screen
+        // Hide row selection button
         super.layoutSubviews()
-        checkButton.isHidden = false
-        trailingSpaceConstraint.constant = 0
-        leadingSpaceConstraint.constant = 30.0
-        backView.backgroundColor = .white
+        checkButton.isHidden = true
+        leadingSpaceConstraint.constant = 15.0
+        trailingSpaceConstraint.constant = 15.0
+
+        backgroundColor = UIColor.clear
+
+        backView.layer.borderWidth = 1
+        backView.layer.cornerRadius = 10
+        backView.layer.borderColor = UIColor.clear.cgColor
+        backView.layer.masksToBounds = true
+
+        layer.shadowOpacity = 0.18
+        layer.shadowOffset = CGSize(width: 1, height: 2)
+        layer.shadowRadius = 2
+        layer.shadowColor = UIColor.black.cgColor
+        layer.masksToBounds = false
     }
 
     @IBAction override func editButtonTapped(_: Any) {
-        let input = UIAlertController(title: param?.attributeKey, message: "Enter new value", preferredStyle: .alert)
+        var input: UIAlertController!
+        if param?.type == "esp.param.name" {
+            input = UIAlertController(title: attributeKey, message: "Enter device name of length 1-32 characters", preferredStyle: .alert)
+        } else {
+            input = UIAlertController(title: attributeKey, message: "Enter new value", preferredStyle: .alert)
+        }
         input.addTextField { textField in
             textField.text = self.controlValue ?? ""
             self.addHeightConstraint(textField: textField)
@@ -52,13 +72,13 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
                 if let intValue = Int(value) {
                     if let bounds = param?.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int {
                         if intValue >= min, intValue <= max {
-                            param?.value = intValue
+                            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]], delegate: delegate)
                             controlValueLabel.text = value
                         } else {
                             showAlert(message: "Value out of bound.")
                         }
                     } else {
-                        param?.value = intValue
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]], delegate: delegate)
                         controlValueLabel.text = value
                     }
                 } else {
@@ -68,13 +88,13 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
                 if let floatValue = Float(value) {
                     if let bounds = param?.bounds, let max = bounds["max"] as? Float, let min = bounds["min"] as? Float {
                         if floatValue >= min, floatValue <= max {
-                            param?.value = floatValue
+                            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]], delegate: delegate)
                             controlValueLabel.text = value
                         } else {
                             showAlert(message: "Value out of bound.")
                         }
                     } else {
-                        param?.value = floatValue
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]], delegate: delegate)
                         controlValueLabel.text = value
                     }
                 } else {
@@ -84,34 +104,30 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
                 if boolTypeValidValues.keys.contains(value) {
                     let validValue = boolTypeValidValues[value]!
                     if validValue == 0 {
-                        param?.value = false
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: false]], delegate: delegate)
                         controlValueLabel.text = value
                     } else {
-                        param?.value = true
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: true]], delegate: delegate)
                         controlValueLabel.text = value
                     }
                 } else {
                     showAlert(message: "Please enter a valid boolean value.")
                 }
             } else {
-                param?.value = controlValue
+                if param?.type == "esp.param.name" {
+                    if value.count < 1 || value.count > 32 || value.isEmpty || value.trimmingCharacters(in: .whitespaces).isEmpty {
+                        showAlert(message: "Please enter a valid device name within a range of 1-32 characters")
+                        return
+                    }
+                }
+                DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]], delegate: delegate)
                 controlValueLabel.text = value
-            }
-        }
-    }
 
-    @IBAction override func checkBoxPressed(_: Any) {
-        if param!.selected {
-            editButton.isHidden = true
-            checkButton.setImage(UIImage(named: "unselected"), for: .normal)
-            param!.selected = false
-            device.selectedParams -= 1
-        } else {
-            editButton.isHidden = false
-            checkButton.setImage(UIImage(named: "selected"), for: .normal)
-            param!.selected = true
-            device.selectedParams += 1
+                if Configuration.shared.appConfiguration.supportLocalControl {
+                    ESPScheduler.shared.updateDeviceName(for: device.node?.node_id, name: device.name ?? "", deviceName: value)
+                }
+            }
+            param?.value = controlValue as Any
         }
-        delegate?.paramStateChangedat(indexPath: indexPath)
     }
 }

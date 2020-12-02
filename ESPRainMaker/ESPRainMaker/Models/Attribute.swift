@@ -49,6 +49,7 @@ class Param: Attribute {
     var type: String?
     var selected = false
     var canBeScheduled = false
+    var valid_strs: [String]?
 
     enum CodingKeys: String, CodingKey {
         case uiType = "ui_type"
@@ -59,6 +60,7 @@ class Param: Attribute {
         case type
         case canBeScheduled
         case value
+        case valid_strs
     }
 
     override func encode(to encoder: Encoder) throws {
@@ -70,6 +72,7 @@ class Param: Attribute {
         try container.encode(type, forKey: .type)
         try container.encode(canBeScheduled, forKey: .canBeScheduled)
         try container.encode(attributeKey, forKey: .attributeKey)
+        try container.encode(valid_strs, forKey: .valid_strs)
 
         if let primitiveDataType = dataType {
             if primitiveDataType.lowercased() == "int" {
@@ -95,6 +98,7 @@ class Param: Attribute {
         uiType = try container.decodeIfPresent(String.self, forKey: .uiType)
         attributeKey = try container.decodeIfPresent(String.self, forKey: .attributeKey)
         canBeScheduled = try container.decodeIfPresent(Bool.self, forKey: .canBeScheduled) ?? false
+        valid_strs = try container.decodeIfPresent([String].self, forKey: .valid_strs)
 
         try super.init(from: decoder)
 
@@ -127,5 +131,6 @@ class Param: Attribute {
         type = param.type
         selected = param.selected
         canBeScheduled = param.canBeScheduled
+        valid_strs = param.valid_strs
     }
 }

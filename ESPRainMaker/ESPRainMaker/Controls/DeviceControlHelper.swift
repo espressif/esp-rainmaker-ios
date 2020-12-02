@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  PrimaryControlTableViewCell.swift
+//  DeviceControlHelper.swift
 //  ESPRainMaker
 //
 
-import UIKit
+import Foundation
 
-class PrimaryControlTableViewCell: UITableViewCell {
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
+///  Protocol to update listeners about failure in updating params
+protocol ParamUpdateProtocol {
+    func failureInUpdatingParam()
+}
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+class DeviceControlHelper {
+    static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?) {
+        NetworkManager.shared.updateThingShadow(nodeID: nodeID, parameter: parameter) { result in
+            switch result {
+            case .failure:
+                delegate?.failureInUpdatingParam()
+            default:
+                break
+            }
+        }
     }
 }

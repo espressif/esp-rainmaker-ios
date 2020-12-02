@@ -26,10 +26,11 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        tableView.register(UINib(nibName: "ScheduleSwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "scheduleSwitchTVC")
-        tableView.register(UINib(nibName: "ScheduleGenericTableViewCell", bundle: nil), forCellReuseIdentifier: "scheduleGenericTVC")
+        tableView.register(UINib(nibName: "SwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "SwitchTableViewCell")
+        tableView.register(UINib(nibName: "GenericControlTableViewCell", bundle: nil), forCellReuseIdentifier: "genericControlCell")
         tableView.register(UINib(nibName: "DeviceHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "deviceHV")
-        tableView.register(UINib(nibName: "ScheduleSliderTableViewCell", bundle: nil), forCellReuseIdentifier: "scheduleSliderTableViewCell")
+        tableView.register(UINib(nibName: "SliderTableViewCell", bundle: nil), forCellReuseIdentifier: "SliderTableViewCell")
+        tableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
     }
 
     // MARK: - IBActions
@@ -65,7 +66,9 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                     let maxValue = bounds["max"] as? Float ?? 100
                     let minValue = bounds["min"] as? Float ?? 0
                     if minValue < maxValue {
-                        let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleSliderTableViewCell", for: indexPath) as! ScheduleSliderTableViewCell
+                        let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
+                        object_setClass(sliderCell, ScheduleSliderTableViewCell.self)
+                        let cell = sliderCell as! ScheduleSliderTableViewCell
                         cell.hueSlider.isHidden = true
                         cell.slider.isHidden = false
                         if let bounds = param.bounds {
@@ -99,7 +102,9 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                 }
             }
         } else if param.uiType == "esp.ui.toggle", param.dataType?.lowercased() == "bool" {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleSwitchTVC", for: indexPath) as! ScheduleSwitchTableViewCell
+            let switchCell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
+            object_setClass(switchCell, ScheduleSwitchTableViewCell.self)
+            let cell = switchCell as! ScheduleSwitchTableViewCell
             cell.controlName.text = param.name?.deletingPrefix(device.name!)
             cell.param = param
 
@@ -131,7 +136,9 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                 maxValue = bounds["max"] as? Int ?? 360
             }
 
-            let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleSliderTableViewCell", for: indexPath) as! ScheduleSliderTableViewCell
+            let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
+            object_setClass(sliderCell, ScheduleSliderTableViewCell.self)
+            let cell = sliderCell as! ScheduleSliderTableViewCell
             cell.delegate = self
             cell.indexPath = indexPath
             cell.slider.isHidden = true
@@ -140,7 +147,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
             cell.hueSlider.minimumValue = CGFloat(minValue)
             cell.hueSlider.maximumValue = CGFloat(maxValue)
 
-            if minValue == 0 && maxValue == 360 {
+            if minValue == 0, maxValue == 360 {
                 cell.hueSlider.hasRainbow = true
                 cell.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
             } else {
@@ -155,37 +162,84 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
             cell.maxLabel.text = "\(maxValue)"
             cell.hueSlider.thumbColor = UIColor(hue: value / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
             cell.device = device
-            if param.properties?.contains("write") ?? false, device.node?.isConnected ?? false || device.node?.localNetwork ?? false {
-                cell.hueSlider.isEnabled = true
-            } else {
-                cell.hueSlider.isEnabled = false
-            }
             cell.title.text = param.name ?? ""
 
             if param.selected {
                 cell.checkButton.setImage(UIImage(named: "selected"), for: .normal)
                 cell.hueSlider.isEnabled = true
+                cell.hueSlider.alpha = 1.0
             } else {
                 cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
                 cell.hueSlider.isEnabled = false
+                cell.hueSlider.alpha = 0.5
             }
 
             return cell
+        } else if param.uiType == "esp.ui.dropdown" {
+            if let dataType = param.dataType?.lowercased(), dataType == "int" || dataType == "string" {
+                let dropDownCell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
+                object_setClass(dropDownCell, ScheduleDropDownTableViewCell.self)
+                let cell = dropDownCell as! ScheduleDropDownTableViewCell
+                cell.controlName.text = param.name?.deletingPrefix(device.name!)
+                cell.device = device
+                cell.param = param
+                cell.delegate = self
+                cell.indexPath = indexPath
+
+                var currentValue = ""
+                if param.dataType?.lowercased() == "string" {
+                    currentValue = param.value as! String
+                } else {
+                    currentValue = String(param.value as! Int)
+                }
+                cell.controlValueLabel.text = currentValue
+                cell.currentValue = currentValue
+                cell.dropDownButton.isHidden = false
+                var datasource: [String] = []
+                if dataType == "int" {
+                    guard let bounds = param.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int, let step = bounds["step"] as? Int, max > min else {
+                        return getTableViewGenericCell(param: param, indexPath: indexPath)
+                    }
+                    for item in stride(from: min, to: max + 1, by: step) {
+                        datasource.append(String(item))
+                    }
+                } else if param.dataType?.lowercased() == "string" {
+                    datasource.append(contentsOf: param.valid_strs ?? [])
+                }
+                cell.datasource = datasource
+
+                if param.selected {
+                    cell.checkButton.setImage(UIImage(named: "selected"), for: .normal)
+                    cell.dropDownButton.isEnabled = true
+                    cell.dropDownButton.alpha = 1.0
+                } else {
+                    cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+                    cell.dropDownButton.isEnabled = false
+                    cell.dropDownButton.alpha = 0.5
+                }
+
+                if !cell.datasource.contains(currentValue) {
+                    cell.controlValueLabel.text = currentValue + " (Invalid)"
+                }
+                return cell
+            }
         }
 
         return getTableViewGenericCell(param: param, indexPath: indexPath)
     }
 
     private func getTableViewGenericCell(param: Param, indexPath: IndexPath) -> ScheduleGenericTableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleGenericTVC", for: indexPath) as! ScheduleGenericTableViewCell
+        let genericCell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
+        object_setClass(genericCell, ScheduleGenericTableViewCell.self)
+        let cell = genericCell as! ScheduleGenericTableViewCell
         cell.device = availableDeviceCopy[indexPath.section]
         cell.delegate = self
         cell.indexPath = indexPath
         cell.controlName.text = param.name
         if let value = param.value {
             cell.controlValue = "\(value)"
+            cell.controlValueLabel.text = "\(value)"
         }
-        cell.controlValueLabel.text = cell.controlValue
         if let data_type = param.dataType {
             cell.dataType = data_type
         }
@@ -226,6 +280,8 @@ extension SelectDevicesViewController: UITableViewDataSource {
 
     func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = getTableViewCellBasedOn(indexPath: indexPath)
+        cell.borderWidth = 0.5
+        cell.borderColor = .lightGray
         return cell
     }
 

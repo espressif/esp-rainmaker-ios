@@ -12,37 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  StaticControlTableViewCell.swift
+//  DropDownTableViewCell.swift
 //  ESPRainMaker
 //
 
+import DropDown
 import UIKit
 
-class StaticControlTableViewCell: UITableViewCell {
+class DropDownTableViewCell: UITableViewCell {
+    // IB outlets
     @IBOutlet var backView: UIView!
-    @IBOutlet var controlNameLabel: UILabel!
+    @IBOutlet var controlName: UILabel!
     @IBOutlet var controlValueLabel: UILabel!
+    @IBOutlet var dropDownButton: UIButton!
+    @IBOutlet var checkButton: UIButton!
+    @IBOutlet var leadingSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet var trailingSpaceConstraint: NSLayoutConstraint!
+
+    // Stored properties
+    var datasource: [String] = []
+    var param: Param!
+    var device: Device!
+    var currentValue = ""
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-        backgroundColor = UIColor.clear
-
-        backView.layer.borderWidth = 1
-        backView.layer.cornerRadius = 10
-        backView.layer.borderColor = UIColor.clear.cgColor
-        backView.layer.masksToBounds = true
-
-        layer.shadowOpacity = 0.18
-        layer.shadowOffset = CGSize(width: 1, height: 2)
-        layer.shadowRadius = 2
-        layer.shadowColor = UIColor.black.cgColor
-        layer.masksToBounds = false
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
+    // IB actions
+    @IBAction func dropDownButtonTapped(_: Any) {}
 
-        // Configure the view for the selected state
-    }
+    @IBAction func checkBoxPressed(_: Any) {}
 }
