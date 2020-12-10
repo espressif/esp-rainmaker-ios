@@ -40,11 +40,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         User.shared.pool.delegate = self
         VersionManager.shared.checkForAppUpdate()
         let credentialsProvider = AWSCognitoCredentialsProvider(
-            regionType: AWSRegionType.USEast1,
-            identityPoolId: Keys.current.poolID!
+            regionType: Configuration.shared.awsConfiguration.awsRegion,
+            identityPoolId: Configuration.shared.awsConfiguration.poolID
         )
         let configuration = AWSServiceConfiguration(
-            region: AWSRegionType.USEast1,
+            region: Configuration.shared.awsConfiguration.awsRegion,
             credentialsProvider: credentialsProvider
         )
         AWSServiceManager.default().defaultServiceConfiguration = configuration

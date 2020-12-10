@@ -34,22 +34,20 @@ class User {
     var updateDeviceList = false
     var currentAssociationInfo: AssociationConfig?
     var updateUserInfo = false
-    #if LOCAL_CONTROL
-        var localServices: [String: ESPLocalService] = [:]
+    var localServices: [String: ESPLocalService] = [:]
 
-        private var localControl = ESPLocalControl()
-    #endif
+    lazy var localControl: ESPLocalControl = {
+        ESPLocalControl()
+    }()
 
     private init() {
         // setup service configuration
-        let serviceConfiguration = AWSServiceConfiguration(region: Constants.CognitoIdentityUserPoolRegion, credentialsProvider: nil)
-
-        let currentKeys = Keys.current
+        let serviceConfiguration = AWSServiceConfiguration(region: Configuration.shared.awsConfiguration.awsRegion, credentialsProvider: nil)
 
         // create pool configuration
-        let poolConfiguration = AWSCognitoIdentityUserPoolConfiguration(clientId: currentKeys.clientID!,
-                                                                        clientSecret: currentKeys.clientSecret,
-                                                                        poolId: currentKeys.poolID!)
+        let poolConfiguration = AWSCognitoIdentityUserPoolConfiguration(clientId: Configuration.shared.awsConfiguration.appClientId,
+                                                                        clientSecret: nil,
+                                                                        poolId: Configuration.shared.awsConfiguration.poolID)
 
         // initialize user pool client
         AWSCognitoIdentityUserPool.register(with: serviceConfiguration, userPoolConfiguration: poolConfiguration, forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
@@ -99,7 +97,7 @@ class User {
                 if Int(difference) > expire {
                     let parameter = ["user_name": User.shared.userInfo.username, "refreshtoken": refreshTokenInfo["token"] as! String]
                     let header: HTTPHeaders = ["Content-Type": "application/json"]
-                    let url = Constants.baseURL + "/" + Constants.apiVersion + "/login"
+                    let url = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/login"
                     NetworkManager.shared.genericRequest(url: url, method: .post, parameters: parameter, encoding: JSONEncoding.default, headers: header) { response in
                         if let json = response {
                             if let accessToken = json["accesstoken"] as? String {
@@ -134,78 +132,72 @@ class User {
         }
     }
 
-    #if LOCAL_CONTROL
-
-        /// Update information of local network for existing nodes.
-        ///
-        private func updateNodeLocalNetworkInfo() {
-            var notifyLocalNetworkUpdate = true
-            if let nodeList = User.shared.associatedNodeList {
-                let group = DispatchGroup()
-                var localNodeList: [Node] = []
-                for node in nodeList {
-                    if localServices.keys.contains(node.node_id ?? "") {
-                        node.localNetwork = true
-                        notifyLocalNetworkUpdate = false
-                        group.enter()
-                        NetworkManager.shared.getNodeInfo(nodeId: node.node_id ?? "") { node, _ in
-                            if node != nil {
-                                localNodeList.append(node!)
-                            }
-                            group.leave()
+    /// Update information of local network for existing nodes.
+    ///
+    private func updateNodeLocalNetworkInfo() {
+        var notifyLocalNetworkUpdate = true
+        if let nodeList = User.shared.associatedNodeList {
+            let group = DispatchGroup()
+            var localNodeList: [Node] = []
+            for node in nodeList {
+                if localServices.keys.contains(node.node_id ?? "") {
+                    node.localNetwork = true
+                    notifyLocalNetworkUpdate = false
+                    group.enter()
+                    NetworkManager.shared.getNodeInfo(nodeId: node.node_id ?? "") { node, _ in
+                        if node != nil {
+                            localNodeList.append(node!)
                         }
-                    } else {
-                        node.localNetwork = false
+                        group.leave()
                     }
-                }
-                group.notify(queue: DispatchQueue.main) {
-                    self.processNodeInfoResponse(nodeList: localNodeList)
+                } else {
+                    node.localNetwork = false
                 }
             }
-            if notifyLocalNetworkUpdate {
-                NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
+            group.notify(queue: DispatchQueue.main) {
+                self.processNodeInfoResponse(nodeList: localNodeList)
             }
         }
-
-        private func processNodeInfoResponse(nodeList: [Node]) {
-            for localNode in nodeList {
-                if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
-                    node.node_id == localNode.node_id
-                }) {
-                    localNode.localNetwork = true
-                    User.shared.associatedNodeList![index] = localNode
-                }
-            }
-            if nodeList.count > 0 {
-                NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
-            }
-        }
-
-        /// Start search for services on local network.
-        ///
-        func startServiceDiscovery() {
-            DispatchQueue.main.async {
-                self.localControl.delegate = self
-                self.localControl.searchForServicesOfType(type: Constants.serviceType, domain: Constants.serviceDomain)
-            }
-        }
-
-    #endif
-}
-
-#if LOCAL_CONTROL
-    extension User: ESPLocalControlDelegate {
-        func updateInAvailableLocalServices(services: [ESPLocalService]) {
-            localServices.removeAll()
-            for service in services {
-                var hostname = service.hostname
-                if hostname.contains(".") {
-                    let endIndex = hostname.range(of: ".")!.lowerBound
-                    hostname = String(hostname[..<endIndex])
-                }
-                localServices[hostname] = service
-            }
-            updateNodeLocalNetworkInfo()
+        if notifyLocalNetworkUpdate {
+            NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
         }
     }
-#endif
+
+    private func processNodeInfoResponse(nodeList: [Node]) {
+        for localNode in nodeList {
+            if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
+                node.node_id == localNode.node_id
+            }) {
+                localNode.localNetwork = true
+                User.shared.associatedNodeList![index] = localNode
+            }
+        }
+        if nodeList.count > 0 {
+            NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
+        }
+    }
+
+    /// Start search for services on local network.
+    ///
+    func startServiceDiscovery() {
+        DispatchQueue.main.async {
+            self.localControl.delegate = self
+            self.localControl.searchForServicesOfType(type: Constants.serviceType, domain: Constants.serviceDomain)
+        }
+    }
+}
+
+extension User: ESPLocalControlDelegate {
+    func updateInAvailableLocalServices(services: [ESPLocalService]) {
+        localServices.removeAll()
+        for service in services {
+            var hostname = service.hostname
+            if hostname.contains(".") {
+                let endIndex = hostname.range(of: ".")!.lowerBound
+                hostname = String(hostname[..<endIndex])
+            }
+            localServices[hostname] = service
+        }
+        updateNodeLocalNetworkInfo()
+    }
+}

@@ -1522,7 +1522,7 @@ Connect your mobile phone to the Wi-Fi network with a name like PROV_XXXXXX</str
                                     <constraint firstItem="FE8-lw-FvL" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="olS-t6-0xF" secondAttribute="trailing" constant="8" symbolic="YES" id="kQT-r8-hcI"/>
                                 </constraints>
                             </view>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="abcd1234" borderStyle="roundedRect" placeholder="abcd1234" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Abk-rH-ckO">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Abk-rH-ckO">
                                 <rect key="frame" x="32" y="177.5" width="350" height="60"/>
                                 <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>

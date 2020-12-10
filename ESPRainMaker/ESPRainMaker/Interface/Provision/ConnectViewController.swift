@@ -76,8 +76,15 @@ class ConnectViewController: UIViewController {
                 }
             case let .failedToConnect(error):
                 DispatchQueue.main.async {
+                    var errorDescription = ""
+                    switch error {
+                    case .securityMismatch, .versionInfoError:
+                        errorDescription = error.description
+                    default:
+                        errorDescription = error.description + "\nCheck if POP is correct."
+                    }
                     let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
-                    self.showAlert(error: error.description + "\nCheck if POP is correct.", action: action)
+                    self.showAlert(error: errorDescription, action: action)
                 }
             default:
                 DispatchQueue.main.async {

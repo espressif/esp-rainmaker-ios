@@ -15,49 +15,47 @@
 //  DeviceHeaderView.swift
 //  ESPRainMaker
 //
-#if SCHEDULE
-    import UIKit
+import UIKit
 
-    protocol ScheduleActionDelegate {
-        func headerViewDidTappedFor(section: Int)
-        func paramStateChangedat(indexPath: IndexPath)
+protocol ScheduleActionDelegate {
+    func headerViewDidTappedFor(section: Int)
+    func paramStateChangedat(indexPath: IndexPath)
+}
+
+class DeviceHeaderView: UITableViewHeaderFooterView {
+    @IBOutlet var deviceLabel: UILabel!
+    @IBOutlet var arrowImageView: UIImageView!
+    @IBOutlet var selectDeviceButton: UIButton!
+    var delegate: ScheduleActionDelegate?
+    var section: Int!
+    var device: Device!
+
+    @IBAction func headerViewTapped(_: Any) {
+        delegate?.headerViewDidTappedFor(section: section)
     }
 
-    class DeviceHeaderView: UITableViewHeaderFooterView {
-        @IBOutlet var deviceLabel: UILabel!
-        @IBOutlet var arrowImageView: UIImageView!
-        @IBOutlet var selectDeviceButton: UIButton!
-        var delegate: ScheduleActionDelegate?
-        var section: Int!
-        var device: Device!
-
-        @IBAction func headerViewTapped(_: Any) {
-            delegate?.headerViewDidTappedFor(section: section)
-        }
-
-        @IBAction func selectDeviceParams(_: Any) {
-            if device.selectedParams == 0 {
-                selectDeviceButton.setImage(UIImage(named: "checkbox_select"), for: .normal)
-                for param in device.params! {
-                    param.selected = true
-                    device.selectedParams += 1
-                }
-                delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
-            } else if device.selectedParams == device.params?.count {
-                selectDeviceButton.setImage(UIImage(named: "checkbox_unselect"), for: .normal)
-                for param in device.params! {
-                    param.selected = false
-                }
-                device.selectedParams = 0
-                delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
-            } else {
-                selectDeviceButton.setImage(UIImage(named: "checkbox_unselect"), for: .normal)
-                for param in device.params! {
-                    param.selected = false
-                }
-                device.selectedParams = 0
-                delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
+    @IBAction func selectDeviceParams(_: Any) {
+        if device.selectedParams == 0 {
+            selectDeviceButton.setImage(UIImage(named: "checkbox_select"), for: .normal)
+            for param in device.params! {
+                param.selected = true
+                device.selectedParams += 1
             }
+            delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
+        } else if device.selectedParams == device.params?.count {
+            selectDeviceButton.setImage(UIImage(named: "checkbox_unselect"), for: .normal)
+            for param in device.params! {
+                param.selected = false
+            }
+            device.selectedParams = 0
+            delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
+        } else {
+            selectDeviceButton.setImage(UIImage(named: "checkbox_unselect"), for: .normal)
+            for param in device.params! {
+                param.selected = false
+            }
+            device.selectedParams = 0
+            delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
         }
     }
-#endif
+}

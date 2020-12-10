@@ -83,7 +83,7 @@ For more details :
 
 - Local Control ensures your devices are reachable even when your internet connection is poor or there is no internet over connected Wi-Fi
 
-Local Control feature is optional but enabled by default. It can be disabled from the build settings by removing `Local_Control` keyword from `Active Compilation Condition` under `Swift Compiler - Custom Flags`.
+Local Control feature is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Local Control` key from `App Configuration` to `NO`.
 
 
 ### Personalisation
@@ -103,12 +103,11 @@ Local Control feature is optional but enabled by default. It can be disabled fro
  - Remove.
  - Enable/disable.
 
-Schedule feature is optional but enabled by default. Schedule can be disabled from the build settings by removing `Schedule` keyword from `Active Compilation Condition` under `Swift Compiler - Custom Flags`.
+Schedule feature is optional but enabled by default. Schedule can be disabled from the `Configuration.plist` by setting `Enable Schedule` key from `App Configuration` to `NO`.
   
 
 ## Supports
 
-  
 
 - iOS 12.0 or greater.
 
@@ -120,21 +119,23 @@ Schedule feature is optional but enabled by default. Schedule can be disabled fr
 
 ## Installation
 
-  
-
 - Run `pod install` from  ESPRainMaker folder in the terminal.
 
-- Terminal will prompt to set AWS credentials which are managed using  [Cocopods-Keys](https://github.com/orta/cocoapods-keys) in the project.
+- After pod installation open ESPRainMaker.xcworkspace project.
 
-- `UserPoolId` and `UserPoolAppClientId` are keys for Release build configuration.
+- Build and run the project.
 
--  `Staging_UserPoolId` and `Staging_UserPoolAppClientId` are keys for Debug builds.
 
-- Set keys and after pod installation open ESPRainMaker.xcworkspace project.
+## Additional Settings
 
-- Enter your bundle id and run the project.
+Settings associated with provisioning a device can be modified in the `Configuration.plist` file under `Provision Settings` dictionary. Description of each key can be found below.
 
-  
+| Key      | Type |   Description |
+| ----------- | ----------- | --- |
+| ESP Transport | String | Possible values: <br>**Both**(Default) : Supports both BLE and SoftAP device provisioning.<br>**SoftAP** : supports only SoftAP device provisioning.<br>**BLE** : supports only BLE device provisioning. |
+| BLE Device Prefix | String | Search for BLE devices with this prefix in name. |
+| ESP Allow Prefix Search | Bool | Prefix search allows you to filter available BLE device list based on prefix value.  |
+| ESP Security Mode | String | Possible values: <br>**Secure**(Default) : for secure/encrypted communication between device and app.<br>**Unsecure** : for unsecure/unencrypted communication between device and app.|
 
 ## License
 

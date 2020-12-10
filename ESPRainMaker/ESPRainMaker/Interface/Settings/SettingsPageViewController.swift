@@ -78,18 +78,18 @@ class SettingsPageViewController: UIViewController {
 
     @IBAction func openPrivacy(_: Any) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            showDocumentVC(url: "https://rainmaker.espressif.com/docs/privacy-policy.html")
+            showDocumentVC(url: Configuration.shared.externalLinks.privacyPolicyURL)
         }
     }
 
     @IBAction func openTC(_: Any) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            showDocumentVC(url: "https://rainmaker.espressif.com/docs/terms-of-use.html")
+            showDocumentVC(url: Configuration.shared.externalLinks.termsOfUseURL)
         }
     }
 
     @IBAction func openDocumentation(_: Any) {
-        showDocumentVC(url: "https://rainmaker.espressif.com")
+        showDocumentVC(url: Configuration.shared.externalLinks.documentationURL)
     }
 
     @IBAction func backButtonPressed(_: Any) {

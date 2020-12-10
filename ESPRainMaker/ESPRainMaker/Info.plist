@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>APP_THEME_COLOR</key>
-	<string>#FFFFFF</string>
-	<key>AUTH_URL</key>
-	<string>$(AUTH_URL)</string>
-	<key>BASE_API_URL_ENDPOINT</key>
-	<string>$(BASE_API_URL_ENDPOINT)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -28,15 +22,7 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeRole</key>
-			<string>None</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.espressif.rainmaker.intsoftap</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.espressif.rainmaker.softap</string>
@@ -45,17 +31,6 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>CLAIM_BASE_URL</key>
-	<string>$(CLAIM_BASE_URL)</string>
-	<key>DeviceNamePrefix</key>
-	<string>PROV_</string>
-	<key>ESP Provision Settings</key>
-	<dict>
-		<key>ESP Allow Prefix Search</key>
-		<string>YES</string>
-		<key>ESP Securtiy Mode</key>
-		<string>Secure</string>
-	</dict>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>itms-apps</string>
@@ -79,10 +54,6 @@
 	<string>Reading QR code</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>App requires access to local network in order to control your devices locally.</string>
-	<key>ProofOfPossession</key>
-	<string>abcd1234</string>
-	<key>REDIRECT_URL</key>
-	<string>$(REDIRECT_URL)</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -109,7 +80,5 @@
 	<false/>
 	<key>WifiBaseUrl</key>
 	<string>192.168.4.1:80</string>
-	<key>WifiNetworkNamePrefix</key>
-	<string>mysoftap</string>
 </dict>
 </plist>

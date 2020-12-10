@@ -41,34 +41,30 @@ class NetworkManager {
     /// - Parameters:
     ///   - completionHandler: handler called when response to get node info is recieved
     func getNodeInfo(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
-        #if LOCAL_CONTROL
-            if let availableService = User.shared.localServices[nodeId] {
-                availableService.getPropertyInfo { response, error in
-                    if error != nil {
-                        if ESPNetworkMonitor.shared.isConnectedToNetwork {
-                            self.getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
-                        } else {
-                            completionHandler(nil, .localServerError(error!))
-                        }
-                        return
+        if Configuration.shared.appConfiguration.supportLocalControl, let availableService = User.shared.localServices[nodeId] {
+            availableService.getPropertyInfo { response, error in
+                if error != nil {
+                    if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                        self.getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
+                    } else {
+                        completionHandler(nil, .localServerError(error!))
                     }
-                    if let node = JSONParser.parseNodeArray(data: [response!], forSingleNode: true)?[0] {
-                        node.node_id = nodeId
-                        if node.devices?.count ?? 0 < 1 {
-                            completionHandler(nil, .unknownError)
-                        } else {
-                            completionHandler(node, nil)
-                        }
-                        return
-                    }
-                    completionHandler(nil, .emptyConfigData)
+                    return
                 }
-            } else {
-                getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
+                if let node = JSONParser.parseNodeArray(data: [response!], forSingleNode: true)?[0] {
+                    node.node_id = nodeId
+                    if node.devices?.count ?? 0 < 1 {
+                        completionHandler(nil, .unknownError)
+                    } else {
+                        completionHandler(node, nil)
+                    }
+                    return
+                }
+                completionHandler(nil, .emptyConfigData)
             }
-        #else
+        } else {
             getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
-        #endif
+        }
     }
 
     private func getNodeInfoPrivate(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
@@ -115,8 +111,8 @@ class NetworkManager {
     ///   - nodeID: Id of the node for which thing shadow is updated
     ///   - completionHandler: handler called when response to updateThingShadow is recieved
     func updateThingShadow(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
-        #if LOCAL_CONTROL
-            NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
+        NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
+        if Configuration.shared.appConfiguration.supportLocalControl {
             if let nodeid = nodeID {
                 if let availableService = User.shared.localServices[nodeid] {
                     availableService.setProperty(json: parameter) { success, _ in
@@ -128,9 +124,9 @@ class NetworkManager {
                     updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
                 }
             }
-        #else
+        } else {
             updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
-        #endif
+        }
     }
 
     private func updateThingShadowprivate(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {

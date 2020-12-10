@@ -33,13 +33,8 @@ class DevicesViewController: UIViewController {
     @IBOutlet var networkIndicator: UIView!
     @IBOutlet var loadingIndicator: SpinnerView!
 
-//    var currentNode: Node!
     let controlStoryBoard = UIStoryboard(name: "DeviceDetail", bundle: nil)
     private let refreshControl = UIRefreshControl()
-
-    // WIFI
-    private let baseUrl = Bundle.main.infoDictionary?["WifiBaseUrl"] as! String
-    private let networkNamePrefix = Bundle.main.infoDictionary?["WifiNetworkNamePrefix"] as! String
 
     var user: AWSCognitoIdentityUser?
     var pool: AWSCognitoIdentityUserPool?
@@ -134,9 +129,9 @@ class DevicesViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
-        #if SCHEDULE
+        if Configuration.shared.appConfiguration.supportSchedule {
             tabBarController?.tabBar.isHidden = false
-        #endif
+        }
 
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(localNetworkUpdate), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
@@ -208,16 +203,19 @@ class DevicesViewController: UIViewController {
                 User.shared.associatedNodeList = nil
                 if error != nil {
                     self.unhideInitialView(error: error)
-                    #if LOCAL_CONTROL
+                    if Configuration.shared.appConfiguration.supportLocalControl {
                         User.shared.startServiceDiscovery()
-                    #endif
+                    }
                     self.collectionView.isUserInteractionEnabled = true
                     return
                 }
                 User.shared.associatedNodeList = nodes
-                #if LOCAL_CONTROL
+
+                // Start local discovery if its enabled
+                if Configuration.shared.appConfiguration.supportLocalControl {
                     User.shared.startServiceDiscovery()
-                #endif
+                }
+
                 if nodes == nil || nodes?.count == 0 {
                     self.setViewForNoNodes()
                 } else {
