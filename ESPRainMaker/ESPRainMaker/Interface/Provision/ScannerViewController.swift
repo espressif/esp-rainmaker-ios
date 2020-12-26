@@ -51,11 +51,17 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     func scanQrCode() {
         ESPProvisionManager.shared.scanQRCode(scanView: scannerView) { espDevice, _ in
             if let device = espDevice {
-                DispatchQueue.main.async {
-                    Utility.showLoader(message: "Connecting to device", view: self.view)
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    self.connectDevice(espDevice: device)
+                if self.isDeviceSupported(device: device) {
+                    DispatchQueue.main.async {
+                        Utility.showLoader(message: "Connecting to device", view: self.view)
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self.connectDevice(espDevice: device)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.retry(message: "Device type not supported. Please choose another device and try again.")
+                    }
                 }
             } else {
                 DispatchQueue.main.async {
@@ -106,17 +112,24 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     }
 
     @IBAction func selectManualProvisioning(_: Any) {
-        let actionSheet = UIAlertController(title: "", message: "Choose Provisioning Transport", preferredStyle: .actionSheet)
-        let bleAction = UIAlertAction(title: "BLE", style: .default) { _ in
-            self.goToBleProvision()
+        switch Configuration.shared.espProvSetting.transport {
+        case .ble:
+            goToBleProvision()
+        case .softAp:
+            goToSoftAPProvision()
+        default:
+            let actionSheet = UIAlertController(title: "", message: "Choose Provisioning Transport", preferredStyle: .actionSheet)
+            let bleAction = UIAlertAction(title: "BLE", style: .default) { _ in
+                self.goToBleProvision()
+            }
+            let softapAction = UIAlertAction(title: "SoftAP", style: .default) { _ in
+                self.goToSoftAPProvision()
+            }
+            actionSheet.addAction(bleAction)
+            actionSheet.addAction(softapAction)
+            actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            present(actionSheet, animated: true, completion: nil)
         }
-        let softapAction = UIAlertAction(title: "SoftAP", style: .default) { _ in
-            self.goToSoftAPProvision()
-        }
-        actionSheet.addAction(bleAction)
-        actionSheet.addAction(softapAction)
-        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        present(actionSheet, animated: true, completion: nil)
     }
 
     func retry(message: String) {
@@ -153,6 +166,23 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     func goToSoftAPProvision() {
         let bleLandingVC = storyboard?.instantiateViewController(withIdentifier: "provisionLanding") as! ProvisionLandingViewController
         navigationController?.pushViewController(bleLandingVC, animated: true)
+    }
+
+    // Helper method to check whether app supports the scanned device.
+    private func isDeviceSupported(device: ESPDevice) -> Bool {
+        switch Configuration.shared.espProvSetting.transport {
+        case .both:
+            return true
+        case .softAp:
+            if device.transport == .softap {
+                return true
+            }
+        case .ble:
+            if device.transport == .ble {
+                return true
+            }
+        }
+        return false
     }
 
     /*

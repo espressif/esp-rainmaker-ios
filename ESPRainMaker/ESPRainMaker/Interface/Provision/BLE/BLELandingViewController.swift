@@ -62,7 +62,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
 
         // Checking whether filtering by prefix header is allowed
         prefixTextField.text = Utility.deviceNamePrefix
-        if Utility.espProvSetting.allowPrefixSearch {
+        if Configuration.shared.espProvSetting.allowPrefixSearch {
             prefixView.isHidden = false
         } else {
             textTopConstraint.constant = -10
@@ -100,7 +100,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
 
     func scanBleDevices() {
         Utility.showLoader(message: "Searching for BLE Devices..", view: view)
-        ESPProvisionManager.shared.searchESPDevices(devicePrefix: Utility.deviceNamePrefix, transport: .ble, security: Utility.espProvSetting.securityMode) { bleDevices, _ in
+        ESPProvisionManager.shared.searchESPDevices(devicePrefix: Utility.deviceNamePrefix, transport: .ble, security: Configuration.shared.espProvSetting.securityMode) { bleDevices, _ in
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
                 self.bleDevices = bleDevices

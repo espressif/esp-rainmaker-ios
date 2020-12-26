@@ -198,9 +198,8 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     }
 
     func loginWith(idProvider: String) {
-        let currentKeys = Keys.current
-        let loginURL = Constants.authURL + "/authorize" + "?identity_provider=" + idProvider + "&redirect_uri=" + Constants.redirectURL + "&response_type=CODE&client_id="
-        session = SFAuthenticationSession(url: URL(string: loginURL + currentKeys.clientID!)!, callbackURLScheme: Constants.redirectURL) { url, error in
+        let loginURL = Configuration.shared.awsConfiguration.authURL + "/authorize" + "?identity_provider=" + idProvider + "&redirect_uri=" + Configuration.shared.awsConfiguration.redirectURL + "&response_type=CODE&client_id="
+        session = SFAuthenticationSession(url: URL(string: loginURL + Configuration.shared.awsConfiguration.appClientId!)!, callbackURLScheme: Configuration.shared.awsConfiguration.redirectURL) { url, error in
             if error != nil {
                 return
             }
@@ -228,9 +227,8 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     }
 
     func requestToken(code: String) {
-        let url = Constants.authURL + "/token"
-        let currentKeys = Keys.current
-        let parameters = ["grant_type": "authorization_code", "client_id": currentKeys.clientID!, "code": code, "redirect_uri": Constants.redirectURL]
+        let url = Configuration.shared.awsConfiguration.authURL + "/token"
+        let parameters = ["grant_type": "authorization_code", "client_id": Configuration.shared.awsConfiguration.appClientId!, "code": code, "redirect_uri": Configuration.shared.awsConfiguration.redirectURL]
         let headers: HTTPHeaders = ["Content-Type": "application/x-www-form-urlencoded"]
         NetworkManager.shared.genericRequest(url: url, method: .post, parameters: parameters, encoding: URLEncoding.default,
                                              headers: headers) { response in
@@ -399,15 +397,15 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     }
 
     @IBAction func openPrivacy(_: Any) {
-        showDocumentVC(url: "https://rainmaker.espressif.com/docs/privacy-policy.html")
+        showDocumentVC(url: Configuration.shared.externalLinks.privacyPolicyURL)
     }
 
     @IBAction func openDocumentation(_: Any) {
-        showDocumentVC(url: "https://rainmaker.espressif.com")
+        showDocumentVC(url: Configuration.shared.externalLinks.documentationURL)
     }
 
     @IBAction func openTC(_: Any) {
-        showDocumentVC(url: "https://rainmaker.espressif.com/docs/terms-of-use.html")
+        showDocumentVC(url: Configuration.shared.externalLinks.termsOfUseURL)
     }
 
     func showDocumentVC(url: String) {

@@ -68,15 +68,16 @@ class ESPLocalStorage {
             do {
                 var nodes: [Node] = []
                 nodes = try JSONDecoder().decode([Node].self, from: nodeDetailsData)
-                #if LOCAL_CONTROL
-                    for node in nodes {
-                        if User.shared.localServices.keys.contains(node.node_id ?? "") {
-                            node.localNetwork = true
-                        }
+                for node in nodes {
+                    if User.shared.localServices.keys.contains(node.node_id ?? "") {
+                        node.localNetwork = true
                     }
-                #endif
-                ESPScheduler.shared.schedules = fetchSchedules()
-                ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodes)
+                }
+                // Fetch schedule details if it is supported
+                if Configuration.shared.appConfiguration.supportSchedule {
+                    ESPScheduler.shared.schedules = fetchSchedules()
+                    ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodes)
+                }
                 return nodes
             } catch {
                 return nil

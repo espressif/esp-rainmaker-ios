@@ -16,91 +16,89 @@
 //  ESPRainMaker
 //
 
-#if SCHEDULE
-    import UIKit
+import UIKit
 
-    class SelectDaysViewController: UIViewController {
-        @IBOutlet var tableView: UITableView!
-        var week = ESPScheduler.shared.currentSchedule.week
-        var pvc: ScheduleViewController?
-        var selectAll = false
+class SelectDaysViewController: UIViewController {
+    @IBOutlet var tableView: UITableView!
+    var week = ESPScheduler.shared.currentSchedule.week
+    var pvc: ScheduleViewController?
+    var selectAll = false
 
-        override func viewDidLoad() {
-            super.viewDidLoad()
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
+        if week.getDecimalConversionOfSelectedDays() == 127 {
+            selectAll = true
+        }
+    }
+
+    @IBAction func backButtonTapped(_: Any) {
+        ESPScheduler.shared.currentSchedule.trigger.days = week.getDecimalConversionOfSelectedDays()
+        dismiss(animated: true) {
+            self.pvc?.setRepeatStatus()
+        }
+    }
+}
+
+extension SelectDaysViewController: UITableViewDelegate {
+    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 0 {
+            return 50.0
+        }
+        return 40.0
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 0 {
+            selectAll = !selectAll
+            for item in week.daysInWeek {
+                item.selected = selectAll
+            }
+            tableView.reloadData()
+        } else {
+            let day = week.daysInWeek[indexPath.row - 1]
+            day.selected = !day.selected
+            let cell = tableView.cellForRow(at: indexPath)
+            if day.selected {
+                cell?.accessoryType = .checkmark
+            } else {
+                cell?.accessoryType = .none
+            }
+            let firstCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
             if week.getDecimalConversionOfSelectedDays() == 127 {
                 selectAll = true
-            }
-        }
-
-        @IBAction func backButtonTapped(_: Any) {
-            ESPScheduler.shared.currentSchedule.trigger.days = week.getDecimalConversionOfSelectedDays()
-            dismiss(animated: true) {
-                self.pvc?.setRepeatStatus()
-            }
-        }
-    }
-
-    extension SelectDaysViewController: UITableViewDelegate {
-        func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-            if indexPath.row == 0 {
-                return 50.0
-            }
-            return 40.0
-        }
-
-        func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            if indexPath.row == 0 {
-                selectAll = !selectAll
-                for item in week.daysInWeek {
-                    item.selected = selectAll
-                }
-                tableView.reloadData()
+                firstCell?.accessoryType = .checkmark
             } else {
-                let day = week.daysInWeek[indexPath.row - 1]
-                day.selected = !day.selected
-                let cell = tableView.cellForRow(at: indexPath)
-                if day.selected {
-                    cell?.accessoryType = .checkmark
-                } else {
-                    cell?.accessoryType = .none
-                }
-                let firstCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
-                if week.getDecimalConversionOfSelectedDays() == 127 {
-                    selectAll = true
-                    firstCell?.accessoryType = .checkmark
-                } else {
-                    selectAll = false
-                    firstCell?.accessoryType = .none
-                }
+                selectAll = false
+                firstCell?.accessoryType = .none
             }
         }
     }
+}
 
-    extension SelectDaysViewController: UITableViewDataSource {
-        func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-            return week.daysInWeek.count + 1
-        }
+extension SelectDaysViewController: UITableViewDataSource {
+    func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        return week.daysInWeek.count + 1
+    }
 
-        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "dayListViewCell")!
-            if indexPath.row == 0 {
-                cell.textLabel?.text = "Select All"
-                if week.getDecimalConversionOfSelectedDays() == 127 {
-                    cell.accessoryType = .checkmark
-                } else {
-                    cell.accessoryType = .none
-                }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "dayListViewCell")!
+        if indexPath.row == 0 {
+            cell.textLabel?.text = "Select All"
+            if week.getDecimalConversionOfSelectedDays() == 127 {
+                cell.accessoryType = .checkmark
             } else {
-                let day = week.daysInWeek[indexPath.row - 1]
-                cell.textLabel?.text = day.day
-                if day.selected {
-                    cell.accessoryType = .checkmark
-                } else {
-                    cell.accessoryType = .none
-                }
+                cell.accessoryType = .none
             }
-            return cell
+        } else {
+            let day = week.daysInWeek[indexPath.row - 1]
+            cell.textLabel?.text = day.day
+            if day.selected {
+                cell.accessoryType = .checkmark
+            } else {
+                cell.accessoryType = .none
+            }
         }
+        return cell
     }
-#endif
+}

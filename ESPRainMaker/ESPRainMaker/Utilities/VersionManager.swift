@@ -29,7 +29,7 @@ class VersionManager {
     let currentAppVersion = "1.0"
     let currentAPIVersion = "v1"
 
-    private let supportedVersionURL = Constants.baseURL + "/" + "apiversions"
+    private let supportedVersionURL = Configuration.shared.awsConfiguration.baseURL + "/" + "apiversions"
     private var appStoreURL = "itms-apps://"
 
     private var mainWindow: UIWindow?

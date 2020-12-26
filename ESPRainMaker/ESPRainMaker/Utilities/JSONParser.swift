@@ -34,12 +34,6 @@ struct JSONParser {
         var multiDeviceNodeList: [Node] = []
         var nodeList: [Node] = []
 
-        #if SCHEDULE
-            if !forSingleNode {
-                ESPScheduler.shared.refreshScheduleList()
-            }
-        #endif
-
         for node_details in data {
             var result: [Device] = []
             // Saving node related information
@@ -47,7 +41,7 @@ struct JSONParser {
             node.node_id = node_details["id"] as? String
 
             if let config = node_details["config"] as? [String: Any] {
-                #if SCHEDULE
+                if Configuration.shared.appConfiguration.supportLocalControl {
                     if !forSingleNode {
                         // Check whether scheduling is supported in the node
                         if let services = config["services"] as? [[String: Any]] {
@@ -62,7 +56,7 @@ struct JSONParser {
                             }
                         }
                     }
-                #endif
+                }
 
                 if let nodeInfo = config["info"] as? [String: String] {
                     node.info = Info(name: nodeInfo["name"], fw_version: nodeInfo["fw_version"], type: nodeInfo["type"])
@@ -148,7 +142,7 @@ struct JSONParser {
                     }
                 }
 
-                #if SCHEDULE
+                if Configuration.shared.appConfiguration.supportSchedule {
                     if !forSingleNode {
                         if let schedule = paramInfo[Constants.scheduleKey] as? [String: Any], let schedules = schedule[Constants.schedulesKey] as? [[String: Any]] {
                             for scheduleJSON in schedules {
@@ -156,7 +150,7 @@ struct JSONParser {
                             }
                         }
                     }
-                #endif
+                }
             }
             if node.devices?.count == 1 {
                 singleDeviceNodeList.append(node)
@@ -169,11 +163,11 @@ struct JSONParser {
         if nodeList.isEmpty {
             return nil
         }
-        #if SCHEDULE
+        if Configuration.shared.appConfiguration.supportSchedule {
             if !forSingleNode {
                 ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
             }
-        #endif
+        }
         return nodeList
     }
 }

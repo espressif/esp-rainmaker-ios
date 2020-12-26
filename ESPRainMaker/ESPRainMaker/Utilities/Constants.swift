@@ -18,7 +18,6 @@
 
 import AWSCognitoIdentityProvider
 import Foundation
-import Keys
 
 struct Constants {
     static let bundleIdentifier = Bundle.main.infoDictionary!["CFBundleIdentifier"] as! String
@@ -71,26 +70,20 @@ struct Constants {
     static let noProofCapability = "no_pop"
 
     // Amazon Cognito setup configuration
-    static let CognitoIdentityUserPoolRegion: AWSRegionType = .USEast1
 
     static let AWSCognitoUserPoolsSignInProviderKey = "UserPool"
-    static let baseURL = Bundle.main.infoDictionary!["BASE_API_URL_ENDPOINT"] as? String ?? ""
-    static let authURL = Bundle.main.infoDictionary!["AUTH_URL"] as? String ?? ""
-    static let redirectURL = Bundle.main.infoDictionary!["REDIRECT_URL"] as? String ?? ""
-    static let clientID = Bundle.main.infoDictionary!["APP_CLIENT_ID"] as? String ?? ""
-    static let claimBaseURL = Bundle.main.infoDictionary!["CLAIM_BASE_URL"] as? String ?? ""
     static let idProvider = "Github"
 
     // AWS cognito APIs
-    static let addDevice = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping"
-    static let getUserId = Constants.baseURL + "/" + Constants.apiVersion + "/user"
-    static let getNodes = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes"
-    static let getNodeConfig = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/config"
-    static let getNodeStatus = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/status"
-    static let checkStatus = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping"
+    static let addDevice = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping"
+    static let getUserId = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user"
+    static let getNodes = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes"
+    static let getNodeConfig = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/config"
+    static let getNodeStatus = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/status"
+    static let checkStatus = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping"
 
-    static let updateThingsShadow = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
-    static let getDeviceShadow = Constants.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
+    static let updateThingsShadow = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
+    static let getDeviceShadow = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
 
     // UserDefault keys
     static let newDeviceAdded = Constants.bundleIdentifier + ".newDeviceAdded"
@@ -112,7 +105,7 @@ struct Constants {
     static let github = "Github"
 
     // Theme Color
-    static let backgroundColor = Bundle.main.infoDictionary!["APP_THEME_COLOR"] as? String
+    static let backgroundColor = Configuration.shared.appThemeColor
 
     #if PROD
         static let tokenURL = "https://rainmaker-prod.auth.us-east-1.amazoncognito.com/oauth2/token"
@@ -129,43 +122,20 @@ struct Constants {
     static let localNetworkUpdateNotification = "com.espressif.localNetworkUpdateNotification"
 
     // Claim APIs
-    static let claimInitPath = Constants.claimBaseURL + "/claim/initiate"
-    static let claimVerifyPath = Constants.claimBaseURL + "/claim/verify"
+    static let claimInitPath = Configuration.shared.awsConfiguration.claimURL + "/claim/initiate"
+    static let claimVerifyPath = Configuration.shared.awsConfiguration.claimURL + "/claim/verify"
 
     static let boolTypeValidValues: [String: Bool] = ["true": true, "false": false, "yes": true, "no": false, "0": false, "1": true]
 
-    #if SCHEDULE
-        // Schedule related constants
-        // TODO: Read service/param key from node config.
-        static let scheduleServiceType = "esp.service.schedule"
-        static let scheduleParamType = "esp.param.schedules"
-        static let scheduleKey = "Schedule"
-        static let schedulesKey = "Schedules"
-    #endif
+    // Schedule related constants
+    // TODO: Read service/param key from node config.
+    static let scheduleServiceType = "esp.service.schedule"
+    static let scheduleParamType = "esp.param.schedules"
+    static let scheduleKey = "Schedule"
+    static let schedulesKey = "Schedules"
 
     static let serviceType = "_esp_local_ctrl._tcp."
     static let serviceDomain = "local"
     static let nodeDetails = "com.espressif.node.details"
     static let scheduleDetails = "com.espressif.schedule.details"
-}
-
-struct Keys {
-    let clientID: String?
-    let clientSecret: String?
-    let poolID: String?
-
-    init(clientID: String?, clientSecret: String?, poolID: String?) {
-        self.clientID = clientID
-        self.clientSecret = clientSecret
-        self.poolID = poolID
-    }
-
-    static var current: Keys {
-        let keys = ESPRainMakerKeys()
-        #if PROD
-            return Keys(clientID: keys.userPoolAppClientId, clientSecret: nil, poolID: keys.userPoolId)
-        #else
-            return Keys(clientID: keys.staging_UserPoolAppClientId, clientSecret: nil, poolID: keys.staging_UserPoolId)
-        #endif
-    }
 }

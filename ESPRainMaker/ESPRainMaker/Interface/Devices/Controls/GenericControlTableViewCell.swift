@@ -196,9 +196,9 @@ class GenericControlTableViewCell: UITableViewCell, ParamUpdateProtocol {
                 }
                 controlValueLabel.text = value
 
-                #if SCHEDULE
+                if Configuration.shared.appConfiguration.supportSchedule {
                     ESPScheduler.shared.updateDeviceName(for: device.node?.node_id, name: device.name ?? "", deviceName: value)
-                #endif
+                }
             }
             attribute?.value = controlValue as Any
         }

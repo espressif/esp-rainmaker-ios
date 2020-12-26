@@ -20,7 +20,6 @@
 		F1012F62251110B300839F06 /* Schedule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F1012F61251110B300839F06 /* Schedule.storyboard */; };
 		F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */; };
 		F1072BC6256F9BD400D7CE2C /* BLEDeviceListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */; };
-		F1072BCA256FC19800D7CE2C /* ESPProvSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */; };
 		F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1084204257103BC009F1AC3 /* GradientSlider.swift */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
 		F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */; };
@@ -48,6 +47,8 @@
 		F15EAC0F23E1994E008A766B /* DeviceDetail.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F15EAC1123E1994E008A766B /* DeviceDetail.storyboard */; };
 		F15FFF882402643A00E72D01 /* NoInternetConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15FFF872402643A00E72D01 /* NoInternetConnection.swift */; };
 		F15FFF8A2402645200E72D01 /* NoInternetConnection.xib in Resources */ = {isa = PBXBuildFile; fileRef = F15FFF892402645200E72D01 /* NoInternetConnection.xib */; };
+		F164A2F92581E73000B879BC /* Configuration.plist in Resources */ = {isa = PBXBuildFile; fileRef = F164A2F82581E73000B879BC /* Configuration.plist */; };
+		F164A30825824EC700B879BC /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F164A30725824EC500B879BC /* Configuration.swift */; };
 		F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */ = {isa = PBXBuildFile; fileRef = F17581782418D1F400FF7407 /* amazonRootCA.der */; };
 		F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */; };
 		F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */; };
@@ -149,7 +150,6 @@
 		F1012F61251110B300839F06 /* Schedule.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Schedule.storyboard; sourceTree = "<group>"; };
 		F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLELandingViewController.swift; sourceTree = "<group>"; };
 		F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEDeviceListViewCell.swift; sourceTree = "<group>"; };
-		F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPProvSettings.swift; sourceTree = "<group>"; };
 		F107AB3624CEC979008DB9CD /* ESPScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScheduler.swift; sourceTree = "<group>"; };
 		F1084204257103BC009F1AC3 /* GradientSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientSlider.swift; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
@@ -182,6 +182,8 @@
 		F15EAC1023E1994E008A766B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DeviceDetail.storyboard; sourceTree = "<group>"; };
 		F15FFF872402643A00E72D01 /* NoInternetConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoInternetConnection.swift; sourceTree = "<group>"; };
 		F15FFF892402645200E72D01 /* NoInternetConnection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoInternetConnection.xib; sourceTree = "<group>"; };
+		F164A2F82581E73000B879BC /* Configuration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Configuration.plist; sourceTree = "<group>"; };
+		F164A30725824EC500B879BC /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		F17581782418D1F400FF7407 /* amazonRootCA.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = amazonRootCA.der; sourceTree = "<group>"; };
 		F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListCollectionReusableView.swift; sourceTree = "<group>"; };
 		F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCollectionViewLayout.swift; sourceTree = "<group>"; };
@@ -313,6 +315,7 @@
 				1431462D20DE994C0017E119 /* Assets.xcassets */,
 				1431462F20DE994C0017E119 /* LaunchScreen.storyboard */,
 				1431463220DE994C0017E119 /* Info.plist */,
+				F164A2F82581E73000B879BC /* Configuration.plist */,
 				F151FF0B248253A7006F514E /* ESPRainMaker-Bridging-Header.h */,
 				F151FF0C248253A7006F514E /* ESPRainMaker.entitlements */,
 				F17581782418D1F400FF7407 /* amazonRootCA.der */,
@@ -513,7 +516,7 @@
 				F1EAAC8D23E29D9B00E9A6A8 /* AppConstants.swift */,
 				F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */,
 				F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */,
-				F1072BC9256FC19700D7CE2C /* ESPProvSettings.swift */,
+				F164A30725824EC500B879BC /* Configuration.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -722,6 +725,7 @@
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
 				F190B9D224C82C02006D136D /* ScheduleSliderTableViewCell.xib in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
+				F164A2F92581E73000B879BC /* Configuration.plist in Resources */,
 				F15EABFF23E05A51008A766B /* Localizable.strings in Resources */,
 				F1FB153D234D91000053B0ED /* GenericSliderTableViewCell.xib in Resources */,
 				1431463120DE994C0017E119 /* LaunchScreen.storyboard in Resources */,
@@ -816,7 +820,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\n\n#  gitversioning.sh\n#  \n#\n#  Created by sig on 28.10.13.\n#\n\nversion=$(git rev-parse --verify HEAD | cut -c 1-7)\ncurdate=$(date +\"%d.%m.%y\")\n\nfilesource=\"//\\n//  GitVersion.h\\n\\n\\n#ifndef GitVersion_h\\n#define GitVersion_h\\n\\n#define GIT_SHA_VERSION @\\\"$version\\\"\\n\\n#endif\"\n\ntouch $SRCROOT/ESPRainMaker/Resources/GitVersion.h\necho \"$filesource\" > $SRCROOT/ESPRainMaker/Resources/GitVersion.h\n";
+			shellScript = "\n\n#  gitversioning.sh\n#  \n#\n#  Created by sig on 28.10.13.\n#\n\nversion=$(git rev-parse --verify HEAD | cut -c 1-7)\ncurdate=$(date +\"%d.%m.%y\")\n\nfilesource=\"//\\n//  GitVersion.h\\n\\n\\n#ifndef GitVersion_h\\n#define GitVersion_h\\n\\n#define GIT_SHA_VERSION @\\\"$version\\\"\\n\\n#endif\"\n\ntouch $SRCROOT/ESPRainMaker/Resources/GitVersion.h\necho \"$filesource\" > $SRCROOT/ESPRainMaker/Resources/GitVersion.h\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -886,6 +890,7 @@
 				F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */,
 				F1F4514E232B78100009DCE0 /* Device.swift in Sources */,
 				144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */,
+				F164A30825824EC700B879BC /* Configuration.swift in Sources */,
 				F19A9D1022BB6DD800A450C3 /* MFAViewController.swift in Sources */,
 				F190B9B824BF5208006D136D /* ScheduleListTableViewCell.swift in Sources */,
 				F190B9BE24C07CB5006D136D /* SelectDaysViewController.swift in Sources */,
@@ -906,7 +911,6 @@
 				1431462720DE994B0017E119 /* AppDelegate.swift in Sources */,
 				F1E37E9023CF3AD500A5043F /* PrimaryControlTableViewCell.swift in Sources */,
 				F194B60A22CDD83200417347 /* DeviceListTableViewCell.swift in Sources */,
-				F1072BCA256FC19800D7CE2C /* ESPProvSettings.swift in Sources */,
 				F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */,
 				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
 			);
@@ -973,110 +977,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		F155A31D2397C37E007EEC33 /* ESPRainMaker-Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-			};
-			name = "ESPRainMaker-Debug";
-		};
-		F155A31E2397C37E007EEC33 /* ESPRainMaker-Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 20EAA68DBEE10B9B45CB7E5B /* Pods-ESPRainMaker.esprainmaker-debug.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				AUTH_URL = "https://rainmaker-staging.auth.us-east-1.amazoncognito.com/oauth2";
-				BASE_API_URL_ENDPOINT = "https://api.staging.rainmaker.espressif.com";
-				CLAIM_BASE_URL = "https://esp-claiming.rainmaker.espressif.com";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = ESPRainMaker/ESPRainMaker.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QWXF6GB4AV;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				INFOPLIST_FILE = ESPRainMaker/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_MAP_FILE_PATH = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.2.1;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.intsoftap;
-				PRODUCT_NAME = "ESP RainMaker";
-				PROVISIONING_PROFILE_SPECIFIER = "RainMaker Beta App Development Profile";
-				REDIRECT_URL = "com.espressif.rainmaker.intsoftap://success";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SCHEDULE LOCAL_CONTROL";
-				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
-				SWIFT_OBJC_BRIDGING_HEADER = "ESPRainMaker/ESPRainMaker-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 arm64e armv7s armv7 x86_64";
-			};
-			name = "ESPRainMaker-Debug";
-		};
 		F172D298234352D3005F687A /* ESPRainMaker-Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1143,9 +1043,6 @@
 			baseConfigurationReference = 187D4B6FA979D2D3D8B7C631 /* Pods-ESPRainMaker.esprainmaker-release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				AUTH_URL = "https://auth.rainmaker.espressif.com/oauth2";
-				BASE_API_URL_ENDPOINT = "https://api.rainmaker.espressif.com";
-				CLAIM_BASE_URL = "https://esp-claiming.rainmaker.espressif.com";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ESPRainMaker/ESPRainMaker.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1171,8 +1068,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
 				PRODUCT_NAME = "ESP RainMaker";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				REDIRECT_URL = "com.espressif.rainmaker.softap://success";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SCHEDULE LOCAL_CONTROL";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OBJC_BRIDGING_HEADER = "ESPRainMaker/ESPRainMaker-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1256,74 +1152,6 @@
 			};
 			name = "ESPRainMaker-Release";
 		};
-		F1C611AB24F79804007EEFC6 /* ESPRainMaker-Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = QWXF6GB4AV;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = "ESP ScheduleTests/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.espressif.ESP-ScheduleTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ESP Schedule.app/ESP Schedule";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = "ESPRainMaker-Debug";
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1331,7 +1159,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F172D298234352D3005F687A /* ESPRainMaker-Release */,
-				F155A31D2397C37E007EEC33 /* ESPRainMaker-Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "ESPRainMaker-Release";
@@ -1340,7 +1167,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F172D299234352D3005F687A /* ESPRainMaker-Release */,
-				F155A31E2397C37E007EEC33 /* ESPRainMaker-Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "ESPRainMaker-Release";
@@ -1349,7 +1175,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1C611AA24F79804007EEFC6 /* ESPRainMaker-Release */,
-				F1C611AB24F79804007EEFC6 /* ESPRainMaker-Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "ESPRainMaker-Release";

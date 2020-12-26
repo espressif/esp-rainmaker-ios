@@ -63,12 +63,18 @@ class ESPAPIManager {
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     switch response.result {
                     case let .success(value):
+                        if Configuration.shared.appConfiguration.supportSchedule {
+                            ESPScheduler.shared.refreshScheduleList()
+                        }
                         ESPNetworkMonitor.shared.setNetworkConnection(connected: true)
                         if let json = value as? [String: Any] {
                             if let nodeArray = json["node_details"] as? [[String: Any]] {
                                 let nodes = JSONParser.parseNodeArray(data: nodeArray, forSingleNode: false)
                                 ESPLocalStorage.shared.saveNodeDetails(nodes: nodes)
-                                ESPLocalStorage.shared.saveSchedules()
+                                // Save schedules if it is enabled
+                                if Configuration.shared.appConfiguration.supportSchedule {
+                                    ESPLocalStorage.shared.saveSchedules()
+                                }
                                 completionHandler(nodes, nil)
                                 return
                             } else if let status = json["status"] as? String, let description = json["description"] as? String {

@@ -138,7 +138,7 @@ class ProvisionLandingViewController: UIViewController {
     }
 
     func getESPDevice() {
-        ESPProvisionManager.shared.createESPDevice(deviceName: verifyConnection() ?? "", transport: .softap, security: Utility.espProvSetting.securityMode, completionHandler: { device, _ in
+        ESPProvisionManager.shared.createESPDevice(deviceName: verifyConnection() ?? "", transport: .softap, security: Configuration.shared.espProvSetting.securityMode, completionHandler: { device, _ in
             if device != nil {
                 self.connectDevice(espDevice: device!)
 
