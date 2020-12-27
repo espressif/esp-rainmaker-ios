@@ -20,50 +20,105 @@ import CoreBluetooth
 import ESPProvision
 import Foundation
 import MBProgressHUD
+import SystemConfiguration.CaptiveNetwork
 import UIKit
 
 class ProvisionViewController: UIViewController {
     @IBOutlet var passphraseTextfield: UITextField!
-    @IBOutlet var ssidTextfield: UITextField!
+    @IBOutlet var currentSSIDLabel: UILabel!
     @IBOutlet var provisionButton: UIButton!
+    @IBOutlet var savePasswordButton: UIButton!
+    @IBOutlet var passwordButton: UIButton!
+    @IBOutlet var bottomSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet var wifiListView: UIView!
+    @IBOutlet var passphraseView: UIView!
     @IBOutlet var tableView: UITableView!
+    @IBOutlet var signalImageView: UIImageView!
+    @IBOutlet var authenticationImageView: UIImageView!
 
+    var savedPasswords = UserDefaults.standard.value(forKey: Constants.wifiPassword) as? [String: String] ?? [:]
     var activityView: UIActivityIndicatorView?
-    var grayView: UIView?
     var wifiDetailList: [ESPWifiNetwork] = []
-    var versionInfo: String?
-    var alertTextField: UITextField?
-    var showPasswordImageView: UIImageView!
-    var connectAutomatically = false
-    var isScanFlow = false
+    var shouldSavePassword = true
     var device: ESPDevice!
     var passphrase = ""
-    var pop = ""
-    var ssid = ""
-    @IBOutlet var headerView: UIView!
+    var currentSSID = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
 
-        // Do any additional setup after loading the view, typically from a nib.
-        showPasswordImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
-        let tap = UITapGestureRecognizer(target: self, action: #selector(showPassword))
-        tap.numberOfTapsRequired = 1
-        showPasswordImageView.isUserInteractionEnabled = true
-        showPasswordImageView.contentMode = .scaleAspectFit
-        showPasswordImageView.addGestureRecognizer(tap)
+        let ssidTapGesture = UITapGestureRecognizer(target: self, action: #selector(showWiFiList))
+        wifiListView.addGestureRecognizer(ssidTapGesture)
+        // Add gesture recognizer to hide keyboard(if open) on tapping anywhere on screen
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard))
+        view.addGestureRecognizer(tapGestureRecognizer)
+        tapGestureRecognizer.cancelsTouchesInView = false
 
-        configurePassphraseTextField()
+        getCurrentSSID()
 
-        passphraseTextfield.addTarget(self, action: #selector(passphraseEntered), for: .editingDidEndOnExit)
-        ssidTextfield.addTarget(self, action: #selector(ssidEntered), for: .editingDidEndOnExit)
-        provisionButton.isUserInteractionEnabled = false
-
-        tableView.tableFooterView = UIView()
-        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        // Added observers for Keyboard hide/unhide event.
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         scanDeviceForWiFiList()
+        tableView.tableFooterView = UIView()
+    }
+
+    @objc private func showWiFiList() {
+        if tableView.isHidden {
+            tableView.reloadData()
+        }
+        tableView.isHidden = !tableView.isHidden
+    }
+
+    @objc private func hideKeyBoard() {
+        passphraseTextfield.resignFirstResponder()
+        view.endEditing(true)
+    }
+
+    @objc func keyboardWillShow(notification _: Notification) {
+        UIView.animate(withDuration: 0.1) {
+            self.bottomSpaceConstraint.constant = 200.0
+        }
+    }
+
+    @objc func keyboardWillHide(notification _: Notification) {
+        UIView.animate(withDuration: 0.1) {
+            self.bottomSpaceConstraint.constant = 0.0
+        }
+    }
+
+    private func networkSelected(wifiNetwork: ESPWifiNetwork) {
+        currentSSIDLabel.text = wifiNetwork.ssid
+        currentSSID = wifiNetwork.ssid
+        provisionButton.isHidden = false
+        if wifiNetwork.auth == .open {
+            passphraseView.isHidden = true
+            savePasswordButton.isHidden = true
+        } else {
+            passphraseView.isHidden = false
+            savePasswordButton.isHidden = false
+        }
+        if let password = savedPasswords[currentSSID] {
+            passphraseTextfield.text = password
+        } else {
+            passphraseTextfield.text = ""
+        }
+        setWifiIconImageFor(wifiSignalImageView: signalImageView, wifiSecurityImageView: authenticationImageView, network: wifiNetwork)
+    }
+
+    // Get ssid of currently connected Wi-Fi.
+    private func getCurrentSSID() {
+        if let interfaces = CNCopySupportedInterfaces() as NSArray? {
+            for interface in interfaces {
+                if let interfaceInfo = CNCopyCurrentNetworkInfo(interface as! CFString) as NSDictionary? {
+                    if let ssid = interfaceInfo[kCNNetworkInfoKeySSID as String] as? String {
+                        currentSSID = ssid
+                    }
+                }
+            }
+        }
     }
 
     private func showBusy(isBusy: Bool) {
@@ -80,29 +135,33 @@ class ProvisionViewController: UIViewController {
         provisionButton.isUserInteractionEnabled = !isBusy
     }
 
-    @IBAction func rescanWiFiList(_: Any) {
-        scanDeviceForWiFiList()
-    }
-
     private func provisionDevice(ssid _: String, passphrase: String) {
         Utility.showLoader(message: "Sending association data", view: view)
         self.passphrase = passphrase
         User.shared.associateNodeWithUser(device: device, delegate: self)
     }
 
-    func scanDeviceForWiFiList() {
-        Utility.showLoader(message: "Scanning for Wi-Fi", view: view)
-        device.scanWifiList { wifiList, _ in
-            DispatchQueue.main.async {
-                self.tableView.isHidden = false
-                self.headerView.isHidden = false
-                Utility.hideLoader(view: self.view)
-                if let list = wifiList {
-                    self.wifiDetailList = list.sorted { $0.rssi > $1.rssi }
-                }
-                self.tableView.reloadData()
-            }
+    @IBAction func savePasswordClicked(_: Any) {
+        if shouldSavePassword {
+            shouldSavePassword = false
+            savePasswordButton.setImage(UIImage(named: "unselected"), for: .normal)
+        } else {
+            shouldSavePassword = true
+            savePasswordButton.setImage(UIImage(named: "selected"), for: .normal)
         }
+    }
+
+    @IBAction func rescanWiFiList(_: Any) {
+        scanDeviceForWiFiList()
+    }
+
+    @IBAction func passwordClicked(_: Any) {
+        if passphraseTextfield.isSecureTextEntry {
+            passwordButton.setImage(UIImage(named: "unsecure"), for: .normal)
+        } else {
+            passwordButton.setImage(UIImage(named: "secure"), for: .normal)
+        }
+        passphraseTextfield.togglePasswordVisibility()
     }
 
     @IBAction func cancelClicked(_: Any) {
@@ -110,95 +169,57 @@ class ProvisionViewController: UIViewController {
         navigationController?.popToRootViewController(animated: false)
     }
 
-    @objc func passphraseEntered() {
-        passphraseTextfield.resignFirstResponder()
-        guard let ssid = ssidTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines), let passphrase = passphraseTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines) else {
-            return
-        }
-        if ssid.count > 0, passphrase.count > 0 {
-            provisionButton.isUserInteractionEnabled = true
-            provisionDevice(ssid: ssid, passphrase: passphrase)
-        }
-    }
-
-    @objc func ssidEntered() {
-        guard let ssid = ssidTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines), let passphrase = passphraseTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines) else {
-            return
-        }
-        if ssid.count > 0, passphrase.count > 0 {
-            provisionButton.isUserInteractionEnabled = true
-        }
-        passphraseTextfield.becomeFirstResponder()
-    }
-
     @IBAction func provisionButtonClicked(_: Any) {
-        guard let ssid = ssidTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines), let passphrase = passphraseTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-            ssid.count > 0, passphrase.count > 0 else {
+        guard let passphrase = passphraseTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+              passphrase.count > 0
+        else {
             return
         }
-        provisionDevice(ssid: ssid, passphrase: passphrase)
-    }
-
-    func showError(errorMessage: String) {
-        let alertMessage = errorMessage
-        let alertController = UIAlertController(title: "Provision device", message: alertMessage, preferredStyle: UIAlertController.Style.alert)
-        alertController.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
-        present(alertController, animated: true, completion: nil)
-    }
-
-    func setWifiIconImageFor(cell: WifiListTableViewCell, network: ESPWifiNetwork) {
-        let rssi = network.rssi
-        if rssi > Int32(-50) {
-            cell.signalImageView.image = UIImage(named: "wifi_symbol_strong")
-        } else if rssi > Int32(-60) {
-            cell.signalImageView?.image = UIImage(named: "wifi_symbol_good")
-        } else if rssi > Int32(-67) {
-            cell.signalImageView?.image = UIImage(named: "wifi_symbol_fair")
+        if shouldSavePassword {
+            savedPasswords[currentSSID] = passphrase
         } else {
-            cell.signalImageView?.image = UIImage(named: "wifi_symbol_weak")
+            savedPasswords.removeValue(forKey: currentSSID)
+        }
+        UserDefaults.standard.setValue(savedPasswords, forKey: Constants.wifiPassword)
+        provisionDevice(ssid: currentSSID, passphrase: passphrase)
+    }
+
+    // Scanned ESP device to get list of available Wi-Fi
+    func scanDeviceForWiFiList() {
+        Utility.showLoader(message: "Scanning for Wi-Fi", view: view)
+        device.scanWifiList { wifiList, _ in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                if let list = wifiList {
+                    self.wifiDetailList = list.sorted { $0.rssi > $1.rssi }
+                    // Checked if currently connected SSID is available on Wi-Fi list.
+                    if let currentNetwork = list.first(where: { $0.ssid == self.currentSSID }) {
+                        self.networkSelected(wifiNetwork: currentNetwork)
+                    } else if let activeNetwork = list.first(where: { $0.ssid == Utility.activeSSID }) {
+                        self.networkSelected(wifiNetwork: activeNetwork)
+                    }
+                    self.tableView.reloadData()
+                }
+            }
+        }
+    }
+
+    func setWifiIconImageFor(wifiSignalImageView: UIImageView, wifiSecurityImageView: UIImageView, network: ESPWifiNetwork) {
+        let rssi = network.rssi
+        wifiSignalImageView.isHidden = false
+        if rssi > Int32(-50) {
+            wifiSignalImageView.image = UIImage(named: "wifi_symbol_strong")
+        } else if rssi > Int32(-60) {
+            wifiSignalImageView.image = UIImage(named: "wifi_symbol_good")
+        } else if rssi > Int32(-67) {
+            wifiSignalImageView.image = UIImage(named: "wifi_symbol_fair")
+        } else {
+            wifiSignalImageView.image = UIImage(named: "wifi_symbol_weak")
         }
         if network.auth != .open {
-            cell.authenticationImageView.image = UIImage(named: "wifi_security")
-            cell.authenticationImageView.isHidden = false
+            wifiSecurityImageView.isHidden = false
         } else {
-            cell.authenticationImageView.isHidden = true
-        }
-    }
-
-    func showTextFieldUI() {
-        DispatchQueue.main.async {
-            self.tableView.isHidden = true
-            self.ssidTextfield.isHidden = false
-            self.passphraseTextfield.isHidden = false
-            self.provisionButton.isHidden = false
-            self.headerView.isHidden = true
-        }
-    }
-
-    private func joinOtherNetwork() {
-        let input = UIAlertController(title: "", message: nil, preferredStyle: .alert)
-
-        input.addTextField { textField in
-            textField.placeholder = "Network Name"
-            self.addHeightConstraint(textField: textField)
-        }
-
-        input.addTextField { textField in
-            self.configurePasswordTextfield(textField: textField)
-            self.addHeightConstraint(textField: textField)
-        }
-        input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
-        }))
-        input.addAction(UIAlertAction(title: "Connect", style: .default, handler: { [weak input] _ in
-            let ssidTextField = input?.textFields![0]
-            let passphrase = input?.textFields![1]
-
-            if let ssid = ssidTextField?.text, ssid.count > 0 {
-                self.provisionDevice(ssid: ssid, passphrase: passphrase?.text ?? "")
-            }
-        }))
-        DispatchQueue.main.async {
-            self.present(input, animated: true, completion: nil)
+            wifiSecurityImageView.isHidden = true
         }
     }
 
@@ -206,7 +227,7 @@ class ProvisionViewController: UIViewController {
         DispatchQueue.main.async {
             Utility.hideLoader(view: self.view)
             let successVC = self.storyboard?.instantiateViewController(withIdentifier: "successViewController") as! SuccessViewController
-            successVC.ssid = self.ssid
+            successVC.ssid = self.currentSSID
             successVC.passphrase = self.passphrase
             successVC.step1Failed = step1Failed
             successVC.espDevice = self.device
@@ -214,52 +235,10 @@ class ProvisionViewController: UIViewController {
         }
     }
 
-    @objc func showPassword() {
-        if let secureEntry = self.alertTextField?.isSecureTextEntry {
-            alertTextField?.togglePasswordVisibility()
-            if secureEntry {
-                showPasswordImageView.image = UIImage(named: "hide_password")
-            } else {
-                showPasswordImageView.image = UIImage(named: "show_password")
-            }
-        }
-    }
-
-    private func addHeightConstraint(textField: UITextField) {
-        let heightConstraint = NSLayoutConstraint(item: textField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)
-        textField.addConstraint(heightConstraint)
-        textField.font = UIFont(name: textField.font!.fontName, size: 18)
-    }
-
-    private func configurePasswordTextfield(textField: UITextField) {
-        alertTextField = textField
-        textField.placeholder = "Password"
-        textField.isSecureTextEntry = true
-        showPasswordImageView.image = UIImage(named: "show_password")
-        let rightView = UIView(frame: CGRect(x: 0, y: 0, width: showPasswordImageView.frame.width + 10, height: showPasswordImageView.frame.height))
-        rightView.addSubview(showPasswordImageView)
-        textField.rightView = rightView
-        textField.rightViewMode = .always
-    }
-
-    private func configurePassphraseTextField() {
-        alertTextField = passphraseTextfield
-        passphraseTextfield.placeholder = "Password"
-        passphraseTextfield.isSecureTextEntry = true
-        showPasswordImageView.image = UIImage(named: "show_password")
-        let rightView = UIView(frame: CGRect(x: 0, y: 0, width: showPasswordImageView.frame.width + 10, height: showPasswordImageView.frame.height))
-        rightView.addSubview(showPasswordImageView)
-        passphraseTextfield.rightView = rightView
-        passphraseTextfield.rightViewMode = .always
-    }
-
-    private func showConnectionFailure() {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(title: "Failure", message: "Connection to device failed.\n Please make sure you are connected to the Wi-Fi network of device.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ok", style: .destructive, handler: { _ in
-                self.navigationController?.popViewController(animated: true)
-            }))
-            self.present(alert, animated: true, completion: nil)
+    override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
+        if segue.identifier == "joinNetwork" {
+            let destinationVC = segue.destination as! JoinNetworkViewController
+            destinationVC.device = device
         }
     }
 }
@@ -267,40 +246,24 @@ class ProvisionViewController: UIViewController {
 extension ProvisionViewController: UITableViewDelegate {
     func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.row >= wifiDetailList.count {
-            joinOtherNetwork()
-        } else {
-            let wifiNetwork = wifiDetailList[indexPath.row]
-            ssid = wifiNetwork.ssid
-
-            if wifiNetwork.auth != .open {
-                let input = UIAlertController(title: ssid, message: nil, preferredStyle: .alert)
-
-                input.addTextField { textField in
-                    self.configurePasswordTextfield(textField: textField)
-                    self.addHeightConstraint(textField: textField)
-                }
-                input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
-
-                }))
-                input.addAction(UIAlertAction(title: "Provision", style: .default, handler: { [weak input] _ in
-                    let textField = input?.textFields![0]
-                    guard let passphrase = textField?.text else {
-                        return
-                    }
-                    if passphrase.count > 0 {
-                        self.provisionDevice(ssid: self.ssid, passphrase: passphrase)
-                    }
-                }))
-                present(input, animated: true, completion: nil)
-            } else {
-                provisionDevice(ssid: ssid, passphrase: "")
-            }
+        if indexPath.row == 0 {
+            passphraseView.isHidden = true
+            savePasswordButton.isHidden = true
+            tableView.isHidden = true
+            currentSSIDLabel.text = "Select Wi-Fi Network"
+            passphraseTextfield.text = ""
+            provisionButton.isHidden = true
+            signalImageView.isHidden = true
+            authenticationImageView.isHidden = true
+            return
         }
+        let selectedNetwork = wifiDetailList[indexPath.row - 1]
+        networkSelected(wifiNetwork: selectedNetwork)
+        tableView.isHidden = true
     }
 
     func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
-        return 60.0
+        return 45.0
     }
 }
 
@@ -311,12 +274,19 @@ extension ProvisionViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "wifiListCell", for: indexPath) as! WifiListTableViewCell
-        if indexPath.row >= wifiDetailList.count {
-            cell.ssidLabel.text = "Join Other Network"
-            cell.signalImageView.image = UIImage(named: "add_icon")
+        if indexPath.row == 0 {
+            cell.ssidLabel.text = "Select Wi-Fi Network"
+            cell.signalImageView.isHidden = true
+            cell.authenticationImageView.isHidden = true
         } else {
-            cell.ssidLabel.text = wifiDetailList[indexPath.row].ssid
-            setWifiIconImageFor(cell: cell, network: wifiDetailList[indexPath.row])
+            let wifiNetwork = wifiDetailList[indexPath.row - 1]
+            if wifiNetwork.ssid == currentSSIDLabel.text {
+                cell.backgroundColor = UIColor(hexString: "#8265E3").withAlphaComponent(0.6)
+            } else {
+                cell.backgroundColor = .white
+            }
+            cell.ssidLabel.text = wifiDetailList[indexPath.row - 1].ssid
+            setWifiIconImageFor(wifiSignalImageView: cell.signalImageView, wifiSecurityImageView: cell.authenticationImageView, network: wifiNetwork)
         }
         return cell
     }

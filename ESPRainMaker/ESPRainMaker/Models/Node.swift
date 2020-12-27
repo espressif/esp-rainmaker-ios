@@ -26,6 +26,7 @@ class Node: Codable {
     var attributes: [Attribute]?
     var primary: [String]?
     var secondary: [String]?
+    var services: [Service]?
     var isConnected = true
     var timestamp: Int = 0
     var isSchedulingSupported = false
@@ -42,6 +43,7 @@ class Node: Codable {
         case isSchedulingSupported
         case primary
         case secondary
+        case services
     }
 
     func encode(to encoder: Encoder) throws {
@@ -51,6 +53,7 @@ class Node: Codable {
         try container.encode(devices, forKey: .devices)
         try container.encode(primary, forKey: .primary)
         try container.encode(secondary, forKey: .secondary)
+        try container.encode(services, forKey: .services)
 
         var configContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
         try configContainer.encode(info, forKey: .info)
@@ -63,6 +66,7 @@ class Node: Codable {
         devices = try container.decode([Device]?.self, forKey: .devices)
         primary = try container.decode([String]?.self, forKey: .primary)
         secondary = try container.decode([String]?.self, forKey: .secondary)
+        services = try container.decode([Service]?.self, forKey: .services)
 
         let configContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
         info = try configContainer.decode(Info?.self, forKey: .info)
@@ -102,6 +106,12 @@ class Node: Codable {
     }
 
     init() {}
+}
+
+class Service: Codable {
+    var name: String?
+    var params: [Param]?
+    var type: String?
 }
 
 struct Info: Codable {

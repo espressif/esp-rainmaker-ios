@@ -104,6 +104,59 @@ class NetworkManager {
 
     // MARK: - Thing Shadow
 
+    /// Method to get device parameter values
+    ///
+    /// - Parameters:
+    ///   - device: Device for which get param is required
+    ///   - completionHandler: handler called when response to getDeviceParam is recieved
+    func getDeviceParam(device: Device, completionHandler: @escaping (ESPNetworkError?) -> Void) {
+        NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
+        if Configuration.shared.appConfiguration.supportLocalControl {
+            if let nodeid = device.node?.node_id {
+                if let availableService = User.shared.localServices[nodeid] {
+                    availableService.getPropertyInfo { response, error in
+                        if error != nil {
+                            if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                                self.getDeviceParamPrivate(device: device, completionHandler: completionHandler)
+                            } else {
+                                completionHandler(.localServerError(error!))
+                            }
+                            return
+                        }
+                        if let params = response!["params"] as? [String:Any], let deviceName = device.name, let attributes = params[deviceName] as? [String: Any] {
+                            device.deviceName = deviceName
+                            if let params = device.params {
+                                for index in params.indices {
+                                    if let reportedValue = attributes[params[index].name ?? ""] {
+                                        if params[index].type == Constants.deviceNameParam {
+                                            device.deviceName = reportedValue as? String ?? deviceName
+                                        }
+                                        params[index].value = reportedValue
+                                    }
+                                }
+                            }
+                            completionHandler(nil)
+                        } else {
+                            completionHandler(nil)
+                        }
+                    }
+                } else {
+                    getDeviceParamPrivate(device: device, completionHandler: completionHandler)
+                }
+            }
+        } else {
+            getDeviceParamPrivate(device: device, completionHandler: completionHandler)
+        }
+    }
+
+    private func getDeviceParamPrivate(device: Device, completionHandler: @escaping (ESPNetworkError?) -> Void) {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+            apiManager.getDeviceParams(device: device, completionHandler: completionHandler)
+        } else {
+            completionHandler(.noNetwork)
+        }
+    }
+
     /// Method to update device thing shadow
     /// Any changes of the device params from the app trigger this method
     ///

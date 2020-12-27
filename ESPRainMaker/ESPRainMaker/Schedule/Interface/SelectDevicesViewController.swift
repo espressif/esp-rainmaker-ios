@@ -55,6 +55,11 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
         tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
     }
 
+    func expandSection(expand: Bool, section: Int) {
+        availableDeviceCopy[section].collapsed = !expand
+        tableView.reloadSections(IndexSet(arrayLiteral: section), with: .automatic)
+    }
+
     // MARK: - Private Methods
 
     private func getTableViewCellBasedOn(indexPath: IndexPath) -> UITableViewCell {
@@ -90,9 +95,11 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                         if param.selected {
                             cell.checkButton.setImage(UIImage(named: "selected"), for: .normal)
                             cell.slider.isEnabled = true
+                            cell.slider.alpha = 1.0
                         } else {
-                            cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+                            cell.checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
                             cell.slider.isEnabled = false
+                            cell.slider.alpha = 0.5
                         }
                         cell.device = device
                         cell.scheduleDelegate = self
@@ -121,7 +128,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                 cell.checkButton.setImage(UIImage(named: "selected"), for: .normal)
                 cell.toggleSwitch.isEnabled = true
             } else {
-                cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+                cell.checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
                 cell.toggleSwitch.isEnabled = false
             }
             cell.device = device
@@ -169,7 +176,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                 cell.hueSlider.isEnabled = true
                 cell.hueSlider.alpha = 1.0
             } else {
-                cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+                cell.checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
                 cell.hueSlider.isEnabled = false
                 cell.hueSlider.alpha = 0.5
             }
@@ -213,7 +220,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                     cell.dropDownButton.isEnabled = true
                     cell.dropDownButton.alpha = 1.0
                 } else {
-                    cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+                    cell.checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
                     cell.dropDownButton.isEnabled = false
                     cell.dropDownButton.alpha = 0.5
                 }
@@ -249,7 +256,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
             cell.checkButton.setImage(UIImage(named: "selected"), for: .normal)
             cell.editButton.isHidden = false
         } else {
-            cell.checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+            cell.checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
             cell.editButton.isHidden = true
         }
         return cell

@@ -44,7 +44,6 @@ class DevicesViewController: UIViewController {
     var pool: AWSCognitoIdentityUserPool?
     var checkDeviceAssociation = false
 
-    private var groupCount = 0
     private var currentPage = 0
     private var absoluteSegmentPosition: [CGFloat] = []
 
@@ -80,11 +79,21 @@ class DevicesViewController: UIViewController {
         // Register nib
         collectionView.register(UINib(nibName: "DeviceGroupEmptyDeviceCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "deviceGroupEmptyDeviceCVC")
 
+        // Add gesture to hide Group DropDown menu
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideDropDown))
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self
+        view.addGestureRecognizer(tapGesture)
+
         if !Configuration.shared.appConfiguration.supportGrouping {
             segmentControl.isHidden = true
             groupMenuButton.isHidden = true
         } else {
             configureSegmentControl()
+        }
+        
+        if !Configuration.shared.appConfiguration.supportSchedule {
+            tabBarController?.viewControllers?.remove(at: 1)
         }
     }
 
@@ -117,19 +126,20 @@ class DevicesViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
-        if Configuration.shared.appConfiguration.supportSchedule {
-            tabBarController?.tabBar.isHidden = false
-        }
-
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(localNetworkUpdate), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
-    }
-
-    override func prepare(for _: UIStoryboardSegue, sender _: Any?) {
-        tabBarController?.tabBar.isHidden = true
+        tabBarController?.tabBar.isHidden = false
     }
 
     // MARK: - Observer functions
+
+    @objc func hideDropDown() {
+        dropDownMenu.isHidden = true
+    }
+
+    @objc func reloadCollectionView() {
+        collectionView.reloadData()
+    }
 
     @objc func appEnterForeground() {
         refreshDeviceList()
@@ -166,16 +176,13 @@ class DevicesViewController: UIViewController {
                 User.shared.associatedNodeList = nil
                 if error != nil {
                     self.unhideInitialView(error: error)
-                    if Configuration.shared.appConfiguration.supportLocalControl {
-                        User.shared.startServiceDiscovery()
-                    }
                     self.collectionView.isUserInteractionEnabled = true
                     return
                 }
                 User.shared.associatedNodeList = nodes
 
                 if Configuration.shared.appConfiguration.supportGrouping {
-                    NodeGroupManager.shared.getNodeGroups { groups, error in
+                    NodeGroupManager.shared.getNodeGroups { _, error in
                         DispatchQueue.main.async {
                             // Start local discovery if its enabled
                             if Configuration.shared.appConfiguration.supportLocalControl {
@@ -183,14 +190,15 @@ class DevicesViewController: UIViewController {
                             }
                         }
                         if error != nil {
-                            self.groupCount = 0
                             Utility.showToastMessage(view: self.view, message: error!.description, duration: 5.0)
                         }
-                        self.groupCount = groups?.count ?? 0
                         self.setupSegmentControl()
                         self.prepareView()
                     }
                 } else {
+                    if Configuration.shared.appConfiguration.supportLocalControl {
+                        User.shared.startServiceDiscovery()
+                    }
                     self.prepareView()
                 }
             }
@@ -230,7 +238,53 @@ class DevicesViewController: UIViewController {
         navigationController?.pushViewController(deviceTraitsVC, animated: true)
     }
 
+    @IBAction func addDeviceClicked(_: Any) {
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        tabBarController?.tabBar.isHidden = true
+
+        // Check if scan is enabled in ap
+        if Configuration.shared.espProvSetting.scanEnabled {
+            let scannerVC = mainStoryboard.instantiateViewController(withIdentifier: "scannerVC") as! ScannerViewController
+            navigationController?.pushViewController(scannerVC, animated: true)
+        } else {
+            // If scan is not enabled check supported transport
+            switch Configuration.shared.espProvSetting.transport {
+            case .ble:
+                // Go directly to BLE manual provisioing
+                goToBleProvision()
+            case .softAp:
+                // Go directly to SoftAP manual provisioing
+                goToSoftAPProvision()
+            default:
+                // If both BLE and SoftAP is supported. Present Action Sheet to give option to choose.
+                let actionSheet = UIAlertController(title: "", message: "Choose Provisioning Transport", preferredStyle: .actionSheet)
+                let bleAction = UIAlertAction(title: "BLE", style: .default) { _ in
+                    self.goToBleProvision()
+                }
+                let softapAction = UIAlertAction(title: "SoftAP", style: .default) { _ in
+                    self.goToSoftAPProvision()
+                }
+                actionSheet.addAction(bleAction)
+                actionSheet.addAction(softapAction)
+                actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                present(actionSheet, animated: true, completion: nil)
+            }
+        }
+    }
+
     // MARK: - Private Methods
+
+    private func goToBleProvision() {
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let bleLandingVC = mainStoryboard.instantiateViewController(withIdentifier: "bleLandingVC") as! BLELandingViewController
+        navigationController?.pushViewController(bleLandingVC, animated: true)
+    }
+
+    private func goToSoftAPProvision() {
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let softLandingVC = mainStoryboard.instantiateViewController(withIdentifier: "provisionLanding") as! ProvisionLandingViewController
+        navigationController?.pushViewController(softLandingVC, animated: true)
+    }
 
     private func prepareView() {
         if User.shared.associatedNodeList == nil || User.shared.associatedNodeList?.count == 0 {
@@ -273,7 +327,7 @@ class DevicesViewController: UIViewController {
         if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
             infoLabel.text = "No Device Added"
             emptyListIcon.image = UIImage(named: "no_device_icon")
-            infoLabel.textColor = .black
+            infoLabel.textColor = .white
             initialView.isHidden = false
             collectionView.isHidden = true
             addButton.isHidden = true
@@ -290,11 +344,11 @@ class DevicesViewController: UIViewController {
         for i in 0 ... NodeGroupManager.shared.nodeGroup.count {
             var stringBoundingbox: CGSize = .zero
             if i == 0 {
-                stringBoundingbox = "All Devices".size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.5, weight: .semibold)])
+                stringBoundingbox = "All Devices".size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.5, weight: .semibold)])
                 segmentControl.insertSegment(withTitle: "All Devices", at: i, animated: false)
             } else {
                 let groupName = NodeGroupManager.shared.nodeGroup[i - 1].group_name ?? ""
-                stringBoundingbox = (groupName as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.5, weight: .semibold)])
+                stringBoundingbox = (groupName as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.5, weight: .semibold)])
                 segmentControl.insertSegment(withTitle: groupName, at: i, animated: false)
             }
             segmentPosition = segmentPosition + stringBoundingbox.width + 20
@@ -340,20 +394,20 @@ class DevicesViewController: UIViewController {
 
     // Helper method to customise UISegmentControl
     private func configureSegmentControl() {
-        let currentBGColor = UIColor(hexString: "#5330b9")
+        let currentBGColor = UIColor(hexString: "#8265E3")
         segmentControl.removeBorder()
-        segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0, weight: .regular)], for: .normal)
-        segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.5, weight: .semibold), NSAttributedString.Key.underlineStyle: NSUnderlineStyle.thick.rawValue], for: .selected)
+        segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white as Any, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.0, weight: .regular)], for: .normal)
+        segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white as Any, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.5, weight: .semibold), NSAttributedString.Key.underlineStyle: NSUnderlineStyle.thick.rawValue], for: .selected)
         segmentControl.changeUnderlineColor(color: currentBGColor)
         let allDeviceSize = getFontWidthForString(text: "All Devices")
-        segmentControl.setWidth(allDeviceSize.width + 20, forSegmentAt: 0)
+        segmentControl.setWidth(allDeviceSize.width + 40, forSegmentAt: 0)
     }
 
     private func unhideInitialView(error: ESPNetworkError?) {
         User.shared.associatedNodeList = ESPLocalStorage.shared.fetchNodeDetails()
         if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
             infoLabel.text = "No devices to show\n" + (error?.description ?? "Something went wrong!!")
-            emptyListIcon.image = UIImage(named: "api_error_icon")
+            emptyListIcon.image = nil
             infoLabel.textColor = .red
             initialView.isHidden = false
             collectionView.isHidden = true
@@ -367,7 +421,6 @@ class DevicesViewController: UIViewController {
         }
         if Configuration.shared.appConfiguration.supportGrouping {
             NodeGroupManager.shared.nodeGroup = ESPLocalStorage.shared.fetchNodeGroups()
-            groupCount = NodeGroupManager.shared.nodeGroup.count
             setupSegmentControl()
             prepareView()
         }
@@ -399,13 +452,6 @@ class DevicesViewController: UIViewController {
             }
         }
     }
-
-    private func goToNodeDetails(node: Node) {
-        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
-        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
-        destination.currentNode = node
-        navigationController?.pushViewController(destination, animated: true)
-    }
 }
 
 extension DevicesViewController: UICollectionViewDelegate {
@@ -421,7 +467,17 @@ extension DevicesViewController: UICollectionViewDelegate {
 
 extension DevicesViewController: UICollectionViewDataSource {
     func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        return groupCount + 1
+        if Configuration.shared.appConfiguration.supportGrouping {
+            if NodeGroupManager.shared.nodeGroup.count == 0 {
+                if User.shared.associatedNodeList == nil || User.shared.associatedNodeList?.count == 0 {
+                    return 0
+                } else {
+                    return 1
+                }
+            }
+            return NodeGroupManager.shared.nodeGroup.count + 1
+        }
+        return 1
     }
 
     func numberOfSections(in _: UICollectionView) -> Int {
@@ -506,22 +562,19 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
     }
 
     func didSelectNode(node: Node) {
-        // Get sharing details for this user to display at node details.
-        if Configuration.shared.appConfiguration.supportSharing {
-            Utility.showLoader(message: "Updating Node details...", view: view)
-            NodeSharingManager.shared.getSharingDetails(node: node) { error in
-                Utility.hideLoader(view: self.view)
-                if error != nil {
-                    // Unable to collect sharing information for this particular node.
-                    Utility.showToastMessage(view: self.view, message: "Unable to update current node details with error:\(error!.description).")
-                }
-                // Navigate to node details view controller
-                DispatchQueue.main.async {
-                    self.goToNodeDetails(node: node)
-                }
-            }
-        } else {
-            goToNodeDetails(node: node)
+        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
+        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
+        destination.currentNode = node
+        navigationController?.pushViewController(destination, animated: true)
+    }
+}
+
+extension DevicesViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view == groupMenuButton {
+            return false
         }
+
+        return true
     }
 }

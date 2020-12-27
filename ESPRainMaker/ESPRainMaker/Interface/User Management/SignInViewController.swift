@@ -39,6 +39,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     @IBOutlet var googleLoginButton: UIButton!
     @IBOutlet var appleLoginButton: UIButton!
     @IBOutlet var appVersionLabel: UILabel!
+    @IBOutlet var signupLabel: UILabel!
     //    let passwordButtonRightView = UIButton(frame: CGRect(x: 0, y: 0, width: 22.0, height: 16.0))
 
     var pool: AWSCognitoIdentityUserPool?
@@ -100,7 +101,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
             }
         }
         if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
-            currentBGColor = UIColor(hexString: "#5330b9")
+            currentBGColor = UIColor(hexString: "#8265E3")
         }
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .normal)
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .selected)
@@ -129,7 +130,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
         presentationController?.delegate = self
         pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
         // Looks for single or multiple taps.
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
 
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
@@ -144,6 +145,20 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
         }
         segmentControl.addUnderlineForSelectedSegment()
         appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
+
+        let text = "I have read and agree to the Privacy Policy and Terms of Use."
+        let underlineAttriString = NSMutableAttributedString(string: text)
+        let range1 = (text as NSString).range(of: "Terms of Use")
+        underlineAttriString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range1)
+        underlineAttriString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.blue, range: range1)
+        underlineAttriString.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: 14.0), range: range1)
+        let range2 = (text as NSString).range(of: "Privacy Policy")
+        underlineAttriString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range2)
+        underlineAttriString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.blue, range: range2)
+        underlineAttriString.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: 14.0), range: range2)
+        signupLabel.attributedText = underlineAttriString
+        signupLabel.isUserInteractionEnabled = true
+        signupLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapLabel(gesture:))))
     }
 
     override func viewDidLayoutSubviews() {
@@ -183,6 +198,17 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
             }
         }
         segmentControl.changeUnderlinePosition()
+    }
+
+    @IBAction func tapLabel(gesture: UITapGestureRecognizer) {
+        let termsRange = (signupLabel.text! as NSString).range(of: "Terms of Use")
+        let privacyRange = (signupLabel.text! as NSString).range(of: "Privacy Policy")
+
+        if gesture.didTapAttributedTextInLabel(label: signupLabel, inRange: termsRange) {
+            openTC(self)
+        } else if gesture.didTapAttributedTextInLabel(label: signupLabel, inRange: privacyRange) {
+            openPrivacy(self)
+        }
     }
 
     @IBAction func loginWithGoogle(_: Any) {
@@ -289,8 +315,9 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     @IBAction func signUp(_ sender: AnyObject) {
         dismissKeyboard()
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            guard let userNameValue = self.email.text, !userNameValue.isEmpty,
-                let passwordValue = self.registerPassword.text, !passwordValue.isEmpty else {
+            guard let userNameValue = email.text, !userNameValue.isEmpty,
+                  let passwordValue = registerPassword.text, !passwordValue.isEmpty
+            else {
                 let alertController = UIAlertController(title: "Missing Required Fields",
                                                         message: "Username / Password are required for registration.",
                                                         preferredStyle: .alert)
@@ -327,7 +354,7 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
 
             var attributes = [AWSCognitoIdentityUserAttributeType]()
 
-            if let emailValue = self.email.text, !emailValue.isEmpty {
+            if let emailValue = email.text, !emailValue.isEmpty {
                 let email = AWSCognitoIdentityUserAttributeType()
                 email?.name = "email"
                 email?.value = emailValue

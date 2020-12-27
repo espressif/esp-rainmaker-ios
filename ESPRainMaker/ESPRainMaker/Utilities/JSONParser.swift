@@ -41,6 +41,22 @@ struct JSONParser {
             node.node_id = node_details["id"] as? String
 
             if let config = node_details["config"] as? [String: Any] {
+                if let services = config["services"] as? [[String: Any]] {
+                    var nodeServices: [Service] = []
+                    for serviceJSON in services {
+                        if let type = serviceJSON["type"] as? String {
+                            let service = Service()
+                            service.type = type
+                            service.name = serviceJSON["name"] as? String
+                            if let params = serviceJSON["params"] as? [[String: Any]] {
+                                service.params = getParams(paramJSON: params)
+                            }
+                            nodeServices.append(service)
+                        }
+                    }
+                    node.services = nodeServices
+                }
+
                 if Configuration.shared.appConfiguration.supportSchedule { // Check whether scheduling is supported in the node
                     if let services = config["services"] as? [[String: Any]] {
                         for service in services {
@@ -118,6 +134,17 @@ struct JSONParser {
                 node.devices = result.sorted { $0.name! < $1.name! }
             }
 
+            // Get value for service params
+            for service in node.services ?? [] {
+                if let serviceName = service.name, let paramInfo = node_details["params"] as? [String: Any], let serviceInfo = paramInfo[serviceName] as? [String: Any] {
+                    for param in service.params ?? [] {
+                        if let paramName = param.name {
+                            param.value = serviceInfo[paramName]
+                        }
+                    }
+                }
+            }
+
             if let statusInfo = node_details["status"] as? [String: Any], let connectivity = statusInfo["connectivity"] as? [String: Any], let status = connectivity["connected"] as? Bool {
                 node.isConnected = status
                 node.timestamp = connectivity["timestamp"] as? Int ?? 0
@@ -147,6 +174,14 @@ struct JSONParser {
                         }
                     }
                 }
+
+                for service in node.services ?? [] {
+                    if service.type != "esp.service.schedule", let serviceInfo = paramInfo[service.name ?? ""] as? [String: Any] {
+                        for param in service.params ?? [] {
+                            param.value = serviceInfo[param.name ?? ""]
+                        }
+                    }
+                }
             }
             if node.devices?.count == 1 {
                 singleDeviceNodeList.append(node)
@@ -165,5 +200,32 @@ struct JSONParser {
             }
         }
         return nodeList
+    }
+
+    static func getParams(paramJSON: [[String: Any]]) -> [Param] {
+        var params: [Param] = []
+        for attr in paramJSON {
+            let dynamicAttr = Param()
+            if let attrName = attr["name"] as? String {
+                dynamicAttr.name = attrName
+            } else {
+                dynamicAttr.name = attr["name"] as? String
+            }
+            dynamicAttr.uiType = attr["ui_type"] as? String
+            dynamicAttr.dataType = attr["data_type"] as? String
+            dynamicAttr.properties = attr["properties"] as? [String]
+            dynamicAttr.bounds = attr["bounds"] as? [String: Any]
+            dynamicAttr.type = attr["type"] as? String
+            dynamicAttr.valid_strs = attr["valid_strs"] as? [String]
+
+            if dynamicAttr.properties?.contains("write") ?? false {
+                if dynamicAttr.type != Constants.deviceNameParam {
+                    dynamicAttr.canBeScheduled = true
+                }
+            }
+
+            params.append(dynamicAttr)
+        }
+        return params
     }
 }

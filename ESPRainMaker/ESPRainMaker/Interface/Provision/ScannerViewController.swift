@@ -31,9 +31,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer?
     @IBOutlet var scannerView: UIView!
-    @IBOutlet var addManuallyButton: PrimaryButton!
-    @IBOutlet var scannerHeading: UILabel!
-    @IBOutlet var scannerDescription: UILabel!
+    @IBOutlet var noCameraView: UIView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,6 +44,8 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             break
         }
         scanQrCode()
+
+        Utility.setActiveSSID()
     }
 
     override func viewDidLayoutSubviews() {
@@ -59,7 +59,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     }
 
     func scanQrCode() {
-        ESPProvisionManager.shared.scanQRCode(scanView: scannerView) { espDevice, _ in
+        ESPProvisionManager.shared.scanQRCode(scanView: scannerView) { espDevice, scanError in
             if let device = espDevice {
                 if self.isDeviceSupported(device: device) {
                     DispatchQueue.main.async {
@@ -75,7 +75,16 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                 }
             } else {
                 DispatchQueue.main.async {
-                    self.retry(message: "QR code is not valid.")
+                    if let error = scanError {
+                        switch error {
+                        case .cameraAccessDenied:
+                            self.noCameraView.isHidden = false
+                        case .espDeviceNotFound, .softApSearchNotSupported, .invalidQRCode:
+                            self.retry(message: error.description)
+                        case .videoInputError, .videoOutputError, .cameraNotAvailable, .avCaptureDeviceInputError:
+                            self.showAlertWith(message: "Unable to scan QR code. Something went wrong while processing camera input.")
+                        }
+                    }
                 }
             }
         }
@@ -92,6 +101,17 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                     self.retry(message: "Device could not be connected. Please try again")
                 }
             }
+        }
+    }
+
+    @IBAction func goToSettings(_: Any) {
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+
+        if UIApplication.shared.canOpenURL(settingsUrl) {
+            UIApplication.shared.open(settingsUrl, completionHandler: { _ in
+            })
         }
     }
 
@@ -143,7 +163,6 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
 
     func retry(message: String) {
         Utility.hideLoader(view: view)
-        addManuallyButton.isEnabled = true
         let alertController = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Okay", style: .default, handler: { _ in
             DispatchQueue.main.async {
@@ -161,8 +180,6 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
 
     func goToProvision(device: ESPDevice) {
         let provisionVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
-        provisionVC.connectAutomatically = true
-        provisionVC.isScanFlow = true
         provisionVC.device = device
         navigationController?.pushViewController(provisionVC, animated: true)
     }
@@ -229,7 +246,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
 }
 
 extension ScannerViewController: ESPDeviceConnectionDelegate {
-    func getProofOfPossesion(forDevice _: ESPDevice) -> String? {
-        return nil
+    func getProofOfPossesion(forDevice _: ESPDevice, completionHandler: @escaping (String) -> Void) {
+        completionHandler("")
     }
 }

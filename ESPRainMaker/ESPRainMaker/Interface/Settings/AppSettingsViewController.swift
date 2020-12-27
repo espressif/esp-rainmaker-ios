@@ -68,7 +68,7 @@ class AppSettingsViewController: UIViewController {
 
     func updateUIViews() {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.uiViewUpdateNotification)))
-        var currentBGColor: UIColor = UIColor(hexString: "#5330b9")
+        var currentBGColor = UIColor(hexString: "#8265E3")
         if let color = AppConstants.shared.appThemeColor {
             PrimaryButton.appearance().backgroundColor = color
             TopBarView.appearance().backgroundColor = color
@@ -81,8 +81,8 @@ class AppSettingsViewController: UIViewController {
             }
         }
         if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
-            PrimaryButton.appearance().setTitleColor(UIColor(hexString: "#5330b9"), for: .normal)
-            BarButton.appearance().setTitleColor(UIColor(hexString: "#5330b9"), for: .normal)
+            PrimaryButton.appearance().setTitleColor(UIColor(hexString: "#8265E3"), for: .normal)
+            BarButton.appearance().setTitleColor(UIColor(hexString: "#8265E3"), for: .normal)
         } else {
             PrimaryButton.appearance().setTitleColor(UIColor.white, for: .normal)
             BarButton.appearance().setTitleColor(#colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1), for: .normal)
@@ -108,7 +108,7 @@ class AppSettingsViewController: UIViewController {
 
 extension AppSettingsViewController: ColorPickerViewDelegate {
     func colorPickerView(_: ColorPickerView, didSelectItemAt _: IndexPath) {
-        if let index = self.colorPicker.indexOfSelectedColor {
+        if let index = colorPicker.indexOfSelectedColor {
             AppConstants.shared.appThemeColor = colorPicker.colors[index]
             UserDefaults.standard.backgroundColor = colorPicker.colors[index]
             updateUIViews()

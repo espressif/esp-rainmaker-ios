@@ -52,6 +52,36 @@ class EditNodeGroupViewController: UIViewController {
 
     // MARK: - IB Actions
 
+    @IBAction func removeGroupButtonPressed(_: Any) {
+        // Add confirmation alert before removing node group
+        let alertController = UIAlertController(title: "Remove", message: "Are you sure to remove this group?", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+        let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+            Utility.showLoader(message: "Removing group...", view: self.view)
+            // Perform remove node group operation for selected group
+            NodeGroupManager.shared.performNodeGroupOperation(group: self.currentNodeGroup, parameter: nil, method: .delete) { success, error in
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    // Check if remove node group operation is successful
+                    if success {
+                        if let index = NodeGroupManager.shared.nodeGroup.firstIndex(where: { $0.group_id == self.currentNodeGroup.group_id }) {
+                            NodeGroupManager.shared.nodeGroup.remove(at: index)
+                        }
+                        User.shared.updateDeviceList = true
+                        NodeGroupManager.shared.listUpdated = true
+                        self.navigationController?.popViewController(animated: true)
+                    } else {
+                        // In case remove operation is unsuccessful, show error as toast
+                        Utility.showToastMessage(view: self.view, message: error!.description, duration: 5.0)
+                    }
+                }
+            }
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(confirmAction)
+        present(alertController, animated: true, completion: nil)
+    }
+
     @IBAction func nameButtonPressed(_: Any) {
         // Open dialog box for renaming the group
         let input = UIAlertController(title: "Enter new name", message: "", preferredStyle: .alert)
@@ -238,19 +268,21 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
             var deviceImage: UIImage!
             switch deviceType {
             case "esp.device.switch":
-                deviceImage = UIImage(named: "switch_device_icon")
+                deviceImage = UIImage(named: "switch")
             case "esp.device.lightbulb":
-                deviceImage = UIImage(named: "light_bulb_icon")
+                deviceImage = UIImage(named: "light")
             case "esp.device.fan":
-                deviceImage = UIImage(named: "fan_icon")
+                deviceImage = UIImage(named: "fan")
             case "esp.device.thermostat":
-                deviceImage = UIImage(named: "thermostat_icon")
+                deviceImage = UIImage(named: "thermostat")
             case "esp.device.temperature-sensor":
-                deviceImage = UIImage(named: "temperature_sensor_icon")
+                deviceImage = UIImage(named: "temperature_sensor")
             case "esp.device.lock":
-                deviceImage = UIImage(named: "lock_icon")
+                deviceImage = UIImage(named: "lock")
             case "esp.device.sensor":
                 deviceImage = UIImage(named: "sensor_icon")
+            case "esp.device.outlet":
+                deviceImage = UIImage(named: "outlet")
             default:
                 deviceImage = UIImage(named: "dummy_device_icon")
             }
@@ -273,13 +305,11 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
                     headerView.borderWidth = 0.0
                     return headerView
                 } else {
-                    headerView.topBorder.backgroundColor = .lightGray
                     headerView.headerLabel.isHidden = false
                     headerView.selectButton.isHidden = false
                     headerView.selectedImage.isHidden = false
                 }
             }
-            headerView.topBorder.backgroundColor = .lightGray
             headerView.headerLabel.text = node.info?.name ?? "Node"
             headerView.selectButtonAction = {
                 Utility.showLoader(message: "Removing device..", view: self.view)
@@ -313,11 +343,7 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
         default:
             let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "selectionNodeFooterCV", for: indexPath) as! SelectNodeFooterCollectionReusableView
             if singleDeviceNodeCount > 0 {
-                if indexPath.section == 0 {
-                    footerView.bottomBorder.backgroundColor = .clear
-                } else {
-                    footerView.bottomBorder.backgroundColor = .lightGray
-                }
+                footerView.bottomBorder.backgroundColor = .clear
             }
             return footerView
         }

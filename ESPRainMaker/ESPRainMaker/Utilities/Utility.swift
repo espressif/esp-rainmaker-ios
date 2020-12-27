@@ -21,6 +21,7 @@ import Foundation
 import MBProgressHUD
 import Network
 import Reachability
+import SystemConfiguration.CaptiveNetwork
 import Toast_Swift
 import UIKit
 
@@ -28,6 +29,7 @@ class Utility {
     static var deviceNamePrefix = Configuration.shared.espProvSetting.bleDevicePrefix
     static let allowPrefixFilter = Bundle.main.infoDictionary?[Constants.allowFilteringByPrefix] as? Bool ?? false
     static let baseUrl = Bundle.main.infoDictionary?[Constants.wifiBaseUrl] as? String ?? Constants.wifiBaseUrlDefault
+    static var activeSSID = ""
 
     var deviceName = ""
     var configPath: String = Constants.configPath
@@ -39,7 +41,6 @@ class Utility {
     var sessionCharacteristic: CBCharacteristic!
     var configUUIDMap: [String: CBCharacteristic] = [:]
     var deviceVersionInfo: NSDictionary?
-    var currentSSID = ""
 
     /// Method to process descriptor values read from BLE devices
     ///
@@ -64,6 +65,20 @@ class Utility {
             } else if value.contains(Constants.associationCharacterstic) {
                 associationPath = value
                 configUUIDMap.updateValue(descriptor.characteristic, forKey: associationPath)
+            }
+        }
+    }
+
+    /// Method to store SSID of connected WI-Fi before provisioning
+    ///
+    class func setActiveSSID() {
+        if let interfaces = CNCopySupportedInterfaces() as NSArray? {
+            for interface in interfaces {
+                if let interfaceInfo = CNCopyCurrentNetworkInfo(interface as! CFString) as NSDictionary? {
+                    if let ssid = interfaceInfo[kCNNetworkInfoKeySSID as String] as? String {
+                        Utility.activeSSID = ssid
+                    }
+                }
             }
         }
     }

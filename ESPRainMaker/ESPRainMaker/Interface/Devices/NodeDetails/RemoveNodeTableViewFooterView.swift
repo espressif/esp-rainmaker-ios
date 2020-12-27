@@ -18,5 +18,4 @@
 
 import UIKit
 
-class RemoveNodeTableViewFooterView: UITableViewHeaderFooterView {
-}
+class RemoveNodeTableViewFooterView: UITableViewHeaderFooterView {}

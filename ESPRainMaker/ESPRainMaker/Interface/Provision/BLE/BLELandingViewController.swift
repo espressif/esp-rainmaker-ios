@@ -56,7 +56,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
         tableview.tableFooterView = UIView()
 
         // Adding tap gesture to hide keyboard on outside touch
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
 
@@ -131,6 +131,40 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
         navigationController?.pushViewController(connectVC, animated: true)
     }
 
+    func checkForAssistedClaiming(device: ESPDevice) {
+        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo["rmaker"] as? NSDictionary, let rmaikerCap = rmaikerInfo["cap"] as? [String], rmaikerCap.contains("claim") {
+            if device.transport == .ble {
+                goToClaimVC(device: device)
+            } else {
+                let action = UIAlertAction(title: "Okay", style: .default, handler: nil)
+                showAlert(error: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", action: action)
+            }
+        } else {
+            goToProvision(device: device)
+        }
+    }
+
+    func goToProvision(device: ESPDevice) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            let provisionVC = self.storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
+            provisionVC.device = device
+            self.navigationController?.pushViewController(provisionVC, animated: true)
+        }
+    }
+
+    func goToClaimVC(device: ESPDevice) {
+        let claimVC = storyboard?.instantiateViewController(withIdentifier: "claimVC") as! ClaimViewController
+        claimVC.device = device
+        navigationController?.pushViewController(claimVC, animated: true)
+    }
+
+    private func showAlert(error: String, action: UIAlertAction) {
+        let alertController = UIAlertController(title: "Error!", message: error, preferredStyle: .alert)
+        alertController.addAction(action)
+        present(alertController, animated: true, completion: nil)
+    }
+
     private func showBusy(isBusy: Bool, message: String = "") {
         DispatchQueue.main.async {
             if isBusy {
@@ -146,7 +180,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
     // MARK: - UITableView
 
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        guard let peripherals = self.bleDevices else {
+        guard let peripherals = bleDevices else {
             return 0
         }
         return peripherals.count
@@ -154,7 +188,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "bleDeviceCell", for: indexPath) as! BLEDeviceListViewCell
-        if let peripheral = self.bleDevices?[indexPath.row] {
+        if let peripheral = bleDevices?[indexPath.row] {
             cell.deviceName.text = peripheral.name
         }
 
@@ -168,7 +202,29 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         Utility.showLoader(message: "Connecting to device", view: view)
-        goToConnectVC(device: bleDevices![indexPath.row])
+        let espDevice = bleDevices![indexPath.row]
+        espDevice.connect(delegate: self) { status in
+            DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                switch status {
+                case .connected:
+                        self.checkForAssistedClaiming(device: espDevice)
+                case let .failedToConnect(error):
+                        var errorDescription = ""
+                        switch error {
+                        case .securityMismatch, .versionInfoError:
+                            errorDescription = error.description
+                        default:
+                            errorDescription = error.description + "\nCheck if POP is correct."
+                        }
+                        let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
+                        self.showAlert(error: errorDescription, action: action)
+                default:
+                        let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
+                        self.showAlert(error: "Device disconnected", action: action)
+                }
+            }
+        }
     }
 }
 
@@ -176,5 +232,14 @@ extension BLELandingViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_: UITextField) -> Bool {
         view.endEditing(true)
         return false
+    }
+}
+
+extension BLELandingViewController: ESPDeviceConnectionDelegate {
+    func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (String) -> Void) {
+        let connectVC = storyboard?.instantiateViewController(withIdentifier: Constants.connectVCIdentifier) as! ConnectViewController
+        connectVC.espDevice = forDevice
+        connectVC.popHandler = completionHandler
+        navigationController?.pushViewController(connectVC, animated: true)
     }
 }

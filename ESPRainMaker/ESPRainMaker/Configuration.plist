@@ -49,6 +49,8 @@
 		<true/>
 		<key>ESP Securtiy Mode</key>
 		<string>Secure</string>
+		<key>ESP Scan Enabled</key>
+		<true/>
 	</dict>
 	<key>App Theme Color</key>
 	<string>#FFFFFF</string>

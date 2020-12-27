@@ -133,11 +133,13 @@ struct ESPProvSettings {
     var securityMode: ESPSecurity = .secure
     var transport: ESPDeviceType = .both
     var allowPrefixSearch = true
+    var scanEnabled = true
     var bleDevicePrefix = ""
 
     init(config: [String: Any]?) {
         if let configDict = config {
-            allowPrefixSearch = configDict["ESP Allow Prefix Search"] as? Bool ?? true
+            scanEnabled = configDict["ESP Scan Enabled"] as? Bool ?? true
+            allowPrefixSearch = configDict["Enable Schedule"] as? Bool ?? true
             if let securityModeVal = configDict["ESP Securtiy Mode"] as? String {
                 securityMode = securityModeVal.lowercased() == "unsecure" ? .unsecure : .secure
             }

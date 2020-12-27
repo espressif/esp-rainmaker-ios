@@ -22,6 +22,7 @@ class ScheduleListTableViewCell: UITableViewCell {
     @IBOutlet var scheduleSwitch: UISwitch!
     @IBOutlet var actionLabel: UILabel!
     @IBOutlet var timerLabel: UILabel!
+    @IBOutlet var daysLabel: UILabel!
 
     var index: Int!
     var schedule: ESPSchedule!

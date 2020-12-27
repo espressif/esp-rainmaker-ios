@@ -28,7 +28,7 @@ class ESPAPIManager {
         // Validate api calls with server certificate
         let certificate = [ESPAPIManager.certificate(filename: "amazonRootCA")]
         let trustManager = ServerTrustManager(evaluators: [
-            "api.staging.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-staging.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "rainmaker-prod.auth.us-east-1.amazoncognito.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "api.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "auth.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate), "esp-claiming.rainmaker.espressif.com": PinnedCertificatesTrustEvaluator(certificates: certificate),
+            Configuration.shared.awsConfiguration.baseURL.getDomain(): PinnedCertificatesTrustEvaluator(certificates: certificate), Configuration.shared.awsConfiguration.authURL.getDomain(): PinnedCertificatesTrustEvaluator(certificates: certificate), Configuration.shared.awsConfiguration.claimURL.getDomain(): PinnedCertificatesTrustEvaluator(certificates: certificate),
         ])
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 10
@@ -55,11 +55,14 @@ class ESPAPIManager {
     ///
     /// - Parameters:
     ///   - completionHandler: after response is parsed this block will be called with node array and error(if any) as argument
-    func getNodes(completionHandler: @escaping ([Node]?, ESPNetworkError?) -> Void) {
+    func getNodes(partialList: [Node]? = nil, nextNodeID: String? = nil, completionHandler: @escaping ([Node]?, ESPNetworkError?) -> Void) {
         User.shared.getAccessToken(completionHandler: { accessToken in
             if accessToken != nil {
                 let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                let url = Constants.getNodes + "?node_details=true"
+                var url = Constants.getNodes + "?node_details=true&num_records=10"
+                if nextNodeID != nil {
+                    url += "&start_id=" + nextNodeID!
+                }
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     switch response.result {
                     case let .success(value):
@@ -69,13 +72,32 @@ class ESPAPIManager {
                         ESPNetworkMonitor.shared.setNetworkConnection(connected: true)
                         if let json = value as? [String: Any] {
                             if let nodeArray = json["node_details"] as? [[String: Any]] {
-                                let nodes = JSONParser.parseNodeArray(data: nodeArray, forSingleNode: false)
-                                ESPLocalStorage.shared.saveNodeDetails(nodes: nodes)
-                                // Save schedules if it is enabled
-                                if Configuration.shared.appConfiguration.supportSchedule {
-                                    ESPLocalStorage.shared.saveSchedules()
+                                var finalNodeList: [Node]?
+                                if let nodes = JSONParser.parseNodeArray(data: nodeArray, forSingleNode: false) {
+                                    if nextNodeID == nil {
+                                        finalNodeList = nodes
+                                    } else {
+                                        finalNodeList = partialList
+                                        for node in nodes {
+                                            if node.devices?.count == 1 {
+                                                finalNodeList?.insert(node, at: 0)
+                                            } else {
+                                                finalNodeList?.append(node)
+                                            }
+                                        }
+                                    }
                                 }
-                                completionHandler(nodes, nil)
+
+                                if let nextNodeID = json["next_id"] as? String {
+                                    self.getNodes(partialList: finalNodeList, nextNodeID: nextNodeID, completionHandler: completionHandler)
+                                } else {
+                                    ESPLocalStorage.shared.saveNodeDetails(nodes: finalNodeList)
+                                    // Save schedules if it is enabled
+                                    if Configuration.shared.appConfiguration.supportSchedule {
+                                        ESPLocalStorage.shared.saveSchedules()
+                                    }
+                                    completionHandler(finalNodeList, nil)
+                                }
                                 return
                             } else if let status = json["status"] as? String, let description = json["description"] as? String {
                                 if status == "failure" {
@@ -138,6 +160,46 @@ class ESPAPIManager {
                 }
             } else {
                 completionHandler(nil, ESPNetworkError.emptyToken)
+            }
+        }
+    }
+
+    /// Get device parameters current value
+    ///
+    /// - Parameters:
+    ///   - completionHandler: handler called when response to get device paramater is recieved
+    func getDeviceParams(device: Device, completionHandler: @escaping (ESPNetworkError?) -> Void) {
+        User.shared.getAccessToken { accessToken in
+            if accessToken != nil {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+                let url = Constants.setParam + "?node_id=" + (device.node?.node_id ?? "")
+                self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    switch response.result {
+                    case let .success(value):
+                        if let response = value as? [String: Any] {
+                            if let deviceName = device.name, let attributes = response[deviceName] as? [String: Any] {
+                                device.deviceName = deviceName
+                                if let params = device.params {
+                                    for index in params.indices {
+                                        if let reportedValue = attributes[params[index].name ?? ""] {
+                                            if params[index].type == Constants.deviceNameParam {
+                                                device.deviceName = reportedValue as? String ?? deviceName
+                                            }
+                                            params[index].value = reportedValue
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        completionHandler(nil)
+                        return
+                    case let .failure(error):
+                        completionHandler(ESPNetworkError.serverError(error.localizedDescription))
+                        return
+                    }
+                }
+            } else {
+                completionHandler(ESPNetworkError.emptyToken)
             }
         }
     }
@@ -258,7 +320,8 @@ class ESPAPIManager {
                 if idToken != nil {
                     let url = Constants.setParam + "?nodeid=" + nodeid
                     let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": idToken!]
-                    self.session.request(url, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+
+                    self.session.request(url, method: .put, parameters: parameter, encoding: ESPCustomJsonEncoder.default, headers: headers).responseJSON { response in
                         switch response.result {
                         case let .success(value):
                             if let json = value as? [String: Any] {

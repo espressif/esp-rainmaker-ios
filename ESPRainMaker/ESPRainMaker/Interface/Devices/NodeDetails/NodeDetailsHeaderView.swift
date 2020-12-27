@@ -23,7 +23,7 @@ class NodeDetailsHeaderView: UITableViewHeaderFooterView {
     @IBOutlet var arrowImageView: UIImageView!
 
     var headerTappedAction: () -> Void = {}
-    
+
     @IBAction func headerTapped(_: Any) {
         headerTappedAction()
     }

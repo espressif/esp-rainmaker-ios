@@ -194,19 +194,21 @@ extension SelectGroupNodesViewController: UICollectionViewDataSource {
             var deviceImage: UIImage!
             switch deviceType {
             case "esp.device.switch":
-                deviceImage = UIImage(named: "switch_device_icon")
+                deviceImage = UIImage(named: "switch")
             case "esp.device.lightbulb":
-                deviceImage = UIImage(named: "light_bulb_icon")
+                deviceImage = UIImage(named: "light")
             case "esp.device.fan":
-                deviceImage = UIImage(named: "fan_icon")
+                deviceImage = UIImage(named: "fan")
             case "esp.device.thermostat":
-                deviceImage = UIImage(named: "thermostat_icon")
+                deviceImage = UIImage(named: "thermostat")
             case "esp.device.temperature-sensor":
-                deviceImage = UIImage(named: "temperature_sensor_icon")
+                deviceImage = UIImage(named: "temperature_sensor")
             case "esp.device.lock":
-                deviceImage = UIImage(named: "lock_icon")
+                deviceImage = UIImage(named: "lock")
             case "esp.device.sensor":
                 deviceImage = UIImage(named: "sensor_icon")
+            case "esp.device.outlet":
+                deviceImage = UIImage(named: "outlet")
             default:
                 deviceImage = UIImage(named: "dummy_device_icon")
             }
@@ -231,7 +233,6 @@ extension SelectGroupNodesViewController: UICollectionViewDataSource {
                     return headerView
                 }
             }
-            headerView.topBorder.backgroundColor = .lightGray
             headerView.headerLabel.text = node.info?.name ?? "Node"
             headerView.selectButtonAction = {
                 if self.selectedNodes.removeValue(forKey: node.node_id ?? "") != nil {
@@ -245,11 +246,7 @@ extension SelectGroupNodesViewController: UICollectionViewDataSource {
         default:
             let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "selectionNodeFooterCV", for: indexPath) as! SelectNodeFooterCollectionReusableView
             if singleDeviceNodeCount > 0 {
-                if indexPath.section == 0 {
-                    footerView.bottomBorder.backgroundColor = .clear
-                } else {
-                    footerView.bottomBorder.backgroundColor = .lightGray
-                }
+                footerView.bottomBorder.backgroundColor = .clear
             }
             return footerView
         }

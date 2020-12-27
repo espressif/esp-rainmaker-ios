@@ -20,8 +20,8 @@ import UIKit
     // MARK: Properties
 
     @IBInspectable public var hasRainbow: Bool = false { didSet { updateTrackColors() } }
-    @IBInspectable public var minColor: UIColor = UIColor.blue { didSet { updateTrackColors() } }
-    @IBInspectable public var maxColor: UIColor = UIColor.orange { didSet { updateTrackColors() } }
+    @IBInspectable public var minColor = UIColor.blue { didSet { updateTrackColors() } }
+    @IBInspectable public var maxColor = UIColor.orange { didSet { updateTrackColors() } }
 
     @IBInspectable var value: CGFloat {
         get { return _value }

@@ -96,12 +96,27 @@ struct Constants {
     static let appThemeKey = Constants.bundleIdentifier + ".appTheme"
     static let appBGKey = Constants.bundleIdentifier + ".appbg"
     static let ignoreVersionKey = Constants.bundleIdentifier + ".ignoreVersions"
+    static let wifiPassword = Constants.bundleIdentifier + ".wifiPassword"
 
     // Device param keys
     static let deviceNameParam = "esp.param.name"
 
     static let cognito = "Cognito"
     static let github = "Github"
+
+    // Device types
+    static let lightBulb = "esp.device.lightbulb"
+    static let switchDevice = "esp.device.switch"
+
+    // UI types
+    static let hue = "esp.ui.hue-slider"
+    static let toggle = "esp.ui.toggle"
+    static let hueCircle = "esp.ui.hue-circle"
+    static let bigSwitch = "esp.ui.push-btn-big"
+
+    // Service types
+    static let timezoneServiceName = "esp.service.time"
+    static let timezoneServiceParam = "esp.param.tz"
 
     // Theme Color
     static let backgroundColor = Configuration.shared.appThemeColor
@@ -119,6 +134,7 @@ struct Constants {
 
     static let networkUpdateNotification = "com.espressif.networkUpdateNotification"
     static let localNetworkUpdateNotification = "com.espressif.localNetworkUpdateNotification"
+    static let reloadCollectionView = "com.espressif.reloadCollectionView"
 
     // Claim APIs
     static let claimInitPath = Configuration.shared.awsConfiguration.claimURL + "/claim/initiate"

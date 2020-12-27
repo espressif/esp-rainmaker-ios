@@ -198,7 +198,6 @@ class ProvisionLandingViewController: UIViewController {
 
     func goToProvision(device: ESPDevice) {
         let provVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
-        provVC.isScanFlow = false
         provVC.device = device
         navigationController?.pushViewController(provVC, animated: true)
     }
@@ -251,7 +250,7 @@ private func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: 
 }
 
 extension ProvisionLandingViewController: ESPDeviceConnectionDelegate {
-    func getProofOfPossesion(forDevice _: ESPDevice) -> String? {
-        return ""
+    func getProofOfPossesion(forDevice _: ESPDevice, completionHandler: @escaping (String) -> Void) {
+        completionHandler("")
     }
 }

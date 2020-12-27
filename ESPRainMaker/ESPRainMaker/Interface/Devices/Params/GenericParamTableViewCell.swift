@@ -123,6 +123,7 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                 if Configuration.shared.appConfiguration.supportLocalControl {
                     ESPScheduler.shared.updateDeviceName(for: device.node?.node_id, name: device.name ?? "", deviceName: value)
                 }
+                device.deviceName = value
             }
             param?.value = controlValue as Any
         }

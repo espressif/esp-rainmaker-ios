@@ -106,9 +106,9 @@ struct Cloud_CmdGetSetDetails {
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    var userID: String = String()
+    var userID = String()
 
-    var secretKey: String = String()
+    var secretKey = String()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -122,7 +122,7 @@ struct Cloud_RespGetSetDetails {
 
     var status: Cloud_CloudConfigStatus = .success
 
-    var deviceSecret: String = String()
+    var deviceSecret = String()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -179,7 +179,7 @@ struct Cloud_CloudConfigPayload {
 
     init() {}
 
-    fileprivate var _storage = _StorageClass.defaultInstance
+    private var _storage = _StorageClass.defaultInstance
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.

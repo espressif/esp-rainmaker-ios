@@ -78,8 +78,6 @@ class ClaimViewController: UIViewController {
 
     func goToProvision() {
         let provisionVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
-        provisionVC.connectAutomatically = true
-        provisionVC.isScanFlow = true
         provisionVC.device = device
         navigationController?.pushViewController(provisionVC, animated: true)
     }

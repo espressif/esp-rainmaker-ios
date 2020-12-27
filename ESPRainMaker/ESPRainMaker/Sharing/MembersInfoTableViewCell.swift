@@ -29,9 +29,9 @@ class MembersInfoTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // UI Customisation
-        contentView.layer.borderWidth = 1
+        contentView.layer.borderWidth = 0.5
         contentView.layer.cornerRadius = 10
-        contentView.layer.borderColor = UIColor.clear.cgColor
+        contentView.layer.borderColor = UIColor.lightGray.cgColor
         contentView.layer.masksToBounds = true
     }
 

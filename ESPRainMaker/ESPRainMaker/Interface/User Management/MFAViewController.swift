@@ -39,7 +39,7 @@ class MFAViewController: UIViewController {
 
     @IBAction func signIn(_: AnyObject) {
         // check if the user is not providing an empty authentication code
-        guard let authenticationCodeValue = self.confirmationCode.text, !authenticationCodeValue.isEmpty else {
+        guard let authenticationCodeValue = confirmationCode.text, !authenticationCodeValue.isEmpty else {
             let alertController = UIAlertController(title: "Authentication Code Missing",
                                                     message: "Please enter the authentication code you received by E-mail / SMS.",
                                                     preferredStyle: .alert)

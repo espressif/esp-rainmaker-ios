@@ -22,28 +22,23 @@ import UIKit
 
 class SettingsPageViewController: UIViewController {
     @IBOutlet var emailLabel: UILabel!
+    @IBOutlet var privacyView: UIView!
     @IBOutlet var changePasswordView: UIView!
     @IBOutlet var appVersionLabel: UILabel!
     @IBOutlet var notificationCount: UILabel!
     @IBOutlet var notificationView: UIView!
     @IBOutlet var pendingActionView: UIView!
-    @IBOutlet var pendingActionViewHeightConstraint: NSLayoutConstraint!
-    var username = ""
+    @IBOutlet var changepasswordTopConstraint: NSLayoutConstraint!
+    @IBOutlet var changepasswordHeightConstraint: NSLayoutConstraint!
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if User.shared.userInfo.loggedInWith == .other {
-            changePasswordView.isHidden = true
-        }
-
-        emailLabel.text = User.shared.userInfo.email
         NotificationCenter.default.addObserver(self, selector: #selector(updateUIView), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
         appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
         navigationController?.navigationBar.isHidden = true
 
-        if Configuration.shared.appConfiguration.supportSharing {
-            getSharingRequests()
-        } else {
+        if !Configuration.shared.appConfiguration.supportSharing {
             pendingActionView.isHidden = true
             pendingActionView.heightAnchor.constraint(equalToConstant: 0.0).isActive = true
         }
@@ -65,6 +60,18 @@ class SettingsPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        emailLabel.text = User.shared.userInfo.email
+
+        if User.shared.userInfo.loggedInWith == .other {
+            changePasswordView.isHidden = true
+            changepasswordHeightConstraint.constant = 0
+            changepasswordTopConstraint.constant = 0
+        } else {
+            changePasswordView.isHidden = false
+            changepasswordHeightConstraint.constant = min(50.0, view.frame.size.height * 0.0701)
+            changepasswordTopConstraint.constant = 2
+        }
+
         if Configuration.shared.appConfiguration.supportSharing {
             var pendingRequestCount = 0
             // Update badge for pending notifications.
@@ -80,28 +87,36 @@ class SettingsPageViewController: UIViewController {
                 notificationCount.text = ""
                 notificationView.isHidden = true
             }
+            getSharingRequests()
         }
     }
 
     @IBAction func signOut(_: Any) {
-        User.shared.currentUser()?.signOut()
-        UserDefaults.standard.removeObject(forKey: Constants.userInfoKey)
-        UserDefaults.standard.removeObject(forKey: Constants.refreshTokenKey)
-        UserDefaults.standard.removeObject(forKey: Constants.accessTokenKey)
-        UserDefaults.standard.removeObject(forKey: Constants.nodeDetails)
-        UserDefaults.standard.removeObject(forKey: Constants.scheduleDetails)
-        UserDefaults.standard.removeObject(forKey: Constants.nodeGroups)
+        let alertController = UIAlertController(title: "Logout", message: "Do you like to proceed?", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+        let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+            User.shared.currentUser()?.signOut()
+            UserDefaults.standard.removeObject(forKey: Constants.userInfoKey)
+            UserDefaults.standard.removeObject(forKey: Constants.refreshTokenKey)
+            UserDefaults.standard.removeObject(forKey: Constants.accessTokenKey)
+            UserDefaults.standard.removeObject(forKey: Constants.nodeDetails)
+            UserDefaults.standard.removeObject(forKey: Constants.scheduleDetails)
+            UserDefaults.standard.removeObject(forKey: Constants.nodeGroups)
+            UserDefaults.standard.removeObject(forKey: Constants.wifiPassword)
 
-        NodeGroupManager.shared.nodeGroup = []
-        NodeSharingManager.shared.sharingRequestsSent = []
-        NodeSharingManager.shared.sharingRequestsReceived = []
+            NodeGroupManager.shared.nodeGroup = []
+            NodeSharingManager.shared.sharingRequestsSent = []
+            NodeSharingManager.shared.sharingRequestsReceived = []
 
-        User.shared.accessToken = nil
-        User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
-        User.shared.associatedNodeList = nil
-
-        navigationController?.popToRootViewController(animated: false)
-        refresh()
+            User.shared.accessToken = nil
+            User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
+            User.shared.associatedNodeList = nil
+            self.tabBarController?.selectedIndex = 0
+            self.refresh()
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(confirmAction)
+        present(alertController, animated: true, completion: nil)
     }
 
     func refresh() {
@@ -159,15 +174,15 @@ class SettingsPageViewController: UIViewController {
     private func getSharingRequests() {
         NodeSharingManager.shared.getSharingRequests(primaryUser: false) { requests, error in
             guard let _ = error else {
-                var count = 0
-                if let sharingRequests = requests {
-                    for request in sharingRequests {
-                        if request.request_status?.lowercased() == "pending" {
-                            count += 1
+                DispatchQueue.main.async {
+                    var count = 0
+                    if let sharingRequests = requests {
+                        for request in sharingRequests {
+                            if request.request_status?.lowercased() == "pending" {
+                                count += 1
+                            }
                         }
                     }
-                }
-                DispatchQueue.main.async {
                     if count > 0 {
                         self.notificationCount.text = "\(count)"
                         self.notificationView.isHidden = false
@@ -178,13 +193,6 @@ class SettingsPageViewController: UIViewController {
                 }
                 return
             }
-        }
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
-        if segue.identifier == "changePasswordSegue" {
-            let changePasswordVC = segue.destination as! ChangePasswordViewController
-            changePasswordVC.username = username
         }
     }
 }

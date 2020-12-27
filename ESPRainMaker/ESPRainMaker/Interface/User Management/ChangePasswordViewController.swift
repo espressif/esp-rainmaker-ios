@@ -23,14 +23,13 @@ class ChangePasswordViewController: UIViewController {
     @IBOutlet var oldPasswordTextField: PasswordTextField!
     @IBOutlet var newPasswordTextField: PasswordTextField!
     @IBOutlet var confirmNewPasswordTextField: PasswordTextField!
-    var username: String!
     var pool: AWSCognitoIdentityUserPool?
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
 
@@ -44,13 +43,13 @@ class ChangePasswordViewController: UIViewController {
     }
 
     @IBAction func setPassword(_: Any) {
-        let user = pool?.getUser(username)
-        guard let oldPassword = self.oldPasswordTextField.text, !oldPassword.isEmpty else {
+        let user = pool?.getUser(User.shared.userInfo.email)
+        guard let oldPassword = oldPasswordTextField.text, !oldPassword.isEmpty else {
             showAlertWith(title: "Error", message: "Old password is required to change the password")
             return
         }
 
-        guard let newPassword = self.newPasswordTextField.text, !newPassword.isEmpty else {
+        guard let newPassword = newPasswordTextField.text, !newPassword.isEmpty else {
             showAlertWith(title: "Error", message: "New password is required to change the password")
             return
         }

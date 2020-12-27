@@ -28,10 +28,10 @@ class ResetPasswordViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let username = self.user?.username {
+        if let username = user?.username {
             infoLabel.text = "To set a new password we have sent a verification code to " + username
         }
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
 
@@ -55,7 +55,7 @@ class ResetPasswordViewController: UIViewController {
     }
 
     @IBAction func updatePassword(_: AnyObject) {
-        guard let confirmationCodeValue = self.confirmationCode.text, !confirmationCodeValue.isEmpty else {
+        guard let confirmationCodeValue = confirmationCode.text, !confirmationCodeValue.isEmpty else {
             showAlert(title: "Code is empty", message: "Please enter a valid confirmation code.")
             return
         }

@@ -151,8 +151,6 @@ Node Sharing is optional but enabled by default. It can be disabled from the `Co
 
 - Run `pod install` from  ESPRainMaker folder in the terminal.
 
-- Install Swiftformat command-line tool from terminal using `brew install swiftformat`.
-
 - After pod installation open ESPRainMaker.xcworkspace project.
 
 - Build and run the project.

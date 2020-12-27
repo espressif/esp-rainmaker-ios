@@ -27,8 +27,11 @@ class DocumentViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         webView.navigationDelegate = self
-        webView.load(URLRequest(url: URL(string: documentLink)!))
-        // Do any additional setup after loading the view.
+        if let documentURL = URL(string: documentLink) {
+            webView.load(URLRequest(url: documentURL))
+        } else {
+            Utility.showToastMessage(view: view, message: "Webpage URL is incorrect or invalid.", duration: 4.0)
+        }
     }
 
     @IBAction func backButtonPressed(_: Any) {

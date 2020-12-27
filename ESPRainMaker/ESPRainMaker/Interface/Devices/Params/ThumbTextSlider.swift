@@ -19,7 +19,7 @@
 import UIKit
 
 class ThumbTextSlider: UISlider {
-    var thumbTextLabel: UILabel = UILabel()
+    var thumbTextLabel = UILabel()
     @IBInspectable var trackHeight: CGFloat = 3
 
     @IBInspectable var thumbRadius: CGFloat = 40
@@ -28,7 +28,7 @@ class ThumbTextSlider: UISlider {
     // and set as thumb. You can customize it's colors, border, etc.
     private lazy var thumbView: UIView = {
         let thumb = UIView()
-        thumb.backgroundColor = UIColor(hexString: "#5330b9") //thumbTintColor
+        thumb.backgroundColor = UIColor(hexString: "#8265E3") // thumbTintColor
         thumb.layer.borderWidth = 0.4
         thumb.layer.borderColor = UIColor.darkGray.cgColor
         return thumb
