@@ -19,9 +19,6 @@
 import UIKit
 
 class GenericParamTableViewCell: GenericControlTableViewCell {
-    var attributeKey = ""
-    var delegate: ParamUpdateProtocol?
-
     override func layoutSubviews() {
         // Customise switch element for param screen
         // Hide row selection button
@@ -72,13 +69,13 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                 if let intValue = Int(value) {
                     if let bounds = param?.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int {
                         if intValue >= min, intValue <= max {
-                            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]], delegate: delegate)
+                            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]], delegate: paramDelegate)
                             controlValueLabel.text = value
                         } else {
                             showAlert(message: "Value out of bound.")
                         }
                     } else {
-                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]], delegate: delegate)
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: intValue]], delegate: paramDelegate)
                         controlValueLabel.text = value
                     }
                 } else {
@@ -88,13 +85,13 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                 if let floatValue = Float(value) {
                     if let bounds = param?.bounds, let max = bounds["max"] as? Float, let min = bounds["min"] as? Float {
                         if floatValue >= min, floatValue <= max {
-                            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]], delegate: delegate)
+                            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]], delegate: paramDelegate)
                             controlValueLabel.text = value
                         } else {
                             showAlert(message: "Value out of bound.")
                         }
                     } else {
-                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]], delegate: delegate)
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: floatValue]], delegate: paramDelegate)
                         controlValueLabel.text = value
                     }
                 } else {
@@ -104,10 +101,10 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                 if boolTypeValidValues.keys.contains(value) {
                     let validValue = boolTypeValidValues[value]!
                     if validValue == 0 {
-                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: false]], delegate: delegate)
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: false]], delegate: paramDelegate)
                         controlValueLabel.text = value
                     } else {
-                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: true]], delegate: delegate)
+                        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: true]], delegate: paramDelegate)
                         controlValueLabel.text = value
                     }
                 } else {
@@ -120,7 +117,7 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                         return
                     }
                 }
-                DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]], delegate: delegate)
+                DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]], delegate: paramDelegate)
                 controlValueLabel.text = value
 
                 if Configuration.shared.appConfiguration.supportLocalControl {

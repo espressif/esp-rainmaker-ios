@@ -19,11 +19,6 @@
 import UIKit
 
 class ParamSliderTableViewCell: SliderTableViewCell {
-    var paramName: String = ""
-    var dataType: String!
-    var sliderValue = ""
-    var delegate: ParamUpdateProtocol?
-
     override func layoutSubviews() {
         // Customise slider element for param screen
         // Hide row selection button
@@ -49,11 +44,11 @@ class ParamSliderTableViewCell: SliderTableViewCell {
     @IBAction override func sliderValueChanged(_ sender: UISlider) {
         if dataType.lowercased() == "int" {
             sliderValue = paramName + ": \(Int(slider.value))"
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]], delegate: delegate)
+            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]], delegate: paramDelegate)
             param.value = Int(sender.value)
         } else {
             sliderValue = paramName + ": \(slider.value)"
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: sender.value]], delegate: delegate)
+            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: sender.value]], delegate: paramDelegate)
             param.value = sender.value
         }
     }
@@ -65,7 +60,7 @@ class ParamSliderTableViewCell: SliderTableViewCell {
     @IBAction override func hueSliderValueChanged(_ sender: GradientSlider) {
         if currentHueValue != sender.value {
             hueSlider.thumbColor = UIColor(hue: CGFloat(sender.value / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]], delegate: delegate)
+            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]], delegate: paramDelegate)
             currentHueValue = sender.value
             param.value = Int(sender.value)
         }

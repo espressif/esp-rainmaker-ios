@@ -19,12 +19,6 @@
 import ESPProvision
 import Foundation
 
-enum ClaimError: String {
-    case startClaimFailed = "Claim start failed"
-    case initClaimFailed = "Claim init failed"
-    case verifyClaimFailed = "Claim verify failed"
-}
-
 class AssistedClaiming {
     var device: ESPDevice!
     var csrData: Data!
@@ -47,16 +41,25 @@ class AssistedClaiming {
             if let data = payloadData {
                 device.sendData(path: Constants.claimPath, data: data) { response, error in
                     guard error == nil, response != nil else {
-                        completionHandler(false, ClaimError.startClaimFailed.rawValue)
+                        switch error {
+                        case let .sendDataError(dataError as NSError):
+                            if dataError.domain == "com.espressif.ble", dataError.code == 1 {
+                                completionHandler(false, "BLE characteristic related with claiming cannot be found.")
+                            } else {
+                                fallthrough
+                            }
+                        default:
+                            completionHandler(false, "Sending claim start request to device failed with error:\(error!.localizedDescription)")
+                        }
                         return
                     }
                     self.readDeviceInfo(responseData: response!, completionHandler: completionHandler)
                 }
             } else {
-                completionHandler(false, ClaimError.startClaimFailed.rawValue)
+                completionHandler(false, "Failed to generate payload data for sending claim start request to device.")
             }
         } catch {
-            completionHandler(false, ClaimError.startClaimFailed.rawValue)
+            completionHandler(false, "Generating claim start request throws exception:\(error.localizedDescription)")
         }
     }
 
@@ -71,16 +74,16 @@ class AssistedClaiming {
             if let data = payloadData {
                 device.sendData(path: Constants.claimPath, data: data) { response, error in
                     guard error == nil, response != nil else {
-                        completionHandler(false, ClaimError.initClaimFailed.rawValue)
+                        completionHandler(false, "Failed to get CSR from device with error:\(error!.description)")
                         return
                     }
                     self.processCSRResponse(response: response!, completionHandler: completionHandler)
                 }
             } else {
-                completionHandler(false, ClaimError.initClaimFailed.rawValue)
+                completionHandler(false, "Failed to generate payload data for sending claim init response to device.")
             }
         } catch {
-            completionHandler(false, ClaimError.initClaimFailed.rawValue)
+            completionHandler(false, "Generating claim init request throws exception:\(error.localizedDescription)")
         }
     }
 
@@ -96,6 +99,7 @@ class AssistedClaiming {
             if let data = payloadData {
                 device.sendData(path: Constants.claimPath, data: data) { response, error in
                     guard error == nil, response != nil else {
+                        completionHandler(false, "Failed to send certificated to device with error:\(error!.description)")
                         return
                     }
                     if offset + self.datacount >= self.certificateData.count {
@@ -105,10 +109,10 @@ class AssistedClaiming {
                     }
                 }
             } else {
-                completionHandler(false, ClaimError.verifyClaimFailed.rawValue)
+                completionHandler(false, "Failed to generate payload data for sending certificate to device.")
             }
         } catch {
-            completionHandler(false, ClaimError.verifyClaimFailed.rawValue)
+            completionHandler(false, "Generating claim verify request throws exception:\(error.localizedDescription)")
         }
     }
 
@@ -130,16 +134,16 @@ class AssistedClaiming {
     // MARK: - Claim API Calls
 
     private func sendDeviceInfoToCloud(response: [String: Any], completionHandler: @escaping (Bool, String?) -> Void) {
-        NetworkManager.shared.genericAuthorizedDataRequest(url: Constants.claimInitPath, parameter: response) { data in
+        NetworkManager.shared.genericAuthorizedDataRequest(url: Constants.claimInitPath, parameter: response) { data, error in
             if data == nil {
-                completionHandler(false, ClaimError.initClaimFailed.rawValue)
+                completionHandler(false, "Error while sending device info to cloud:\(error!.description)")
                 return
             }
             do {
                 if let responseJSON = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String: String] {
                     if let status = responseJSON["status"] {
                         if status.lowercased() == "failure" {
-                            var failDescription = ClaimError.initClaimFailed.rawValue
+                            var failDescription = "Claim init failed"
                             if let description = responseJSON["description"] {
                                 failDescription = description
                             }
@@ -150,7 +154,7 @@ class AssistedClaiming {
                 }
                 self.getCSRFromDevice(response: data!, completionHandler: completionHandler)
             } catch {
-                completionHandler(false, ClaimError.initClaimFailed.rawValue)
+                completionHandler(false, "Serializing response of request to send device info to cloud throws exception:\(error.localizedDescription)")
             }
         }
     }
@@ -158,16 +162,16 @@ class AssistedClaiming {
     private func sendCSRToAPI(completionHandler: @escaping (Bool, String?) -> Void) {
         do {
             let response = try JSONSerialization.jsonObject(with: csrData, options: .allowFragments) as? [String: String] ?? [:]
-            NetworkManager.shared.genericAuthorizedDataRequest(url: Constants.claimVerifyPath, parameter: response) { data in
+            NetworkManager.shared.genericAuthorizedDataRequest(url: Constants.claimVerifyPath, parameter: response) { data, error in
                 if data == nil {
-                    completionHandler(false, ClaimError.initClaimFailed.rawValue)
+                    completionHandler(false, "Error while sending CSR to cloud:\(error!.description)")
                     return
                 }
                 do {
                     if let responseJSON = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String: String] {
                         if let status = responseJSON["status"] {
                             if status.lowercased() == "failure" {
-                                var failDescription = ClaimError.verifyClaimFailed.rawValue
+                                var failDescription = "Claim verify failed"
                                 if let description = responseJSON["description"] {
                                     failDescription = description
                                 }
@@ -179,11 +183,11 @@ class AssistedClaiming {
                     self.certificateData = data!
                     self.sendCertificateToDevice(completionHandler: completionHandler, offset: 0)
                 } catch {
-                    completionHandler(false, ClaimError.verifyClaimFailed.rawValue)
+                    completionHandler(false, "Serializing response of request to send CSR to cloud throws exception:\(error.localizedDescription)")
                 }
             }
         } catch {
-            completionHandler(false, ClaimError.verifyClaimFailed.rawValue)
+            completionHandler(false, "Serializing CSR data to send as paramater throws exception:\(error.localizedDescription)")
         }
     }
 
@@ -195,10 +199,10 @@ class AssistedClaiming {
             if response.respPayload.status == .success {
                 sendDeviceInfoToCloud(response: try (JSONSerialization.jsonObject(with: response.respPayload.buf.payload, options: .allowFragments) as? [String: Any] ?? [:]), completionHandler: completionHandler)
             } else {
-                completionHandler(false, ClaimError.startClaimFailed.rawValue)
+                completionHandler(false, "Failure sending claim start request to device with status:\(response.respPayload.status)")
             }
         } catch {
-            completionHandler(false, ClaimError.startClaimFailed.rawValue)
+            completionHandler(false, "Serializing response of claim start request to device throws exception:\(error.localizedDescription)")
         }
     }
 
@@ -219,10 +223,10 @@ class AssistedClaiming {
                     getCSRFromDevice(response: nil, completionHandler: completionHandler)
                 }
             } else {
-                completionHandler(false, ClaimError.initClaimFailed.rawValue)
+                completionHandler(false, "Failure getting CSR from device with status:\(response.respPayload.status)")
             }
         } catch {
-            completionHandler(false, ClaimError.initClaimFailed.rawValue)
+            completionHandler(false, "Serializing CSR response from device throws exception:\(error.localizedDescription)")
         }
     }
 

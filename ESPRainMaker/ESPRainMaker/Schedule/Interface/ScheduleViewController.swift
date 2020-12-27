@@ -179,8 +179,9 @@ class ScheduleViewController: UIViewController {
                         // To check if schedule is successfully added.
                         User.shared.updateDeviceList = true
                         self.navigationController?.popToRootViewController(animated: false)
+
                     } else {
-                        Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your network connection!!")
+                        Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your connection!!")
                     }
                 }
             }

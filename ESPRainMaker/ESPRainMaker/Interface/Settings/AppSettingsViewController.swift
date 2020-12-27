@@ -54,7 +54,7 @@ class AppSettingsViewController: UIViewController {
     @IBAction func pickImage(_: Any) {
         if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum) {
             imagePicker.delegate = self
-            imagePicker.allowsEditing = false
+            imagePicker.allowsEditing = true
             imagePicker.sourceType = .savedPhotosAlbum
             present(imagePicker, animated: true, completion: nil)
         }

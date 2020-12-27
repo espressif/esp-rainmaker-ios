@@ -250,13 +250,13 @@ class ESPAPIManager {
     ///
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
-    ///   - completionHandler: handler called when response to updateThingShadow is recieved
-    func updateThingShadow(nodeID: String?, parameter: [String: Any], completionHandler: ((CustomError) -> Void)? = nil) {
+    ///   - completionHandler: handler called when response to setDeviceParam is recieved
+    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: ((CustomError) -> Void)? = nil) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if let nodeid = nodeID {
             User.shared.getAccessToken(completionHandler: { idToken in
                 if idToken != nil {
-                    let url = Constants.updateThingsShadow + "?nodeid=" + nodeid
+                    let url = Constants.setParam + "?nodeid=" + nodeid
                     let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": idToken!]
                     self.session.request(url, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                         switch response.result {
@@ -313,22 +313,22 @@ class ESPAPIManager {
     ///   - url: URL of the api
     ///   - parameter: Parameter to be included in the api call
     ///   - completionHandler: Callback invoked after api response is recieved
-    func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, completionHandler: @escaping (Data?) -> Void) {
+    func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
         User.shared.getAccessToken(completionHandler: { accessToken in
             if accessToken != nil {
                 let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
                 self.session.request(url, method: .post, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseData { response in
                     switch response.result {
                     case let .success(value):
-                        completionHandler(value)
+                        completionHandler(value, nil)
                         return
-                    case .failure:
-                        completionHandler(nil)
+                    case let .failure(error):
+                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
                         return
                     }
                 }
             } else {
-                completionHandler(nil)
+                completionHandler(nil, .emptyToken)
             }
         })
     }

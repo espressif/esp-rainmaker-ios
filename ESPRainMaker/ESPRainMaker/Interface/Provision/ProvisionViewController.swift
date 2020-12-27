@@ -85,7 +85,7 @@ class ProvisionViewController: UIViewController {
     }
 
     private func provisionDevice(ssid _: String, passphrase: String) {
-        showLoader(message: "Sending association data")
+        Utility.showLoader(message: "Sending association data", view: view)
         self.passphrase = passphrase
         User.shared.associateNodeWithUser(device: device, delegate: self)
     }
@@ -144,16 +144,6 @@ class ProvisionViewController: UIViewController {
         let alertController = UIAlertController(title: "Provision device", message: alertMessage, preferredStyle: UIAlertController.Style.alert)
         alertController.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
         present(alertController, animated: true, completion: nil)
-    }
-
-    func showLoader(message: String) {
-        DispatchQueue.main.async {
-            let loader = MBProgressHUD.showAdded(to: self.view, animated: true)
-            loader.mode = MBProgressHUDMode.indeterminate
-            loader.label.text = message
-            loader.backgroundView.blurEffectStyle = .dark
-            loader.bezelView.backgroundColor = UIColor.white
-        }
     }
 
     func setWifiIconImageFor(cell: WifiListTableViewCell, network: ESPWifiNetwork) {

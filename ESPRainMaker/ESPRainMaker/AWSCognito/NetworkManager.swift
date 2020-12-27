@@ -109,29 +109,29 @@ class NetworkManager {
     ///
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
-    ///   - completionHandler: handler called when response to updateThingShadow is recieved
-    func updateThingShadow(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
+    ///   - completionHandler: handler called when response to setDeviceParam is recieved
+    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if Configuration.shared.appConfiguration.supportLocalControl {
             if let nodeid = nodeID {
                 if let availableService = User.shared.localServices[nodeid] {
                     availableService.setProperty(json: parameter) { success, _ in
                         if !success {
-                            self.updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+                            self.setDeviceParamPrivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
                         }
                     }
                 } else {
-                    updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+                    setDeviceParamPrivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
                 }
             }
         } else {
-            updateThingShadowprivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+            setDeviceParamPrivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
         }
     }
 
-    private func updateThingShadowprivate(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
+    private func setDeviceParamPrivate(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            apiManager.updateThingShadow(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+            apiManager.setDeviceParam(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
         } else {
             completionHandler(.failure)
         }
@@ -158,7 +158,7 @@ class NetworkManager {
     ///   - url: URL of the api
     ///   - parameters: Parameter to be included in the api call
     ///   - completionHandler: Callback invoked after api response is recieved
-    func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, completionHandler: @escaping (Data?) -> Void) {
+    func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
         apiManager.genericAuthorizedDataRequest(url: url, parameter: parameter, completionHandler: completionHandler)
     }
 }

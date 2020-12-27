@@ -29,6 +29,10 @@ class GenericControlTableViewCell: UITableViewCell {
     @IBOutlet var trailingSpaceConstraint: NSLayoutConstraint!
 
     // Stored properties
+    var scheduleDelegate: ScheduleActionDelegate?
+    var indexPath: IndexPath!
+    var attributeKey = ""
+    var paramDelegate: ParamUpdateProtocol?
     var controlValue: String?
     var dataType: String = "String"
     var device: Device!

@@ -18,9 +18,6 @@
 import UIKit
 
 class ScheduleGenericTableViewCell: GenericControlTableViewCell {
-    var delegate: ScheduleActionDelegate?
-    var indexPath: IndexPath!
-
     override func layoutSubviews() {
         super.layoutSubviews()
         checkButton.isHidden = false
@@ -112,6 +109,6 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
             param!.selected = true
             device.selectedParams += 1
         }
-        delegate?.paramStateChangedat(indexPath: indexPath)
+        scheduleDelegate?.paramStateChangedat(indexPath: indexPath)
     }
 }

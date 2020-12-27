@@ -31,7 +31,7 @@ class DevicesCollectionViewCell: UICollectionViewCell {
     @IBOutlet var offlineLabel: UILabel!
     @IBAction func switchButtonPressed(_: Any) {
         switchValue = !switchValue
-        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [device.primary ?? "": switchValue]]) { result in
+        NetworkManager.shared.setDeviceParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [device.primary ?? "": switchValue]]) { result in
             switch result {
             case .failure:
                 let view = self.parentViewController?.view ?? self.contentView

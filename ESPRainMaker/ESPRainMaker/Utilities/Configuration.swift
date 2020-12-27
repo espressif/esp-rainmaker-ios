@@ -120,7 +120,7 @@ struct ExternalLink {
         if let configDict = config {
             termsOfUseURL = configDict["Terms of Use"] as? String ?? ""
             privacyPolicyURL = configDict["Privacy Policy"] as? String ?? ""
-            documentationURL = configDict["Docuemntation"] as? String ?? ""
+            documentationURL = configDict["Documentation"] as? String ?? ""
         }
     }
 }

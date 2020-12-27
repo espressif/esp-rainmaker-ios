@@ -20,9 +20,6 @@ import DropDown
 import UIKit
 
 class ScheduleDropDownTableViewCell: DropDownTableViewCell {
-    var delegate: ScheduleActionDelegate?
-    var indexPath: IndexPath!
-
     override func layoutSubviews() {
         super.layoutSubviews()
         // Cutomised appearance of control element for schedule action
@@ -44,7 +41,7 @@ class ScheduleDropDownTableViewCell: DropDownTableViewCell {
             param.selected = true
             device.selectedParams += 1
         }
-        delegate?.paramStateChangedat(indexPath: indexPath)
+        scheduleDelegate?.paramStateChangedat(indexPath: indexPath)
     }
 
     @IBAction override func dropDownButtonTapped(_: Any) {
