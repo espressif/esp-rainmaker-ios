@@ -35,9 +35,12 @@ class DeviceTraitListViewController: UIViewController {
         // Do any additional setup after loading the view.
         tableView.tableFooterView = UIView()
         tableView.register(UINib(nibName: "SwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "SwitchTableViewCell")
-        tableView.register(UINib(nibName: "GenericSliderTableViewCell", bundle: nil), forCellReuseIdentifier: "GenericSliderTableViewCell")
+        tableView.register(UINib(nibName: "SliderTableViewCell", bundle: nil), forCellReuseIdentifier: "SliderTableViewCell")
         tableView.register(UINib(nibName: "StaticControlTableViewCell", bundle: nil), forCellReuseIdentifier: "staticControlTableViewCell")
         tableView.register(UINib(nibName: "GenericControlTableViewCell", bundle: nil), forCellReuseIdentifier: "genericControlCell")
+        tableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
+        tableView.register(ParamSwitchTableViewCell.self, forCellReuseIdentifier: "switchParamTableViewCell")
+
         titleLabel.text = device?.getDeviceName() ?? "Details"
         tableView.estimatedRowHeight = 70.0
         tableView.rowHeight = UITableView.automaticDimension
@@ -106,9 +109,6 @@ class DeviceTraitListViewController: UIViewController {
         if device?.isReachable() ?? false {
             tableView.alpha = 1.0
             tableView.isUserInteractionEnabled = true
-            if device?.node?.node_id == nil {
-                print("nil")
-            }
             NetworkManager.shared.getNodeInfo(nodeId: (device?.node?.node_id)!) { node, error in
                 if error != nil {
                     return
@@ -210,7 +210,9 @@ class DeviceTraitListViewController: UIViewController {
     @objc func setBrightness(_: UISlider) {}
 
     func getTableViewGenericCell(attribute: Param, indexPath: IndexPath) -> GenericControlTableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
+        let genericCell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
+        object_setClass(genericCell, GenericParamTableViewCell.self)
+        let cell = genericCell as! GenericParamTableViewCell
         cell.controlName.text = attribute.name
         cell.delegate = self
         if let value = attribute.value {
@@ -226,11 +228,10 @@ class DeviceTraitListViewController: UIViewController {
             cell.dataType = data_type
         }
         cell.device = device
-        cell.attribute = attribute
+        cell.param = attribute
         if let attributeName = attribute.name {
             cell.attributeKey = attributeName
         }
-        cell.attribute = attribute
         return cell
     }
 
@@ -241,10 +242,14 @@ class DeviceTraitListViewController: UIViewController {
                     let maxValue = bounds["max"] as? Float ?? 100
                     let minValue = bounds["min"] as? Float ?? 0
                     if minValue < maxValue {
-                        let cell = tableView.dequeueReusableCell(withIdentifier: "GenericSliderTableViewCell", for: indexPath) as! GenericSliderTableViewCell
+                        let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
+                        object_setClass(sliderCell, ParamSliderTableViewCell.self)
+                        let cell = sliderCell as! ParamSliderTableViewCell
+
                         cell.delegate = self
                         cell.hueSlider.isHidden = true
                         cell.slider.isHidden = false
+                        cell.param = dynamicAttribute
                         if let bounds = dynamicAttribute.bounds {
                             cell.slider.minimumValue = bounds["min"] as? Float ?? 0
                             cell.slider.maximumValue = bounds["max"] as? Float ?? 100
@@ -275,7 +280,9 @@ class DeviceTraitListViewController: UIViewController {
                 }
             }
         } else if dynamicAttribute.uiType == "esp.ui.toggle", dynamicAttribute.dataType?.lowercased() == "bool" {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
+            let switchCell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
+            object_setClass(switchCell, ParamSwitchTableViewCell.self)
+            let cell = switchCell as! ParamSwitchTableViewCell
             cell.delegate = self
             cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
             cell.device = device
@@ -306,8 +313,11 @@ class DeviceTraitListViewController: UIViewController {
                 maxValue = bounds["max"] as? Int ?? 360
             }
 
-            let cell = tableView.dequeueReusableCell(withIdentifier: "GenericSliderTableViewCell", for: indexPath) as! GenericSliderTableViewCell
+            let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
+            object_setClass(sliderCell, ParamSliderTableViewCell.self)
+            let cell = sliderCell as! ParamSliderTableViewCell
             cell.delegate = self
+            cell.param = dynamicAttribute
             cell.slider.isHidden = true
             cell.hueSlider.isHidden = false
 
@@ -341,6 +351,48 @@ class DeviceTraitListViewController: UIViewController {
             cell.title.text = dynamicAttribute.name ?? ""
 
             return cell
+        } else if dynamicAttribute.uiType == "esp.ui.dropdown" {
+            if let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "int" || dataType == "string" {
+                let dropDownCell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
+                object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
+                let cell = dropDownCell as! ParamDropDownTableViewCell
+                cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
+                cell.device = device
+                cell.param = dynamicAttribute
+                cell.delegate = self
+
+                var currentValue = ""
+                if dataType == "string" {
+                    currentValue = dynamicAttribute.value as! String
+                } else {
+                    currentValue = String(dynamicAttribute.value as! Int)
+                }
+                cell.controlValueLabel.text = currentValue
+                cell.currentValue = currentValue
+
+                if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false {
+                    cell.dropDownButton.isHidden = false
+                    var datasource: [String] = []
+                    if dataType == "int" {
+                        guard let bounds = dynamicAttribute.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int, let step = bounds["step"] as? Int, max > min else {
+                            return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
+                        }
+                        for item in stride(from: min, to: max + 1, by: step) {
+                            datasource.append(String(item))
+                        }
+                    } else if dynamicAttribute.dataType?.lowercased() == "string" {
+                        datasource.append(contentsOf: dynamicAttribute.valid_strs ?? [])
+                    }
+                    cell.datasource = datasource
+                } else {
+                    cell.dropDownButton.isHidden = true
+                }
+
+                if !cell.datasource.contains(currentValue) {
+                    cell.controlValueLabel.text = currentValue + " (Invalid)"
+                }
+                return cell
+            }
         }
 
         return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)

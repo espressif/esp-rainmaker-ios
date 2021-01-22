@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -59,11 +59,24 @@
                             <constraint firstItem="4I4-iU-MGH" firstAttribute="leading" secondItem="sLB-Of-xcU" secondAttribute="leading" id="rYR-Nj-xok"/>
                         </constraints>
                     </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RSs-CN-r3a">
+                        <rect key="frame" x="0.0" y="0.0" width="40" height="60"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="40" id="aqk-ci-hr4"/>
+                        </constraints>
+                        <state key="normal" image="unselected"/>
+                        <connections>
+                            <action selector="checkBoxPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="2eb-ea-rA0"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
+                    <constraint firstAttribute="bottom" secondItem="RSs-CN-r3a" secondAttribute="bottom" id="H2s-UJ-0cD"/>
                     <constraint firstItem="6jM-IR-wpL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="J9G-PD-cEY"/>
+                    <constraint firstItem="RSs-CN-r3a" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="NLW-te-vLh"/>
                     <constraint firstItem="6jM-IR-wpL" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="XHJ-9Q-jFL"/>
+                    <constraint firstItem="RSs-CN-r3a" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="fzC-Nb-4Un"/>
                     <constraint firstAttribute="bottom" secondItem="6jM-IR-wpL" secondAttribute="bottom" id="wyy-sG-nJN"/>
                     <constraint firstAttribute="trailing" secondItem="6jM-IR-wpL" secondAttribute="trailing" constant="15" id="x1m-H9-DdA"/>
                 </constraints>
@@ -71,12 +84,17 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="backView" destination="6jM-IR-wpL" id="D75-jp-6Ue"/>
+                <outlet property="checkButton" destination="RSs-CN-r3a" id="Xuh-Mb-Gzr"/>
                 <outlet property="controlName" destination="sLB-Of-xcU" id="hXY-ba-jiA"/>
                 <outlet property="controlStateLabel" destination="4I4-iU-MGH" id="nZw-QW-c1u"/>
-                <outlet property="leadingConstraint" destination="3bp-0i-Pbu" id="d1R-6y-Yre"/>
+                <outlet property="leadingSpaceConstraint" destination="J9G-PD-cEY" id="xQQ-Pq-2Yb"/>
                 <outlet property="toggleSwitch" destination="dTT-0l-2t4" id="hsA-YC-1Kr"/>
+                <outlet property="trailingSpaceConstraint" destination="x1m-H9-DdA" id="kLt-0S-OpS"/>
             </connections>
             <point key="canvasLocation" x="139" y="129"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <image name="unselected" width="20" height="20"/>
+    </resources>
 </document>

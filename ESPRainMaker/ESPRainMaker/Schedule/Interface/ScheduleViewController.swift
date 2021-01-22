@@ -37,6 +37,14 @@ class ScheduleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // Update list of available devices for schedule
+        if let nodeList = User.shared.associatedNodeList {
+            ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+        }
+
+        // Configure view for current schedule
+        ESPScheduler.shared.configureDeviceForCurrentSchedule()
+
         // Configure time of date picker based on the value of schedule minute field.
         datePicker.backgroundColor = UIColor.white
         if ESPScheduler.shared.currentSchedule.id != nil {

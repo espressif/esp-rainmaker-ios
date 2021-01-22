@@ -19,6 +19,7 @@
 import Alamofire
 import AWSCognitoIdentityProvider
 import AWSMobileClient
+import DropDown
 import ESPProvision
 import UIKit
 
@@ -49,6 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         )
         AWSServiceManager.default().defaultServiceConfiguration = configuration
         ESPNetworkMonitor.shared.startMonitoring()
+        DropDown.startListeningToKeyboard()
         // Uncomment the next line to see library related logs.
 //        ESPProvisionManager.shared.enableLogs(true)
         return true

@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ScheduleSwitchTableViewCell.swift
+//  ScheduleDropDownTableViewCell.swift
 //  ESPRainMaker
 //
+
+import DropDown
 import UIKit
 
-class ScheduleSwitchTableViewCell: SwitchTableViewCell {
+class ScheduleDropDownTableViewCell: DropDownTableViewCell {
     var delegate: ScheduleActionDelegate?
     var indexPath: IndexPath!
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
     override func layoutSubviews() {
         super.layoutSubviews()
+        // Cutomised appearance of control element for schedule action
         checkButton.isHidden = false
         trailingSpaceConstraint.constant = 0
         leadingSpaceConstraint.constant = 30.0
@@ -35,12 +34,12 @@ class ScheduleSwitchTableViewCell: SwitchTableViewCell {
 
     @IBAction override func checkBoxPressed(_: Any) {
         if param.selected {
-            toggleSwitch.isEnabled = false
+            dropDownButton.isEnabled = false
             checkButton.setImage(UIImage(named: "unselected"), for: .normal)
             param.selected = false
             device.selectedParams -= 1
         } else {
-            toggleSwitch.isEnabled = true
+            dropDownButton.isEnabled = true
             checkButton.setImage(UIImage(named: "selected"), for: .normal)
             param.selected = true
             device.selectedParams += 1
@@ -48,12 +47,30 @@ class ScheduleSwitchTableViewCell: SwitchTableViewCell {
         delegate?.paramStateChangedat(indexPath: indexPath)
     }
 
-    @IBAction override func switchStateChanged(_ sender: UISwitch) {
-        if sender.isOn {
-            controlStateLabel.text = "On"
-        } else {
-            controlStateLabel.text = "Off"
+    @IBAction override func dropDownButtonTapped(_: Any) {
+        // Configuring dropdown attributes
+        DropDown.appearance().backgroundColor = UIColor.white
+        DropDown.appearance().selectionBackgroundColor = #colorLiteral(red: 0.04705882353, green: 0.4392156863, blue: 0.9098039216, alpha: 1)
+        let dropDown = DropDown()
+        dropDown.dataSource = datasource
+        dropDown.width = UIScreen.main.bounds.size.width - 100
+        dropDown.anchorView = backView
+        dropDown.show()
+        // Selecting param value in dropdown list
+        if let index = datasource.firstIndex(where: { $0 == currentValue }) {
+            dropDown.selectRow(at: index)
         }
-        param.value = sender.isOn
+        // Assigning action for dropdown item selection
+        dropDown.selectionAction = { [unowned self] (_: Int, item: String) in
+            if self.param.dataType?.lowercased() == "string" {
+                param.value = item
+            } else {
+                param.value = Int(item)
+            }
+            currentValue = item
+            DispatchQueue.main.async {
+                controlValueLabel.text = item
+            }
+        }
     }
 }

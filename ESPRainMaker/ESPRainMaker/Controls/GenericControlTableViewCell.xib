@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -32,7 +32,7 @@
                                 <color key="textColor" red="0.10196078431372549" green="0.10196078431372549" blue="0.10196078431372549" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="My5-9a-qjK">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="My5-9a-qjK">
                                 <rect key="frame" x="252" y="16" width="22" height="27"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="22" id="bBn-ns-66v"/>
@@ -57,11 +57,25 @@
                             <constraint firstItem="My5-9a-qjK" firstAttribute="top" secondItem="uIA-4d-qmP" secondAttribute="top" constant="16" id="sNg-zK-GNe"/>
                         </constraints>
                     </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LCw-Qw-onE">
+                        <rect key="frame" x="0.0" y="0.0" width="40" height="60"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="40" id="auB-6Y-yV1"/>
+                        </constraints>
+                        <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <state key="normal" image="unselected"/>
+                        <connections>
+                            <action selector="checkBoxPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="bZy-Jf-UPQ"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
+                    <constraint firstItem="LCw-Qw-onE" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="6xW-WU-ceL"/>
                     <constraint firstAttribute="bottom" secondItem="uIA-4d-qmP" secondAttribute="bottom" id="H9l-qg-Fwh"/>
                     <constraint firstItem="uIA-4d-qmP" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="LFP-CP-6bR"/>
+                    <constraint firstItem="LCw-Qw-onE" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="P1G-AJ-Hko"/>
+                    <constraint firstAttribute="bottom" secondItem="LCw-Qw-onE" secondAttribute="bottom" id="ZXx-qU-syQ"/>
                     <constraint firstItem="uIA-4d-qmP" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="q2B-YF-9qH"/>
                     <constraint firstAttribute="trailing" secondItem="uIA-4d-qmP" secondAttribute="trailing" constant="15" id="zUO-Nb-tdY"/>
                 </constraints>
@@ -69,11 +83,17 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="backView" destination="uIA-4d-qmP" id="Vta-W1-3w0"/>
+                <outlet property="checkButton" destination="LCw-Qw-onE" id="8Vu-oX-R1c"/>
                 <outlet property="controlName" destination="MDY-dV-8Ts" id="7JS-rS-ZP9"/>
                 <outlet property="controlValueLabel" destination="DJP-Qv-1T8" id="Ih4-4C-dwt"/>
                 <outlet property="editButton" destination="My5-9a-qjK" id="zqH-9t-frJ"/>
+                <outlet property="leadingSpaceConstraint" destination="LFP-CP-6bR" id="nIu-P1-ICf"/>
+                <outlet property="trailingSpaceConstraint" destination="zUO-Nb-tdY" id="kZo-yU-dd0"/>
             </connections>
             <point key="canvasLocation" x="137.68115942028987" y="83.035714285714278"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <image name="unselected" width="20" height="20"/>
+    </resources>
 </document>

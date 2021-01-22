@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  SwitchTableViewCell.swift
+//  SwitchParamTableViewCell.swift
 //  ESPRainMaker
 //
 
 import UIKit
 
-class SwitchTableViewCell: UITableViewCell, ParamUpdateProtocol {
-    @IBOutlet var backView: UIView!
-    @IBOutlet var controlName: UILabel!
-    @IBOutlet var toggleSwitch: UISwitch!
-    @IBOutlet var controlStateLabel: UILabel!
-    @IBOutlet var leadingConstraint: NSLayoutConstraint!
-
-    var attributeKey = ""
-    var param: Param!
-    var device: Device!
+class ParamSwitchTableViewCell: SwitchTableViewCell {
     var delegate: ParamUpdateProtocol?
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Customise switch element for param screen
+        // Hide row selection button
+        checkButton.isHidden = true
+        leadingSpaceConstraint.constant = 15.0
+        trailingSpaceConstraint.constant = 15.0
+
         backgroundColor = UIColor.clear
 
         backView.layer.borderWidth = 1
@@ -45,30 +45,15 @@ class SwitchTableViewCell: UITableViewCell, ParamUpdateProtocol {
         layer.shadowRadius = 2
         layer.shadowColor = UIColor.black.cgColor
         layer.masksToBounds = false
-        // Initialization code
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
-
-    @IBAction func switchStateChanged(_ sender: UISwitch) {
+    @IBAction override func switchStateChanged(_ sender: UISwitch) {
         if sender.isOn {
             controlStateLabel.text = "On"
         } else {
             controlStateLabel.text = "Off"
         }
-        NetworkManager.shared.updateThingShadow(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]]) { result in
-            switch result {
-            case .failure:
-                self.failureInUpdatingParam()
-            default:
-                break
-            }
-        }
-    }
-
-    func failureInUpdatingParam() {
-        delegate?.failureInUpdatingParam()
+        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]], delegate: delegate)
+        param.value = sender.isOn
     }
 }
