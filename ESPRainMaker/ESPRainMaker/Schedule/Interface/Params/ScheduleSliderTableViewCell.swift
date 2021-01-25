@@ -18,9 +18,6 @@
 import UIKit
 
 class ScheduleSliderTableViewCell: SliderTableViewCell {
-    var delegate: ScheduleActionDelegate?
-    var indexPath: IndexPath!
-
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -49,7 +46,7 @@ class ScheduleSliderTableViewCell: SliderTableViewCell {
             checkButton.setImage(UIImage(named: "selected"), for: .normal)
             device.selectedParams += 1
         }
-        delegate?.paramStateChangedat(indexPath: indexPath)
+        scheduleDelegate?.paramStateChangedat(indexPath: indexPath)
     }
 
     @IBAction override func sliderValueChanged(_ slider: UISlider) {

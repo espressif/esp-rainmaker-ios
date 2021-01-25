@@ -35,6 +35,12 @@ class SliderTableViewCell: UITableViewCell {
     var device: Device!
     var currentHueValue: CGFloat = 0
     var param: Param!
+    var scheduleDelegate: ScheduleActionDelegate?
+    var indexPath: IndexPath!
+    var paramName: String = ""
+    var dataType: String!
+    var sliderValue = ""
+    var paramDelegate: ParamUpdateProtocol?
 
     override func awakeFromNib() {
         super.awakeFromNib()

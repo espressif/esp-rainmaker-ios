@@ -20,12 +20,14 @@
 //
 
 import AVFoundation
+import CoreLocation
 import ESPProvision
 import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 import UIKit
 
 class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
+    let locationManager = CLLocationManager()
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer?
     @IBOutlet var scannerView: UIView!
@@ -35,6 +37,14 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Check for device type to ask for location permission
+        // Location permission is needed to get SSID of connected Wi-Fi network.
+        switch Configuration.shared.espProvSetting.transport {
+        case .both, .softAp:
+            getLocationPermission()
+        default:
+            break
+        }
         scanQrCode()
     }
 
@@ -65,8 +75,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                 }
             } else {
                 DispatchQueue.main.async {
-                    self.retry(message: "Device could not be scanned. Please try again")
-                    print("Failed to scan")
+                    self.retry(message: "QR code is not valid.")
                 }
             }
         }
@@ -198,6 +207,24 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+
+    private func getLocationPermission() {
+        let locStatus = CLLocationManager.authorizationStatus()
+        switch locStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+            return
+        case .denied, .restricted:
+            let alert = UIAlertController(title: "Location Services are disabled", message: "Please enable Location Services in your Settings", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alert.addAction(okAction)
+            present(alert, animated: true, completion: nil)
+        case .authorizedAlways, .authorizedWhenInUse:
+            break
+        @unknown default:
+            break
+        }
     }
 }
 

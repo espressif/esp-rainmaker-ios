@@ -214,7 +214,7 @@ class DeviceTraitListViewController: UIViewController {
         object_setClass(genericCell, GenericParamTableViewCell.self)
         let cell = genericCell as! GenericParamTableViewCell
         cell.controlName.text = attribute.name
-        cell.delegate = self
+        cell.paramDelegate = self
         if let value = attribute.value {
             cell.controlValue = "\(value)"
         }
@@ -246,7 +246,7 @@ class DeviceTraitListViewController: UIViewController {
                         object_setClass(sliderCell, ParamSliderTableViewCell.self)
                         let cell = sliderCell as! ParamSliderTableViewCell
 
-                        cell.delegate = self
+                        cell.paramDelegate = self
                         cell.hueSlider.isHidden = true
                         cell.slider.isHidden = false
                         cell.param = dynamicAttribute
@@ -283,7 +283,7 @@ class DeviceTraitListViewController: UIViewController {
             let switchCell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
             object_setClass(switchCell, ParamSwitchTableViewCell.self)
             let cell = switchCell as! ParamSwitchTableViewCell
-            cell.delegate = self
+            cell.paramDelegate = self
             cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
             cell.device = device
             cell.param = dynamicAttribute
@@ -316,7 +316,7 @@ class DeviceTraitListViewController: UIViewController {
             let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
             object_setClass(sliderCell, ParamSliderTableViewCell.self)
             let cell = sliderCell as! ParamSliderTableViewCell
-            cell.delegate = self
+            cell.paramDelegate = self
             cell.param = dynamicAttribute
             cell.slider.isHidden = true
             cell.hueSlider.isHidden = false
@@ -359,7 +359,7 @@ class DeviceTraitListViewController: UIViewController {
                 cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
                 cell.device = device
                 cell.param = dynamicAttribute
-                cell.delegate = self
+                cell.paramDelegate = self
 
                 var currentValue = ""
                 if dataType == "string" {
@@ -370,20 +370,21 @@ class DeviceTraitListViewController: UIViewController {
                 cell.controlValueLabel.text = currentValue
                 cell.currentValue = currentValue
 
+                var datasource: [String] = []
+                if dataType == "int" {
+                    guard let bounds = dynamicAttribute.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int, let step = bounds["step"] as? Int, max > min else {
+                        return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
+                    }
+                    for item in stride(from: min, to: max + 1, by: step) {
+                        datasource.append(String(item))
+                    }
+                } else if dynamicAttribute.dataType?.lowercased() == "string" {
+                    datasource.append(contentsOf: dynamicAttribute.valid_strs ?? [])
+                }
+                cell.datasource = datasource
+
                 if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false {
                     cell.dropDownButton.isHidden = false
-                    var datasource: [String] = []
-                    if dataType == "int" {
-                        guard let bounds = dynamicAttribute.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int, let step = bounds["step"] as? Int, max > min else {
-                            return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
-                        }
-                        for item in stride(from: min, to: max + 1, by: step) {
-                            datasource.append(String(item))
-                        }
-                    } else if dynamicAttribute.dataType?.lowercased() == "string" {
-                        datasource.append(contentsOf: dynamicAttribute.valid_strs ?? [])
-                    }
-                    cell.datasource = datasource
                 } else {
                     cell.dropDownButton.isHidden = true
                 }

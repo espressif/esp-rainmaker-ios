@@ -170,14 +170,16 @@ class SuccessViewController: UIViewController {
             switch error {
             case .wifiStatusUnknownError, .wifiStatusDisconnected, .wifiStatusNetworkNotFound, .wifiStatusAuthenticationError:
                 errorMessage = error.description
+                self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
             case .wifiStatusError:
                 errorMessage = "Unable to fetch Wi-Fi state."
+                self.step3SendRequestToAddDevice()
             default:
                 errorMessage = "Unknown error."
+                self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
             }
             self.step2ErrorLabel.text = errorMessage
             self.step2ErrorLabel.isHidden = false
-            self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
         }
     }
 

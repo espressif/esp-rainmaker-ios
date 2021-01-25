@@ -18,9 +18,6 @@
 import UIKit
 
 class ScheduleSwitchTableViewCell: SwitchTableViewCell {
-    var delegate: ScheduleActionDelegate?
-    var indexPath: IndexPath!
-
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -45,7 +42,7 @@ class ScheduleSwitchTableViewCell: SwitchTableViewCell {
             param.selected = true
             device.selectedParams += 1
         }
-        delegate?.paramStateChangedat(indexPath: indexPath)
+        scheduleDelegate?.paramStateChangedat(indexPath: indexPath)
     }
 
     @IBAction override func switchStateChanged(_ sender: UISwitch) {

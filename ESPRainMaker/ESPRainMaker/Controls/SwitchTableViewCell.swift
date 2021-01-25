@@ -32,6 +32,9 @@ class SwitchTableViewCell: UITableViewCell {
     var attributeKey = ""
     var param: Param!
     var device: Device!
+    var paramDelegate: ParamUpdateProtocol?
+    var scheduleDelegate: ScheduleActionDelegate?
+    var indexPath: IndexPath!
 
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -34,6 +34,9 @@ class DropDownTableViewCell: UITableViewCell {
     var param: Param!
     var device: Device!
     var currentValue = ""
+    var scheduleDelegate: ScheduleActionDelegate?
+    var indexPath: IndexPath!
+    var paramDelegate: ParamUpdateProtocol?
 
     override func awakeFromNib() {
         super.awakeFromNib()

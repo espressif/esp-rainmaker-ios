@@ -95,7 +95,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                             cell.slider.isEnabled = false
                         }
                         cell.device = device
-                        cell.delegate = self
+                        cell.scheduleDelegate = self
                         cell.indexPath = indexPath
                         return cell
                     }
@@ -125,7 +125,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                 cell.toggleSwitch.isEnabled = false
             }
             cell.device = device
-            cell.delegate = self
+            cell.scheduleDelegate = self
             cell.indexPath = indexPath
             return cell
         } else if param.uiType == "esp.ui.hue-slider" {
@@ -139,7 +139,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
             let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
             object_setClass(sliderCell, ScheduleSliderTableViewCell.self)
             let cell = sliderCell as! ScheduleSliderTableViewCell
-            cell.delegate = self
+            cell.scheduleDelegate = self
             cell.indexPath = indexPath
             cell.slider.isHidden = true
             cell.hueSlider.isHidden = false
@@ -183,7 +183,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
                 cell.controlName.text = param.name?.deletingPrefix(device.name!)
                 cell.device = device
                 cell.param = param
-                cell.delegate = self
+                cell.scheduleDelegate = self
                 cell.indexPath = indexPath
 
                 var currentValue = ""
@@ -233,7 +233,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
         object_setClass(genericCell, ScheduleGenericTableViewCell.self)
         let cell = genericCell as! ScheduleGenericTableViewCell
         cell.device = availableDeviceCopy[indexPath.section]
-        cell.delegate = self
+        cell.scheduleDelegate = self
         cell.indexPath = indexPath
         cell.controlName.text = param.name
         if let value = param.value {

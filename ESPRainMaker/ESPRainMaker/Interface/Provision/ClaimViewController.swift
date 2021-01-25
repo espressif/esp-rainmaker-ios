@@ -42,8 +42,8 @@ class ClaimViewController: UIViewController {
         startAssistedClaiming()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         centralIcon.rotate360Degrees()
     }
 
@@ -61,9 +61,14 @@ class ClaimViewController: UIViewController {
                     self.goToProvision()
                 } else {
                     self.centralIcon.layer.removeAllAnimations()
-                    self.progressIndicator.text = "Claiming finished with error:"
+                    self.progressIndicator.text = "Claiming failed with error:"
                     self.failureLabel.text = error ?? "Failure"
                     self.failureLabel.isHidden = false
+                    var status = "Claiming failed. Please reboot the device and restart provisioning."
+                    if error == "BLE characteristic related with claiming cannot be found." {
+                        status = "Please restart your iOS device to reset BLE cache and try again."
+                    }
+                    self.statusLabel.text = status
                     self.statusLabel.isHidden = false
                     self.okButton.isHidden = false
                 }

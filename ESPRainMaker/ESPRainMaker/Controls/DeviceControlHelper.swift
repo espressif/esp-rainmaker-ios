@@ -25,7 +25,7 @@ protocol ParamUpdateProtocol {
 
 class DeviceControlHelper {
     static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?) {
-        NetworkManager.shared.updateThingShadow(nodeID: nodeID, parameter: parameter) { result in
+        NetworkManager.shared.setDeviceParam(nodeID: nodeID, parameter: parameter) { result in
             switch result {
             case .failure:
                 delegate?.failureInUpdatingParam()

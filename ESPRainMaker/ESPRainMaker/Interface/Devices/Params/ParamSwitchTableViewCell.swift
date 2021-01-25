@@ -19,8 +19,6 @@
 import UIKit
 
 class ParamSwitchTableViewCell: SwitchTableViewCell {
-    var delegate: ParamUpdateProtocol?
-
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -53,7 +51,7 @@ class ParamSwitchTableViewCell: SwitchTableViewCell {
         } else {
             controlStateLabel.text = "Off"
         }
-        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]], delegate: delegate)
+        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]], delegate: paramDelegate)
         param.value = sender.isOn
     }
 }

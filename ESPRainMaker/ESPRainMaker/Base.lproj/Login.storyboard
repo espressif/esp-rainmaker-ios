@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7xV-BH-yep">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
@@ -18,11 +18,11 @@
                         <viewControllerLayoutGuide type="bottom" id="mA1-gy-n1o"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Jn3-Gc-aDK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="vbf-DW-tCX">
-                                <rect key="frame" x="32" y="177.5" width="311" height="60"/>
+                                <rect key="frame" x="32" y="177.5" width="350" height="60"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="D7G-KQ-6Yd"/>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="350" id="Zxu-NY-OGa"/>
@@ -34,16 +34,16 @@
                                 </connections>
                             </textField>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uco-WI-bQ6" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Forgot Password" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N2v-5h-wSd" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="124" y="62.5" width="127.5" height="19.5"/>
+                                        <rect key="frame" x="143.5" y="62.5" width="127.5" height="19.5"/>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f29-Y5-riN" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="299" y="52.5" width="60" height="40"/>
+                                        <rect key="frame" x="338" y="52.5" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="NvG-iQ-1Fw"/>
                                             <constraint firstAttribute="width" constant="60" id="Tbl-fv-p1C"/>
@@ -67,13 +67,13 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please enter your registered email id to reset your password." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gKX-ex-fKU">
-                                <rect key="frame" x="32" y="128" width="311" height="33.5"/>
+                                <rect key="frame" x="32" y="128" width="350" height="33.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" red="0.10196078431372549" green="0.10196078431372549" blue="0.10196078431372549" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FGx-IB-54K" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="32" y="253.5" width="311" height="56"/>
+                                <rect key="frame" x="32" y="253.5" width="350" height="56"/>
                                 <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="56" id="DKp-XL-f0g"/>
@@ -132,24 +132,24 @@
                         <viewControllerLayoutGuide type="bottom" id="XlW-9i-wAK"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="crK-FR-DP8">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view alpha="0.69999999999999996" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jk9-8C-iT0">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mzs-oO-38O" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Verification" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4oS-bc-CpR" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="144.5" y="62.5" width="86.5" height="19.5"/>
+                                        <rect key="frame" x="164" y="62.5" width="86.5" height="19.5"/>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Js-sE-gsW" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="299" y="52.5" width="60" height="40"/>
+                                        <rect key="frame" x="338" y="52.5" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="ZdJ-dx-bg1"/>
                                             <constraint firstAttribute="height" constant="40" id="mDV-6a-Kng"/>
@@ -174,7 +174,7 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Code sent to:" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Lk-o1-eQs">
-                                <rect key="frame" x="20" y="116" width="335" height="21"/>
+                                <rect key="frame" x="20" y="116" width="374" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="afb-mP-reG"/>
                                 </constraints>
@@ -183,7 +183,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GY2-R0-Wzu">
-                                <rect key="frame" x="20" y="147" width="335" height="19"/>
+                                <rect key="frame" x="20" y="147" width="374" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="19" id="OjZ-Ma-Xlf"/>
                                 </constraints>
@@ -192,7 +192,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Code" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="DXK-W6-OxS">
-                                <rect key="frame" x="105" y="206" width="165.5" height="34"/>
+                                <rect key="frame" x="124.5" y="206" width="165.5" height="34"/>
                                 <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="165.5" id="1Y9-bp-a4E"/>
@@ -205,7 +205,7 @@
                                 </connections>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0mh-6Y-WXI" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="85" y="270" width="205" height="50"/>
+                                <rect key="frame" x="85" y="270" width="244" height="50"/>
                                 <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Vjc-FO-lTf"/>
@@ -224,7 +224,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ERk-vr-Ven">
-                                <rect key="frame" x="101" y="328" width="173" height="30"/>
+                                <rect key="frame" x="120.5" y="328" width="173" height="30"/>
                                 <state key="normal" title="Resend Verification Code">
                                     <color key="titleColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
@@ -275,7 +275,7 @@
                 <navigationController storyboardIdentifier="signInController" automaticallyAdjustsScrollViewInsets="NO" id="7xV-BH-yep" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="0Jm-4Z-C0c">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="barTintColor" red="0.94901960780000005" green="0.94509803920000002" blue="0.98823529409999999" alpha="1" colorSpace="calibratedRGB"/>
@@ -301,11 +301,11 @@
                         <viewControllerLayoutGuide type="bottom" id="dUA-yd-Wa5"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="V6n-wX-MUK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rQn-tz-G8q" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="32" y="418.5" width="311" height="56"/>
+                                <rect key="frame" x="32" y="402" width="350" height="56"/>
                                 <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="56" id="i7h-u5-CuL"/>
@@ -325,7 +325,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eBJ-5n-hTK" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="96"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="bottom" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQe-69-CWe" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="16" y="30" width="50" height="50"/>
@@ -342,13 +342,13 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reset Password" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lav-jU-c1A" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="127.5" y="62.5" width="120.5" height="19.5"/>
+                                        <rect key="frame" x="147" y="62.5" width="120.5" height="19.5"/>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ss1-4G-4US" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="299" y="52.5" width="60" height="40"/>
+                                        <rect key="frame" x="338" y="52.5" width="60" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="WEd-f0-54L"/>
                                             <constraint firstAttribute="height" constant="40" id="du5-jE-Yaz"/>
@@ -374,7 +374,7 @@
                                 </constraints>
                             </view>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="New Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zpl-bT-SzX" customClass="PasswordTextField" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="32" y="177.5" width="311" height="60"/>
+                                <rect key="frame" x="32" y="161" width="350" height="60"/>
                                 <color key="backgroundColor" red="0.96470588235294119" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="D3f-Yf-mqH"/>
@@ -387,7 +387,7 @@
                                 </connections>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Confirm Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="1xx-Av-yRj" customClass="PasswordTextField" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="32" y="241.5" width="311" height="60"/>
+                                <rect key="frame" x="32" y="225" width="350" height="60"/>
                                 <color key="backgroundColor" red="0.96470588235294119" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="ei3-vR-fWe"/>
@@ -399,7 +399,7 @@
                                 </connections>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Verification Code" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lw9-JZ-Vz6">
-                                <rect key="frame" x="32" y="305.5" width="311" height="60"/>
+                                <rect key="frame" x="32" y="289" width="350" height="60"/>
                                 <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="2N4-sq-o8t"/>
@@ -411,13 +411,13 @@
                                 </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="To set a new password we sent a verification code to " textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tZH-nQ-skT">
-                                <rect key="frame" x="32" y="128" width="311" height="33.5"/>
+                                <rect key="frame" x="32" y="128" width="350" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" red="0.1019607843" green="0.1019607843" blue="0.1019607843" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password should contain at least one capital letter, one special character and a number." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YPd-xb-bfy">
-                                <rect key="frame" x="48" y="373.5" width="295" height="29"/>
+                                <rect key="frame" x="48" y="357" width="334" height="29"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <color key="textColor" red="0.50588235294117645" green="0.50588235294117645" blue="0.6588235294117647" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
@@ -468,21 +468,21 @@
             <objects>
                 <viewController id="LX5-kB-9Sg" customClass="SignInViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Seu-in-CWQ">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FkL-Cb-9Ck">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="133.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="179"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="brand_name_icon" translatesAutoresizingMaskIntoConstraints="NO" id="Qga-nn-XAF">
-                                        <rect key="frame" x="114.5" y="35.5" width="146" height="42"/>
+                                        <rect key="frame" x="134" y="81" width="146" height="42"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="146" id="8IB-0x-eR6"/>
                                             <constraint firstAttribute="height" constant="42" id="bWp-D8-uds"/>
                                         </constraints>
                                     </imageView>
                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="88g-vZ-6Pe">
-                                        <rect key="frame" x="0.0" y="102.5" width="375" height="32"/>
+                                        <rect key="frame" x="0.0" y="148" width="414" height="32"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <segments>
                                             <segment title="SIGN IN"/>
@@ -505,10 +505,10 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NOm-gh-05c">
-                                <rect key="frame" x="0.0" y="133.5" width="375" height="503.5"/>
+                                <rect key="frame" x="0.0" y="179" width="414" height="687"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rD6-gP-i6F">
-                                        <rect key="frame" x="32" y="20" width="311" height="41.5"/>
+                                        <rect key="frame" x="32" y="20" width="350" height="56"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="15" maxX="40" maxY="15"/>
@@ -531,13 +531,13 @@
                                         </connections>
                                     </button>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="github_logo" translatesAutoresizingMaskIntoConstraints="NO" id="S77-dl-nOK">
-                                        <rect key="frame" x="42" y="20" width="40" height="41.5"/>
+                                        <rect key="frame" x="42" y="20" width="40" height="56"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="40" id="fCF-gn-xXA"/>
                                         </constraints>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceLeftToRight" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xFD-Uk-9IC">
-                                        <rect key="frame" x="32" y="71.5" width="311" height="41"/>
+                                        <rect key="frame" x="32" y="86" width="350" height="55.5"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="40" maxY="0.0"/>
@@ -560,13 +560,13 @@
                                         </connections>
                                     </button>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="apple_icon" translatesAutoresizingMaskIntoConstraints="NO" id="oXl-Q8-zlA">
-                                        <rect key="frame" x="42" y="73.5" width="40" height="37"/>
+                                        <rect key="frame" x="42" y="88" width="40" height="51.5"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="40" id="tgk-fY-9ya"/>
                                         </constraints>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceLeftToRight" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="66L-qr-T3Y">
-                                        <rect key="frame" x="32" y="122.5" width="311" height="41.5"/>
+                                        <rect key="frame" x="32" y="151.5" width="350" height="55.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="40" maxY="0.0"/>
                                         <state key="normal" title="Sign in with Google">
@@ -588,19 +588,19 @@
                                         </connections>
                                     </button>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="google_logo" translatesAutoresizingMaskIntoConstraints="NO" id="Gwd-74-f1T">
-                                        <rect key="frame" x="42" y="126.5" width="40" height="33.5"/>
+                                        <rect key="frame" x="42" y="155.5" width="40" height="47.5"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="40" id="xnA-Yo-Zs1"/>
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="or use your email id" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FFy-79-By5">
-                                        <rect key="frame" x="124.5" y="190" width="126" height="17"/>
+                                        <rect key="frame" x="144" y="233" width="126" height="17"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <color key="textColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="HT5-AL-XVD">
-                                        <rect key="frame" x="32" y="217" width="311" height="44.5"/>
+                                        <rect key="frame" x="32" y="260" width="350" height="60"/>
                                         <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="lessThanOrEqual" constant="350" id="zet-mg-5Ka"/>
@@ -612,7 +612,7 @@
                                         </connections>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9ju-xn-L6Y" customClass="PasswordTextField" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="32" y="265.5" width="311" height="45"/>
+                                        <rect key="frame" x="32" y="324" width="350" height="60"/>
                                         <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                         <textInputTraits key="textInputTraits" returnKeyType="done" secureTextEntry="YES" textContentType="password"/>
@@ -621,7 +621,7 @@
                                         </connections>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dkG-ck-a8M" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="32" y="326.5" width="311" height="41"/>
+                                        <rect key="frame" x="32" y="400" width="350" height="55.5"/>
                                         <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                         <inset key="imageEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <state key="normal" title="Sign in">
@@ -637,7 +637,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N0c-II-QAS" customClass="SecondaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="122.5" y="391.5" width="130" height="32"/>
+                                        <rect key="frame" x="142" y="479.5" width="130" height="32"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                         <state key="normal" title="Forgot password?">
                                             <color key="titleColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -647,7 +647,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nte-Hn-u6r">
-                                        <rect key="frame" x="37.5" y="449.5" width="110" height="28"/>
+                                        <rect key="frame" x="57" y="633" width="110" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="110" id="SBl-e0-oFz"/>
                                         </constraints>
@@ -660,7 +660,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UHd-4C-Y0a">
-                                        <rect key="frame" x="157.5" y="449.5" width="60" height="28"/>
+                                        <rect key="frame" x="177" y="633" width="60" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="D5w-Yu-wdG"/>
                                         </constraints>
@@ -673,7 +673,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bdv-Bv-ccB">
-                                        <rect key="frame" x="217.5" y="449.5" width="140" height="28"/>
+                                        <rect key="frame" x="237" y="633" width="140" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="140" id="1Yy-xT-6lD"/>
                                         </constraints>
@@ -732,13 +732,12 @@
                                 </constraints>
                             </view>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Atr-3P-rUd">
-                                <rect key="frame" x="0.0" y="133.5" width="375" height="503.5"/>
+                                <rect key="frame" x="0.0" y="179" width="414" height="687"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="h4Y-lz-Rgy">
-                                        <rect key="frame" x="12.5" y="32" width="350" height="60"/>
+                                        <rect key="frame" x="32" y="32" width="350" height="60"/>
                                         <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="350" id="1Ge-JB-Urx"/>
                                             <constraint firstAttribute="height" constant="60" id="yuu-87-nX7"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -748,7 +747,7 @@
                                         </connections>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="iHL-JY-aSZ" customClass="PasswordTextField" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="12.5" y="96" width="350" height="60"/>
+                                        <rect key="frame" x="32" y="96" width="350" height="60"/>
                                         <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="60" id="KJw-k0-Ggg"/>
@@ -760,7 +759,7 @@
                                         </connections>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Confirm Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8mB-EP-5Ss" customClass="PasswordTextField" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="12.5" y="160" width="350" height="60"/>
+                                        <rect key="frame" x="32" y="160" width="350" height="60"/>
                                         <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="60" id="vvX-oF-f6H"/>
@@ -772,13 +771,13 @@
                                         </connections>
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password should contain at least one capital letter, special character and number." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EnL-64-Qqm">
-                                        <rect key="frame" x="32.5" y="228" width="310" height="29"/>
+                                        <rect key="frame" x="52" y="228" width="310" height="29"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                         <color key="textColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0zy-Lk-qHe">
-                                        <rect key="frame" x="12.5" y="277.5" width="24" height="24"/>
+                                        <rect key="frame" x="32" y="277.5" width="24" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="24" id="JZv-Iu-huu"/>
                                             <constraint firstAttribute="height" constant="24" id="K4A-G4-ouH"/>
@@ -794,13 +793,13 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="I agree to these" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xh9-pd-L28">
-                                        <rect key="frame" x="44.5" y="281" width="101" height="17"/>
+                                        <rect key="frame" x="64" y="281" width="100.5" height="17"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TTe-Mf-ssw">
-                                        <rect key="frame" x="147.5" y="275" width="89" height="29"/>
+                                        <rect key="frame" x="166.5" y="275" width="89" height="29"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <state key="normal" title="Terms Of Use"/>
                                         <connections>
@@ -808,7 +807,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GPM-zl-nF5" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="12.5" y="330" width="350" height="56"/>
+                                        <rect key="frame" x="32" y="330" width="350" height="56"/>
                                         <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="56" id="8K5-rM-PpR"/>
@@ -837,7 +836,6 @@
                                     <constraint firstItem="iHL-JY-aSZ" firstAttribute="centerX" secondItem="Atr-3P-rUd" secondAttribute="centerX" id="KwO-Cx-5iY"/>
                                     <constraint firstItem="GPM-zl-nF5" firstAttribute="trailing" secondItem="h4Y-lz-Rgy" secondAttribute="trailing" id="Lvk-Ak-Ep2"/>
                                     <constraint firstItem="GPM-zl-nF5" firstAttribute="centerX" secondItem="Atr-3P-rUd" secondAttribute="centerX" id="MLx-6C-A05"/>
-                                    <constraint firstItem="h4Y-lz-Rgy" firstAttribute="leading" secondItem="Atr-3P-rUd" secondAttribute="leading" priority="99" constant="32" id="NWx-co-wOA"/>
                                     <constraint firstItem="Xh9-pd-L28" firstAttribute="centerY" secondItem="0zy-Lk-qHe" secondAttribute="centerY" id="SvA-mB-yJW"/>
                                     <constraint firstItem="8mB-EP-5Ss" firstAttribute="centerX" secondItem="Atr-3P-rUd" secondAttribute="centerX" id="Uej-gC-XCB"/>
                                     <constraint firstItem="GPM-zl-nF5" firstAttribute="leading" secondItem="iHL-JY-aSZ" secondAttribute="leading" id="Uuw-D0-8eV"/>
@@ -848,19 +846,17 @@
                                     <constraint firstItem="Xh9-pd-L28" firstAttribute="top" secondItem="EnL-64-Qqm" secondAttribute="bottom" constant="24" id="h4M-i7-7i2"/>
                                     <constraint firstItem="EnL-64-Qqm" firstAttribute="top" secondItem="8mB-EP-5Ss" secondAttribute="bottom" constant="8" id="iHF-Dz-DZt"/>
                                     <constraint firstItem="TTe-Mf-ssw" firstAttribute="centerY" secondItem="Xh9-pd-L28" secondAttribute="centerY" id="kPq-gS-3KX"/>
-                                    <constraint firstAttribute="trailing" secondItem="h4Y-lz-Rgy" secondAttribute="trailing" priority="99" constant="32" id="kTi-hI-LLU"/>
                                     <constraint firstItem="TTe-Mf-ssw" firstAttribute="leading" secondItem="Xh9-pd-L28" secondAttribute="trailing" constant="2" id="mzY-pL-OfL"/>
                                     <constraint firstItem="iHL-JY-aSZ" firstAttribute="trailing" secondItem="h4Y-lz-Rgy" secondAttribute="trailing" id="p3w-pr-HEy"/>
                                     <constraint firstItem="8mB-EP-5Ss" firstAttribute="leading" secondItem="h4Y-lz-Rgy" secondAttribute="leading" id="rm4-Qh-jpe"/>
                                     <constraint firstItem="h4Y-lz-Rgy" firstAttribute="top" secondItem="Atr-3P-rUd" secondAttribute="top" constant="32" id="sOu-LM-W6b"/>
-                                    <constraint firstItem="h4Y-lz-Rgy" firstAttribute="centerX" secondItem="Atr-3P-rUd" secondAttribute="centerX" id="xda-Ue-0Ig"/>
                                     <constraint firstItem="iHL-JY-aSZ" firstAttribute="top" secondItem="h4Y-lz-Rgy" secondAttribute="bottom" constant="4" id="xe6-ZP-eYL"/>
                                     <constraint firstItem="8mB-EP-5Ss" firstAttribute="trailing" secondItem="h4Y-lz-Rgy" secondAttribute="trailing" id="xkI-Wh-Z86"/>
                                     <constraint firstItem="8mB-EP-5Ss" firstAttribute="top" secondItem="iHL-JY-aSZ" secondAttribute="bottom" constant="4" id="yFl-Vh-kqR"/>
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="App Version - v1.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F4a-1m-dcP">
-                                <rect key="frame" x="136" y="632.5" width="103.5" height="14.5"/>
+                                <rect key="frame" x="155.5" y="861.5" width="103.5" height="14.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <color key="textColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <nil key="highlightedColor"/>
@@ -872,6 +868,7 @@
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="trailing" secondItem="QPE-t6-ANk" secondAttribute="trailing" id="4Nz-3K-pkd"/>
                             <constraint firstItem="F4a-1m-dcP" firstAttribute="centerX" secondItem="Seu-in-CWQ" secondAttribute="centerX" id="5MG-Oj-Ten"/>
                             <constraint firstItem="FkL-Cb-9Ck" firstAttribute="top" secondItem="Seu-in-CWQ" secondAttribute="top" id="7pY-Vj-6ZA"/>
+                            <constraint firstItem="HT5-AL-XVD" firstAttribute="trailing" secondItem="h4Y-lz-Rgy" secondAttribute="trailing" id="CgG-fJ-iqY"/>
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="top" secondItem="FkL-Cb-9Ck" secondAttribute="bottom" id="Ps0-BG-k6p"/>
                             <constraint firstAttribute="bottom" secondItem="Atr-3P-rUd" secondAttribute="bottom" constant="30" id="RKq-rL-r5U"/>
                             <constraint firstItem="dkG-ck-a8M" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" multiplier="0.062" id="Xd8-ZK-CvV"/>
@@ -886,6 +883,7 @@
                             <constraint firstItem="NOm-gh-05c" firstAttribute="top" secondItem="FkL-Cb-9Ck" secondAttribute="bottom" id="pS5-Bf-PEY"/>
                             <constraint firstItem="Atr-3P-rUd" firstAttribute="leading" secondItem="QPE-t6-ANk" secondAttribute="leading" id="vB8-Yi-d2u"/>
                             <constraint firstAttribute="bottom" secondItem="F4a-1m-dcP" secondAttribute="bottom" constant="20" id="zJy-0W-HUP"/>
+                            <constraint firstItem="HT5-AL-XVD" firstAttribute="leading" secondItem="h4Y-lz-Rgy" secondAttribute="leading" id="zSm-OH-cUi"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Bei-DQ-UZk"/>
@@ -920,11 +918,11 @@
             <objects>
                 <viewController storyboardIdentifier="documentVC" id="wXr-Ub-V7p" customClass="DocumentViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="V28-tt-vRP">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VvT-Zr-VFS">
-                                <rect key="frame" x="0.0" y="48" width="375" height="619"/>
+                                <rect key="frame" x="0.0" y="48" width="414" height="848"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -932,14 +930,14 @@
                                 </wkWebViewConfiguration>
                             </wkWebView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EK2-tY-Ire">
-                                <rect key="frame" x="326" y="10" width="39" height="30"/>
+                                <rect key="frame" x="365" y="10" width="39" height="30"/>
                                 <state key="normal" title="Close"/>
                                 <connections>
                                     <action selector="closeWebView:" destination="wXr-Ub-V7p" eventType="touchUpInside" id="R70-GQ-0tG"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wvO-yc-hIb">
-                                <rect key="frame" x="10" y="10" width="34" height="30"/>
+                                <rect key="frame" x="10" y="54" width="34" height="30"/>
                                 <state key="normal" title="Back"/>
                                 <connections>
                                     <action selector="backButtonPressed:" destination="wXr-Ub-V7p" eventType="touchUpInside" id="2ha-Nw-chQ"/>

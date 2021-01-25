@@ -57,12 +57,12 @@ class ESPScheduler {
                         deviceJSON[device.name ?? ""] = actionJSON
                     }
                     jsonString["action"] = deviceJSON
-                    apiManager.updateThingShadow(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
+                    apiManager.setDeviceParam(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
                         switch result {
                         case .success:
                             finalResult = finalResult || true
                         default:
-                            Utility.showToastMessage(view: onView, message: "Unable to save schedule for \(key)")
+                            Utility.showToastMessage(view: onView, message: "Unable to save schedule for \(self.getDeviceListFromAction(action: actions, forKey: key))")
                             finalResult = finalResult || false
                         }
                         if i == actions.keys.count {
@@ -95,12 +95,12 @@ class ESPScheduler {
             if actions.keys.count > 0 {
                 for key in actions.keys {
                     i += 1
-                    apiManager.updateThingShadow(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
+                    apiManager.setDeviceParam(nodeID: key, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
                         switch result {
                         case .success:
                             finalResult = finalResult || true
                         default:
-                            Utility.showToastMessage(view: onView, message: "Unable to edit schedule for \(key)")
+                            Utility.showToastMessage(view: onView, message: "Unable to edit schedule for \(self.getDeviceListFromAction(action: actions, forKey: key))")
                             finalResult = finalResult || false
                         }
                         if i == actions.keys.count {
@@ -131,18 +131,19 @@ class ESPScheduler {
             jsonString["operation"] = "remove"
             var i = 0
             var finalResult = false
-            let actions = createActionsFromDeviceList()
-            for nodeID in actions.keys {
+            for nodeID in currentSchedule.actions.keys {
                 i += 1
-                apiManager.updateThingShadow(nodeID: nodeID, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
+                apiManager.setDeviceParam(nodeID: nodeID, parameter: [Constants.scheduleKey: [Constants.schedulesKey: [jsonString]]]) { result in
                     switch result {
                     case .success:
                         finalResult = finalResult || true
                     default:
-                        Utility.showToastMessage(view: onView, message: "Unable to delete schedule for \(nodeID)")
-                        finalResult = finalResult || false
+                        if nodeID != "" {
+                            Utility.showToastMessage(view: onView, message: "Unable to delete schedule for \(nodeID)")
+                            finalResult = finalResult || false
+                        }
                     }
-                    if i == actions.keys.count {
+                    if i == self.currentSchedule.actions.keys.count {
                         completionHandler(finalResult)
                     }
                 }
@@ -329,5 +330,17 @@ class ESPScheduler {
                 }
             }
         }
+    }
+
+    /// Get device names of a node for which schedule operation is performed
+    private func getDeviceListFromAction(action: [String: [Device]], forKey: String) -> String {
+        if let devices = action[forKey] {
+            var deviceNames: [String] = []
+            for device in devices {
+                deviceNames.append(device.deviceName)
+            }
+            return deviceNames.joined(separator: ", ")
+        }
+        return forKey
     }
 }
