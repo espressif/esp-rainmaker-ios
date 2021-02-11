@@ -102,11 +102,13 @@ struct AWSConfiguration {
 struct AppConfiguration {
     var supportSchedule = true
     var supportLocalControl = true
+    var supportGrouping = true
 
     init(config: [String: Any]?) {
         if let configDict = config {
             supportSchedule = configDict["Enable Schedule"] as? Bool ?? true
             supportLocalControl = configDict["Enable Local Control"] as? Bool ?? true
+            supportGrouping = configDict["Enable Grouping"] as? Bool ?? true
         }
     }
 }
@@ -133,7 +135,7 @@ struct ESPProvSettings {
 
     init(config: [String: Any]?) {
         if let configDict = config {
-            allowPrefixSearch = configDict["Enable Schedule"] as? Bool ?? true
+            allowPrefixSearch = configDict["ESP Allow Prefix Search"] as? Bool ?? true
             if let securityModeVal = configDict["ESP Securtiy Mode"] as? String {
                 securityMode = securityModeVal.lowercased() == "unsecure" ? .unsecure : .secure
             }

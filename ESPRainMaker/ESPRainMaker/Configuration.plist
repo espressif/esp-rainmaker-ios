@@ -30,6 +30,8 @@
 	</dict>
 	<key>App Configuration</key>
 	<dict>
+		<key>Enable Grouping</key>
+		<true/>
 		<key>Enable Schedule</key>
 		<true/>
 		<key>Enable Local Control</key>

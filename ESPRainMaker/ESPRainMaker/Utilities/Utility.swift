@@ -90,9 +90,9 @@ class Utility {
         }
     }
 
-    class func showToastMessage(view: UIView, message: String = "") {
+    class func showToastMessage(view: UIView, message: String = "", duration: TimeInterval = ToastManager.shared.duration) {
         DispatchQueue.main.async {
-            view.makeToast(message)
+            view.makeToast(message, duration: duration, position: ToastManager.shared.position, title: nil, image: nil, style: ToastManager.shared.style, completion: nil)
         }
     }
 }

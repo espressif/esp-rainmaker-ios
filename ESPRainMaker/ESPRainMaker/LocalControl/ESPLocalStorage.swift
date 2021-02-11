@@ -22,6 +22,33 @@ import Foundation
 class ESPLocalStorage {
     static let shared = ESPLocalStorage()
 
+    /// Method to save current node groups information locally
+    ///
+    func saveNodeGroupInfo() {
+        do {
+            let encoded = try JSONEncoder().encode(NodeGroupManager.shared.nodeGroup)
+            UserDefaults.standard.setValue(encoded, forKey: Constants.nodeGroups)
+        } catch {
+            print(error)
+        }
+    }
+
+    /// Method to fetch locally stored node group information for current user.
+    ///
+    /// - Returns: Array of node groups.
+    func fetchNodeGroups() -> [NodeGroup] {
+        var groupsList: [NodeGroup] = []
+        do {
+            if let groupData = UserDefaults.standard.object(forKey: Constants.nodeGroups) as? Data {
+                groupsList = try JSONDecoder().decode([NodeGroup].self, from: groupData)
+            }
+            return groupsList
+        } catch {
+            print(error)
+            return groupsList
+        }
+    }
+
     /// Method to save current schedule information locally
     ///
     func saveSchedules() {

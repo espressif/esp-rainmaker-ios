@@ -21,6 +21,14 @@
 		F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */; };
 		F1072BC6256F9BD400D7CE2C /* BLEDeviceListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */; };
 		F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1084204257103BC009F1AC3 /* GradientSlider.swift */; };
+		F10B073325CD714100723254 /* NodeGrouping.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10B073225CD714000723254 /* NodeGrouping.storyboard */; };
+		F10B074825CD7EBC00723254 /* NodeGroupsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B074725CD7EBC00723254 /* NodeGroupsViewController.swift */; };
+		F10B074C25CEDB9F00723254 /* NodeGroupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B074B25CEDB9F00723254 /* NodeGroupManager.swift */; };
+		F10B075225CEE44200723254 /* NodeGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B075125CEE44200723254 /* NodeGroup.swift */; };
+		F10B075625CF147C00723254 /* ErrorResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B075525CF147C00723254 /* ErrorResponse.swift */; };
+		F10B076E25D11CCD00723254 /* NodeGroupTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B076D25D11CCD00723254 /* NodeGroupTableViewCell.swift */; };
+		F10B077225D2726800723254 /* NewNodeGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077125D2726800723254 /* NewNodeGroupViewController.swift */; };
+		F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
 		F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */; };
 		F1110429252D8E2D0030A1D3 /* ESPLocalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */; };
@@ -36,6 +44,8 @@
 		F12261A422C620ED004D049F /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12261A322C620ED004D049F /* User.swift */; };
 		F123428324D0113600CAD4A2 /* ScheduleSwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F123428124D0113600CAD4A2 /* ScheduleSwitchTableViewCell.swift */; };
 		F123428724D0131200CAD4A2 /* ScheduleGenericTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F123428524D0131200CAD4A2 /* ScheduleGenericTableViewCell.swift */; };
+		F133494225DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F133494025DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift */; };
+		F133494325DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F133494125DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib */; };
 		F13A014023E359250067F8B8 /* DocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13A013F23E359250067F8B8 /* DocumentViewController.swift */; };
 		F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13A01B923E98B680067F8B8 /* UserInfo.swift */; };
 		F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13F273D238CF6170003AABB /* ScannerViewController.swift */; };
@@ -84,6 +94,7 @@
 		F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */; };
 		F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */; };
 		F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB511A23321B7E002401F9 /* JSONParser.swift */; };
+		F1B0ACFA25DBCB7B004057BD /* DeviceGroupCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B0ACF925DBCB7A004057BD /* DeviceGroupCollectionViewCell.swift */; };
 		F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */; };
 		F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B3558823B8DC4C004552FC /* ExtensionManager.swift */; };
 		F1BBD465255C1EE900CB0F42 /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */; };
@@ -118,6 +129,11 @@
 		F1FB153C234D91000053B0ED /* SliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FB153A234D91000053B0ED /* SliderTableViewCell.swift */; };
 		F1FB153D234D91000053B0ED /* SliderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1FB153B234D91000053B0ED /* SliderTableViewCell.xib */; };
 		F1FB153F234DED260053B0ED /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FB153E234DED260053B0ED /* Errors.swift */; };
+		F1FFC8F925D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC8F825D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift */; };
+		F1FFC8FD25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC8FC25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift */; };
+		F1FFC90125D44CA400DD26C6 /* AddNodeGroupsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC90025D44CA400DD26C6 /* AddNodeGroupsViewController.swift */; };
+		F1FFC90725D4872C00DD26C6 /* SelectNodeFooterCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC90625D4872B00DD26C6 /* SelectNodeFooterCollectionReusableView.swift */; };
+		F1FFC91125D4A04500DD26C6 /* EditNodeGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC91025D4A04500DD26C6 /* EditNodeGroupViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +171,14 @@
 		F1072BC4256F9BD300D7CE2C /* BLEDeviceListViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEDeviceListViewCell.swift; sourceTree = "<group>"; };
 		F107AB3624CEC979008DB9CD /* ESPScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScheduler.swift; sourceTree = "<group>"; };
 		F1084204257103BC009F1AC3 /* GradientSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientSlider.swift; sourceTree = "<group>"; };
+		F10B073225CD714000723254 /* NodeGrouping.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NodeGrouping.storyboard; sourceTree = "<group>"; };
+		F10B074725CD7EBC00723254 /* NodeGroupsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroupsViewController.swift; sourceTree = "<group>"; };
+		F10B074B25CEDB9F00723254 /* NodeGroupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroupManager.swift; sourceTree = "<group>"; };
+		F10B075125CEE44200723254 /* NodeGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroup.swift; sourceTree = "<group>"; };
+		F10B075525CF147C00723254 /* ErrorResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResponse.swift; sourceTree = "<group>"; };
+		F10B076D25D11CCD00723254 /* NodeGroupTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroupTableViewCell.swift; sourceTree = "<group>"; };
+		F10B077125D2726800723254 /* NewNodeGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewNodeGroupViewController.swift; sourceTree = "<group>"; };
+		F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGroupNodesViewController.swift; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
 		F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalStorage.swift; sourceTree = "<group>"; };
 		F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalService.swift; sourceTree = "<group>"; };
@@ -170,6 +194,8 @@
 		F12261A322C620ED004D049F /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		F123428124D0113600CAD4A2 /* ScheduleSwitchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSwitchTableViewCell.swift; sourceTree = "<group>"; };
 		F123428524D0131200CAD4A2 /* ScheduleGenericTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleGenericTableViewCell.swift; sourceTree = "<group>"; };
+		F133494025DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceGroupEmptyDeviceCollectionViewCell.swift; sourceTree = "<group>"; };
+		F133494125DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeviceGroupEmptyDeviceCollectionViewCell.xib; sourceTree = "<group>"; };
 		F13A013F23E359250067F8B8 /* DocumentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewController.swift; sourceTree = "<group>"; };
 		F13A01B923E98B680067F8B8 /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		F13F273D238CF6170003AABB /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
@@ -222,6 +248,7 @@
 		F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericControlTableViewCell.swift; sourceTree = "<group>"; };
 		F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericControlTableViewCell.xib; sourceTree = "<group>"; };
 		F1AB511A23321B7E002401F9 /* JSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
+		F1B0ACF925DBCB7A004057BD /* DeviceGroupCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceGroupCollectionViewCell.swift; sourceTree = "<group>"; };
 		F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewController.swift; sourceTree = "<group>"; };
 		F1B3558823B8DC4C004552FC /* ExtensionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionManager.swift; sourceTree = "<group>"; };
 		F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
@@ -257,6 +284,11 @@
 		F1FB153A234D91000053B0ED /* SliderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderTableViewCell.swift; sourceTree = "<group>"; };
 		F1FB153B234D91000053B0ED /* SliderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SliderTableViewCell.xib; sourceTree = "<group>"; };
 		F1FB153E234DED260053B0ED /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		F1FFC8F825D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGroupNodeCollectionViewCell.swift; sourceTree = "<group>"; };
+		F1FFC8FC25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNodeHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
+		F1FFC90025D44CA400DD26C6 /* AddNodeGroupsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNodeGroupsViewController.swift; sourceTree = "<group>"; };
+		F1FFC90625D4872B00DD26C6 /* SelectNodeFooterCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNodeFooterCollectionReusableView.swift; sourceTree = "<group>"; };
+		F1FFC91025D4A04500DD26C6 /* EditNodeGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNodeGroupViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -304,6 +336,7 @@
 			isa = PBXGroup;
 			children = (
 				F11DC9DB25791B1500603BF5 /* Controls */,
+				F10B074625CD72DF00723254 /* Grouping */,
 				F117CDED252C758800ADB856 /* LocalControl */,
 				F1DE5D07251360AA00973E30 /* Schedule */,
 				F191CD3F251122D300BDCEF1 /* Claim */,
@@ -316,6 +349,7 @@
 				143146B120EB221E0017E119 /* Interface */,
 				1431462620DE994B0017E119 /* AppDelegate.swift */,
 				F1012F61251110B300839F06 /* Schedule.storyboard */,
+				F10B073225CD714000723254 /* NodeGrouping.storyboard */,
 				F15EAC1123E1994E008A766B /* DeviceDetail.storyboard */,
 				F15EAC0C23E198FF008A766B /* Login.storyboard */,
 				1431462A20DE994B0017E119 /* Main.storyboard */,
@@ -414,6 +448,23 @@
 			path = SoftAP;
 			sourceTree = "<group>";
 		};
+		F10B074625CD72DF00723254 /* Grouping */ = {
+			isa = PBXGroup;
+			children = (
+				F10B074725CD7EBC00723254 /* NodeGroupsViewController.swift */,
+				F10B076D25D11CCD00723254 /* NodeGroupTableViewCell.swift */,
+				F10B074B25CEDB9F00723254 /* NodeGroupManager.swift */,
+				F10B077125D2726800723254 /* NewNodeGroupViewController.swift */,
+				F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */,
+				F1FFC8F825D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift */,
+				F1FFC8FC25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift */,
+				F1FFC90625D4872B00DD26C6 /* SelectNodeFooterCollectionReusableView.swift */,
+				F1FFC90025D44CA400DD26C6 /* AddNodeGroupsViewController.swift */,
+				F1FFC91025D4A04500DD26C6 /* EditNodeGroupViewController.swift */,
+			);
+			path = Grouping;
+			sourceTree = "<group>";
+		};
 		F117CDED252C758800ADB856 /* LocalControl */ = {
 			isa = PBXGroup;
 			children = (
@@ -506,6 +557,8 @@
 				F1F45151232B7ECB0009DCE0 /* Attribute.swift */,
 				F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */,
 				F13A01B923E98B680067F8B8 /* UserInfo.swift */,
+				F10B075125CEE44200723254 /* NodeGroup.swift */,
+				F10B075525CF147C00723254 /* ErrorResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -617,6 +670,9 @@
 				F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */,
 				F1DDA06723588B110005F982 /* NodeDetailsViewController.swift */,
 				F1DDA06923588C890005F982 /* NodeDetailsTableViewCell.swift */,
+				F1B0ACF925DBCB7A004057BD /* DeviceGroupCollectionViewCell.swift */,
+				F133494025DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift */,
+				F133494125DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib */,
 			);
 			path = Devices;
 			sourceTree = "<group>";
@@ -743,9 +799,11 @@
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
 				F164A2F92581E73000B879BC /* Configuration.plist in Resources */,
+				F10B073325CD714100723254 /* NodeGrouping.storyboard in Resources */,
 				F15EABFF23E05A51008A766B /* Localizable.strings in Resources */,
 				F1FB153D234D91000053B0ED /* SliderTableViewCell.xib in Resources */,
 				1431463120DE994C0017E119 /* LaunchScreen.storyboard in Resources */,
+				F133494325DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib in Resources */,
 				F190B9CC24C765C4006D136D /* ControlSectionHeaderView.xib in Resources */,
 				F15EAC0F23E1994E008A766B /* DeviceDetail.storyboard in Resources */,
 				F190B9CA24C0D892006D136D /* DeviceHeaderView.xib in Resources */,
@@ -848,12 +906,15 @@
 				F1F45150232B7A780009DCE0 /* DeviceTraitListViewController.swift in Sources */,
 				F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
+				F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */,
+				F1FFC8F925D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift in Sources */,
 				F1943A7724C9DF230001564A /* ESPDays.swift in Sources */,
 				F181CD9624D7F46300447296 /* NanoID.swift in Sources */,
 				F123428324D0113600CAD4A2 /* ScheduleSwitchTableViewCell.swift in Sources */,
 				F1DE5D092513621200973E30 /* ESPScheduler.swift in Sources */,
 				F191CD472511231C00BDCEF1 /* ClaimViewController.swift in Sources */,
 				F190B9B624BF51AE006D136D /* ScheduleListViewController.swift in Sources */,
+				F10B074C25CEDB9F00723254 /* NodeGroupManager.swift in Sources */,
 				F19A9D1B22C0ED4C00A450C3 /* ConfirmSignUpViewController.swift in Sources */,
 				F1CA0C94257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift in Sources */,
 				F117CDEF252C75CD00ADB856 /* ESPLocalControl.swift in Sources */,
@@ -870,6 +931,7 @@
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
 				F1110431252D927F0030A1D3 /* constants.pb.swift in Sources */,
 				F1EAACAA23E2A74300E9A6A8 /* ColorPickerView.swift in Sources */,
+				F10B074825CD7EBC00723254 /* NodeGroupsViewController.swift in Sources */,
 				F19A9D1922C0ED4C00A450C3 /* ResetPasswordViewController.swift in Sources */,
 				F1EAACAC23E2A74300E9A6A8 /* ColorPickerViewDelegate.swift in Sources */,
 				F12261A022C61695004D049F /* DeviceAssociation.swift in Sources */,
@@ -891,11 +953,15 @@
 				F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */,
 				F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */,
 				F1E37E9323D6CF4800A5043F /* PasswordTextField.swift in Sources */,
+				F1FFC91125D4A04500DD26C6 /* EditNodeGroupViewController.swift in Sources */,
 				F1EAACA923E2A74300E9A6A8 /* ColorPickerCell.swift in Sources */,
 				F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */,
+				F1B0ACFA25DBCB7B004057BD /* DeviceGroupCollectionViewCell.swift in Sources */,
+				F10B075225CEE44200723254 /* NodeGroup.swift in Sources */,
 				F190B9BA24BF7775006D136D /* ScheduleViewController.swift in Sources */,
 				143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */,
 				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
+				F10B076E25D11CCD00723254 /* NodeGroupTableViewCell.swift in Sources */,
 				F1DDA06823588B110005F982 /* NodeDetailsViewController.swift in Sources */,
 				F1EAAC8E23E29D9B00E9A6A8 /* AppConstants.swift in Sources */,
 				F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */,
@@ -903,22 +969,28 @@
 				F1C8082C22CA17790098F3B4 /* NetworkManager.swift in Sources */,
 				F123428724D0131200CAD4A2 /* ScheduleGenericTableViewCell.swift in Sources */,
 				F190B9C424C0A6C8006D136D /* SelectDevicesViewController.swift in Sources */,
+				F10B075625CF147C00723254 /* ErrorResponse.swift in Sources */,
 				F15FFF882402643A00E72D01 /* NoInternetConnection.swift in Sources */,
 				F111042D252D924F0030A1D3 /* esp_local_ctrl.pb.swift in Sources */,
 				F19A9D1322C0D23E00A450C3 /* SignInViewController.swift in Sources */,
 				F190B9D124C82C02006D136D /* ScheduleSliderTableViewCell.swift in Sources */,
+				F1FFC8FD25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift in Sources */,
 				F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */,
 				F1F4514E232B78100009DCE0 /* Device.swift in Sources */,
+				F133494225DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift in Sources */,
 				144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */,
 				F164A30825824EC700B879BC /* Configuration.swift in Sources */,
 				F19A9D1022BB6DD800A450C3 /* MFAViewController.swift in Sources */,
 				F190B9B824BF5208006D136D /* ScheduleListTableViewCell.swift in Sources */,
 				F190B9BE24C07CB5006D136D /* SelectDaysViewController.swift in Sources */,
+				F10B077225D2726800723254 /* NewNodeGroupViewController.swift in Sources */,
 				F1072BC6256F9BD400D7CE2C /* BLEDeviceListViewCell.swift in Sources */,
 				F1BBD465255C1EE900CB0F42 /* SpinnerView.swift in Sources */,
+				F1FFC90125D44CA400DD26C6 /* AddNodeGroupsViewController.swift in Sources */,
 				F18BADCE24CAC1EE00A696AE /* ESPSchedule.swift in Sources */,
 				F191CD492511235700BDCEF1 /* esp_rmaker_claim.pb.swift in Sources */,
 				F191CD41251122D300BDCEF1 /* AssistedClaiming.swift in Sources */,
+				F1FFC90725D4872C00DD26C6 /* SelectNodeFooterCollectionReusableView.swift in Sources */,
 				F19F6FF522F45A1500C70DE3 /* DeviceListTableView.swift in Sources */,
 				F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */,
 				F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */,
@@ -1082,7 +1154,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.3.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
