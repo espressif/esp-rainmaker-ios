@@ -116,6 +116,25 @@ Node Grouping allows you to create abstract or logical groups of devices like li
 
 Node Grouping is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Grouping` key from `App Configuration` to `NO`.
   
+  ### Node Sharing
+
+  Node Sharing allows a user to share nodes with other registered users and allow them to monitor and control these nodes.
+  List of operations that are supported in node sharing :
+
+  For primary users:
+
+  - Register requests to share nodes.
+  - View pending requests.
+  - Cancel a pending request, if required.
+  - Remove node sharing.
+
+  For secondary users:
+
+  - View pending requests.
+  - Accept/decline pending requests.
+
+Node Sharing is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Sharing` key from `App Configuration` to `NO`.
+  
 
 ## Supports
 

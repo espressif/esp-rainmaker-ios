@@ -251,7 +251,7 @@ class ESPAPIManager {
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
     ///   - completionHandler: handler called when response to setDeviceParam is recieved
-    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: ((CustomError) -> Void)? = nil) {
+    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: ((ESPHTTPSRequestStatus) -> Void)? = nil) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if let nodeid = nodeID {
             User.shared.getAccessToken(completionHandler: { idToken in
@@ -340,11 +340,11 @@ class ESPAPIManager {
     ///   - url: URL of the api
     ///   - parameter: Parameter to be included in the api call
     ///   - completionHandler: Callback invoked after api response is recieved
-    func genericAuthorizedJSONRequest(url: String, parameter: [String: Any]?, method _: HTTPMethod, completionHandler: @escaping (Any?, ESPNetworkError?) -> Void) {
+    func genericAuthorizedJSONRequest(url: String, parameter: [String: Any]?, method: HTTPMethod, completionHandler: @escaping (Any?, ESPNetworkError?) -> Void) {
         User.shared.getAccessToken(completionHandler: { accessToken in
             if accessToken != nil {
                 let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-                self.session.request(url, method: .post, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                self.session.request(url, method: method, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     switch response.result {
                     case let .success(value):
                         completionHandler(value, nil)

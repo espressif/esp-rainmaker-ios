@@ -24,7 +24,8 @@ class Node: Codable {
     var info: Info?
     var devices: [Device]?
     var attributes: [Attribute]?
-    var role: String?
+    var primary: [String]?
+    var secondary: [String]?
     var isConnected = true
     var timestamp: Int = 0
     var isSchedulingSupported = false
@@ -37,17 +38,19 @@ class Node: Codable {
         case config
         case devices
         case config_version
-        case role
         case info
         case isSchedulingSupported
+        case primary
+        case secondary
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(node_id, forKey: .node_id)
-        try container.encode(role, forKey: .role)
         try container.encode(isSchedulingSupported, forKey: .isSchedulingSupported)
         try container.encode(devices, forKey: .devices)
+        try container.encode(primary, forKey: .primary)
+        try container.encode(secondary, forKey: .secondary)
 
         var configContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
         try configContainer.encode(info, forKey: .info)
@@ -57,8 +60,10 @@ class Node: Codable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         node_id = try container.decode(String?.self, forKey: .node_id)
-        role = try container.decode(String?.self, forKey: .role)
         devices = try container.decode([Device]?.self, forKey: .devices)
+        primary = try container.decode([String]?.self, forKey: .primary)
+        secondary = try container.decode([String]?.self, forKey: .secondary)
+
         let configContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
         info = try configContainer.decode(Info?.self, forKey: .info)
         config_version = try configContainer.decode(String.self, forKey: .config_version)

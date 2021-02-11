@@ -194,20 +194,43 @@ class DeviceTraitListViewController: UIViewController {
         }
     }
 
-    /*
-     // MARK: - Navigation
+    // MARK: - IB Actions
 
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
     @IBAction func backButtonPressed(_: Any) {
         navigationController?.popViewController(animated: true)
     }
 
-    @objc func setBrightness(_: UISlider) {}
+    @IBAction func infoButtonPressed(_: Any) {
+        // Get current node by node ID
+        if let i = User.shared.associatedNodeList!.firstIndex(where: { $0.node_id == self.device?.node?.node_id }) {
+            let currentNode = User.shared.associatedNodeList![i]
+
+            if Configuration.shared.appConfiguration.supportSharing {
+                Utility.showLoader(message: "Updating Node details...", view: view)
+                // Fetch sharing details for current user.
+                NodeSharingManager.shared.getSharingDetails(node: currentNode) { error in
+                    Utility.hideLoader(view: self.view)
+                    if error != nil {
+                        // Error while fetching sharing infromation.
+                        Utility.showToastMessage(view: self.view, message: "Unable to update current node details with error:\(error!.description).")
+                    }
+                    // Navigate to node details screen.
+                    DispatchQueue.main.async {
+                        self.goToNodeDetails(node: currentNode)
+                    }
+                }
+            } else {
+                goToNodeDetails(node: currentNode)
+            }
+        }
+    }
+
+    func goToNodeDetails(node: Node) {
+        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
+        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
+        destination.currentNode = node
+        navigationController?.pushViewController(destination, animated: true)
+    }
 
     func getTableViewGenericCell(attribute: Param, indexPath: IndexPath) -> GenericControlTableViewCell {
         let genericCell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
@@ -397,15 +420,6 @@ class DeviceTraitListViewController: UIViewController {
         }
 
         return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
-        if segue.identifier == Constants.nodeDetailSegue {
-            let destination = segue.destination as! NodeDetailsViewController
-            if let i = User.shared.associatedNodeList!.firstIndex(where: { $0.node_id == self.device?.node?.node_id }) {
-                destination.currentNode = User.shared.associatedNodeList![i]
-            }
-        }
     }
 }
 
