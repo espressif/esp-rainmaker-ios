@@ -68,7 +68,7 @@ class Device: Codable {
 
     func getDeviceName() -> String? {
         if let deviceNameParam = params?.first(where: { param -> Bool in
-            param.type == Constants.deviceNameParam
+            param.type == "esp.param.name"
         }) {
             if let name = deviceNameParam.value as? String {
                 return name

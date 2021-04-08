@@ -16,7 +16,6 @@
 //  ESPRainMaker
 //
 
-import AWSCognitoIdentityProvider
 import Foundation
 
 struct Constants {
@@ -83,6 +82,7 @@ struct Constants {
     static let checkStatus = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping"
     static let setParam = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
     static let sharing = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/sharing"
+    static let pushNotification = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/push_notification/mobile_platform_endpoint"
 
     // UserDefault keys
     static let newDeviceAdded = Constants.bundleIdentifier + ".newDeviceAdded"
@@ -135,6 +135,8 @@ struct Constants {
     static let networkUpdateNotification = "com.espressif.networkUpdateNotification"
     static let localNetworkUpdateNotification = "com.espressif.localNetworkUpdateNotification"
     static let reloadCollectionView = "com.espressif.reloadCollectionView"
+    static let reloadParamTableView = "com.espressif.reloadParamTableView"
+    static let refreshDeviceList = "com.espressif.refreshDeviceList"
 
     // Claim APIs
     static let claimInitPath = Configuration.shared.awsConfiguration.claimURL + "/claim/initiate"
@@ -151,7 +153,4 @@ struct Constants {
 
     static let serviceType = "_esp_local_ctrl._tcp."
     static let serviceDomain = "local"
-    static let nodeDetails = "com.espressif.node.details"
-    static let scheduleDetails = "com.espressif.schedule.details"
-    static let nodeGroups = "com.espressif.node.groups"
 }

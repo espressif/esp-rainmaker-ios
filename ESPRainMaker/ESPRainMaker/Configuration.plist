@@ -52,6 +52,8 @@
 		<key>ESP Scan Enabled</key>
 		<true/>
 	</dict>
+	<key>App Group</key>
+	<string>group.com.espressif.rainmaker.softap</string>
 	<key>App Theme Color</key>
 	<string>#FFFFFF</string>
 </dict>

@@ -64,8 +64,8 @@ class EditNodeGroupViewController: UIViewController {
                     Utility.hideLoader(view: self.view)
                     // Check if remove node group operation is successful
                     if success {
-                        if let index = NodeGroupManager.shared.nodeGroup.firstIndex(where: { $0.group_id == self.currentNodeGroup.group_id }) {
-                            NodeGroupManager.shared.nodeGroup.remove(at: index)
+                        if let index = NodeGroupManager.shared.nodeGroups.firstIndex(where: { $0.group_id == self.currentNodeGroup.group_id }) {
+                            NodeGroupManager.shared.nodeGroups.remove(at: index)
                         }
                         User.shared.updateDeviceList = true
                         NodeGroupManager.shared.listUpdated = true

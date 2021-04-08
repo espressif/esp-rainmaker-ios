@@ -26,7 +26,7 @@ enum ESPDeviceType: Int {
     case softAp
 }
 
-class Configuration {
+class Configuration: ESPConfiguration {
     static let shared = Configuration()
     var awsConfiguration: AWSConfiguration!
     var appConfiguration: AppConfiguration!
@@ -34,7 +34,8 @@ class Configuration {
     var espProvSetting: ESPProvSettings!
     var appThemeColor: String!
 
-    private init() {
+    private override init() {
+        super.init()
         guard let configDictionary = getCustomPlist() else {
             fatalError("Configuration.plist file is not present. Please check the documents for more information.")
         }
@@ -46,21 +47,6 @@ class Configuration {
         externalLinks = ExternalLink(config: configDictionary["External Links"] as? [String: Any])
         espProvSetting = ESPProvSettings(config: configDictionary["Provision Settings"] as? [String: Any])
         appThemeColor = configDictionary["App Theme Color"] as? String ?? "#FFFFFF"
-    }
-
-    private func getCustomPlist() -> [String: Any]? {
-        if let path = Bundle.main.path(forResource: "Configuration", ofType: "plist") {
-            do {
-                let url = URL(fileURLWithPath: path)
-                let data = try Data(contentsOf: url)
-                if let configPlist = try PropertyListSerialization.propertyList(from: data, options: .mutableContainers, format: nil) as? [String: Any] {
-                    return configPlist
-                }
-            } catch {
-                return nil
-            }
-        }
-        return nil
     }
 }
 

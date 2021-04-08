@@ -60,6 +60,7 @@ class SettingsPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        tabBarController?.tabBar.isHidden = false
         emailLabel.text = User.shared.userInfo.email
 
         if User.shared.userInfo.loggedInWith == .other {
@@ -95,16 +96,23 @@ class SettingsPageViewController: UIViewController {
         let alertController = UIAlertController(title: "Logout", message: "Do you like to proceed?", preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+            
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+            appDelegate?.disablePlatformApplicationARN()
+            UIApplication.shared.unregisterForRemoteNotifications()
+            UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+            
             User.shared.currentUser()?.signOut()
             UserDefaults.standard.removeObject(forKey: Constants.userInfoKey)
             UserDefaults.standard.removeObject(forKey: Constants.refreshTokenKey)
             UserDefaults.standard.removeObject(forKey: Constants.accessTokenKey)
-            UserDefaults.standard.removeObject(forKey: Constants.nodeDetails)
-            UserDefaults.standard.removeObject(forKey: Constants.scheduleDetails)
-            UserDefaults.standard.removeObject(forKey: Constants.nodeGroups)
+            
+            let localStorageHandler = ESPLocalStorageHandler()
+            localStorageHandler.cleanupData()
+            
             UserDefaults.standard.removeObject(forKey: Constants.wifiPassword)
 
-            NodeGroupManager.shared.nodeGroup = []
+            NodeGroupManager.shared.nodeGroups = []
             NodeSharingManager.shared.sharingRequestsSent = []
             NodeSharingManager.shared.sharingRequestsReceived = []
 
@@ -112,6 +120,7 @@ class SettingsPageViewController: UIViewController {
             User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
             User.shared.associatedNodeList = nil
             self.tabBarController?.selectedIndex = 0
+            
             self.refresh()
         }
         alertController.addAction(cancelAction)

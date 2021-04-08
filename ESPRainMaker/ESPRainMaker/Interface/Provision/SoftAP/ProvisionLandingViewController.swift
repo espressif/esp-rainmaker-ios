@@ -170,7 +170,6 @@ class ProvisionLandingViewController: UIViewController {
             default:
                 DispatchQueue.main.async {
                     self.retry(message: "Device could not be connected. Please try again")
-                    print("Failed to connect")
                 }
             }
         }

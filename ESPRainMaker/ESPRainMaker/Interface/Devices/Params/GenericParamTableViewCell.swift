@@ -117,13 +117,20 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                         return
                     }
                 }
-                DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]], delegate: paramDelegate)
+                DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]], delegate: paramDelegate) { result in
+                    // Updates local storage in case parameter update is successfull.
+                    if result == .success {
+                        DispatchQueue.main.async {
+                            self.device.deviceName = value
+                            ESPLocalStorageHandler().saveNodeDetails(nodes: User.shared.associatedNodeList)
+                        }
+                    }
+                }
                 controlValueLabel.text = value
 
                 if Configuration.shared.appConfiguration.supportLocalControl {
                     ESPScheduler.shared.updateDeviceName(for: device.node?.node_id, name: device.name ?? "", deviceName: value)
                 }
-                device.deviceName = value
             }
             param?.value = controlValue as Any
         }

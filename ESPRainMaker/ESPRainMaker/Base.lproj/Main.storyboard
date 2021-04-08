@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -314,7 +314,7 @@
         <!--Espressif-->
         <scene sceneID="vP2-nv-Q6V">
             <objects>
-                <navigationController storyboardIdentifier="startViewController" title="Espressif" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="fullScreen" id="mgC-Sj-4EB" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="startViewController" title="Espressif" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="fullScreen" id="mgC-Sj-4EB" customClass="DevicesNavigationController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Devices" image="devices" selectedImage="devices_selected" id="7E4-zH-Cb0">
                         <inset key="imageInsets" minX="0.0" minY="24" maxX="0.0" maxY="24"/>
                     </tabBarItem>
@@ -568,7 +568,7 @@
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wifiListCell" id="cHM-rp-6Qs" customClass="WifiListTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="28" width="350" height="43.5"/>
+                                                <rect key="frame" x="0.0" y="24.5" width="350" height="43.5"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cHM-rp-6Qs" id="KGP-NE-uxb">
                                                     <rect key="frame" x="0.0" y="0.0" width="350" height="43.5"/>
@@ -1706,7 +1706,7 @@ Unable to add device</string>
         <!--Tab Bar Controller-->
         <scene sceneID="J5D-1u-iK1">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="S6F-ru-bO5" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="tabBarController" automaticallyAdjustsScrollViewInsets="NO" id="S6F-ru-bO5" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" hidden="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="djK-iE-0fU">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
@@ -1991,7 +1991,7 @@ Unable to add device</string>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="bleDeviceCell" rowHeight="70" id="e2b-VG-MGG" customClass="BLEDeviceListViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="70"/>
+                                        <rect key="frame" x="0.0" y="24.5" width="414" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e2b-VG-MGG" id="tEp-Iw-EPl">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="70"/>

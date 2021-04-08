@@ -91,10 +91,11 @@ class ESPAPIManager {
                                 if let nextNodeID = json["next_id"] as? String {
                                     self.getNodes(partialList: finalNodeList, nextNodeID: nextNodeID, completionHandler: completionHandler)
                                 } else {
-                                    ESPLocalStorage.shared.saveNodeDetails(nodes: finalNodeList)
+                                    let localStorageHandler = ESPLocalStorageHandler()
+                                    localStorageHandler.saveNodeDetails(nodes: finalNodeList)
                                     // Save schedules if it is enabled
                                     if Configuration.shared.appConfiguration.supportSchedule {
-                                        ESPLocalStorage.shared.saveSchedules()
+                                        localStorageHandler.saveSchedules(schedules: ESPScheduler.shared.schedules)
                                     }
                                     completionHandler(finalNodeList, nil)
                                 }
@@ -138,8 +139,8 @@ class ESPAPIManager {
                     case let .success(value):
                         if let json = value as? [String: Any] {
                             if let nodeArray = json["node_details"] as? [[String: Any]] {
-                                if let node = JSONParser.parseNodeArray(data: nodeArray, forSingleNode: true)?[0] {
-                                    completionHandler(node, nil)
+                                if let nodes = JSONParser.parseNodeArray(data: nodeArray, forSingleNode: true), nodes.count > 0 {
+                                    completionHandler(nodes[0], nil)
                                     return
                                 }
                                 completionHandler(nil, ESPNetworkError.emptyConfigData)
