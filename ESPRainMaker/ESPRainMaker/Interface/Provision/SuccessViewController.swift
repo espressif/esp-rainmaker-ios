@@ -236,8 +236,6 @@ class SuccessViewController: UIViewController {
     @IBAction func goToFirstView(_: Any) {
         let destinationVC = navigationController?.viewControllers.first as! DevicesViewController
         destinationVC.checkDeviceAssociation = true
-        destinationVC.deviceID = deviceID
-        destinationVC.requestID = requestID
         navigationController?.navigationBar.isHidden = false
         navigationController?.popToRootViewController(animated: true)
     }

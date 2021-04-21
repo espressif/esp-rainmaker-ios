@@ -104,6 +104,17 @@ Local Control feature is optional but enabled by default. It can be disabled fro
  - Enable/disable.
 
 Schedule feature is optional but enabled by default. Schedule can be disabled from the `Configuration.plist` by setting `Enable Schedule` key from `App Configuration` to `NO`.
+
+### Node Grouping
+
+Node Grouping allows you to create abstract or logical groups of devices like lights, switches, fans etc. List of operations that are supported in node grouping :
+
+ - Create groups.
+ - Edit groups (rename or add/remove device).
+ - Remove groups.
+ - List groups.
+
+Node Grouping is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Grouping` key from `App Configuration` to `NO`.
   
 
 ## Supports
@@ -120,6 +131,8 @@ Schedule feature is optional but enabled by default. Schedule can be disabled fr
 ## Installation
 
 - Run `pod install` from  ESPRainMaker folder in the terminal.
+
+- Install Swiftformat command-line tool from terminal using `brew install swiftformat`.
 
 - After pod installation open ESPRainMaker.xcworkspace project.
 

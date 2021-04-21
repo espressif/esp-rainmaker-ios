@@ -136,4 +136,5 @@ struct Constants {
     static let serviceDomain = "local"
     static let nodeDetails = "com.espressif.node.details"
     static let scheduleDetails = "com.espressif.schedule.details"
+    static let nodeGroups = "com.espressif.node.groups"
 }

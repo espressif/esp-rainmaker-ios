@@ -45,6 +45,7 @@ enum ESPNetworkError: Error {
     case localServerError(ESPLocalServiceError)
     case noNetwork
     case unknownError
+    case parsingError(_ description: String = "Unable to parse data.")
 
     var description: String {
         switch self {
@@ -60,6 +61,8 @@ enum ESPNetworkError: Error {
             return localError.description
         case .noNetwork:
             return "Not connected to network."
+        case let .parsingError(description):
+            return description
         case .unknownError:
             return "Unknown error."
         }
