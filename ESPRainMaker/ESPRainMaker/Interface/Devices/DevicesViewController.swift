@@ -375,7 +375,8 @@ class DevicesViewController: UIViewController {
 
     private func preparePopover(contentController: UIViewController,
                                 sender: UIView,
-                                delegate: UIPopoverPresentationControllerDelegate?) {
+                                delegate: UIPopoverPresentationControllerDelegate?)
+    {
         contentController.modalPresentationStyle = .popover
         contentController.popoverPresentationController!.sourceView = sender
         contentController.popoverPresentationController!.sourceRect = sender.bounds
@@ -397,6 +398,13 @@ class DevicesViewController: UIViewController {
                 }
             }
         }
+    }
+
+    private func goToNodeDetails(node: Node) {
+        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
+        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
+        destination.currentNode = node
+        navigationController?.pushViewController(destination, animated: true)
     }
 }
 
@@ -498,9 +506,22 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
     }
 
     func didSelectNode(node: Node) {
-        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
-        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
-        destination.currentNode = node
-        navigationController?.pushViewController(destination, animated: true)
+        // Get sharing details for this user to display at node details.
+        if Configuration.shared.appConfiguration.supportSharing {
+            Utility.showLoader(message: "Updating Node details...", view: view)
+            NodeSharingManager.shared.getSharingDetails(node: node) { error in
+                Utility.hideLoader(view: self.view)
+                if error != nil {
+                    // Unable to collect sharing information for this particular node.
+                    Utility.showToastMessage(view: self.view, message: "Unable to update current node details with error:\(error!.description).")
+                }
+                // Navigate to node details view controller
+                DispatchQueue.main.async {
+                    self.goToNodeDetails(node: node)
+                }
+            }
+        } else {
+            goToNodeDetails(node: node)
+        }
     }
 }

@@ -103,12 +103,14 @@ struct AppConfiguration {
     var supportSchedule = true
     var supportLocalControl = true
     var supportGrouping = true
+    var supportSharing = true
 
     init(config: [String: Any]?) {
         if let configDict = config {
             supportSchedule = configDict["Enable Schedule"] as? Bool ?? true
             supportLocalControl = configDict["Enable Local Control"] as? Bool ?? true
             supportGrouping = configDict["Enable Grouping"] as? Bool ?? true
+            supportSharing = configDict["Enable Sharing"] as? Bool ?? true
         }
     }
 }

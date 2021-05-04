@@ -21,7 +21,7 @@
 
 import Foundation
 
-enum CustomError: Error {
+enum ESPHTTPSRequestStatus: Error {
     case emptyConfigData
     case emptyResultCount
     case emptyToken

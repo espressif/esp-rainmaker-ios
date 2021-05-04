@@ -24,6 +24,10 @@ class SettingsPageViewController: UIViewController {
     @IBOutlet var emailLabel: UILabel!
     @IBOutlet var changePasswordView: UIView!
     @IBOutlet var appVersionLabel: UILabel!
+    @IBOutlet var notificationCount: UILabel!
+    @IBOutlet var notificationView: UIView!
+    @IBOutlet var pendingActionView: UIView!
+    @IBOutlet var pendingActionViewHeightConstraint: NSLayoutConstraint!
     var username = ""
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,6 +39,14 @@ class SettingsPageViewController: UIViewController {
         emailLabel.text = User.shared.userInfo.email
         NotificationCenter.default.addObserver(self, selector: #selector(updateUIView), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
         appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
+        navigationController?.navigationBar.isHidden = true
+
+        if Configuration.shared.appConfiguration.supportSharing {
+            getSharingRequests()
+        } else {
+            pendingActionView.isHidden = true
+            pendingActionView.heightAnchor.constraint(equalToConstant: 0.0).isActive = true
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -52,7 +64,23 @@ class SettingsPageViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        tabBarController?.tabBar.isHidden = true
+
+        if Configuration.shared.appConfiguration.supportSharing {
+            var pendingRequestCount = 0
+            // Update badge for pending notifications.
+            for request in NodeSharingManager.shared.sharingRequestsReceived {
+                if request.request_status?.lowercased() == "pending" {
+                    pendingRequestCount += 1
+                }
+            }
+            if pendingRequestCount > 0 {
+                notificationCount.text = "\(pendingRequestCount)"
+                notificationView.isHidden = false
+            } else {
+                notificationCount.text = ""
+                notificationView.isHidden = true
+            }
+        }
     }
 
     @IBAction func signOut(_: Any) {
@@ -62,10 +90,17 @@ class SettingsPageViewController: UIViewController {
         UserDefaults.standard.removeObject(forKey: Constants.accessTokenKey)
         UserDefaults.standard.removeObject(forKey: Constants.nodeDetails)
         UserDefaults.standard.removeObject(forKey: Constants.scheduleDetails)
+        UserDefaults.standard.removeObject(forKey: Constants.nodeGroups)
+
+        NodeGroupManager.shared.nodeGroup = []
+        NodeSharingManager.shared.sharingRequestsSent = []
+        NodeSharingManager.shared.sharingRequestsReceived = []
+
         User.shared.accessToken = nil
         User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
         User.shared.associatedNodeList = nil
-        navigationController?.popViewController(animated: true)
+
+        navigationController?.popToRootViewController(animated: false)
         refresh()
     }
 
@@ -119,6 +154,31 @@ class SettingsPageViewController: UIViewController {
             return nameImage
         }
         return nil
+    }
+
+    private func getSharingRequests() {
+        NodeSharingManager.shared.getSharingRequests(primaryUser: false) { requests, error in
+            guard let _ = error else {
+                var count = 0
+                if let sharingRequests = requests {
+                    for request in sharingRequests {
+                        if request.request_status?.lowercased() == "pending" {
+                            count += 1
+                        }
+                    }
+                }
+                DispatchQueue.main.async {
+                    if count > 0 {
+                        self.notificationCount.text = "\(count)"
+                        self.notificationView.isHidden = false
+                    } else {
+                        self.notificationCount.text = ""
+                        self.notificationView.isHidden = true
+                    }
+                }
+                return
+            }
+        }
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {

@@ -36,6 +36,8 @@
 		<true/>
 		<key>Enable Local Control</key>
 		<true/>
+		<key>Enable Sharing</key>
+		<true/>
 	</dict>
 	<key>Provision Settings</key>
 	<dict>

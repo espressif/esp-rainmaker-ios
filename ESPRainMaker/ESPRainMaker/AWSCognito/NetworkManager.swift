@@ -110,7 +110,7 @@ class NetworkManager {
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
     ///   - completionHandler: handler called when response to setDeviceParam is recieved
-    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
+    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (ESPHTTPSRequestStatus) -> Void) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if Configuration.shared.appConfiguration.supportLocalControl {
             if let nodeid = nodeID {
@@ -129,7 +129,7 @@ class NetworkManager {
         }
     }
 
-    private func setDeviceParamPrivate(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (CustomError) -> Void) {
+    private func setDeviceParamPrivate(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (ESPHTTPSRequestStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             apiManager.setDeviceParam(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
         } else {
