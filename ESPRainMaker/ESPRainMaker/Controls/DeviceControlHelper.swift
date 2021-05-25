@@ -24,7 +24,7 @@ protocol ParamUpdateProtocol {
 }
 
 enum DeviceControlHelper {
-    static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?, completionHandler: ((ESPHTTPSRequestStatus) -> Void)? = nil) {
+    static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?, completionHandler: ((ESPCloudResponseStatus) -> Void)? = nil) {
         NetworkManager.shared.setDeviceParam(nodeID: nodeID, parameter: parameter) { result in
             switch result {
             case .failure:

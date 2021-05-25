@@ -32,6 +32,10 @@ class Node: Codable {
     var isSchedulingSupported = false
     var localNetwork = false
     var fromLocalStorage = false
+    var maxSchedulesCount = -1
+    var currentSchedulesCount = 0
+    var scheduleName = "Schedule"
+    var schedulesName = "Schedules"
 
     enum CodingKeys: String, CodingKey {
         case node_id = "id"
@@ -44,6 +48,8 @@ class Node: Codable {
         case primary
         case secondary
         case services
+        case maxSchedulesCount
+        case currentSchedulesCount
     }
 
     func encode(to encoder: Encoder) throws {
@@ -54,6 +60,8 @@ class Node: Codable {
         try container.encode(primary, forKey: .primary)
         try container.encode(secondary, forKey: .secondary)
         try container.encode(services, forKey: .services)
+        try container.encode(maxSchedulesCount, forKey: .maxSchedulesCount)
+        try container.encode(currentSchedulesCount, forKey: .currentSchedulesCount)
 
         var configContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
         try configContainer.encode(info, forKey: .info)
@@ -79,11 +87,16 @@ class Node: Codable {
             }
         }
         isSchedulingSupported = try container.decodeIfPresent(Bool.self, forKey: .isSchedulingSupported) ?? false
+        maxSchedulesCount = try container.decodeIfPresent(Int.self, forKey: .maxSchedulesCount) ?? -1
+        currentSchedulesCount = try container.decodeIfPresent(Int.self, forKey: .currentSchedulesCount) ?? 0
         isConnected = false
         fromLocalStorage = true
     }
 
-    func getNodeStatus() -> String {
+    init() {}
+    
+    /// Returns reachability status of node
+    var nodeStatus: String {
         var status = ""
         if fromLocalStorage {
             if localNetwork {
@@ -104,11 +117,8 @@ class Node: Codable {
                 }
             }
         }
-
         return status
     }
-
-    init() {}
 }
 
 class Service: Codable {

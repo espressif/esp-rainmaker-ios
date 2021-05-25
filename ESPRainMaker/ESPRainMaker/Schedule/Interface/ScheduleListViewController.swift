@@ -54,6 +54,7 @@ class ScheduleListViewController: UIViewController {
         super.viewDidAppear(animated)
         tableView.isEditing = false
         editButton.setTitle("Edit", for: .normal)
+        ESPScheduler.shared.currentScheduleKey = nil
         // Show UI based on scheudle list count
         if User.shared.updateDeviceList {
             User.shared.updateDeviceList = false
@@ -156,6 +157,21 @@ class ScheduleListViewController: UIViewController {
         })
         tableView.reloadData()
     }
+    
+    /// Format schedule list after switching schedule status
+    /// - Parameters:
+    ///   - index: position of schedule in list
+    ///   - enabled: is schedule enabled or disabled
+    private func formatScheduleList(index: Int, enabled: Bool) {
+        let schedule = ESPScheduler.shared.schedules[scheduleList[index]]
+        ESPScheduler.shared.schedules[scheduleList[index]] = nil
+        let scheduleKey = scheduleList[index]
+        var scheduleKeys = scheduleKey.components(separatedBy: ".")
+        scheduleKeys[scheduleKeys.count-1] = enabled ? "true": "false"
+        scheduleList[index] = scheduleKeys.joined(separator: ".")
+        ESPScheduler.shared.schedules[scheduleList[index]] = schedule
+    }
+
 }
 
 extension ScheduleListViewController: UITableViewDelegate {
@@ -168,6 +184,7 @@ extension ScheduleListViewController: UITableViewDelegate {
         let scheduleVC = storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController
         ESPScheduler.shared.currentSchedule = ESPScheduler.shared.schedules[scheduleList[indexPath.section]]!
         scheduleVC.scheduleKey = scheduleList[indexPath.section]
+        ESPScheduler.shared.currentScheduleKey = scheduleList[indexPath.section]
         navigationController?.pushViewController(scheduleVC, animated: true)
     }
 
@@ -182,10 +199,15 @@ extension ScheduleListViewController: UITableViewDelegate {
             let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
             let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
                 DispatchQueue.main.async {
-                    ESPScheduler.shared.deleteScheduleAt(key: self.scheduleList[indexPath.section], onView: self.view) { result in
-                        if result {
-                            Utility.showLoader(message: "", view: self.view)
-                            self.refreshScheduleList(self)
+                    Utility.showLoader(message: "", view: self.view)
+                    ESPScheduler.shared.deleteScheduleAt(key: self.scheduleList[indexPath.section], onView: self.view) { result  in
+                        switch result {
+                        case .success(_):
+                            DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
+                                self.refreshScheduleList(self)
+                            })
+                        default:
+                            Utility.hideLoader(view: self.view)
                         }
                     }
                 }
@@ -222,6 +244,7 @@ extension ScheduleListViewController: UITableViewDataSource {
         cell.scheduleSwitch.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         cell.scheduleSwitch.setOn(schedule.enabled, animated: true)
         cell.index = indexPath.section
+        cell.delegate = self
         return cell
     }
 
@@ -231,5 +254,16 @@ extension ScheduleListViewController: UITableViewDataSource {
 
     func numberOfSections(in _: UITableView) -> Int {
         return scheduleList.count
+    }
+}
+
+extension ScheduleListViewController: ScheduleListTableViewCellDelegate {
+    
+    func scheduleStateChanged(index: Int, enabled: Bool, shouldRefresh: Bool) {
+        if !shouldRefresh, index < scheduleList.count {
+            self.formatScheduleList(index: index, enabled: enabled)
+        } else {
+            self.refreshScheduleList(self)
+        }
     }
 }

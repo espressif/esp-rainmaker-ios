@@ -21,16 +21,6 @@
 
 import Foundation
 
-enum ESPHTTPSRequestStatus: Error {
-    case emptyConfigData
-    case emptyResultCount
-    case emptyToken
-    case userIDNotPresent
-    case emptyNodeList
-    case success
-    case failure
-}
-
 enum InputValidationError: String {
     case outOfBound = "Input value is out of bound"
     case invalid = "Input value is inavlid"
@@ -41,6 +31,7 @@ enum ESPNetworkError: Error {
     case keyNotPresent
     case emptyToken
     case serverError(_ description: String = "Oops!! Something went bad. Please try again after sometime")
+    case noData
     case emptyConfigData
     case localServerError(ESPLocalServiceError)
     case noNetwork
@@ -65,6 +56,8 @@ enum ESPNetworkError: Error {
             return description
         case .unknownError:
             return "Unknown error."
+        case .noData:
+            return "Data not present"
         }
     }
 }

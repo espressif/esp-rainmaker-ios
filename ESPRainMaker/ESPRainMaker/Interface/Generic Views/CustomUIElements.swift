@@ -91,6 +91,21 @@ class SecondaryButton: UIButton {
     }
 }
 
+class RemoveScheduleButton: UIButton {
+    
+    let removeThemeColor = "#F45C10"
+    let removeBackgroundColor = "#FFECE4"
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.layer.borderWidth = CGFloat(2.0)
+        self.layer.borderColor = UIColor(hexString: removeThemeColor).cgColor
+        self.layer.cornerRadius = CGFloat(10.0)
+        self.backgroundColor = UIColor(hexString: removeBackgroundColor)
+        self.setTitleColor(UIColor(hexString: removeThemeColor), for: .normal)
+    }
+}
+
 class BGImageView: UIImageView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)

@@ -28,6 +28,7 @@ class ScheduleSwitchTableViewCell: SwitchTableViewCell {
         trailingSpaceConstraint.constant = 0
         leadingSpaceConstraint.constant = 30.0
         backView.backgroundColor = .white
+        setupSelections()
     }
 
     @IBAction override func checkBoxPressed(_: Any) {
@@ -52,5 +53,21 @@ class ScheduleSwitchTableViewCell: SwitchTableViewCell {
             controlStateLabel.text = "Off"
         }
         param.value = sender.isOn
+    }
+}
+
+extension ScheduleSwitchTableViewCell: ScheduleActionAllowedProtocol {
+    func setupSelections() {
+        switch device.scheduleAction {
+        case .allowed:
+            self.alpha = 1.0
+            checkButton.isEnabled = true
+            toggleSwitch.isEnabled = param?.selected ?? false
+        default:
+            self.alpha = 0.6
+            checkButton.isEnabled = false
+            toggleSwitch.isEnabled = false
+            scheduleDelegate?.takeScheduleNotAllowedAction(action: device.scheduleAction)
+        }
     }
 }

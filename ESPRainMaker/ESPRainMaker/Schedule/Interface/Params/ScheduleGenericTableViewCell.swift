@@ -24,6 +24,7 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
         trailingSpaceConstraint.constant = 0
         leadingSpaceConstraint.constant = 30.0
         backView.backgroundColor = .white
+        setupSelections()
     }
 
     @IBAction override func editButtonTapped(_: Any) {
@@ -110,5 +111,21 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
             device.selectedParams += 1
         }
         scheduleDelegate?.paramStateChangedat(indexPath: indexPath)
+    }
+}
+
+extension ScheduleGenericTableViewCell: ScheduleActionAllowedProtocol {
+    func setupSelections() {
+        switch device.scheduleAction {
+        case .allowed:
+            self.alpha = 1.0
+            checkButton.isEnabled = true
+            editButton.isHidden = param?.selected ?? false
+        default:
+            self.alpha = 0.6
+            checkButton.isEnabled = false
+            editButton.isHidden = true
+            scheduleDelegate?.takeScheduleNotAllowedAction(action: device.scheduleAction)
+        }
     }
 }

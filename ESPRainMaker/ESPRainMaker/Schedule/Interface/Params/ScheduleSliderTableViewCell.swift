@@ -28,6 +28,7 @@ class ScheduleSliderTableViewCell: SliderTableViewCell {
         trailingSpaceConstraint.constant = 0
         leadingSpaceConstraint.constant = 30.0
         backView.backgroundColor = .white
+        setupSelections()
     }
 
     @IBAction override func checkBoxPressed(_: Any) {
@@ -70,6 +71,24 @@ class ScheduleSliderTableViewCell: SliderTableViewCell {
                 param.value = sender.value
             }
             currentHueValue = sender.value
+        }
+    }
+}
+
+extension ScheduleSliderTableViewCell: ScheduleActionAllowedProtocol {
+    func setupSelections() {
+        switch device.scheduleAction {
+        case .allowed:
+            self.alpha = 1.0
+            checkButton.isEnabled = true
+            hueSlider.isEnabled = param?.selected ?? false
+            slider.isEnabled = param?.selected ?? false
+        default:
+            checkButton.isEnabled = false
+            hueSlider.isEnabled = false
+            slider.isEnabled = false
+            self.alpha = 0.6
+            scheduleDelegate?.takeScheduleNotAllowedAction(action: device.scheduleAction)
         }
     }
 }

@@ -33,31 +33,43 @@ class ScheduleViewController: UIViewController {
     @IBOutlet var timerViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet var timeLabel: UILabel!
     @IBOutlet var timeView: UIView!
-    @IBOutlet var removeButton: UIButton!
+    @IBOutlet var removeButton: RemoveScheduleButton!
 
     var isCollapsed = true
     var scheduleKey = ""
+    
+    var deSelectedNodeIDs: [String] = [String]()
+    var selectedNodeIDs: [String] = [String]()
+    
+    var failedSchedule: ESPSchedule?
 
     // MARK: - Overriden Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Update list of available devices for schedule
         if let nodeList = User.shared.associatedNodeList {
             ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
         }
-
+        
         // Configure view for current schedule
         ESPScheduler.shared.configureDeviceForCurrentSchedule()
+        
+        failedSchedule = getFailedSchedule(schedule: ESPScheduler.shared.currentSchedule)
+        
+        //Get devices already selected for scheduling
+        selectedNodeIDs = getSelectedNodeIDs()
 
         // Configure time of date picker based on the value of schedule minute field.
         datePicker.backgroundColor = UIColor.white
         if ESPScheduler.shared.currentSchedule.id != nil {
             scheduleNameLabel.text = ESPScheduler.shared.currentSchedule.name
-            let dateString = ESPScheduler.shared.currentSchedule.trigger.getTimeDetails()
-            datePicker.setDate(from: dateString, format: "h:mm a", animated: true)
+            let lastSelectedDateStr = ESPScheduler.shared.currentSchedule.trigger.getTimeDetails()
+            datePicker.setDate(from: lastSelectedDateStr, format: "h:mm a", animated: true)
             removeButton.isHidden = false
+            removeButton.setTitle("Remove", for: .normal)
+            removeButton.setImage(UIImage(named: "trash"), for: .normal)
         }
 
         actionListTextView.textContainer.heightTracksTextView = true
@@ -81,11 +93,16 @@ class ScheduleViewController: UIViewController {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = true
         // Show list of actions added on a schedule.
+        getDeSelectedNodeIDs()
         let actionList = ESPScheduler.shared.getActionList()
         if actionList == "" {
+            if deSelectedNodeIDs.count > 0 {
+                saveButton.isHidden = false
+            } else {
+                saveButton.isHidden = true
+            }
             actionListTextView.text = ""
             actionTextViewHeightConstraint.priority = .defaultHigh
-            saveButton.isHidden = true
         } else {
             actionListTextView.text = actionList
             actionTextViewHeightConstraint.priority = .defaultLow
@@ -111,12 +128,15 @@ class ScheduleViewController: UIViewController {
         let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
             DispatchQueue.main.async {
                 Utility.showLoader(message: "", view: self.view)
-                ESPScheduler.shared.deleteScheduleAt(key: self.scheduleKey, onView: self.view) { result in
+                ESPScheduler.shared.deleteScheduleAt(key: self.scheduleKey, onView: self.view) { result  in
                     DispatchQueue.main.async {
                         Utility.hideLoader(view: self.view)
-                        if result {
+                        switch result {
+                        case .success(_):
                             User.shared.updateDeviceList = true
                             self.navigationController?.popViewController(animated: true)
+                        default:
+                            break
                         }
                     }
                 }
@@ -140,6 +160,7 @@ class ScheduleViewController: UIViewController {
         }))
         input.addAction(UIAlertAction(title: "Done", style: .default, handler: { [weak input] _ in
             let textField = input?.textFields![0]
+            textField?.keyboardType = .asciiCapable
             guard let name = textField?.text else {
                 return
             }
@@ -178,6 +199,7 @@ class ScheduleViewController: UIViewController {
         dailyImageView.isHidden = false
         daysLabel.text = "Never"
         ESPScheduler.shared.currentSchedule.trigger.days = 0
+        ESPScheduler.shared.currentSchedule.week = ESPWeek(number: 0)
     }
 
     @IBAction func saveSchedule(_: Any) {
@@ -188,45 +210,139 @@ class ScheduleViewController: UIViewController {
             alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
         } else {
-            Utility.showLoader(message: "", view: view)
-            // If no id is present that means new schedule is added.
-            if ESPScheduler.shared.currentSchedule.id == nil {
-                // Generate a unique 4 length id for the new schedule.
-                ESPScheduler.shared.currentSchedule.id = NanoID.new(4)
-                ESPScheduler.shared.currentSchedule.operation = .add
+            //If de-selected node count is greater than 0 then call delete on those node ids. Else call edit schedule.
+            if deSelectedNodeIDs.count > 0 {
+                self.deleteNodesForSchedule() { schedulesDeleted in
+                    self.editSchedule(scheduleName: scheduleName, schedulesDeleted: schedulesDeleted)
+                }
             } else {
-                // Schedule already present so will run edit operation on it.
-                ESPScheduler.shared.currentSchedule.operation = .edit
+                self.editSchedule(scheduleName: scheduleName, schedulesDeleted: false)
             }
-
-            // Give value for the schedule parameters based on the user selection.
-            ESPScheduler.shared.currentSchedule.name = scheduleName
-            let trigger = ESPTrigger()
-            trigger.days = ESPScheduler.shared.currentSchedule.week.getDecimalConversionOfSelectedDays()
-
-            let date = datePicker.date
-            let components = Calendar.current.dateComponents([.hour, .minute], from: date)
-            let hour = components.hour!
-            let minute = components.minute!
-            trigger.minutes = hour * 60 + minute
-            ESPScheduler.shared.currentSchedule.trigger = trigger
-
-            // Call save operation.
-            ESPScheduler.shared.saveSchedule(onView: view) { result in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+        }
+    }
+    
+    /// Calls delete action on deselected nodes and returns true if user has edited schedule without removing all actions
+    /// - Parameter callEditAction: called with flag informing if schedule actions have been deleted
+    private func deleteNodesForSchedule(_ callEditAction: @escaping (Bool) -> Void) {
+        DispatchQueue.main.async { Utility.showLoader(message: "", view: self.view) }
+        ESPScheduler.shared.deleteScheduleNodes(key: ESPScheduler.shared.currentScheduleKey, onView: view, nodeIDs: deSelectedNodeIDs) { result  in
+            //If user has deselected all devices, then set update device list to true and pop to schedule list screen. Else call edit schedule.
+            var schedulesDeleted: Bool = false
+            switch result {
+            case .success(_):
+                schedulesDeleted = true
+            default:
+                schedulesDeleted = false
+            }
+            let actionList = ESPScheduler.shared.getActionList()
+            DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
+                if actionList == "" {
                     Utility.hideLoader(view: self.view)
-                    if result {
-                        // Result is success. Navigate back to schedule list and refetch the list.
-                        // To check if schedule is successfully added.
+                    if schedulesDeleted {
                         User.shared.updateDeviceList = true
                         self.navigationController?.popToRootViewController(animated: false)
+                    }
+                } else {
+                    callEditAction(schedulesDeleted)
+                }
+            })
+        }
+    }
+    
+    /// Called when user has edited user actions in a schedule. Or created a new schedule.
+    /// - Parameter scheduleName: schedule name
+    private func editSchedule(scheduleName: String, schedulesDeleted: Bool) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
+        }
+        // If no id is present that means new schedule is added.
+        if ESPScheduler.shared.currentSchedule != nil, ESPScheduler.shared.currentSchedule.id == nil {
+            // Generate a unique 4 length id for the new schedule.
+            ESPScheduler.shared.currentSchedule.id = NanoID.new(4)
+            ESPScheduler.shared.currentSchedule.operation = .add
+        } else {
+            // Schedule already present so will run edit operation on it.
+            ESPScheduler.shared.currentSchedule.operation = .edit
+        }
 
+        // Give value for the schedule parameters based on the user selection.
+        ESPScheduler.shared.currentSchedule.name = scheduleName
+        ESPScheduler.shared.currentSchedule.trigger = self.getTrigger()
+        
+        // Call save operation.
+        ESPScheduler.shared.saveSchedule(onView: view) { result  in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                Utility.hideLoader(view: self.view)
+                switch result {
+                case .success(_):
+                    // Result is success. Navigate back to schedule list and refetch the list.
+                    // To check if schedule is successfully added.
+                    User.shared.updateDeviceList = true
+                    self.formatCurrentScheduleKey()
+                    if !ESPScheduler.shared.currentSchedule.enabled {
+                        Utility.showLoader(message: "", view: self.view)
+                        ESPScheduler.shared.currentSchedule.enabled = true
+                        ESPScheduler.shared.currentSchedule.operation = .edit
+                        ESPScheduler.shared.shouldEnableSchedule(onView: self.view, completionHandler: { result in
+                            DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
+                                Utility.hideLoader(view: self.view)
+                                switch result {
+                                case .success(_):
+                                    break
+                                case .failure:
+                                    Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your connection!!")
+                                }
+                                self.navigationController?.popToRootViewController(animated: false)
+                            })
+                        })
                     } else {
-                        Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your connection!!")
+                        self.navigationController?.popToRootViewController(animated: false)
+                    }
+                case .failure:
+                    if let failed = self.failedSchedule {
+                        if let _ = ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey] {
+                            ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey] = failed
+                            ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey]?.actions = ESPScheduler.shared.currentSchedule.actions
+                        }
+                    }
+                    Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your connection!!")
+                    if schedulesDeleted {
+                        User.shared.updateDeviceList = true
+                        self.navigationController?.popToRootViewController(animated: false)
                     }
                 }
             }
         }
+    }
+    
+    private func getFailedSchedule(schedule: ESPSchedule) -> ESPSchedule {
+        let failed = ESPSchedule()
+        failed.id = schedule.id
+        failed.name = schedule.name
+        failed.actions = schedule.actions
+        failed.trigger = schedule.trigger
+        failed.operation = schedule.operation
+        failed.week = schedule.week
+        failed.enabled = schedule.enabled
+        return failed
+    }
+    
+    private func formatCurrentScheduleKey() {
+        let trigger = ESPScheduler.shared.currentSchedule.trigger
+        ESPScheduler.shared.currentScheduleKey = "\(ESPScheduler.shared.currentSchedule.id!).\(ESPScheduler.shared.currentSchedule.name!).\(trigger.days!).\(trigger.minutes!).\(ESPScheduler.shared.currentSchedule.enabled)"
+    }
+    
+    /// Get trigger object for schedule
+    /// - Returns: trigger value for current schedule
+    private func getTrigger() -> ESPTrigger {
+        let trigger = ESPTrigger()
+        trigger.days = ESPScheduler.shared.currentSchedule.week.getDecimalConversionOfSelectedDays()
+        let date = datePicker.date
+        let components = Calendar.current.dateComponents([.hour, .minute], from: date)
+        let hour = components.hour!
+        let minute = components.minute!
+        trigger.minutes = hour * 60 + minute
+        return trigger
     }
 
     @IBAction func selectDevicesPressed(_: Any) {
@@ -240,11 +356,99 @@ class ScheduleViewController: UIViewController {
                 availableDeviceCopy.append(device)
             }
         }
-        selectDeviceVC.availableDeviceCopy = availableDeviceCopy
+        availableDeviceCopy = configureDeviceScheduleActions(availableDeviceCopy)
+        selectDeviceVC.availableDeviceCopy = sortDevices(availableDevices: availableDeviceCopy)
         navigationController?.pushViewController(selectDeviceVC, animated: true)
     }
-
+    
+    /// Get list of node IDs for which some action has been selected
+    /// - Returns: list of selected node IDs
+    private func getSelectedNodeIDs() -> [String] {
+        var nodeIDs: [String] = [String]()
+        for device in ESPScheduler.shared.availableDevices.values {
+            if let node = device.node, let nodeID = node.node_id {
+                if device.selectedParams > 0, !nodeIDs.contains(nodeID) {
+                    nodeIDs.append(nodeID)
+                }
+            }
+        }
+        return nodeIDs
+    }
+    
+    /// Get list of node IDs for which actions have been removed from the original selected nodes.
+    /// - Returns: list of deselected node IDs
+    private func getDeSelectedNodeIDs() {
+        let nodeIDs = getSelectedNodeIDs()
+        deSelectedNodeIDs = [String]()
+        for nodeID in selectedNodeIDs {
+            if !nodeIDs.contains(nodeID) {
+                deSelectedNodeIDs.append(nodeID)
+            }
+        }
+    }
+    
     // MARK: - Private Methods
+    
+    /// Set schedule action status for a device to allowed (if said device is online) if schedule already has a device from the same node
+    /// - Parameter availableDevices: list of available devices
+    /// - Returns: list of available devices after configuration
+    private func configureDeviceScheduleActions(_ availableDevices: [Device]) -> [Device] {
+        var finalDevicesList = [Device]()
+        var selectedCount = 0
+        var deSelectedCount = 0
+        var nodesSelected = [String: Bool]()
+        for device in availableDevices {
+            if let node_id = device.node?.node_id {
+                if device.selectedParams > 0 {
+                    nodesSelected[node_id] = true
+                }
+            }
+        }
+        for device in availableDevices {
+            if let node_id = device.node?.node_id, let selected = nodesSelected[node_id], selected {
+                switch device.scheduleAction {
+                case .deviceOffline:
+                    device.scheduleActionStatus = .deviceOffline
+                default:
+                    device.scheduleActionStatus = .allowed
+                }
+            }
+            //Sort devices such that selected devices are on top and not selected devices are on bottom
+            if device.selectedParams > 0 {
+                finalDevicesList.insert(device, at: selectedCount)
+                selectedCount+=1
+            } else {
+                finalDevicesList.insert(device, at: selectedCount+deSelectedCount)
+                deSelectedCount+=1
+            }
+        }
+        return finalDevicesList
+    }
+    
+    /// Sort devices in the following order [allowed devices, max reached devices, offline devices]
+    /// - Parameter availableDevices: list of avaiable devices
+    /// - Returns: list of avaiable devices after sorting
+    private func sortDevices(availableDevices: [Device]) -> [Device] {
+        var devices = [Device]()
+        var availableCount = 0
+        var maxReachedCount = 0
+        var offlineCount = 0
+        for device in availableDevices {
+            let status = device.scheduleAction
+            switch status {
+            case .allowed:
+                devices.insert(device, at: availableCount)
+                availableCount+=1
+            case .maxScheduleReached(_):
+                devices.insert(device, at: availableCount+maxReachedCount)
+                maxReachedCount+=1
+            case .deviceOffline:
+                devices.insert(device, at: availableCount+maxReachedCount+offlineCount)
+                offlineCount+=1
+            }
+        }
+        return devices
+    }
 
     private func addHeightConstraint(textField: UITextField) {
         let heightConstraint = NSLayoutConstraint(item: textField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)

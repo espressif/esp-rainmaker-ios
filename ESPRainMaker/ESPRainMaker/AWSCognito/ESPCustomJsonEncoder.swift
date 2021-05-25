@@ -25,6 +25,8 @@ import Foundation
 /// request. The `Content-Type` HTTP header field of an encoded request is set to `application/json`.
 public struct ESPCustomJsonEncoder: ParameterEncoding {
     // MARK: Properties
+    
+    public static let key = "ESPCustomJsonEncoderKey"
 
     /// Returns a `JSONEncoding` instance with default writing options.
     public static var `default`: ESPCustomJsonEncoder { return ESPCustomJsonEncoder() }
@@ -45,28 +47,28 @@ public struct ESPCustomJsonEncoder: ParameterEncoding {
     }
 
     // MARK: Encoding
-
     public func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
         var urlRequest = try urlRequest.asURLRequest()
-
-        guard let parameters = parameters else { return urlRequest }
-
+        var data: Data?
         do {
-            let data = try JSONSerialization.data(withJSONObject: parameters, options: options)
-
-            let string = String(data: data, encoding: .utf8)?.replacingOccurrences(of: "\\/", with: "/")
-
-            if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
-                urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let parameters = parameters?[ESPCustomJsonEncoder.key] as? [[String: Any]] {
+                data = try JSONSerialization.data(withJSONObject: parameters, options: options)
+            } else if let parameters = parameters {
+                data = try JSONSerialization.data(withJSONObject: parameters, options: options)
             }
-
-            urlRequest.httpBody = string?.data(using: .utf8)
+            if let data = data {
+                let string = String(data: data, encoding: .utf8)?.replacingOccurrences(of: "\\/", with: "/")
+                if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
+                    urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                }
+                urlRequest.httpBody = string?.data(using: .utf8)
+            }
         } catch {
             throw AFError.parameterEncodingFailed(reason: .jsonEncodingFailed(error: error))
         }
-
         return urlRequest
     }
+
 
     /// Encodes any JSON compatible object into a `URLRequest`.
     ///
