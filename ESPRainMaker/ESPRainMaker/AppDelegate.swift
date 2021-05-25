@@ -17,8 +17,6 @@
 //
 
 import Alamofire
-import AWSCognitoIdentityProvider
-import AWSMobileClient
 import DropDown
 import ESPProvision
 import UIKit
@@ -26,12 +24,7 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var signInViewController: SignInViewController?
-    var mfaViewController: MFAViewController?
-    var navigationController: UINavigationController?
     var storyboard: UIStoryboard?
-    var rememberDeviceCompletionSource: AWSTaskCompletionSource<NSNumber>?
-    var user: AWSCognitoIdentityUser?
     var isInitialized = false
     let apiManager = ESPAPIManager()
     var deviceToken: String?
@@ -41,17 +34,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // fetch the user pool client we initialized in above step
         storyboard = UIStoryboard(name: "Login", bundle: nil)
-        User.shared.pool.delegate = self
+        
+        setServerParams()
+        setESPTokenKeys()
+        migrateCode()
+        
         VersionManager.shared.checkForAppUpdate()
-        let credentialsProvider = AWSCognitoCredentialsProvider(
-            regionType: Configuration.shared.awsConfiguration.awsRegion,
-            identityPoolId: Configuration.shared.awsConfiguration.poolID
-        )
-        let configuration = AWSServiceConfiguration(
-            region: Configuration.shared.awsConfiguration.awsRegion,
-            credentialsProvider: credentialsProvider
-        )
-        AWSServiceManager.default().defaultServiceConfiguration = configuration
         ESPNetworkMonitor.shared.startMonitoring()
         DropDown.startListeningToKeyboard()
 
@@ -125,129 +113,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-    }
-}
-
-// MARK: - AWSCognitoIdentityInteractiveAuthenticationDelegate protocol delegate
-
-extension AppDelegate: AWSCognitoIdentityInteractiveAuthenticationDelegate {
-    func startPasswordAuthentication() -> AWSCognitoIdentityPasswordAuthentication {
-        if navigationController == nil {
-            if !Thread.isMainThread {
-                DispatchQueue.main.sync {
-                    navigationController = storyboard?.instantiateViewController(withIdentifier: "signInController") as? UINavigationController
-                }
-            } else {
-                navigationController = storyboard?.instantiateViewController(withIdentifier: "signInController") as? UINavigationController
-            }
-        }
-        if !Thread.isMainThread {
-            DispatchQueue.main.sync {
-                if signInViewController == nil {
-                    signInViewController = navigationController?.viewControllers[0] as? SignInViewController
-                    navigationController?.modalPresentationStyle = .fullScreen
-                }
-
-                navigationController!.popToRootViewController(animated: true)
-                if !navigationController!.isViewLoaded
-                    || navigationController!.view.window == nil
-                {
-                    window?.rootViewController?.present(navigationController!,
-                                                        animated: true,
-                                                        completion: nil)
-                }
-            }
-        } else {
-            if signInViewController == nil {
-                signInViewController = navigationController?.viewControllers[0] as? SignInViewController
-                navigationController?.modalPresentationStyle = .fullScreen
-            }
-
-            navigationController!.popToRootViewController(animated: true)
-            if !navigationController!.isViewLoaded
-                || navigationController!.view.window == nil
-            {
-                window?.rootViewController?.present(navigationController!,
-                                                    animated: true,
-                                                    completion: nil)
-            }
-        }
-        
-        // Additional check to remove local storage before login screen is presented.
-        let localStorageHandler = ESPLocalStorageHandler()
-        localStorageHandler.cleanupData()
-        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-        
-        return signInViewController!
-    }
-
-    func startMultiFactorAuthentication() -> AWSCognitoIdentityMultiFactorAuthentication {
-        if mfaViewController == nil {
-            mfaViewController = MFAViewController()
-            mfaViewController?.modalPresentationStyle = .popover
-        }
-        DispatchQueue.main.async {
-            if !self.mfaViewController!.isViewLoaded
-                || self.mfaViewController!.view.window == nil
-            {
-                // display mfa as popover on current view controller
-                let viewController = self.window?.rootViewController!
-                viewController?.present(self.mfaViewController!,
-                                        animated: true,
-                                        completion: nil)
-
-                // configure popover vc
-                let presentationController = self.mfaViewController!.popoverPresentationController
-                presentationController?.permittedArrowDirections = UIPopoverArrowDirection.left
-                presentationController?.sourceView = viewController!.view
-                presentationController?.sourceRect = viewController!.view.bounds
-            }
-        }
-        return mfaViewController!
-    }
-
-    func startRememberDevice() -> AWSCognitoIdentityRememberDevice {
-        return self
-    }
-}
-
-// MARK: - AWSCognitoIdentityRememberDevice protocol delegate
-
-extension AppDelegate: AWSCognitoIdentityRememberDevice {
-    func getRememberDevice(_ rememberDeviceCompletionSource: AWSTaskCompletionSource<NSNumber>) {
-        self.rememberDeviceCompletionSource = rememberDeviceCompletionSource
-        DispatchQueue.main.async {
-            // dismiss the view controller being present before asking to remember device
-            self.window?.rootViewController!.presentedViewController?.dismiss(animated: true, completion: nil)
-            let alertController = UIAlertController(title: "Remember Device",
-                                                    message: "Do you want to remember this device?.",
-                                                    preferredStyle: .actionSheet)
-
-            let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
-                self.rememberDeviceCompletionSource?.set(result: true)
-            })
-            let noAction = UIAlertAction(title: "No", style: .default, handler: { _ in
-                self.rememberDeviceCompletionSource?.set(result: false)
-            })
-            alertController.addAction(yesAction)
-            alertController.addAction(noAction)
-
-            self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
-        }
-    }
-
-    func didCompleteStepWithError(_ error: Error?) {
-        DispatchQueue.main.async {
-            if let error = error as NSError? {
-                let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                        message: error.userInfo["message"] as? String,
-                                                        preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "ok", style: .default, handler: nil)
-                alertController.addAction(okAction)
-                DispatchQueue.main.async {
-                    self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
-                }
-            }
-        }
     }
 }

@@ -21,6 +21,7 @@
 
 import Foundation
 import UIKit
+import Alamofire
 
 extension UISegmentedControl {
     func removeBorder() {
@@ -453,5 +454,198 @@ extension String {
     func getDomain() -> String {
         let url = URL(string: self)
         return url?.host ?? ""
+    }
+}
+
+extension UIViewController {
+    
+    func handleError(error: ESPAPIError?, buttonTitle: String) {
+        if let err = error {
+            var title = "Error"
+            var message = ""
+            switch err {
+            case .serverError(let serverError):
+                if let text = (serverError as NSError).userInfo["__type"] as? String {
+                    title = text
+                }
+                if let text = (serverError as NSError).userInfo["message"] as? String {
+                    message = text
+                }
+            case.errorCode(_ ,let desc):
+                message = desc
+            default:
+                break
+            }
+            let alertController = UIAlertController(title: title,
+                                                    message: message,
+                                                    preferredStyle: .alert)
+            let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: nil)
+            alertController.addAction(dismissAction)
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+}
+
+extension ESPNoRefreshTokenLogic {
+    
+    /// Clear user data on logging out
+    func clearUserData() {
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        appDelegate?.disablePlatformApplicationARN()
+        UIApplication.shared.unregisterForRemoteNotifications()
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        ESPTokenWorker.shared.deleteAll()
+        UserDefaults.standard.removeObject(forKey: Constants.wifiPassword)
+        let localStorageHandler = ESPLocalStorageHandler()
+        localStorageHandler.cleanupData()
+        NodeGroupManager.shared.nodeGroups = []
+        NodeSharingManager.shared.sharingRequestsSent = []
+        NodeSharingManager.shared.sharingRequestsReceived = []
+        User.shared.accessToken = nil
+        User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
+        User.shared.associatedNodeList = nil
+    }
+    
+    /// Is sign in view controller presented currently
+    /// - Returns: true if sign in VC is present, false if absent
+    func isSigninViewControllerPresented() -> Bool {
+        if let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
+            if tabBarController.selectedIndex == 0 {
+                if let nav = tabBarController.selectedViewController as? UINavigationController, let top = nav.topViewController?.presentedViewController as? UINavigationController {
+                    let vcs = top.viewControllers
+                    if vcs.count > 0, let _ = vcs[0] as? SignInViewController {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+    
+    /// Present sign in view controller on the top view controller
+    func presentSigninViewController() {
+        if let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
+            if let vcs = tabBarController.viewControllers, vcs.count > 0 {
+                tabBarController.selectedIndex = 0
+                let storyboard = UIStoryboard(name: "Login", bundle: nil)
+                if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {
+                    if let _ = nav.viewControllers.first as? SignInViewController {
+                        nav.modalPresentationStyle = .fullScreen
+                        tabBarController.present(nav, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Sign out user if refresh token is absent
+    /// - Parameter error: error
+    func noRefreshSignOutUser(error: ESPAPIError) {
+        switch error {
+        case .errorCode(let errorCode, _):
+            if ESPErrorCodeDescription.logOutUserCodes.contains(errorCode) {
+                self.signOut()
+            }
+        default:
+            break
+        }
+        self.clearUserData()
+        DispatchQueue.main.async {
+            if self.isSigninViewControllerPresented() {
+                return
+            }
+            self.presentSigninViewController()
+        }
+    }
+    
+    /// Call sign out user
+    func signOut() {
+        let service = ESPLogoutService(presenter: nil)
+        service.logoutUser()
+    }
+    
+    /// Validate API response to check if the user exists and there is no issue with the user session
+    /// - Parameter response: API response data
+    /// - Returns: true is user session is valid and false if invalid
+    func validateDataResponse(response: AFDataResponse<Data>) -> Bool  {
+        var result = true
+        switch response.result {
+        case .success(let value):
+            if let espResponse = try? JSONDecoder().decode(ESPSessionResponse.self, from: value) {
+                if espResponse.status?.lowercased() == "failure" {
+                    if let description = espResponse.description, description.lowercased() == "unauthorized" {
+                        result = false
+                    } else if let errorCode = espResponse.errorCode {
+                        let code = "\(errorCode)"
+                        if ESPErrorCodeDescription.logOutUserCodes.contains(code) {
+                            result = false
+                        }
+                    }
+                }
+            }
+        default:
+            break
+        }
+        if !result {
+            validateRefreshToken()
+        }
+        return result
+    }
+    
+    /// Validate API response to check if the user exists and there is no issue with the user session
+    /// - Parameter response: API response JSON
+    /// - Returns: true is user session is valid and false if invalid
+    func validateJSONResponse(response: AFDataResponse<Any>) -> Bool {
+        var result = true
+        switch response.result {
+        case .success(let value):
+            if let value = value as? [String: Any] {
+                if let status = value["status"] as? String, status.lowercased() == "failure" {
+                    if let description = value["description"] as? String, description.lowercased() == "unauthorized" {
+                        result = false
+                    } else if let errorCode = value["error_code"] as? Int {
+                        let code = "\(errorCode)"
+                        if ESPErrorCodeDescription.logOutUserCodes.contains(code) {
+                            result = false
+                        }
+                    }
+                }
+            }
+        default:
+            break
+        }
+        if !result {
+            validateRefreshToken()
+        }
+        return result
+    }
+    
+    /*
+     Clear access token and try to fetch new access token using refresh token
+     */
+    private func validateRefreshToken() {
+        ESPTokenWorker.shared.delete(key: Constants.accessTokenKey)
+        let service = ESPExtendUserSessionWorker()
+        service.checkUserSession() { _, error in
+            if let serverError = error {
+                let parser = ESPAPIParser()
+                if !parser.isRefreshTokenValid(serverError: serverError) {
+                    self.clearDataAndPresentSignInVC()
+                }
+            }
+        }
+    }
+    
+    /*
+     Clear user data and sign out of the app.
+     Navigate to devices screen and present sign in screen.
+     */
+    private func clearDataAndPresentSignInVC() {
+        self.clearUserData()
+        DispatchQueue.main.async {
+            if !self.isSigninViewControllerPresented() {
+                self.presentSigninViewController()
+            }
+        }
     }
 }

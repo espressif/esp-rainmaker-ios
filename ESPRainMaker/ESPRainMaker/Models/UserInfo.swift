@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import JWTDecode
 
 enum ServiceProvider: String {
     case other
@@ -41,12 +42,13 @@ struct UserInfo {
     ///   - Userinfo object that contains information about the currently signed-in user
     static func getUserInfo() -> UserInfo {
         var userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
-        if let json = UserDefaults.standard.value(forKey: Constants.userInfoKey) as? [String: Any] {
-            userInfo.username = json[UserInfo.usernameKey] as? String ?? ""
-            userInfo.email = json[UserInfo.emailKey] as? String ?? ""
-            userInfo.userID = json[UserInfo.userIdKey] as? String ?? ""
-            let loggedIn = json[UserInfo.providerKey] as? String ?? ServiceProvider.cognito.rawValue
-            userInfo.loggedInWith = ServiceProvider(rawValue: loggedIn)!
+        if let idToken = ESPTokenWorker.shared.idTokenString, let json = try? decode(jwt: idToken) {
+            userInfo.username = json.cognitoUsername ?? ""
+            userInfo.email = json.email ?? ""
+            userInfo.userID = json.customUserId ?? ""
+            if let loggedInWith = ESPTokenWorker.shared.provider {
+                userInfo.loggedInWith = ServiceProvider(rawValue: loggedInWith)!
+            }
         }
         return userInfo
     }
@@ -55,7 +57,6 @@ struct UserInfo {
     /// This info is required when new app session is started.
     ///
     func saveUserInfo() {
-        let json: [String: Any] = [UserInfo.usernameKey: username, UserInfo.emailKey: email, UserInfo.userIdKey: userID, UserInfo.providerKey: loggedInWith.rawValue]
-        UserDefaults.standard.set(json, forKey: Constants.userInfoKey)
+        ESPTokenWorker.shared.saveProvider(provider: loggedInWith.rawValue)
     }
 }

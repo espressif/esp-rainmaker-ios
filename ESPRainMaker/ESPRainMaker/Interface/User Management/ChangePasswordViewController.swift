@@ -16,19 +16,15 @@
 //  ESPRainMaker
 //
 
-import AWSCognitoIdentityProvider
 import UIKit
 
 class ChangePasswordViewController: UIViewController {
     @IBOutlet var oldPasswordTextField: PasswordTextField!
     @IBOutlet var newPasswordTextField: PasswordTextField!
     @IBOutlet var confirmNewPasswordTextField: PasswordTextField!
-    var pool: AWSCognitoIdentityUserPool?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-        pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
@@ -43,7 +39,6 @@ class ChangePasswordViewController: UIViewController {
     }
 
     @IBAction func setPassword(_: Any) {
-        let user = pool?.getUser(User.shared.userInfo.email)
         guard let oldPassword = oldPasswordTextField.text, !oldPassword.isEmpty else {
             showAlertWith(title: "Error", message: "Old password is required to change the password")
             return
@@ -59,36 +54,8 @@ class ChangePasswordViewController: UIViewController {
             return
         }
         Utility.showLoader(message: "", view: view)
-        user?.changePassword(oldPassword, proposedPassword: newPassword).continueWith { [weak self] (task: AWSTask) -> AnyObject? in
-            guard let strongSelf = self else { return nil }
-            DispatchQueue.main.async {
-                Utility.hideLoader(view: strongSelf.view)
-                if let error = task.error as NSError? {
-                    let alertController = UIAlertController(title: error.userInfo["__type"] as? String ?? "",
-                                                            message: error.userInfo["message"] as? String ?? "",
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                        strongSelf.navigationController?.popToRootViewController(animated: false)
-                    }
-                    alertController.addAction(okAction)
-
-                    strongSelf.present(alertController, animated: true, completion: nil)
-                    return
-                } else {
-                    let alertController = UIAlertController(title: "Success",
-                                                            message: "Password changed successfully",
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                        strongSelf.navigationController?.popToRootViewController(animated: false)
-                    }
-                    alertController.addAction(okAction)
-
-                    strongSelf.present(alertController, animated: true, completion: nil)
-                    return
-                }
-            }
-            return nil
-        }
+        let service = ESPChangePasswordService(presenter: self)
+        service.changePassword(oldPassword: oldPassword, newPassword: newPassword)
     }
 
     func showAlertWith(title: String, message: String) {
@@ -132,5 +99,26 @@ extension ChangePasswordViewController: UITextFieldDelegate {
             return true
         }
         return true
+    }
+}
+
+extension ChangePasswordViewController: ESPChangePasswordPresentationLogic {
+    
+    func passwordChanged(withError error: ESPAPIError?) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            if let _ = error {
+                self.handleError(error: error, buttonTitle: "Ok")
+            } else {
+                let alertController = UIAlertController(title: "Success",
+                                                        message: "Password changed successfully",
+                                                        preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
+                    self.navigationController?.popToRootViewController(animated: false)
+                }
+                alertController.addAction(okAction)
+                self.present(alertController, animated: true, completion: nil)
+            }
+        }
     }
 }

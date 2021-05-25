@@ -96,43 +96,15 @@ class SettingsPageViewController: UIViewController {
         let alertController = UIAlertController(title: "Logout", message: "Do you like to proceed?", preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
-            
-            let appDelegate = UIApplication.shared.delegate as? AppDelegate
-            appDelegate?.disablePlatformApplicationARN()
-            UIApplication.shared.unregisterForRemoteNotifications()
-            UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-            
-            User.shared.currentUser()?.signOut()
-            UserDefaults.standard.removeObject(forKey: Constants.userInfoKey)
-            UserDefaults.standard.removeObject(forKey: Constants.refreshTokenKey)
-            UserDefaults.standard.removeObject(forKey: Constants.accessTokenKey)
-            
-            let localStorageHandler = ESPLocalStorageHandler()
-            localStorageHandler.cleanupData()
-            
-            UserDefaults.standard.removeObject(forKey: Constants.wifiPassword)
-
-            NodeGroupManager.shared.nodeGroups = []
-            NodeSharingManager.shared.sharingRequestsSent = []
-            NodeSharingManager.shared.sharingRequestsReceived = []
-
-            User.shared.accessToken = nil
-            User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
-            User.shared.associatedNodeList = nil
-            self.tabBarController?.selectedIndex = 0
-            
-            self.refresh()
+            DispatchQueue.main.async {
+                Utility.showLoader(message: "Logging Out", view: self.view)
+            }
+            let service = ESPLogoutService(presenter: self)
+            service.logoutUser()            
         }
         alertController.addAction(cancelAction)
         alertController.addAction(confirmAction)
         present(alertController, animated: true, completion: nil)
-    }
-
-    func refresh() {
-        User.shared.currentUser()?.getDetails().continueOnSuccessWith { (_) -> AnyObject? in
-            DispatchQueue.main.async {}
-            return nil
-        }
     }
 
     @IBAction func openPrivacy(_: Any) {
@@ -201,6 +173,24 @@ class SettingsPageViewController: UIViewController {
                     }
                 }
                 return
+            }
+        }
+    }
+}
+
+extension SettingsPageViewController: ESPLogoutUserPresentationLogic, ESPNoRefreshTokenLogic {
+    
+    func userLoggedOut(withError error: ESPAPIError?) {
+        self.clearUserData()
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            self.tabBarController?.selectedIndex = 0
+            let storyboard = UIStoryboard(name: "Login", bundle: nil)
+            if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {
+                if let _ = nav.viewControllers.first as? SignInViewController, let tab = self.tabBarController {
+                    nav.modalPresentationStyle = .fullScreen
+                    tab.present(nav, animated: true, completion: nil)
+                }
             }
         }
     }

@@ -20,7 +20,7 @@ import Alamofire
 import Foundation
 import JWTDecode
 
-class ESPAPIManager {
+class ESPAPIManager: ESPNoRefreshTokenLogic {
     /// A  class that manages API call for this application
     var session: Session!
 
@@ -83,14 +83,20 @@ class ESPAPIManager {
     /// - Parameters:
     ///   - completionHandler: after response is parsed this block will be called with node array and error(if any) as argument
     func getNodes(partialList: [Node]? = nil, nextNodeID: String? = nil, completionHandler: @escaping ([Node]?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        let sessionWorker = ESPExtendUserSessionWorker()
+        sessionWorker.checkUserSession() { accessToken, error in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 var url = Constants.getNodes + "?node_details=true&num_records=10"
                 if nextNodeID != nil {
                     url += "&start_id=" + nextNodeID!
                 }
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    if !self.validateJSONResponse(response: response) {
+                        completionHandler(nil, .emptyToken)
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         if Configuration.shared.appConfiguration.supportSchedule {
@@ -147,9 +153,11 @@ class ESPAPIManager {
                     }
                 }
             } else {
-                completionHandler(nil, .emptyToken)
+                if self.validatedRefreshToken(error: error) {
+                    completionHandler(nil, .emptyToken)
+                }
             }
-        })
+        }
     }
 
     /// Get node info like device list, param list and online/offline status
@@ -157,11 +165,16 @@ class ESPAPIManager {
     /// - Parameters:
     ///   - completionHandler: handler called when response to get node info is recieved
     func getNodeInfo(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 let url = Constants.getNodes + "?node_id=" + nodeId
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    if !self.validateJSONResponse(response: response) {
+                        completionHandler(nil, .emptyToken)
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         if let json = value as? [String: Any] {
@@ -187,7 +200,9 @@ class ESPAPIManager {
                     }
                 }
             } else {
-                completionHandler(nil, ESPNetworkError.emptyToken)
+                if self.validatedRefreshToken(error: error) {
+                    completionHandler(nil, .emptyToken)
+                }
             }
         }
     }
@@ -197,11 +212,16 @@ class ESPAPIManager {
     /// - Parameters:
     ///   - completionHandler: handler called when response to get device paramater is recieved
     func getDeviceParams(device: Device, completionHandler: @escaping (ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 let url = Constants.setParam + "?node_id=" + (device.node?.node_id ?? "")
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    if !self.validateJSONResponse(response: response) {
+                        completionHandler(.emptyToken)
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         if let response = value as? [String: Any] {
@@ -227,7 +247,9 @@ class ESPAPIManager {
                     }
                 }
             } else {
-                completionHandler(ESPNetworkError.emptyToken)
+                if self.validatedRefreshToken(error: error) {
+                    completionHandler(.emptyToken)
+                }
             }
         }
     }
@@ -237,11 +259,15 @@ class ESPAPIManager {
     /// - Parameters:
     ///   - completionHandler: handler called when response to get node status is recieved
     func getNodeStatus(node: Node, completionHandler: @escaping (Node?, Error?) -> Void) {
-        User.shared.getAccessToken { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 let url = Constants.getNodeStatus + "?nodeid=" + (node.node_id ?? "")
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    if !self.validateJSONResponse(response: response) {
+                        return
+                    }
                     // Parse the connected status of the node
                     switch response.result {
                     case let .success(value):
@@ -259,7 +285,9 @@ class ESPAPIManager {
                     completionHandler(node, nil)
                 }
             } else {
-                completionHandler(node, nil)
+                if self.validatedRefreshToken(error: error) {
+                    completionHandler(node, nil)
+                }
             }
         }
     }
@@ -272,10 +300,15 @@ class ESPAPIManager {
     ///   - parameter: Request parameter
     ///   - completionHandler: handler called when response to add device to user is recieved with id of the request
     func addDeviceToUser(parameter: [String: String], completionHandler: @escaping (String?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 self.session.request(Constants.addDevice, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    if !self.validateJSONResponse(response: response) {
+                        completionHandler(nil, .emptyToken)
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         if let json = value as? [String: String] {
@@ -299,9 +332,11 @@ class ESPAPIManager {
                     completionHandler(nil, nil)
                 }
             } else {
-                completionHandler(nil, ESPNetworkError.emptyToken)
+                if self.validatedRefreshToken(error: error) {
+                    completionHandler(nil, .emptyToken)
+                }
             }
-        })
+        }
     }
 
     /// Method to fetch device assoication staus
@@ -311,11 +346,16 @@ class ESPAPIManager {
     ///   - requestID: Request id to match with the device association request
     ///   - completionHandler: handler called when response to deviceAssociationStatus is recieved
     func deviceAssociationStatus(nodeID: String, requestID: String, completionHandler: @escaping (String) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
+            if let token = accessToken {
                 let url = Constants.checkStatus + "?node_id=" + nodeID
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 self.session.request(url + "&request_id=" + requestID + "&user_request=true", method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    if !self.validateJSONResponse(response: response) {
+                        completionHandler("error")
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         if let json = value as? [String: String], let status = json["request_status"] {
@@ -328,9 +368,11 @@ class ESPAPIManager {
                     completionHandler("error")
                 }
             } else {
-                completionHandler("error")
+                if self.validatedRefreshToken(error: error) {
+                    completionHandler("error")
+                }
             }
-        })
+        }
     }
 
     // MARK: - Thing Shadow
@@ -344,12 +386,15 @@ class ESPAPIManager {
     func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: ((ESPCloudResponseStatus) -> Void)? = nil) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if let nodeid = nodeID {
-            User.shared.getAccessToken(completionHandler: { accessToken in
-                if accessToken != nil {
+            ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
+                if let token = accessToken {
                     let url = Constants.setParam + "?nodeid=" + nodeid
-                    let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
-
+                    let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                     self.session.request(url, method: .put, parameters: parameter, encoding: ESPCustomJsonEncoder.default, headers: headers).responseJSON { response in
+                        if !self.validateJSONResponse(response: response) {
+                            completionHandler?(.failure)
+                            return
+                        }
                         switch response.result {
                         case let .success(value):
                             if let json = value as? [String: Any] {
@@ -367,8 +412,10 @@ class ESPAPIManager {
                             completionHandler?(.failure)
                         }
                     }
-                } else {}
-            })
+                } else {
+                    let _ = self.validatedRefreshToken(error: error)
+                }
+            }
         }
     }
 
@@ -406,10 +453,15 @@ class ESPAPIManager {
     ///   - method: HTTP method
     ///   - completionHandler: Callback invoked after api response is recieved
     func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, method: HTTPMethod = .post, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 self.session.request(url, method: method, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseData { response in
+                    if !self.validateDataResponse(response: response) {
+                        completionHandler(nil, .emptyToken)
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         completionHandler(value, nil)
@@ -420,9 +472,11 @@ class ESPAPIManager {
                     }
                 }
             } else {
-                completionHandler(nil, .emptyToken)
+                if self.validatedRefreshToken(error: serverError) {
+                    completionHandler(nil, .emptyToken)
+                }
             }
-        })
+        }
     }
 
     /// Method to make generic authorized JSON request
@@ -432,10 +486,15 @@ class ESPAPIManager {
     ///   - parameter: Parameter to be included in the api call
     ///   - completionHandler: Callback invoked after api response is recieved
     func genericAuthorizedJSONRequest(url: String, parameter: [String: Any]?, method: HTTPMethod, completionHandler: @escaping (Any?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken(completionHandler: { accessToken in
-            if accessToken != nil {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 self.session.request(url, method: method, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                    if !self.validateJSONResponse(response: response) {
+                        completionHandler(nil, .emptyToken)
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         completionHandler(value, nil)
@@ -446,9 +505,11 @@ class ESPAPIManager {
                     }
                 }
             } else {
-                completionHandler(nil, .emptyToken)
+                if self.validatedRefreshToken(error: serverError) {
+                    completionHandler(nil, .emptyToken)
+                }
             }
-        })
+        }
     }
     
     /// Method to make generic authorized data request with array as param
@@ -459,12 +520,16 @@ class ESPAPIManager {
     ///   - method: HTTP method
     ///   - completionHandler: Callback invoked after api response is recieved
     func genericAuthorizedMultiParamDataRequest(url: String, parameter: [[String: Any]]?, method: HTTPMethod = .post, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
-        User.shared.getAccessToken() { accessToken in
-            if accessToken != nil {
-                let url = Constants.setParam
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+        
+        ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
+            if let token = accessToken {
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
                 let params = [ESPCustomJsonEncoder.key: parameter as Any]
                 self.session.request(url, method: .put, parameters: params, encoding: ESPCustomJsonEncoder.default, headers: headers).responseData { response in
+                    if !self.validateDataResponse(response: response) {
+                        completionHandler(nil, .emptyToken)
+                        return
+                    }
                     switch response.result {
                     case let .success(value):
                         completionHandler(value, nil)
@@ -475,10 +540,38 @@ class ESPAPIManager {
                     }
                 }
             } else {
-                completionHandler(nil, .emptyToken)
+                if self.validatedRefreshToken(error: serverError) {
+                    completionHandler(nil, .emptyToken)
+                }
             }
         }
     }
     
+    /// Check error code and ireturn true if user session is valid
+    /// - Parameter error: Error from server
+    /// - Returns: true if session is valid. false otherwise
+    private func validatedRefreshToken(error: ESPAPIError?) -> Bool {
+        if let serverError = error {
+            let parser = ESPAPIParser()
+            if !parser.isRefreshTokenValid(serverError: serverError) {
+                self.noRefreshSignOutUser(error: serverError)
+                return false
+            }
+        }
+        return true
+    }
+    
+    /*
+     Clear user data and sign out of the app.
+     Navigate to devices screen and present sign in screen.
+     */
+    private func clearDataAndPresentSignInVC() {
+        self.clearUserData()
+        DispatchQueue.main.async {
+            if !self.isSigninViewControllerPresented() {
+                self.presentSigninViewController()
+            }
+        }
+    }
     
 }
