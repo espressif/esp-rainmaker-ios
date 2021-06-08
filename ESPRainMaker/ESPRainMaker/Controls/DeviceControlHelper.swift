@@ -23,7 +23,7 @@ protocol ParamUpdateProtocol {
     func failureInUpdatingParam()
 }
 
-class DeviceControlHelper {
+enum DeviceControlHelper {
     static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?) {
         NetworkManager.shared.setDeviceParam(nodeID: nodeID, parameter: parameter) { result in
             switch result {

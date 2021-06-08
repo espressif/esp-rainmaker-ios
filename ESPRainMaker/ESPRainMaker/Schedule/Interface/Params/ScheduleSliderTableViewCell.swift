@@ -36,7 +36,7 @@ class ScheduleSliderTableViewCell: SliderTableViewCell {
             hueSlider.isEnabled = false
             slider.isEnabled = false
             param.selected = false
-            checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+            checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
             device.selectedParams -= 1
         } else {
             hueSlider.alpha = 1.0

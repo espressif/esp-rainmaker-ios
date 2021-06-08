@@ -152,13 +152,13 @@ struct Avs_RespGetDetails {
 
     var status: Avs_AVSConfigStatus = .success
 
-    var version: String = String()
+    var version = String()
 
-    var codeChallenge: String = String()
+    var codeChallenge = String()
 
-    var dsn: String = String()
+    var dsn = String()
 
-    var productID: String = String()
+    var productID = String()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -170,11 +170,11 @@ struct Avs_CmdSetConfig {
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    var authCode: String = String()
+    var authCode = String()
 
-    var clientID: String = String()
+    var clientID = String()
 
-    var redirectUri: String = String()
+    var redirectUri = String()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -353,7 +353,7 @@ struct Avs_AVSConfigPayload {
 
     init() {}
 
-    fileprivate var _storage = _StorageClass.defaultInstance
+    private var _storage = _StorageClass.defaultInstance
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.

@@ -32,19 +32,26 @@ class SuccessViewController: UIViewController {
     var step1Failed = false
     var count: Int = 0
     var espDevice: ESPDevice!
+    var failureMessage = ""
+    private var nodeDetailsFetched = false
+    private var nodeIsConnected = false
+    private var setupTimeout = Timer()
 
     @IBOutlet var step1Image: UIImageView!
     @IBOutlet var step2Image: UIImageView!
     @IBOutlet var step3Image: UIImageView!
     @IBOutlet var step4Image: UIImageView!
+    @IBOutlet var step5Image: UIImageView!
     @IBOutlet var step1Indicator: UIActivityIndicatorView!
     @IBOutlet var step2Indicator: UIActivityIndicatorView!
     @IBOutlet var step3Indicator: UIActivityIndicatorView!
     @IBOutlet var step4Indicator: UIActivityIndicatorView!
+    @IBOutlet var step5Indicator: UIActivityIndicatorView!
     @IBOutlet var step1ErrorLabel: UILabel!
     @IBOutlet var step2ErrorLabel: UILabel!
     @IBOutlet var step3ErrorLabel: UILabel!
     @IBOutlet var step4ErrorLabel: UILabel!
+    @IBOutlet var step5ErrorLabel: UILabel!
     @IBOutlet var finalStatusLabel: UILabel!
     @IBOutlet var okayButton: UIButton!
 
@@ -52,7 +59,11 @@ class SuccessViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         if step1Failed {
-            step1FailedWithMessage(message: "Wrong pop entered!")
+            if failureMessage.count > 0 {
+                step1FailedWithMessage(message: failureMessage)
+            } else {
+                step1FailedWithMessage(message: "Wrong pop entered!")
+            }
         } else {
             startProvisioning()
         }
@@ -134,13 +145,90 @@ class SuccessViewController: UIViewController {
                 self.step4Image.image = UIImage(named: "checkbox_checked")
                 self.step4Image.isHidden = false
                 self.addDeviceStatusTimeout?.invalidate()
-                self.provisionFinsihedWithStatus(message: "Device added successfully!!")
+                self.step5SetupNode(nodeID: nodeID)
             } else if status == "timedout" {
                 self.step4FailedWithMessage(message: "Node addition not confirmed")
             } else {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                     self.fetchDeviceAssociationStatus(nodeID: nodeID, requestID: requestID)
                 }
+            }
+        }
+    }
+
+    private func step5SetupNode(nodeID: String) {
+        DispatchQueue.main.async {
+            self.step5Image.isHidden = true
+            self.step5Indicator.isHidden = false
+            self.step5Indicator.startAnimating()
+            self.setupTimeout = Timer(timeInterval: 35.0, target: self, selector: #selector(self.setupTimeOut), userInfo: nil, repeats: false)
+            self.getNodeDetails(nodeID: nodeID)
+            self.getNodeStatus(nodeID: nodeID)
+        }
+    }
+
+    @objc private func getNodeStatus(nodeID: String) {
+        let node = Node()
+        node.node_id = nodeID
+        NetworkManager.shared.getNodeStatus(node: node) { newNode, _ in
+            if let responseNode = newNode {
+                if responseNode.isConnected {
+                    self.nodeIsConnected = true
+                    self.check5thStepStatus()
+                    return
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                self.getNodeStatus(nodeID: nodeID)
+            }
+        }
+    }
+
+    private func getNodeDetails(nodeID: String) {
+        NetworkManager.shared.getNodeInfo(nodeId: nodeID) { node, _ in
+            DispatchQueue.main.async {
+                self.nodeDetailsFetched = true
+                if let newNode = node {
+                    for service in newNode.services ?? [] {
+                        if service.type?.lowercased() == Constants.timezoneServiceName {
+                            if let param = service.params?.first(where: { $0.type?.lowercased() == Constants.timezoneServiceParam }) {
+                                let timezone = param.value as? String
+                                if timezone == nil || timezone!.isEmpty {
+                                    DeviceControlHelper.updateParam(nodeID: nodeID, parameter: [service.name ?? "Time": [param.name ?? "": TimeZone.current.identifier]], delegate: nil)
+                                }
+                            }
+                        }
+                    }
+                }
+                self.check5thStepStatus()
+            }
+        }
+    }
+
+    @objc private func setupTimeOut() {
+        DispatchQueue.main.async {
+            self.step5Image.isHidden = false
+            self.step5Indicator.isHidden = true
+            self.step5Indicator.stopAnimating()
+            if self.nodeDetailsFetched, self.nodeIsConnected {
+                self.step5Image.image = UIImage(named: "checkbox_checked")
+            } else {
+                self.step5Image.image = UIImage(named: "warning_icon")
+                self.step5ErrorLabel.isHidden = false
+                self.step5ErrorLabel.text = "Failed to setup node."
+            }
+            self.provisionFinsihedWithStatus(message: "Device Added Successfully!!")
+        }
+    }
+
+    private func check5thStepStatus() {
+        DispatchQueue.main.async {
+            if self.nodeDetailsFetched, self.nodeIsConnected {
+                self.step5Image.image = UIImage(named: "checkbox_checked")
+                self.step5Image.isHidden = false
+                self.step5Indicator.isHidden = true
+                self.step5Indicator.stopAnimating()
+                self.provisionFinsihedWithStatus(message: "Device Added Successfully!!")
             }
         }
     }
@@ -157,6 +245,7 @@ class SuccessViewController: UIViewController {
             self.step1Image.isHidden = false
             self.step1ErrorLabel.text = message
             self.step1ErrorLabel.isHidden = false
+            self.espDevice.disconnect()
             self.provisionFinsihedWithStatus(message: "Reboot your board and try again.")
         }
     }
@@ -170,12 +259,14 @@ class SuccessViewController: UIViewController {
             switch error {
             case .wifiStatusUnknownError, .wifiStatusDisconnected, .wifiStatusNetworkNotFound, .wifiStatusAuthenticationError:
                 errorMessage = error.description
+                self.espDevice.disconnect()
                 self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
             case .wifiStatusError:
                 errorMessage = "Unable to fetch Wi-Fi state."
                 self.step3SendRequestToAddDevice()
             default:
                 errorMessage = "Unknown error."
+                self.espDevice.disconnect()
                 self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
             }
             self.step2ErrorLabel.text = errorMessage
@@ -190,6 +281,7 @@ class SuccessViewController: UIViewController {
             self.step3Image.isHidden = false
             self.step3ErrorLabel.text = message
             self.step3ErrorLabel.isHidden = false
+            self.espDevice.disconnect()
             self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
         }
     }
@@ -201,7 +293,19 @@ class SuccessViewController: UIViewController {
             self.step4Image.isHidden = false
             self.step4ErrorLabel.text = message
             self.step4ErrorLabel.isHidden = false
+            self.espDevice.disconnect()
             self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
+        }
+    }
+
+    func step5FailedWithMessage(message: String) {
+        DispatchQueue.main.async {
+            self.step5Indicator.stopAnimating()
+            self.step5Image.image = UIImage(named: "warning_icon")
+            self.step5Image.isHidden = false
+            self.step5ErrorLabel.text = message
+            self.step5ErrorLabel.isHidden = false
+            self.provisionFinsihedWithStatus(message: "Device added successfully!!")
         }
     }
 

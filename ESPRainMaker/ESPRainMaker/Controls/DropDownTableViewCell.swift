@@ -37,6 +37,8 @@ class DropDownTableViewCell: UITableViewCell {
     var scheduleDelegate: ScheduleActionDelegate?
     var indexPath: IndexPath!
     var paramDelegate: ParamUpdateProtocol?
+    var service: Service?
+    var node: Node?
 
     override func awakeFromNib() {
         super.awakeFromNib()

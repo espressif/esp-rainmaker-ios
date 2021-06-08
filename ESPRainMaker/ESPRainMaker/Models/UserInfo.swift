@@ -55,7 +55,7 @@ struct UserInfo {
     /// This info is required when new app session is started.
     ///
     func saveUserInfo() {
-        let json: [String: Any] = [UserInfo.usernameKey: self.username, UserInfo.emailKey: self.email, UserInfo.userIdKey: self.userID, UserInfo.providerKey: self.loggedInWith.rawValue]
+        let json: [String: Any] = [UserInfo.usernameKey: username, UserInfo.emailKey: email, UserInfo.userIdKey: userID, UserInfo.providerKey: loggedInWith.rawValue]
         UserDefaults.standard.set(json, forKey: Constants.userInfoKey)
     }
 }

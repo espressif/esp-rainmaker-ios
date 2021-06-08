@@ -56,9 +56,10 @@ class VersionManager {
             switch response.result {
             case let .success(value):
                 if let json = value as? NSDictionary,
-                    let results = json["results"] as? NSArray,
-                    let entry = results.firstObject as? NSDictionary,
-                    let appVersion = entry["version"] as? String {
+                   let results = json["results"] as? NSArray,
+                   let entry = results.firstObject as? NSDictionary,
+                   let appVersion = entry["version"] as? String
+                {
                     let currentVersion = Constants.appVersion
                     if let storeURL = entry["trackViewUrl"] as? String {
                         self.appStoreURL = storeURL
@@ -142,7 +143,7 @@ class VersionManager {
     }
 
     private func goToAppStore() {
-        if let url = URL(string: self.appStoreURL) {
+        if let url = URL(string: appStoreURL) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }

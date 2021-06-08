@@ -116,19 +116,20 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         cell.switchButton.isHidden = true
         cell.primaryValue.isHidden = true
 
-        cell.layer.backgroundColor = UIColor.white.cgColor
         cell.layer.shadowColor = UIColor.lightGray.cgColor
         cell.layer.shadowOffset = CGSize(width: 0.5, height: 1.0)
         cell.layer.shadowRadius = 0.5
         cell.layer.shadowOpacity = 0.5
         cell.layer.masksToBounds = false
 
+        cell.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
         if device.node?.localNetwork ?? false {
             cell.statusView.isHidden = false
         } else if device.node?.isConnected ?? false {
             cell.statusView.isHidden = true
         } else {
             cell.statusView.isHidden = false
+            cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
         }
 
         cell.offlineLabel.text = device.node?.getNodeStatus() ?? ""
@@ -146,10 +147,10 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
                         cell.switchButton.backgroundColor = UIColor.white
                         cell.switchButton.isEnabled = true
                         cell.switchButton.isHidden = false
-                        cell.switchButton.setImage(UIImage(named: "switch_icon_enabled_off"), for: .normal)
+                        cell.switchButton.setBackgroundImage(UIImage(named: "switch_off"), for: .normal)
                         if let value = primaryParam.value as? Bool {
                             if value {
-                                cell.switchButton.setImage(UIImage(named: "switch_icon_enabled_on"), for: .normal)
+                                cell.switchButton.setBackgroundImage(UIImage(named: "switch_on"), for: .normal)
                                 cell.switchValue = true
                             }
                         }
@@ -158,7 +159,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
                         cell.switchButton.isEnabled = false
                         cell.switchButton.backgroundColor = UIColor(hexString: "#E5E5E5")
                         cell.switchButton.alpha = 0.4
-                        cell.switchButton.setImage(UIImage(named: "switch_icon_disabled"), for: .normal)
+                        cell.switchButton.setBackgroundImage(UIImage(named: "switch_disabled"), for: .normal)
                     }
                 } else if primaryParam.dataType?.lowercased() == "string" {
                     cell.switchButton.isHidden = true
@@ -191,19 +192,21 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             var deviceImage: UIImage!
             switch deviceType {
             case "esp.device.switch":
-                deviceImage = UIImage(named: "switch_device_icon")
+                deviceImage = UIImage(named: "switch")
             case "esp.device.lightbulb":
-                deviceImage = UIImage(named: "light_bulb_icon")
+                deviceImage = UIImage(named: "light")
             case "esp.device.fan":
-                deviceImage = UIImage(named: "fan_icon")
+                deviceImage = UIImage(named: "fan")
             case "esp.device.thermostat":
-                deviceImage = UIImage(named: "thermostat_icon")
+                deviceImage = UIImage(named: "thermostat")
             case "esp.device.temperature-sensor":
-                deviceImage = UIImage(named: "temperature_sensor_icon")
+                deviceImage = UIImage(named: "temperature_sensor")
             case "esp.device.lock":
-                deviceImage = UIImage(named: "lock_icon")
+                deviceImage = UIImage(named: "lock")
             case "esp.device.sensor":
                 deviceImage = UIImage(named: "sensor_icon")
+            case "esp.device.outlet":
+                deviceImage = UIImage(named: "outlet")
             default:
                 deviceImage = UIImage(named: "dummy_device_icon")
             }

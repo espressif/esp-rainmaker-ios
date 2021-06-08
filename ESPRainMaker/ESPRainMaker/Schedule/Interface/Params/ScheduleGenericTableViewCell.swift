@@ -100,7 +100,7 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
     @IBAction override func checkBoxPressed(_: Any) {
         if param!.selected {
             editButton.isHidden = true
-            checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+            checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
             param!.selected = false
             device.selectedParams -= 1
         } else {

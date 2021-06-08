@@ -21,6 +21,7 @@ import Foundation
 class SharingRequests: Codable {
     var sharing_requests: [SharingRequest]?
     var next_request_id: String?
+    var next_user_name: String?
 }
 
 class SharingRequest: Codable {
@@ -46,7 +47,7 @@ class SharingRequest: Codable {
         primary_user_name = try container.decodeIfPresent(String.self, forKey: .primary_user_name)
 
         if let dictionary: [String: Any] = try container.decodeIfPresent([String: Any].self, forKey: .metadata) {
-            if let deviceList = dictionary["devices"] as? [[String:String]] {
+            if let deviceList = dictionary["devices"] as? [[String: String]] {
                 metadata = []
                 for device in deviceList {
                     if let deviceName = device["name"] {

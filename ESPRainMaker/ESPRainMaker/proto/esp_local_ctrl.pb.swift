@@ -105,7 +105,7 @@ struct PropertyInfo {
 
     var status: Status = .success
 
-    var name: String = String()
+    var name = String()
 
     var type: UInt32 = 0
 
@@ -272,7 +272,7 @@ struct LocalCtrlMessage {
 
     init() {}
 
-    fileprivate var _storage = _StorageClass.defaultInstance
+    private var _storage = _StorageClass.defaultInstance
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.

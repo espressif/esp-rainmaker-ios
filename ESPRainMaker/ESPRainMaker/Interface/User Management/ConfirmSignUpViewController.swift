@@ -45,7 +45,7 @@ class ConfirmSignUpViewController: UIViewController {
 
     // handle confirm sign up
     @IBAction func confirm(_: AnyObject) {
-        guard let confirmationCodeValue = self.code.text, !confirmationCodeValue.isEmpty else {
+        guard let confirmationCodeValue = code.text, !confirmationCodeValue.isEmpty else {
             let alertController = UIAlertController(title: "Confirmation code missing.",
                                                     message: "Please enter a valid confirmation code.",
                                                     preferredStyle: .alert)

@@ -49,9 +49,9 @@ class PrimaryButton: UIButton {
     }
 
     @objc func changeTheme() {
-        var currentBGColor: UIColor = UIColor(hexString: "#5330b9")
+        var currentBGColor = UIColor(hexString: "#8265E3")
         if let color = AppConstants.shared.appThemeColor {
-            backgroundColor = color
+            setTitleColor(color, for: .normal)
             currentBGColor = color
         } else {
             if let bgColor = Constants.backgroundColor {
@@ -60,9 +60,9 @@ class PrimaryButton: UIButton {
             }
         }
         if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
-            setTitleColor(UIColor(hexString: "#5330b9"), for: .normal)
+            backgroundColor = UIColor(hexString: "#8265E3")
         } else {
-            setTitleColor(UIColor.white, for: .normal)
+            backgroundColor = .white
         }
     }
 }
@@ -75,7 +75,7 @@ class SecondaryButton: UIButton {
     }
 
     @objc func changeTheme() {
-        var currentBGColor: UIColor = UIColor(hexString: "#5330b9")
+        var currentBGColor = UIColor(hexString: "#8265E3")
         if let color = AppConstants.shared.appThemeColor {
             setTitleColor(color, for: .normal)
             currentBGColor = color
@@ -86,7 +86,7 @@ class SecondaryButton: UIButton {
             }
         }
         if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
-            setTitleColor(UIColor(hexString: "#5330b9"), for: .normal)
+            setTitleColor(UIColor(hexString: "#8265E3"), for: .normal)
         }
     }
 }
@@ -127,7 +127,7 @@ class BarButton: UIButton {
             }
         }
         if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
-            setTitleColor(UIColor(hexString: "#5330b9"), for: .normal)
+            setTitleColor(UIColor(hexString: "#8265E3"), for: .normal)
         } else {
             setTitleColor(#colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1), for: .normal)
         }

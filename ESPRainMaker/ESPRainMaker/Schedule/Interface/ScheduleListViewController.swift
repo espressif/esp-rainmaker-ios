@@ -127,7 +127,7 @@ class ScheduleListViewController: UIViewController {
             editButton.isHidden = true
             addButton.isHidden = true
             addScheduleButton.isHidden = true
-            initialLabel.text = "No devices found with schedule feature."
+            initialLabel.text = "You don't have any device \n that supports this."
         } else if scheduleList.count < 1 {
             tableView.isHidden = true
             addButton.isHidden = true
@@ -135,7 +135,7 @@ class ScheduleListViewController: UIViewController {
             editButton.isHidden = true
             addButton.isHidden = true
             addScheduleButton.isHidden = false
-            initialLabel.text = "No list to show. Refresh or add a new schedule."
+            initialLabel.text = "No Schedules added."
         } else {
             tableView.isHidden = false
             addButton.isHidden = false
@@ -146,20 +146,28 @@ class ScheduleListViewController: UIViewController {
 
     func getScheduleList() {
         scheduleList.removeAll()
-        scheduleList = [String](ESPScheduler.shared.schedules.keys).sorted(by: <)
+        scheduleList = [String](ESPScheduler.shared.schedules.keys).sorted(by: { first, second -> Bool in
+            // Sorting schedule list by time
+            let firstArray = first.components(separatedBy: ".")
+            let firstMinutes = Int(firstArray[firstArray.count - 2]) ?? 0
+            let secondArray = second.components(separatedBy: ".")
+            let secondMinutes = Int(secondArray[secondArray.count - 2]) ?? 0
+            return firstMinutes < secondMinutes
+        })
         tableView.reloadData()
     }
 }
 
 extension ScheduleListViewController: UITableViewDelegate {
     func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
-        return 70.0
+        return 80.0
     }
 
     func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         let scheduleVC = storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController
         ESPScheduler.shared.currentSchedule = ESPScheduler.shared.schedules[scheduleList[indexPath.section]]!
+        scheduleVC.scheduleKey = scheduleList[indexPath.section]
         navigationController?.pushViewController(scheduleVC, animated: true)
     }
 
@@ -170,7 +178,7 @@ extension ScheduleListViewController: UITableViewDelegate {
 
     func tableView(_: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let alertController = UIAlertController(title: "Remove", message: "Are you sure to remove this schedule?", preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Are you sure?", message: "", preferredStyle: .alert)
             let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
             let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
                 DispatchQueue.main.async {
@@ -198,18 +206,20 @@ extension ScheduleListViewController: UITableViewDataSource {
         cell.schedule = schedule
         cell.scheduleLabel.text = schedule.name ?? ""
         cell.actionLabel.text = ESPScheduler.shared.getActionList()
+        cell.timerLabel.text = schedule.trigger.getTimeDetails()
         if schedule.trigger.days == 0 {
-            cell.timerLabel.text = "Once at \(schedule.trigger.getTimeDetails())"
+            cell.daysLabel.text = "Once"
         } else if schedule.trigger.days == 127 {
-            cell.timerLabel.text = "Daily at \(schedule.trigger.getTimeDetails())"
+            cell.daysLabel.text = "Everyday"
         } else {
             let dayDescription = schedule.week.getShortDescription()
             if dayDescription.lowercased() == "weekends" || dayDescription.lowercased() == "weekdays" {
-                cell.timerLabel.text = "Every \(dayDescription.dropLast().lowercased()) at \(schedule.trigger.getTimeDetails())"
+                cell.daysLabel.text = "\(dayDescription.dropLast().lowercased())"
             } else {
-                cell.timerLabel.text = "Every \(dayDescription) at \(schedule.trigger.getTimeDetails())"
+                cell.daysLabel.text = "\(dayDescription)"
             }
         }
+        cell.scheduleSwitch.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         cell.scheduleSwitch.setOn(schedule.enabled, animated: true)
         cell.index = indexPath.section
         return cell

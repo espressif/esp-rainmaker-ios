@@ -37,8 +37,7 @@ class NotificationsViewController: UIViewController {
 
     // Method to fetch and filter pending sharing requests.
     private func getSharingRequests() {
-        Utility.showLoader(message: "Fetching notifications...", view: view)
-        // Fetched updated sharing requests
+        Utility.showLoader(message: "Fetching sharing requests...", view: view)
         NodeSharingManager.shared.getSharingRequests(primaryUser: false) { requests, error in
             Utility.hideLoader(view: self.view)
             guard let _ = error else {

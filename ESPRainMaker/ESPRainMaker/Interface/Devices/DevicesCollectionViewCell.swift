@@ -42,9 +42,9 @@ class DevicesCollectionViewCell: UICollectionViewCell {
         }
 
         if switchValue {
-            switchButton.setImage(UIImage(named: "switch_icon_enabled_on"), for: .normal)
+            switchButton.setBackgroundImage(UIImage(named: "switch_on"), for: .normal)
         } else {
-            switchButton.setImage(UIImage(named: "switch_icon_enabled_off"), for: .normal)
+            switchButton.setBackgroundImage(UIImage(named: "switch_off"), for: .normal)
         }
     }
 

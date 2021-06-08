@@ -138,7 +138,15 @@ class ESPLocalService: NSObject {
         var payload = CmdSetPropertyValues()
         var prop = PropertyValue()
         prop.index = 1
-        let jsonData = try! JSONSerialization.data(withJSONObject: json, options: .fragmentsAllowed)
+        let jsonData:Data!
+        if #available(iOS 13.0, *) {
+            jsonData = try! JSONSerialization.data(withJSONObject: json, options: .withoutEscapingSlashes)
+        } else {
+            // Fallback on earlier versions
+            let data = try! JSONSerialization.data(withJSONObject: json, options: .fragmentsAllowed)
+            let jsonStr = String(decoding: data, as: UTF8.self)
+            jsonData = Data(jsonStr.replacingOccurrences(of: "\\/", with: "/").utf8)
+        }
         prop.value = jsonData
         payload.props.append(prop)
         request.cmdSetPropVals = payload

@@ -29,6 +29,7 @@
 		F10B076E25D11CCD00723254 /* NodeGroupTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B076D25D11CCD00723254 /* NodeGroupTableViewCell.swift */; };
 		F10B077225D2726800723254 /* NewNodeGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077125D2726800723254 /* NewNodeGroupViewController.swift */; };
 		F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */; };
+		F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10C2B2925EB82D800B60696 /* User.storyboard */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
 		F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */; };
 		F1110429252D8E2D0030A1D3 /* ESPLocalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */; };
@@ -36,6 +37,7 @@
 		F1110431252D927F0030A1D3 /* constants.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110430252D927F0030A1D3 /* constants.pb.swift */; };
 		F1153F2A238E5E79009DF206 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1153F29238E5E79009DF206 /* NetworkExtension.framework */; };
 		F117CDEF252C75CD00ADB856 /* ESPLocalControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F117CDEE252C75CD00ADB856 /* ESPLocalControl.swift */; };
+		F119C3F2265EAF73006F4088 /* VoiceServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F119C3F1265EAF6F006F4088 /* VoiceServicesViewController.swift */; };
 		F11DC9A02577772F00603BF5 /* DropDownTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F11DC99E2577772E00603BF5 /* DropDownTableViewCell.xib */; };
 		F11DC9A12577772F00603BF5 /* DropDownTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11DC99F2577772F00603BF5 /* DropDownTableViewCell.swift */; };
 		F11DC9D72578D5D100603BF5 /* DeviceControlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11DC9D62578D5D100603BF5 /* DeviceControlHelper.swift */; };
@@ -72,9 +74,14 @@
 		F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */; };
 		F17CEBE8263B23E800BA9E0C /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17CEBE6263B23E800BA9E0C /* NotificationsViewController.swift */; };
 		F17CEBE9263B23E800BA9E0C /* NotificationsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17CEBE7263B23E800BA9E0C /* NotificationsTableViewCell.swift */; };
+		F17EF2B02651661E002AC7BE /* ESPTimezone.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17EF2AF2651661D002AC7BE /* ESPTimezone.swift */; };
+		F17EF2B42652690E002AC7BE /* TimeZoneTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17EF2B32652690D002AC7BE /* TimeZoneTableViewCell.swift */; };
 		F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17F1411239F96C3008326A4 /* VersionManager.swift */; };
 		F181CD9624D7F46300447296 /* NanoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F181CD9524D7F46300447296 /* NanoID.swift */; };
 		F18BADCE24CAC1EE00A696AE /* ESPSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18BADCD24CAC1EE00A696AE /* ESPSchedule.swift */; };
+		F18C23AF25F0B3D5009E232D /* RadialHuePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18C23AE25F0B3D4009E232D /* RadialHuePalette.swift */; };
+		F18C23BE25F1838C009E232D /* CentralSwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18C23BC25F1838C009E232D /* CentralSwitchTableViewCell.swift */; };
+		F18C23BF25F1838C009E232D /* CentralSwitchTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F18C23BD25F1838C009E232D /* CentralSwitchTableViewCell.xib */; };
 		F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */; };
 		F190B9B624BF51AE006D136D /* ScheduleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F190B9B524BF51AE006D136D /* ScheduleListViewController.swift */; };
 		F190B9B824BF5208006D136D /* ScheduleListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F190B9B724BF5208006D136D /* ScheduleListTableViewCell.swift */; };
@@ -96,8 +103,6 @@
 		F195745425B5AA41005F6601 /* AddMemberTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195745225B5AA41005F6601 /* AddMemberTableViewCell.xib */; };
 		F195745925B5AD09005F6601 /* MembersInfoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195745725B5AD09005F6601 /* MembersInfoTableViewCell.swift */; };
 		F195745A25B5AD09005F6601 /* MembersInfoTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */; };
-		F195745F25B5BE96005F6601 /* NewMemberTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195745D25B5BE96005F6601 /* NewMemberTableViewCell.swift */; };
-		F195746025B5BE96005F6601 /* NewMemberTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195745E25B5BE96005F6601 /* NewMemberTableViewCell.xib */; };
 		F195746625B69DDB005F6601 /* NodeDetailsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */; };
 		F195746A25B69DF0005F6601 /* NodeDetailsHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195746925B69DF0005F6601 /* NodeDetailsHeaderView.xib */; };
 		F199217A25B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F199217925B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift */; };
@@ -115,11 +120,15 @@
 		F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */; };
 		F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B3558823B8DC4C004552FC /* ExtensionManager.swift */; };
 		F1BBD465255C1EE900CB0F42 /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */; };
+		F1C1AD5025EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C1AD4E25EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift */; };
+		F1C1AD5125EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1C1AD4F25EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib */; };
 		F1C8082C22CA17790098F3B4 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C8082B22CA17790098F3B4 /* NetworkManager.swift */; };
+		F1C8F406260CDA3800A79767 /* ESPCustomJsonEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C8F405260CDA3800A79767 /* ESPCustomJsonEncoder.swift */; };
 		F1CA0C7E2579F27D0085E19A /* ParamSliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA0C7D2579F27D0085E19A /* ParamSliderTableViewCell.swift */; };
 		F1CA0C8C257A08710085E19A /* GenericParamTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA0C8B257A08700085E19A /* GenericParamTableViewCell.swift */; };
 		F1CA0C94257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA0C93257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift */; };
 		F1CA0C98257A2E270085E19A /* ParamDropDownTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA0C97257A2E270085E19A /* ParamDropDownTableViewCell.swift */; };
+		F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA4BC0260FE7EC00F12D14 /* JoinNetworkViewController.swift */; };
 		F1DB6F62232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */; };
 		F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A322A8EA140092DAB9 /* Utility.swift */; };
 		F1DD70A622A8EA2A0092DAB9 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A522A8EA2A0092DAB9 /* Constants.swift */; };
@@ -144,6 +153,7 @@
 		F1FB153C234D91000053B0ED /* SliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FB153A234D91000053B0ED /* SliderTableViewCell.swift */; };
 		F1FB153D234D91000053B0ED /* SliderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1FB153B234D91000053B0ED /* SliderTableViewCell.xib */; };
 		F1FB153F234DED260053B0ED /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FB153E234DED260053B0ED /* Errors.swift */; };
+		F1FBF05625EED1D200627C07 /* RadialHueColorPaletteDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FBF05525EED1D200627C07 /* RadialHueColorPaletteDelegate.swift */; };
 		F1FFC8F925D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC8F825D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift */; };
 		F1FFC8FD25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC8FC25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift */; };
 		F1FFC90125D44CA400DD26C6 /* AddNodeGroupsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC90025D44CA400DD26C6 /* AddNodeGroupsViewController.swift */; };
@@ -194,6 +204,9 @@
 		F10B076D25D11CCD00723254 /* NodeGroupTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroupTableViewCell.swift; sourceTree = "<group>"; };
 		F10B077125D2726800723254 /* NewNodeGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewNodeGroupViewController.swift; sourceTree = "<group>"; };
 		F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGroupNodesViewController.swift; sourceTree = "<group>"; };
+		F10C2AEB25E584C300B60696 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
+		F10C2AEF25E58B9800B60696 /* NotificationsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsTableViewCell.swift; sourceTree = "<group>"; };
+		F10C2B2925EB82D800B60696 /* User.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = User.storyboard; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
 		F1105D9425492EC00047DF1B /* ESPLocalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalStorage.swift; sourceTree = "<group>"; };
 		F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalService.swift; sourceTree = "<group>"; };
@@ -201,6 +214,7 @@
 		F1110430252D927F0030A1D3 /* constants.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = constants.pb.swift; sourceTree = "<group>"; };
 		F1153F29238E5E79009DF206 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		F117CDEE252C75CD00ADB856 /* ESPLocalControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalControl.swift; sourceTree = "<group>"; };
+		F119C3F1265EAF6F006F4088 /* VoiceServicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceServicesViewController.swift; sourceTree = "<group>"; };
 		F11DC99E2577772E00603BF5 /* DropDownTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DropDownTableViewCell.xib; sourceTree = "<group>"; };
 		F11DC99F2577772F00603BF5 /* DropDownTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DropDownTableViewCell.swift; sourceTree = "<group>"; };
 		F11DC9D62578D5D100603BF5 /* DeviceControlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceControlHelper.swift; sourceTree = "<group>"; };
@@ -241,9 +255,14 @@
 		F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCollectionViewLayout.swift; sourceTree = "<group>"; };
 		F17CEBE6263B23E800BA9E0C /* NotificationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		F17CEBE7263B23E800BA9E0C /* NotificationsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsTableViewCell.swift; sourceTree = "<group>"; };
+		F17EF2AF2651661D002AC7BE /* ESPTimezone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTimezone.swift; sourceTree = "<group>"; };
+		F17EF2B32652690D002AC7BE /* TimeZoneTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneTableViewCell.swift; sourceTree = "<group>"; };
 		F17F1411239F96C3008326A4 /* VersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionManager.swift; sourceTree = "<group>"; };
 		F181CD9524D7F46300447296 /* NanoID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NanoID.swift; sourceTree = "<group>"; };
 		F18BADCD24CAC1EE00A696AE /* ESPSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPSchedule.swift; sourceTree = "<group>"; };
+		F18C23AE25F0B3D4009E232D /* RadialHuePalette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialHuePalette.swift; sourceTree = "<group>"; };
+		F18C23BC25F1838C009E232D /* CentralSwitchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralSwitchTableViewCell.swift; sourceTree = "<group>"; };
+		F18C23BD25F1838C009E232D /* CentralSwitchTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CentralSwitchTableViewCell.xib; sourceTree = "<group>"; };
 		F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssociationConfig.swift; sourceTree = "<group>"; };
 		F190B9B524BF51AE006D136D /* ScheduleListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListViewController.swift; sourceTree = "<group>"; };
 		F190B9B724BF5208006D136D /* ScheduleListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListTableViewCell.swift; sourceTree = "<group>"; };
@@ -265,8 +284,6 @@
 		F195745225B5AA41005F6601 /* AddMemberTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddMemberTableViewCell.xib; sourceTree = "<group>"; };
 		F195745725B5AD09005F6601 /* MembersInfoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersInfoTableViewCell.swift; sourceTree = "<group>"; };
 		F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MembersInfoTableViewCell.xib; sourceTree = "<group>"; };
-		F195745D25B5BE96005F6601 /* NewMemberTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMemberTableViewCell.swift; sourceTree = "<group>"; };
-		F195745E25B5BE96005F6601 /* NewMemberTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewMemberTableViewCell.xib; sourceTree = "<group>"; };
 		F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeDetailsHeaderView.swift; sourceTree = "<group>"; };
 		F195746925B69DF0005F6601 /* NodeDetailsHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NodeDetailsHeaderView.xib; sourceTree = "<group>"; };
 		F199217925B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveNodeTableViewFooterView.swift; sourceTree = "<group>"; };
@@ -284,13 +301,17 @@
 		F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewController.swift; sourceTree = "<group>"; };
 		F1B3558823B8DC4C004552FC /* ExtensionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionManager.swift; sourceTree = "<group>"; };
 		F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
+		F1C1AD4E25EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundHueSliderTableViewCell.swift; sourceTree = "<group>"; };
+		F1C1AD4F25EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundHueSliderTableViewCell.xib; sourceTree = "<group>"; };
 		F1C611A324F79804007EEFC6 /* ESP ScheduleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ESP ScheduleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1C77F1124911FD4000CE2FE /* GitVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GitVersion.h; sourceTree = "<group>"; };
 		F1C8082B22CA17790098F3B4 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		F1C8F405260CDA3800A79767 /* ESPCustomJsonEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPCustomJsonEncoder.swift; sourceTree = "<group>"; };
 		F1CA0C7D2579F27D0085E19A /* ParamSliderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParamSliderTableViewCell.swift; sourceTree = "<group>"; };
 		F1CA0C8B257A08700085E19A /* GenericParamTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericParamTableViewCell.swift; sourceTree = "<group>"; };
 		F1CA0C93257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleDropDownTableViewCell.swift; sourceTree = "<group>"; };
 		F1CA0C97257A2E270085E19A /* ParamDropDownTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParamDropDownTableViewCell.swift; sourceTree = "<group>"; };
+		F1CA4BC0260FE7EC00F12D14 /* JoinNetworkViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinNetworkViewController.swift; sourceTree = "<group>"; };
 		F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesCollectionViewCell.swift; sourceTree = "<group>"; };
 		F1DD70A322A8EA140092DAB9 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		F1DD70A522A8EA2A0092DAB9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -314,6 +335,7 @@
 		F1FB153A234D91000053B0ED /* SliderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderTableViewCell.swift; sourceTree = "<group>"; };
 		F1FB153B234D91000053B0ED /* SliderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SliderTableViewCell.xib; sourceTree = "<group>"; };
 		F1FB153E234DED260053B0ED /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		F1FBF05525EED1D200627C07 /* RadialHueColorPaletteDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadialHueColorPaletteDelegate.swift; sourceTree = "<group>"; };
 		F1FFC8F825D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGroupNodeCollectionViewCell.swift; sourceTree = "<group>"; };
 		F1FFC8FC25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNodeHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
 		F1FFC90025D44CA400DD26C6 /* AddNodeGroupsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNodeGroupsViewController.swift; sourceTree = "<group>"; };
@@ -379,6 +401,7 @@
 				1431468F20E387C60017E119 /* proto */,
 				143146B120EB221E0017E119 /* Interface */,
 				1431462620DE994B0017E119 /* AppDelegate.swift */,
+				F10C2B2925EB82D800B60696 /* User.storyboard */,
 				F1012F61251110B300839F06 /* Schedule.storyboard */,
 				F10B073225CD714000723254 /* NodeGrouping.storyboard */,
 				F15EAC1123E1994E008A766B /* DeviceDetail.storyboard */,
@@ -454,6 +477,7 @@
 				F191CD442511231C00BDCEF1 /* ConnectViewController.swift */,
 				F13F273D238CF6170003AABB /* ScannerViewController.swift */,
 				143146B420EB273B0017E119 /* ProvisionViewController.swift */,
+				F1CA4BC0260FE7EC00F12D14 /* JoinNetworkViewController.swift */,
 				144149432126AE09002AD5E1 /* SuccessViewController.swift */,
 				F151FF1D24827343006F514E /* WifiListTableViewCell.swift */,
 				F1072BC2256F9BA800D7CE2C /* SoftAP */,
@@ -528,6 +552,7 @@
 				F122619F22C61695004D049F /* DeviceAssociation.swift */,
 				F1C8082B22CA17790098F3B4 /* NetworkManager.swift */,
 				F1E46CA0253ED6B9007000FB /* ESPAPIManager.swift */,
+				F1C8F405260CDA3800A79767 /* ESPCustomJsonEncoder.swift */,
 			);
 			path = AWSCognito;
 			sourceTree = "<group>";
@@ -548,6 +573,7 @@
 			children = (
 				F1EAAC8B23E2078300E9A6A8 /* AppSettingsViewController.swift */,
 				F19F6FF222F02B3400C70DE3 /* SettingsPageViewController.swift */,
+				F119C3F1265EAF6F006F4088 /* VoiceServicesViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -602,8 +628,6 @@
 				F195745225B5AA41005F6601 /* AddMemberTableViewCell.xib */,
 				F195745725B5AD09005F6601 /* MembersInfoTableViewCell.swift */,
 				F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */,
-				F195745D25B5BE96005F6601 /* NewMemberTableViewCell.swift */,
-				F195745E25B5BE96005F6601 /* NewMemberTableViewCell.xib */,
 				F133495425E24CE200CCB308 /* NodeSharingManager.swift */,
 				F133495C25E2B84000CCB308 /* SharingTableViewCell.swift */,
 				F133495D25E2B84000CCB308 /* SharingTableViewCell.xib */,
@@ -619,6 +643,7 @@
 				F199217925B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift */,
 				F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */,
 				F195746925B69DF0005F6601 /* NodeDetailsHeaderView.xib */,
+				F17EF2B32652690D002AC7BE /* TimeZoneTableViewCell.swift */,
 			);
 			path = NodeDetails;
 			sourceTree = "<group>";
@@ -634,6 +659,8 @@
 				F19A9D1422C0ED4C00A450C3 /* ForgotPasswordViewController.swift */,
 				F19A9D1222C0D23E00A450C3 /* SignInViewController.swift */,
 				F19A9D0E22BB6DD800A450C3 /* MFAViewController.swift */,
+				F10C2AEB25E584C300B60696 /* NotificationsViewController.swift */,
+				F10C2AEF25E58B9800B60696 /* NotificationsTableViewCell.swift */,
 			);
 			path = "User Management";
 			sourceTree = "<group>";
@@ -743,6 +770,7 @@
 			children = (
 				F15EAC0123E05A51008A766B /* Localizable.strings */,
 				F1C77F1124911FD4000CE2FE /* GitVersion.h */,
+				F17EF2AF2651661D002AC7BE /* ESPTimezone.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -758,6 +786,12 @@
 				F1CA0C7D2579F27D0085E19A /* ParamSliderTableViewCell.swift */,
 				F1CA0C8B257A08700085E19A /* GenericParamTableViewCell.swift */,
 				F1CA0C97257A2E270085E19A /* ParamDropDownTableViewCell.swift */,
+				F1C1AD4E25EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift */,
+				F1C1AD4F25EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib */,
+				F1FBF05525EED1D200627C07 /* RadialHueColorPaletteDelegate.swift */,
+				F18C23AE25F0B3D4009E232D /* RadialHuePalette.swift */,
+				F18C23BC25F1838C009E232D /* CentralSwitchTableViewCell.swift */,
+				F18C23BD25F1838C009E232D /* CentralSwitchTableViewCell.xib */,
 			);
 			path = Params;
 			sourceTree = "<group>";
@@ -773,7 +807,6 @@
 				1431461F20DE994B0017E119 /* Sources */,
 				1431462020DE994B0017E119 /* Frameworks */,
 				1431462120DE994B0017E119 /* Resources */,
-				1487EBE92123D8C4007F44A6 /* Format code */,
 				BD0440008F6752DCBA91CC73 /* [CP] Embed Pods Frameworks */,
 				F1C77F0D2486DC91000CE2FE /* ShellScript */,
 			);
@@ -856,11 +889,12 @@
 				F133495F25E2B84100CCB308 /* SharingTableViewCell.xib in Resources */,
 				F1012F62251110B300839F06 /* Schedule.storyboard in Resources */,
 				F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */,
+				F18C23BF25F1838C009E232D /* CentralSwitchTableViewCell.xib in Resources */,
 				F11DC9A02577772F00603BF5 /* DropDownTableViewCell.xib in Resources */,
 				F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */,
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
+				F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
-				F195746025B5BE96005F6601 /* NewMemberTableViewCell.xib in Resources */,
 				F164A2F92581E73000B879BC /* Configuration.plist in Resources */,
 				F195745425B5AA41005F6601 /* AddMemberTableViewCell.xib in Resources */,
 				F195745A25B5AD09005F6601 /* MembersInfoTableViewCell.xib in Resources */,
@@ -871,6 +905,7 @@
 				F133494325DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib in Resources */,
 				F190B9CC24C765C4006D136D /* ControlSectionHeaderView.xib in Resources */,
 				F15EAC0F23E1994E008A766B /* DeviceDetail.storyboard in Resources */,
+				F1C1AD5125EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib in Resources */,
 				F190B9CA24C0D892006D136D /* DeviceHeaderView.xib in Resources */,
 				1431462E20DE994C0017E119 /* Assets.xcassets in Resources */,
 				F15FFF8A2402645200E72D01 /* NoInternetConnection.xib in Resources */,
@@ -890,20 +925,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1487EBE92123D8C4007F44A6 /* Format code */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Format code";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "swiftformat .\n";
-		};
 		51E93EB2AFF55234E9421D11 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -972,6 +993,7 @@
 				F17CEBE8263B23E800BA9E0C /* NotificationsViewController.swift in Sources */,
 				F1F45150232B7A780009DCE0 /* DeviceTraitListViewController.swift in Sources */,
 				F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */,
+				F1FBF05625EED1D200627C07 /* RadialHueColorPaletteDelegate.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
 				F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */,
 				F1FFC8F925D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift in Sources */,
@@ -1005,9 +1027,11 @@
 				F1F4513A2328C5D40009DCE0 /* DevicesViewController.swift in Sources */,
 				F1EAACAE23E2A74300E9A6A8 /* DefaultValues.swift in Sources */,
 				F1E46CA1253ED6BA007000FB /* ESPAPIManager.swift in Sources */,
+				F1C1AD5025EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift in Sources */,
 				F1EAACAB23E2A74300E9A6A8 /* UIColor+Extension.swift in Sources */,
 				F1E37E9523D772EC00A5043F /* ThumbTextSlider.swift in Sources */,
 				F1CA0C7E2579F27D0085E19A /* ParamSliderTableViewCell.swift in Sources */,
+				F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */,
 				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
 				F17CEBE9263B23E800BA9E0C /* NotificationsTableViewCell.swift in Sources */,
 				F191CD462511231C00BDCEF1 /* ConnectViewController.swift in Sources */,
@@ -1030,11 +1054,11 @@
 				F10B075225CEE44200723254 /* NodeGroup.swift in Sources */,
 				F190B9BA24BF7775006D136D /* ScheduleViewController.swift in Sources */,
 				143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */,
+				F18C23BE25F1838C009E232D /* CentralSwitchTableViewCell.swift in Sources */,
 				F133495525E24CE200CCB308 /* NodeSharingManager.swift in Sources */,
 				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
 				F10B076E25D11CCD00723254 /* NodeGroupTableViewCell.swift in Sources */,
 				F1EAAC8E23E29D9B00E9A6A8 /* AppConstants.swift in Sources */,
-				F195745F25B5BE96005F6601 /* NewMemberTableViewCell.swift in Sources */,
 				F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */,
 				F133495025E23C4400CCB308 /* NodeDetailsViewController.swift in Sources */,
 				F11DC9A12577772F00603BF5 /* DropDownTableViewCell.swift in Sources */,
@@ -1066,9 +1090,13 @@
 				F191CD41251122D300BDCEF1 /* AssistedClaiming.swift in Sources */,
 				F1FFC90725D4872C00DD26C6 /* SelectNodeFooterCollectionReusableView.swift in Sources */,
 				F19F6FF522F45A1500C70DE3 /* DeviceListTableView.swift in Sources */,
+				F119C3F2265EAF73006F4088 /* VoiceServicesViewController.swift in Sources */,
 				F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */,
+				F1C8F406260CDA3800A79767 /* ESPCustomJsonEncoder.swift in Sources */,
+				F18C23AF25F0B3D5009E232D /* RadialHuePalette.swift in Sources */,
 				F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */,
 				F1402AB8239677B300C989F8 /* StaticControlTableViewCell.swift in Sources */,
+				F17EF2B42652690E002AC7BE /* TimeZoneTableViewCell.swift in Sources */,
 				F1FB153C234D91000053B0ED /* SliderTableViewCell.swift in Sources */,
 				F1105D9525492EC00047DF1B /* ESPLocalStorage.swift in Sources */,
 				F190B9C624C0D842006D136D /* DeviceHeaderView.swift in Sources */,
@@ -1081,6 +1109,7 @@
 				F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */,
 				F133495125E23C4400CCB308 /* NodeDetailsTableViewCell.swift in Sources */,
 				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
+				F17EF2B02651661E002AC7BE /* ESPTimezone.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

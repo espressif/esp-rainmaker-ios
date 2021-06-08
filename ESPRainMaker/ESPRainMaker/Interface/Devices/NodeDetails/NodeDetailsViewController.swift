@@ -29,6 +29,10 @@ class NodeDetailsViewController: UIViewController {
     var dataSource: [[String]] = [[]]
     var collapsed = [false, false, false]
     var pendingRequests: [SharingRequest] = []
+    var sharingIndex = 0
+    var timeZoneParam: Param!
+    var timeZoneService: Service!
+    var shareAction: UIAlertAction?
 
     // MARK: - Overriden Methods
 
@@ -40,6 +44,7 @@ class NodeDetailsViewController: UIViewController {
         tableView.register(UINib(nibName: "MembersInfoTableViewCell", bundle: nil), forCellReuseIdentifier: "membersInfoTVC")
         tableView.register(UINib(nibName: "NewMemberTableViewCell", bundle: nil), forCellReuseIdentifier: "newMemberTVC")
         tableView.register(UINib(nibName: "SharingTableViewCell", bundle: nil), forCellReuseIdentifier: "sharingTVC")
+        tableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
 
         tableView.estimatedRowHeight = 70.0
         tableView.tableFooterView = UIView()
@@ -47,8 +52,13 @@ class NodeDetailsViewController: UIViewController {
 
         createDataSource()
 
+        if Configuration.shared.appConfiguration.supportSharing {
+            getSharingInfo()
+        }
+
         // Add gesture to hide keyoboard on tapping anywhere on screen
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGestureRecognizer.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGestureRecognizer)
     }
 
@@ -111,13 +121,36 @@ class NodeDetailsViewController: UIViewController {
 
     // Method to create data source for table view based on user role, sharing details and node information.
     func createDataSource() {
+        // First section will contain node id
         var index = 0
         dataSource = [[]]
         dataSource[index].append("Node ID")
         dataSource[index].append("Node ID:\(currentNode.node_id ?? "")")
 
+        // Second section will contain node information
+        index += 1
+        dataSource.append([])
+        dataSource[index].append("Node Information")
+        dataSource[index].append("Type:\(currentNode.info?.type ?? "")")
+        dataSource[index].append("Firmware version:\(currentNode.info?.fw_version ?? "")")
+        if let tzService = currentNode.services?.first(where: { $0.type == Constants.timezoneServiceName }) {
+            if let tzParam = tzService.params?.first(where: { $0.type == Constants.timezoneServiceParam }) {
+                let timezone = tzParam.value as? String
+                timeZoneParam = tzParam
+                timeZoneService = tzService
+                dataSource[index].append("Timezone:\(timezone ?? "")")
+            }
+        }
+        if let attributes = currentNode.attributes {
+            for attribute in attributes {
+                dataSource[index].append("\(attribute.name ?? ""):\(attribute.value ?? "")")
+            }
+        }
+
+        // If sharing is supported third section will contain related information.
         if Configuration.shared.appConfiguration.supportSharing {
             index += 1
+            sharingIndex = index
             dataSource.append([])
             dataSource[index].append("Sharing")
             if let primaryUsers = currentNode.primary {
@@ -143,19 +176,6 @@ class NodeDetailsViewController: UIViewController {
                 dataSource[index].append("Not Available")
             }
         }
-
-        index += 1
-        dataSource.append([])
-        dataSource[index].append("Node Information")
-        dataSource[index].append("Name:\(currentNode.info?.name ?? "")")
-        dataSource[index].append("Type:\(currentNode.info?.type ?? "")")
-        dataSource[index].append("Firmware version:\(currentNode.info?.fw_version ?? "")")
-        dataSource[index].append("Config Version:\(currentNode.config_version ?? "")")
-        if let attributes = currentNode.attributes {
-            for attribute in attributes {
-                dataSource[index].append("\(attribute.name ?? ""):\(attribute.value ?? "")")
-            }
-        }
     }
 
     // MARK: - Private Methods
@@ -163,10 +183,31 @@ class NodeDetailsViewController: UIViewController {
     // Method to update sharing data based on number of pending requests.
     private func updateSharingData() {
         if pendingRequests.count < 1 {
-            dataSource[1].removeLast()
+            dataSource[sharingIndex].removeLast()
         }
         DispatchQueue.main.async {
-            self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
+            self.tableView.reloadSections(IndexSet(arrayLiteral: self.sharingIndex), with: .automatic)
+        }
+    }
+
+    // Method to fetch sharing information for current node.
+    private func getSharingInfo() {
+        loadingIndicator.isHidden = false
+        loadingIndicator.animate()
+        loadingLabel.isHidden = false
+        NodeSharingManager.shared.getSharingDetails(node: currentNode) { error in
+            DispatchQueue.main.async {
+                self.loadingIndicator.isHidden = true
+                self.loadingLabel.isHidden = true
+            }
+            if error != nil {
+                // Unable to collect sharing information for this particular node.
+                Utility.showToastMessage(view: self.view, message: "Unable to update current node details with error:\(error!.description).")
+                return
+            }
+            // Navigate to node details view controller
+            self.createDataSource()
+            self.tableView.reloadData()
         }
     }
 
@@ -192,8 +233,10 @@ class NodeDetailsViewController: UIViewController {
                     DispatchQueue.main.async {
                         // If pending request count is non zero, show these requests in a separate section.
                         if self.pendingRequests.count > 0 {
-                            self.dataSource[1].append("Pending for acceptance")
-                            self.tableView.reloadData()
+                            if !self.dataSource[self.sharingIndex].contains("Pending for acceptance") {
+                                self.dataSource[self.sharingIndex].append("Pending for acceptance")
+                                self.tableView.reloadData()
+                            }
                         }
                     }
                 }
@@ -203,69 +246,59 @@ class NodeDetailsViewController: UIViewController {
         }
     }
 
-    // Method to return appropriate table view cell for sharing feature.
-    private func getTableViewCellForNewMember(forIndexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "newMemberTVC", for: forIndexPath) as! NewMemberTableViewCell
-        cell.memberEmailTextField.text = ""
-        cell.memberEmailTextField.becomeFirstResponder()
-        cell.memberEmailTextField.delegate = self
-        cell.cancelButtonAction = {
-            if self.pendingRequests.count > 0 {
-                self.dataSource[1][self.dataSource[1].count - 2] = "Add Member"
-            } else {
-                self.dataSource[1][self.dataSource[1].count - 1] = "Add Member"
-            }
-            self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
-        }
-        cell.saveButtonAction = {
-            Utility.showLoader(message: "Sharing in progress..", view: self.view)
-            NodeSharingManager.shared.createSharingRequest(userName: cell.memberEmailTextField.text ?? "", node: self.currentNode) { request, error in
-                Utility.hideLoader(view: self.view)
-                guard let apiError = error else {
-                    DispatchQueue.main.async {
-                        if self.pendingRequests.count < 1 {
-                            self.dataSource[1][self.dataSource[1].count - 1] = "Add Member"
-                            self.dataSource[1].append("Pending for acceptance")
-                        } else {
-                            self.dataSource[1][self.dataSource[1].count - 2] = "Add Member"
-                        }
-                        self.pendingRequests.append(request!)
-                        self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
-                    }
-                    return
-                }
-                DispatchQueue.main.async {
-                    self.view.makeToast("Failed to share node with error: \(apiError.description)", duration: 5.0, position: ToastManager.shared.position, title: nil, image: nil, style: ToastManager.shared.style, completion: nil)
-                    if self.pendingRequests.count > 0 {
-                        self.dataSource[1][self.dataSource[1].count - 2] = "Add Member"
-                    } else {
-                        self.dataSource[1][self.dataSource[1].count - 1] = "Add Member"
-                    }
-                    self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
-                }
-            }
-        }
-        return cell
-    }
-
     // Method to get table view cell with Add Member option
     private func getTableViewCellForAddMember(forIndexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "addMemberTVC", for: forIndexPath) as! AddMemberTableViewCell
         view.endEditing(true)
         cell.addMemberButtonAction = {
-            if self.pendingRequests.count > 0 {
-                self.dataSource[1][self.dataSource[1].count - 2] = "New Member"
-            } else {
-                self.dataSource[1][self.dataSource[1].count - 1] = "New Member"
+            // Open dialog box for entering email of the secondary user
+            let input = UIAlertController(title: "Add Member", message: "", preferredStyle: .alert)
+            input.addTextField { textField in
+                textField.placeholder = "Enter email"
+                textField.delegate = self
+                textField.addTarget(self, action: #selector(self.textFieldDidChange(textField:)), for: .editingChanged)
             }
-            self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
+            input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
+
+            }))
+
+            let shareAction = UIAlertAction(title: "Share", style: .default, handler: { [weak input] _ in
+                let textField = input?.textFields![0]
+                guard let email = textField?.text, !email.trimmingCharacters(in: .whitespaces).isEmpty else {
+                    return
+                }
+                Utility.showLoader(message: "Sharing in progress..", view: self.view)
+                NodeSharingManager.shared.createSharingRequest(userName: email, node: self.currentNode) { request, error in
+                    Utility.hideLoader(view: self.view)
+                    guard let apiError = error else {
+                        DispatchQueue.main.async {
+                            if self.pendingRequests.count < 1 {
+                                self.dataSource[self.sharingIndex].append("Pending for acceptance")
+                            }
+                            self.pendingRequests.append(request!)
+                            self.tableView.reloadSections(IndexSet(arrayLiteral: self.sharingIndex), with: .automatic)
+                        }
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        self.view.makeToast("Failed to share node with error: \(apiError.description)", duration: 5.0, position: ToastManager.shared.position, title: nil, image: nil, style: ToastManager.shared.style, completion: nil)
+                    }
+                }
+            })
+
+            shareAction.isEnabled = false
+            self.shareAction = shareAction
+
+            input.addAction(shareAction)
+
+            self.present(input, animated: true, completion: nil)
         }
         return cell
     }
 
     // Method to get table view cell for pending requests.
     private func getTableViewCellForPendingRequest(forIndexPath: IndexPath) -> UITableViewCell {
-        let request = pendingRequests[forIndexPath.row + 1 - dataSource[1].count]
+        let request = pendingRequests[forIndexPath.row + 1 - dataSource[sharingIndex].count]
         let cell = tableView.dequeueReusableCell(withIdentifier: "membersInfoTVC", for: forIndexPath) as! MembersInfoTableViewCell
         cell.removeMemberButton.isHidden = false
         cell.removeButtonAction = {
@@ -273,7 +306,7 @@ class NodeDetailsViewController: UIViewController {
             NodeSharingManager.shared.deleteSharingRequest(request: request) { _, error in
                 Utility.hideLoader(view: self.view)
                 guard let apiError = error else {
-                    self.pendingRequests.remove(at: forIndexPath.row + 1 - self.dataSource[1].count)
+                    self.pendingRequests.remove(at: forIndexPath.row + 1 - self.dataSource[self.sharingIndex].count)
                     self.updateSharingData()
                     return
                 }
@@ -299,6 +332,15 @@ class NodeDetailsViewController: UIViewController {
             cell.timeStampLabel.text = expiringText
         }
         return cell
+    }
+
+    @objc func textFieldDidChange(textField: UITextField) {
+        // Enable share button if text is non empty
+        if let text = textField.text, text.count > 0 {
+            shareAction?.isEnabled = true
+        } else {
+            shareAction?.isEnabled = false
+        }
     }
 }
 
@@ -331,8 +373,8 @@ extension NodeDetailsViewController: UITableViewDelegate {
 
     func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if pendingRequests.count > 0 {
-            if indexPath.section == 1, indexPath.row + 1 == dataSource[1].count - 1 {
-                if dataSource[1][indexPath.row + 1] == "Pending for acceptance" {
+            if indexPath.section == sharingIndex, indexPath.row + 1 == dataSource[sharingIndex].count - 1 {
+                if dataSource[sharingIndex][indexPath.row + 1] == "Pending for acceptance" {
                     return 40.0
                 }
             }
@@ -358,7 +400,7 @@ extension NodeDetailsViewController: UITableViewDataSource {
         if collapsed[section] {
             return 0
         }
-        if section == 1 {
+        if section == sharingIndex {
             return dataSource[section].count - 1 + pendingRequests.count
         }
         return dataSource[section].count - 1
@@ -366,19 +408,17 @@ extension NodeDetailsViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if Configuration.shared.appConfiguration.supportSharing {
-            if indexPath.section == 1 {
-                let header = dataSource[1][0]
-                if indexPath.row + 1 >= dataSource[1].count {
+            if indexPath.section == sharingIndex {
+                let header = dataSource[sharingIndex][0]
+                if indexPath.row + 1 >= dataSource[sharingIndex].count {
                     return getTableViewCellForPendingRequest(forIndexPath: indexPath)
                 }
-                var rowValue = dataSource[1][indexPath.row + 1]
+                var rowValue = dataSource[sharingIndex][indexPath.row + 1]
                 switch header {
                 case "Shared With":
                     switch rowValue {
                     case "Add Member":
                         return getTableViewCellForAddMember(forIndexPath: indexPath)
-                    case "New Member":
-                        return getTableViewCellForNewMember(forIndexPath: indexPath)
                     case "Pending for acceptance":
                         let cell = tableView.dequeueReusableCell(withIdentifier: "sharingTVC", for: indexPath) as! SharingTableViewCell
                         return cell
@@ -395,9 +435,9 @@ extension NodeDetailsViewController: UITableViewDataSource {
                                         if let index = self.currentNode.secondary!.firstIndex(of: cell.secondaryUserLabel.text ?? "") {
                                             self.currentNode.secondary!.remove(at: index)
                                         }
-                                        self.dataSource[1].remove(at: indexPath.row + 1)
+                                        self.dataSource[self.sharingIndex].remove(at: indexPath.row + 1)
                                         DispatchQueue.main.async {
-                                            self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
+                                            self.tableView.reloadSections(IndexSet(arrayLiteral: self.sharingIndex), with: .automatic)
                                         }
                                     } else {
                                         DispatchQueue.main.async {
@@ -415,7 +455,7 @@ extension NodeDetailsViewController: UITableViewDataSource {
                         return cell
                     }
                 case "Shared by":
-                    rowValue = dataSource[1][indexPath.row + 1]
+                    rowValue = dataSource[sharingIndex][indexPath.row + 1]
                     let cell = tableView.dequeueReusableCell(withIdentifier: "membersInfoTVC", for: indexPath) as! MembersInfoTableViewCell
                     cell.removeMemberButton.isHidden = true
                     cell.secondaryUserLabel.text = rowValue
@@ -429,13 +469,32 @@ extension NodeDetailsViewController: UITableViewDataSource {
                 return cell
             }
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailsTVC", for: indexPath) as! NodeDetailsTableViewCell
         let value = dataSource[indexPath.section][indexPath.row + 1]
         if let firstIndex = value.firstIndex(of: ":") {
             let title = String(value[..<firstIndex])
+
+            // Provide different cell for allowing timezone configuration
+            if title == "Timezone" {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
+                object_setClass(cell, TimeZoneTableViewCell.self)
+                let timeZoneCell = cell as! TimeZoneTableViewCell
+                timeZoneCell.node = currentNode
+                timeZoneCell.param = timeZoneParam
+                timeZoneCell.service = timeZoneService
+                timeZoneCell.datasource = ESPTimezone.timezones
+                timeZoneCell.currentValue = timeZoneParam.value as? String ?? ""
+                timeZoneCell.controlName.text = "Time zone"
+                timeZoneCell.controlValueLabel.text = timeZoneParam.value as? String ?? ""
+                return timeZoneCell
+            }
+
+            // Generic node information cell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailsTVC", for: indexPath) as! NodeDetailsTableViewCell
             cell.titleLabel.text = title
             cell.detailLabel.text = String(value.dropFirst(title.count + 1))
+            return cell
         }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailsTVC", for: indexPath) as! NodeDetailsTableViewCell
         return cell
     }
 }
@@ -444,5 +503,9 @@ extension NodeDetailsViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_: UITextField) -> Bool {
         view.endEditing(true)
         return true
+    }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.text = ""
     }
 }

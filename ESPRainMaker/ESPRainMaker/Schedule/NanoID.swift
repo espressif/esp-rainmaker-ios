@@ -59,7 +59,7 @@ class NanoID {
     }
 }
 
-private class NanoIDHelper {
+private enum NanoIDHelper {
     /// Parses input alphabets into a string
     static func parse(_ alphabets: [NanoIDAlphabet]) -> String {
         var stringCharacters = ""

@@ -97,7 +97,7 @@ open class ColorPickerView: UIView, UICollectionViewDelegate, UICollectionViewDa
 
     // MARK: - View management
 
-    open override func layoutSubviews() {
+    override open func layoutSubviews() {
         addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -206,7 +206,8 @@ open class ColorPickerView: UIView, UICollectionViewDelegate, UICollectionViewDa
 
     public func collectionView(_: UICollectionView, layout _: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if let layoutDelegate = layoutDelegate,
-            let sizeForItemAt = layoutDelegate.colorPickerView?(self, sizeForItemAt: indexPath) {
+           let sizeForItemAt = layoutDelegate.colorPickerView?(self, sizeForItemAt: indexPath)
+        {
             return sizeForItemAt
         }
         return DefaultValues.cellSize

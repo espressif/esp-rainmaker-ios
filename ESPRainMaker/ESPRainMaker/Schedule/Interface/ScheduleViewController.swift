@@ -29,8 +29,14 @@ class ScheduleViewController: UIViewController {
     @IBOutlet var repeatView: UIView!
     @IBOutlet var repeatImage: UIImageView!
     @IBOutlet var daysLabel: UILabel!
-    var isCollapsed = true
     @IBOutlet var actionListTextView: UITextView!
+    @IBOutlet var timerViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet var timeLabel: UILabel!
+    @IBOutlet var timeView: UIView!
+    @IBOutlet var removeButton: UIButton!
+
+    var isCollapsed = true
+    var scheduleKey = ""
 
     // MARK: - Overriden Methods
 
@@ -51,10 +57,23 @@ class ScheduleViewController: UIViewController {
             scheduleNameLabel.text = ESPScheduler.shared.currentSchedule.name
             let dateString = ESPScheduler.shared.currentSchedule.trigger.getTimeDetails()
             datePicker.setDate(from: dateString, format: "h:mm a", animated: true)
+            removeButton.isHidden = false
         }
 
         actionListTextView.textContainer.heightTracksTextView = true
         actionListTextView.isScrollEnabled = false
+        actionListTextView.contentInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+        if #available(iOS 14.0, *) {
+            datePicker.preferredDatePickerStyle = .inline
+        } else {
+            // Fallback on earlier versions
+            timeLabel.isHidden = true
+            timerViewHeightConstraint.constant = 200.0
+            datePicker.leadingAnchor.constraint(equalTo: timeView.leadingAnchor, constant: 0).isActive = true
+            datePicker.trailingAnchor.constraint(equalTo: timeView.trailingAnchor, constant: 0).isActive = true
+            datePicker.topAnchor.constraint(equalTo: timeView.topAnchor, constant: 0).isActive = true
+            datePicker.bottomAnchor.constraint(equalTo: timeView.bottomAnchor, constant: 0).isActive = true
+        }
         setRepeatStatus()
     }
 
@@ -85,6 +104,28 @@ class ScheduleViewController: UIViewController {
     }
 
     // MARK: - IBActions
+
+    @IBAction func removeScheduleAction(_: Any) {
+        let alertController = UIAlertController(title: "Are you sure?", message: "", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+        let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+            DispatchQueue.main.async {
+                Utility.showLoader(message: "", view: self.view)
+                ESPScheduler.shared.deleteScheduleAt(key: self.scheduleKey, onView: self.view) { result in
+                    DispatchQueue.main.async {
+                        Utility.hideLoader(view: self.view)
+                        if result {
+                            User.shared.updateDeviceList = true
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                    }
+                }
+            }
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(confirmAction)
+        present(alertController, animated: true, completion: nil)
+    }
 
     @IBAction func scheduleNamePressed(_: Any) {
         let input = UIAlertController(title: "Add name", message: "Choose name for your schedule", preferredStyle: .alert)

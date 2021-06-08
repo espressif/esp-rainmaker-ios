@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "checkboxPartial@1x.png",
+      "filename" : "checkbox_partial@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "checkboxPartial@2x.png.png",
+      "filename" : "checkbox_partial@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "checkboxPartial@3x.png.png",
+      "filename" : "checkbox_partial@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

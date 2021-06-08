@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ClaimViewController.swift
+//  ConnectViewController.swift
 //  ESPRainMaker
-//
-//  Created by Vikas Chandra on 10/01/20.
-//  Copyright © 2020 Espressif. All rights reserved.
 //
 
 import ESPProvision
@@ -26,6 +23,7 @@ class ConnectViewController: UIViewController {
     @IBOutlet var popTextField: UITextField!
     @IBOutlet var headerLabel: UILabel!
     @IBOutlet var nextButton: UIButton!
+    var popHandler: ((String) -> Void)?
     var currentDeviceName = ""
     var espDevice: ESPDevice!
     var pop = ""
@@ -68,26 +66,19 @@ class ConnectViewController: UIViewController {
         espDevice.connect(delegate: self) { status in
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
-            }
-            switch status {
-            case .connected:
-                DispatchQueue.main.async {
-                    self.checkForAssistedClaiming(device: self.espDevice)
-                }
-            case let .failedToConnect(error):
-                DispatchQueue.main.async {
-                    var errorDescription = ""
-                    switch error {
-                    case .securityMismatch, .versionInfoError:
-                        errorDescription = error.description
-                    default:
-                        errorDescription = error.description + "\nCheck if POP is correct."
+                switch status {
+                case .connected:
+                    DispatchQueue.main.async {
+                        self.checkForAssistedClaiming(device: self.espDevice)
                     }
-                    let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
-                    self.showAlert(error: errorDescription, action: action)
-                }
-            default:
-                DispatchQueue.main.async {
+                case let .failedToConnect(error):
+                    switch error {
+                    case .sessionInitError:
+                        self.showStatusScreen(step1Failed: true, message: error.description + ".Please check if POP is correct.")
+                    default:
+                        self.showStatusScreen(step1Failed: true, message: error.description)
+                    }
+                default:
                     let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
                     self.showAlert(error: "Device disconnected", action: action)
                 }
@@ -108,11 +99,20 @@ class ConnectViewController: UIViewController {
         }
     }
 
+    // Show status screen, called when device connection fails.
+    func showStatusScreen(step1Failed: Bool = false, message: String) {
+        Utility.hideLoader(view: view)
+        let successVC = storyboard?.instantiateViewController(withIdentifier: "successViewController") as! SuccessViewController
+        successVC.step1Failed = step1Failed
+        successVC.espDevice = espDevice
+        successVC.failureMessage = message
+        navigationController?.pushViewController(successVC, animated: true)
+    }
+
     func goToProvision() {
         DispatchQueue.main.async {
             Utility.hideLoader(view: self.view)
             let provisionVC = self.storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
-            provisionVC.connectAutomatically = true
             provisionVC.device = self.espDevice
             self.navigationController?.pushViewController(provisionVC, animated: true)
         }
@@ -129,16 +129,10 @@ class ConnectViewController: UIViewController {
         alertController.addAction(action)
         present(alertController, animated: true, completion: nil)
     }
-
-    override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
-        let destination = segue.destination as! ProvisionViewController
-        destination.isScanFlow = false
-        destination.pop = popTextField.text ?? ""
-    }
 }
 
 extension ConnectViewController: ESPDeviceConnectionDelegate {
-    func getProofOfPossesion(forDevice _: ESPDevice) -> String? {
-        return pop
+    func getProofOfPossesion(forDevice _: ESPDevice, completionHandler: @escaping (String) -> Void) {
+        completionHandler(pop)
     }
 }

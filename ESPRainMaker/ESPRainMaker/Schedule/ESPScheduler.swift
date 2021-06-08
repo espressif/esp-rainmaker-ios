@@ -139,7 +139,7 @@ class ESPScheduler {
                         finalResult = finalResult || true
                     default:
                         if nodeID != "" {
-                            Utility.showToastMessage(view: onView, message: "Unable to delete schedule for \(nodeID)")
+                            Utility.showToastMessage(view: onView, message: "Unable to delete schedule for \(self.getDeviceListFromAction(action: self.currentSchedule.actions, forKey: nodeID))")
                             finalResult = finalResult || false
                         }
                     }
@@ -173,7 +173,7 @@ class ESPScheduler {
         for key in ESPScheduler.shared.currentSchedule.actions.keys {
             for device in ESPScheduler.shared.currentSchedule.actions[key]! {
                 let id = [key, device.name].compactMap { $0 }.joined(separator: ".")
-                if let availableDevice = self.availableDevices[id], let params = device.params {
+                if let availableDevice = availableDevices[id], let params = device.params {
                     for param in params {
                         if let availableDeviceParam = availableDevice.params?.first(where: { $0.name == param.name }) {
                             availableDeviceParam.value = param.value
@@ -337,7 +337,12 @@ class ESPScheduler {
         if let devices = action[forKey] {
             var deviceNames: [String] = []
             for device in devices {
-                deviceNames.append(device.deviceName)
+                let key = [forKey, device.name].compactMap { $0 }.joined(separator: ".")
+                if let availableDevice = availableDevices[key] {
+                    deviceNames.append(availableDevice.deviceName)
+                } else {
+                    deviceNames.append(device.name ?? "")
+                }
             }
             return deviceNames.joined(separator: ", ")
         }

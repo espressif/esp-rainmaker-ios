@@ -53,12 +53,12 @@ extension UISegmentedControl {
     }
 
     func changeUnderlineColor(color: UIColor) {
-        guard let underline = self.viewWithTag(1) else { return }
+        guard let underline = viewWithTag(1) else { return }
         underline.backgroundColor = color
     }
 
     func changeUnderlinePosition() {
-        guard let underline = self.viewWithTag(1) else { return }
+        guard let underline = viewWithTag(1) else { return }
         let underlineFinalXPosition = (UIScreen.main.bounds.size.width / CGFloat(numberOfSegments)) * CGFloat(selectedSegmentIndex)
         let underlineWidth: CGFloat = UIScreen.main.bounds.size.width / CGFloat(numberOfSegments)
         UIView.animate(withDuration: 0.1, animations: {
@@ -318,14 +318,14 @@ extension UIView {
         let offset: CGFloat = frame.width / desiredCurve!
         let bounds: CGRect = self.bounds
 
-        let rectBounds: CGRect = CGRect(x: bounds.origin.x, y: bounds.origin.y, width: bounds.size.width, height: bounds.size.height / 2)
-        let rectPath: UIBezierPath = UIBezierPath(rect: rectBounds)
-        let ovalBounds: CGRect = CGRect(x: bounds.origin.x - offset / 2, y: bounds.origin.y, width: bounds.size.width + offset, height: bounds.size.height)
-        let ovalPath: UIBezierPath = UIBezierPath(ovalIn: ovalBounds)
+        let rectBounds = CGRect(x: bounds.origin.x, y: bounds.origin.y, width: bounds.size.width, height: bounds.size.height / 2)
+        let rectPath = UIBezierPath(rect: rectBounds)
+        let ovalBounds = CGRect(x: bounds.origin.x - offset / 2, y: bounds.origin.y, width: bounds.size.width + offset, height: bounds.size.height)
+        let ovalPath = UIBezierPath(ovalIn: ovalBounds)
         rectPath.append(ovalPath)
 
         // Create the shape layer and set its path
-        let maskLayer: CAShapeLayer = CAShapeLayer()
+        let maskLayer = CAShapeLayer()
         maskLayer.frame = bounds
         maskLayer.path = rectPath.cgPath
 
@@ -427,5 +427,45 @@ extension UnkeyedDecodingContainer {
     mutating func decode(_ type: [String: Any].Type) throws -> [String: Any] {
         let nestedContainer = try self.nestedContainer(keyedBy: JSONCodingKeys.self)
         return try nestedContainer.decode(type)
+    }
+}
+
+extension UITapGestureRecognizer {
+    func didTapAttributedTextInLabel(label: UILabel, inRange targetRange: NSRange) -> Bool {
+        // Create instances of NSLayoutManager, NSTextContainer and NSTextStorage
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer(size: CGSize.zero)
+        let textStorage = NSTextStorage(attributedString: label.attributedText!)
+
+        // Configure layoutManager and textStorage
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+
+        // Configure textContainer
+        textContainer.lineFragmentPadding = 0.0
+        textContainer.lineBreakMode = label.lineBreakMode
+        textContainer.maximumNumberOfLines = label.numberOfLines
+        let labelSize = label.bounds.size
+        textContainer.size = labelSize
+
+        // Find the tapped character location and compare it to the specified range
+        let locationOfTouchInLabel = location(in: label)
+        let textBoundingBox = layoutManager.usedRect(for: textContainer)
+        // let textContainerOffset = CGPointMake((labelSize.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x,
+        // (labelSize.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y);
+        let textContainerOffset = CGPoint(x: (labelSize.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x, y: (labelSize.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y)
+
+        // let locationOfTouchInTextContainer = CGPointMake(locationOfTouchInLabel.x - textContainerOffset.x,
+        // locationOfTouchInLabel.y - textContainerOffset.y);
+        let locationOfTouchInTextContainer = CGPoint(x: locationOfTouchInLabel.x - textContainerOffset.x, y: locationOfTouchInLabel.y - textContainerOffset.y)
+        let indexOfCharacter = layoutManager.characterIndex(for: locationOfTouchInTextContainer, in: textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+        return NSLocationInRange(indexOfCharacter, targetRange)
+    }
+}
+
+extension String {
+    func getDomain() -> String {
+        let url = URL(string: self)
+        return url?.host ?? ""
     }
 }

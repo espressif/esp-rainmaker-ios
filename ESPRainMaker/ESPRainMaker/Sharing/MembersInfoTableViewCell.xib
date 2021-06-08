@@ -52,7 +52,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
-                <color key="backgroundColor" red="0.97254901960784312" green="0.97254901960784312" blue="0.9882352941176471" alpha="1" colorSpace="calibratedRGB"/>
+                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="DKz-A5-ACk" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="60L-gd-SAr"/>
                     <constraint firstItem="DKz-A5-ACk" firstAttribute="leading" secondItem="Xgu-eE-lQN" secondAttribute="trailing" constant="16" id="CLc-Zt-ggD"/>
@@ -63,6 +63,14 @@
                     <constraint firstItem="DKz-A5-ACk" firstAttribute="leading" secondItem="Z4d-6g-DSH" secondAttribute="trailing" constant="16" id="qqc-y3-utl"/>
                     <constraint firstItem="Xgu-eE-lQN" firstAttribute="top" secondItem="Z4d-6g-DSH" secondAttribute="bottom" id="wpq-bQ-fZ1"/>
                 </constraints>
+                <userDefinedRuntimeAttributes>
+                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                        <real key="value" value="0.5"/>
+                    </userDefinedRuntimeAttribute>
+                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </userDefinedRuntimeAttribute>
+                </userDefinedRuntimeAttributes>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

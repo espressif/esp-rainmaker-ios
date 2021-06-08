@@ -19,7 +19,7 @@
 import UIKit
 
 class DeviceCollectionViewLayout: UICollectionViewFlowLayout {
-    required override init() { super.init(); common() }
+    override required init() { super.init(); common() }
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder); common() }
 
     private func common() {

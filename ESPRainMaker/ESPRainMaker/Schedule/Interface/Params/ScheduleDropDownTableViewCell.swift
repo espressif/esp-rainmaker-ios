@@ -32,7 +32,7 @@ class ScheduleDropDownTableViewCell: DropDownTableViewCell {
     @IBAction override func checkBoxPressed(_: Any) {
         if param.selected {
             dropDownButton.isEnabled = false
-            checkButton.setImage(UIImage(named: "unselected"), for: .normal)
+            checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
             param.selected = false
             device.selectedParams -= 1
         } else {

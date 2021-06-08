@@ -5,7 +5,6 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -62,7 +61,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="backgroundColor" red="0.96862745098039216" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstItem="2pQ-g1-7hS" firstAttribute="centerX" secondItem="qRp-ck-z1g" secondAttribute="centerX" id="8mO-p1-KKP"/>
                                     <constraint firstItem="mdg-0o-3tF" firstAttribute="centerX" secondItem="qRp-ck-z1g" secondAttribute="centerX" id="FgZ-lk-UXW"/>
@@ -126,8 +125,9 @@
                                             <constraint firstAttribute="height" constant="46" id="kYQ-Rt-INd"/>
                                             <constraint firstAttribute="width" constant="46" id="qXy-0x-X6x"/>
                                         </constraints>
+                                        <color key="tintColor" red="0.50980392159999999" green="0.39607843139999999" blue="0.89019607840000003" alpha="1" colorSpace="calibratedRGB"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="10" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" image="add_icon">
+                                        <state key="normal" image="plus" catalog="system">
                                             <color key="titleColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                         </state>
                                         <state key="selected" image="cross_icon"/>
@@ -158,7 +158,7 @@
                             </view>
                             <tableView hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Pf7-pP-zJ1">
                                 <rect key="frame" x="20" y="154" width="374" height="708"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="nodeGroupsTVC" rowHeight="60" id="zaQ-RE-IK2" customClass="NodeGroupTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="374" height="60"/>
@@ -231,7 +231,7 @@
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="hie-FN-4O1"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.96862745098039216" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="qRp-ck-z1g" firstAttribute="leading" secondItem="hie-FN-4O1" secondAttribute="leading" id="0AD-eC-xo7"/>
                             <constraint firstItem="Pf7-pP-zJ1" firstAttribute="bottom" secondItem="hie-FN-4O1" secondAttribute="bottom" id="6gf-wC-skC"/>
@@ -352,9 +352,25 @@
                                             <constraint firstAttribute="height" constant="1" id="C3x-g7-FYT"/>
                                         </constraints>
                                     </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RYK-hR-a8L" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="328" y="45.5" width="70" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="R8D-Z9-ei0"/>
+                                            <constraint firstAttribute="width" constant="70" id="mxs-QQ-Fkh"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="Delete">
+                                            <color key="titleColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="removeGroupButtonPressed:" destination="E95-5n-8Co" eventType="touchUpInside" id="4vH-G3-hmd"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
+                                    <constraint firstItem="RYK-hR-a8L" firstAttribute="centerY" secondItem="QdR-Yr-rOM" secondAttribute="centerY" id="75C-zu-zdu"/>
+                                    <constraint firstAttribute="trailing" secondItem="RYK-hR-a8L" secondAttribute="trailing" constant="16" id="8jw-6N-BV4"/>
                                     <constraint firstAttribute="trailing" secondItem="4Jf-WX-XkK" secondAttribute="trailing" id="AGW-Nk-Wc6"/>
                                     <constraint firstAttribute="bottom" secondItem="4Jf-WX-XkK" secondAttribute="bottom" id="H0y-VD-iKv"/>
                                     <constraint firstItem="4Jf-WX-XkK" firstAttribute="leading" secondItem="mTx-hW-Xz9" secondAttribute="leading" id="MBW-6D-BNs"/>
@@ -489,7 +505,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mEU-ev-XbD">
+                                        <view hidden="YES" alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mEU-ev-XbD">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="3"/>
                                             <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
@@ -543,7 +559,7 @@
                                     <rect key="frame" x="0.0" y="160" width="414" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QVb-Ps-Mvh">
+                                        <view hidden="YES" alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QVb-Ps-Mvh">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="3"/>
                                             <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
@@ -567,7 +583,7 @@
                             </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4Tw-30-Fmk"/>
-                        <color key="backgroundColor" white="0.95218857020547942" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" red="0.96862745098039216" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="mTx-hW-Xz9" firstAttribute="height" secondItem="6ft-sW-VKs" secondAttribute="height" multiplier="0.107" id="2Ly-W3-dBb"/>
                             <constraint firstAttribute="bottom" secondItem="6sR-LH-RwD" secondAttribute="bottom" id="AvX-4O-xu9"/>
@@ -721,7 +737,7 @@
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="r0S-W5-GAe"/>
-                        <color key="backgroundColor" white="0.94975385273972601" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" red="0.96862745098039216" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="pcp-GS-cds" firstAttribute="leading" secondItem="r0S-W5-GAe" secondAttribute="leading" id="DLG-mk-hWD"/>
                             <constraint firstItem="CNw-lL-d7z" firstAttribute="top" secondItem="Zzr-W2-oh6" secondAttribute="top" id="Gw6-Hd-142"/>
@@ -915,7 +931,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view alpha="0.69999999999999996" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rsF-Dp-HQx">
+                                        <view hidden="YES" alpha="0.69999999999999996" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rsF-Dp-HQx">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="3"/>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
@@ -969,7 +985,7 @@
                                     <rect key="frame" x="0.0" y="160" width="414" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view alpha="0.69999999999999996" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bUG-at-dMp">
+                                        <view hidden="YES" alpha="0.69999999999999996" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bUG-at-dMp">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="3"/>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
@@ -1001,7 +1017,7 @@
                             </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="xER-Q1-IbO"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.96862745098039216" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="Sa3-y5-xdF" firstAttribute="leading" secondItem="WdC-dB-qGh" secondAttribute="leading" id="0Js-u1-v8c"/>
                             <constraint firstAttribute="trailing" secondItem="JDr-Eb-9ed" secondAttribute="trailing" id="41P-Gz-IGc"/>
@@ -1193,7 +1209,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sQH-HX-FDD">
+                                        <view hidden="YES" alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sQH-HX-FDD">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="3"/>
                                             <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
@@ -1247,7 +1263,7 @@
                                     <rect key="frame" x="0.0" y="160" width="414" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GPe-Mw-xzQ">
+                                        <view hidden="YES" alpha="0.69999998807907104" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GPe-Mw-xzQ">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="3"/>
                                             <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
@@ -1279,7 +1295,7 @@
                             </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Eka-z2-2z0"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.96862745100000003" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="0RH-xP-DVV" firstAttribute="top" secondItem="K5J-vu-SeM" secondAttribute="bottom" id="8H3-ap-PhL"/>
                             <constraint firstItem="K5J-vu-SeM" firstAttribute="leading" secondItem="slg-3c-yMr" secondAttribute="leading" id="9dB-6q-QWH"/>
@@ -1307,15 +1323,12 @@
         <segue reference="xle-iJ-63O"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="add_icon" width="36" height="36"/>
         <image name="cross_icon" width="14" height="14"/>
         <image name="delete" width="12" height="12"/>
         <image name="dummy_device_icon" width="48" height="48"/>
+        <image name="plus" catalog="system" width="128" height="113"/>
         <image name="refresh_icon" width="128" height="128"/>
         <image name="right_arrow" width="6.5" height="12"/>
         <image name="unselected_empty" width="10" height="10"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
     </resources>
 </document>

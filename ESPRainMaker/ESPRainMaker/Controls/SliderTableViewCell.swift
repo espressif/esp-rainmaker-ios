@@ -30,6 +30,8 @@ class SliderTableViewCell: UITableViewCell {
     @IBOutlet var checkButton: UIButton!
     @IBOutlet var leadingSpaceConstraint: NSLayoutConstraint!
     @IBOutlet var trailingSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet var minImage: UIImageView!
+    @IBOutlet var maxImage: UIImageView!
 
     // Stored properties
     var device: Device!

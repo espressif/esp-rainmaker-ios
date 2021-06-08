@@ -17,11 +17,12 @@
 //
 
 import Alamofire
+import FlexColorPicker
 import MBProgressHUD
 import UIKit
 
 class DeviceTraitListViewController: UIViewController {
-    var device: Device?
+    var device: Device!
     var pollingTimer: Timer!
     var skipNextAttributeUpdate = false
 
@@ -29,6 +30,9 @@ class DeviceTraitListViewController: UIViewController {
     @IBOutlet var tableView: UITableView!
     @IBOutlet var offlineLabel: UILabel!
     @IBOutlet var networkIndicator: UIView!
+
+    var dataSource: [Param] = []
+    var foundCentralParam = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,6 +43,8 @@ class DeviceTraitListViewController: UIViewController {
         tableView.register(UINib(nibName: "StaticControlTableViewCell", bundle: nil), forCellReuseIdentifier: "staticControlTableViewCell")
         tableView.register(UINib(nibName: "GenericControlTableViewCell", bundle: nil), forCellReuseIdentifier: "genericControlCell")
         tableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
+        tableView.register(UINib(nibName: "CentralSwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "centralSwitchTVC")
+        tableView.register(UINib(nibName: "RoundHueSliderTableViewCell", bundle: nil), forCellReuseIdentifier: "roundHueSliderTVC")
         tableView.register(ParamSwitchTableViewCell.self, forCellReuseIdentifier: "switchParamTableViewCell")
 
         titleLabel.text = device?.getDeviceName() ?? "Details"
@@ -52,9 +58,38 @@ class DeviceTraitListViewController: UIViewController {
                 showLoader(message: "Getting info")
                 updateDeviceAttributes()
             }
+        } else {
+            checkForCentralParam()
         }
 
         checkOfflineStatus()
+    }
+
+    // Method to show central param based on UI type
+    private func checkForCentralParam() {
+        dataSource.removeAll()
+        foundCentralParam = false
+        // Check if UI type is of hue circle. Verify if bounds are in valid region.
+        for param in device?.params ?? [] {
+            if param.uiType == Constants.hueCircle, let bounds = param.bounds, bounds["min"] as? Int ?? 0 == 0, bounds["max"] as? Int ?? 360 == 360 {
+                dataSource.insert(param, at: 0)
+                foundCentralParam = true
+                continue
+            }
+            dataSource.append(param)
+        }
+        if !foundCentralParam {
+            dataSource = []
+            for param in device?.params ?? [] {
+                // Check if UI type is of big Switch.
+                if param.uiType == Constants.bigSwitch, param.dataType?.lowercased() == "bool" {
+                    foundCentralParam = true
+                    dataSource.insert(param, at: 0)
+                } else {
+                    dataSource.append(param)
+                }
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -109,23 +144,9 @@ class DeviceTraitListViewController: UIViewController {
         if device?.isReachable() ?? false {
             tableView.alpha = 1.0
             tableView.isUserInteractionEnabled = true
-            NetworkManager.shared.getNodeInfo(nodeId: (device?.node?.node_id)!) { node, error in
+            NetworkManager.shared.getDeviceParam(device: device) { error in
                 if error != nil {
                     return
-                }
-                if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
-                    node.node_id == (self.device?.node?.node_id)!
-                }) {
-                    let oldNode = User.shared.associatedNodeList![index]
-                    node?.localNetwork = oldNode.localNetwork
-                    User.shared.associatedNodeList![index] = node!
-                    if let currentDevice = node!.devices?.first(where: { nodeDevice -> Bool in
-                        nodeDevice.name == self.device?.name
-                    }) {
-                        self.device = currentDevice
-                    } else {
-                        print("Device with no node.")
-                    }
                 }
                 DispatchQueue.main.async {
                     Utility.hideLoader(view: self.view)
@@ -167,6 +188,7 @@ class DeviceTraitListViewController: UIViewController {
             }
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
+                self.checkForCentralParam()
                 self.tableView.reloadData()
             }
         }
@@ -181,6 +203,7 @@ class DeviceTraitListViewController: UIViewController {
         } else {
             offlineLabel.text = device?.node?.getNodeStatus() ?? ""
             offlineLabel.isHidden = false
+            tableView.isUserInteractionEnabled = false
         }
     }
 
@@ -204,24 +227,7 @@ class DeviceTraitListViewController: UIViewController {
         // Get current node by node ID
         if let i = User.shared.associatedNodeList!.firstIndex(where: { $0.node_id == self.device?.node?.node_id }) {
             let currentNode = User.shared.associatedNodeList![i]
-
-            if Configuration.shared.appConfiguration.supportSharing {
-                Utility.showLoader(message: "Updating Node details...", view: view)
-                // Fetch sharing details for current user.
-                NodeSharingManager.shared.getSharingDetails(node: currentNode) { error in
-                    Utility.hideLoader(view: self.view)
-                    if error != nil {
-                        // Error while fetching sharing infromation.
-                        Utility.showToastMessage(view: self.view, message: "Unable to update current node details with error:\(error!.description).")
-                    }
-                    // Navigate to node details screen.
-                    DispatchQueue.main.async {
-                        self.goToNodeDetails(node: currentNode)
-                    }
-                }
-            } else {
-                goToNodeDetails(node: currentNode)
-            }
+            goToNodeDetails(node: currentNode)
         }
     }
 
@@ -254,6 +260,31 @@ class DeviceTraitListViewController: UIViewController {
         cell.param = attribute
         if let attributeName = attribute.name {
             cell.attributeKey = attributeName
+        }
+        return cell
+    }
+
+    func getTableViewCellOfCentralParam(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
+        if dynamicAttribute.uiType == Constants.hueCircle {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "roundHueSliderTVC", for: indexPath) as! RoundHueSliderTableViewCell
+            cell.device = device
+            cell.param = dynamicAttribute
+            cell.paramDelegate = self
+            let currentColor = HSBColor(hue: CGFloat(dynamicAttribute.value as! Int) / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+
+            cell.hueSlider.setSelectedHSBColor(currentColor, isInteractive: true)
+            cell.selectedColor.setSelectedHSBColor(currentColor, isInteractive: true)
+            return cell
+        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "centralSwitchTVC", for: indexPath) as! CentralSwitchTableViewCell
+        cell.device = device
+        cell.param = dynamicAttribute
+        cell.paramDelegate = self
+        let switchState = dynamicAttribute.value as? Bool ?? false
+        if switchState {
+            cell.powerButton.setBackgroundImage(UIImage(named: "central_switch_on"), for: .normal)
+        } else {
+            cell.powerButton.setBackgroundImage(UIImage(named: "central_switch_off"), for: .normal)
         }
         return cell
     }
@@ -298,11 +329,12 @@ class DeviceTraitListViewController: UIViewController {
                             cell.slider.isEnabled = false
                         }
                         cell.title.text = dynamicAttribute.name ?? ""
+                        setIconsForSliderCell(cell: cell, param: dynamicAttribute)
                         return cell
                     }
                 }
             }
-        } else if dynamicAttribute.uiType == "esp.ui.toggle", dynamicAttribute.dataType?.lowercased() == "bool" {
+        } else if dynamicAttribute.uiType == "esp.ui.toggle" || dynamicAttribute.uiType == Constants.bigSwitch, dynamicAttribute.dataType?.lowercased() == "bool" {
             let switchCell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
             object_setClass(switchCell, ParamSwitchTableViewCell.self)
             let cell = switchCell as! ParamSwitchTableViewCell
@@ -326,9 +358,8 @@ class DeviceTraitListViewController: UIViewController {
             } else {
                 cell.toggleSwitch.isEnabled = false
             }
-
             return cell
-        } else if dynamicAttribute.uiType == "esp.ui.hue-slider" {
+        } else if dynamicAttribute.uiType == "esp.ui.hue-slider" || dynamicAttribute.uiType == Constants.hueCircle {
             var minValue = 0
             var maxValue = 360
             if let bounds = dynamicAttribute.bounds {
@@ -421,6 +452,22 @@ class DeviceTraitListViewController: UIViewController {
 
         return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
     }
+
+    private func setIconsForSliderCell(cell: ParamSliderTableViewCell, param: Param) {
+        if param.type?.lowercased() == "esp.param.brightness" {
+            cell.minImage.image = UIImage(named: "brightness_low")
+            cell.maxImage.image = UIImage(named: "brightness_high")
+        } else if param.type?.lowercased() == "esp.param.saturation" {
+            cell.minImage.image = UIImage(named: "saturation_low")
+            cell.maxImage.image = UIImage(named: "saturation_high")
+        } else if param.type?.lowercased() == "esp.param.cct" {
+            cell.minImage.image = UIImage(named: "cct_low")
+            cell.maxImage.image = UIImage(named: "cct_high")
+        } else {
+            cell.maxImage.image = nil
+            cell.minImage.image = nil
+        }
+    }
 }
 
 extension DeviceTraitListViewController: UITableViewDelegate {
@@ -430,14 +477,23 @@ extension DeviceTraitListViewController: UITableViewDelegate {
 
     func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let sectionHeaderView = SectionHeaderView.instanceFromNib()
-        if section >= device?.params?.count ?? 0 {
-            let staticControl = device?.attributes![section - (device?.params?.count ?? 0)]
+        if section >= dataSource.count {
+            let staticControl = device?.attributes![section - dataSource.count]
             sectionHeaderView.sectionTitle.text = staticControl?.name!.deletingPrefix(device!.name!)
         } else {
-            let control = device?.params![section]
-            sectionHeaderView.sectionTitle.text = control?.name!.deletingPrefix(device!.name!)
+            let control = dataSource[section]
+            sectionHeaderView.sectionTitle.text = control.name!.deletingPrefix(device!.name!)
         }
         return sectionHeaderView
+    }
+
+    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if foundCentralParam {
+            if indexPath.section == 0 {
+                return 300.0
+            }
+        }
+        return UITableView.automaticDimension
     }
 }
 
@@ -447,20 +503,23 @@ extension DeviceTraitListViewController: UITableViewDataSource {
     }
 
     func numberOfSections(in _: UITableView) -> Int {
-        return (device?.params?.count ?? 0) + (device?.attributes?.count ?? 0)
+        return (dataSource.count) + (device?.attributes?.count ?? 0)
     }
 
     func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var paramCell: UITableViewCell!
-        if indexPath.section >= device?.params?.count ?? 0 {
-            let staticControl = device?.attributes![indexPath.section - (device?.params?.count ?? 0)]
+        if indexPath.section == 0, foundCentralParam {
+            return getTableViewCellOfCentralParam(dynamicAttribute: dataSource[indexPath.section], indexPath: indexPath)
+        }
+        if indexPath.section >= dataSource.count {
+            let staticControl = device?.attributes![indexPath.section - dataSource.count]
             let cell = tableView.dequeueReusableCell(withIdentifier: "staticControlTableViewCell", for: indexPath) as! StaticControlTableViewCell
             cell.controlNameLabel.text = staticControl?.name ?? ""
             cell.controlValueLabel.text = staticControl?.value as? String ?? ""
             paramCell = cell as UITableViewCell
         } else {
-            let control = device?.params![indexPath.section]
-            paramCell = getTableViewCellBasedOn(dynamicAttribute: control!, indexPath: indexPath)
+            let control = dataSource[indexPath.section]
+            paramCell = getTableViewCellBasedOn(dynamicAttribute: control, indexPath: indexPath)
         }
 
         if device?.isReachable() ?? false {

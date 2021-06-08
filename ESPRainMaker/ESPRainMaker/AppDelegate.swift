@@ -51,9 +51,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AWSServiceManager.default().defaultServiceConfiguration = configuration
         ESPNetworkMonitor.shared.startMonitoring()
         DropDown.startListeningToKeyboard()
+
+        // Set tab bar appearance to match theme
+        setTabBarAttribute()
+
         // Uncomment the next line to see library related logs.
-//        ESPProvisionManager.shared.enableLogs(true)
+        // ESPProvisionManager.shared.enableLogs(true)
         return true
+    }
+
+    // Method to set appearance of Tab Bar
+    private func setTabBarAttribute() {
+        var currentBGColor = UIColor(hexString: "#8265E3")
+        if let color = AppConstants.shared.appThemeColor {
+            currentBGColor = color
+        }
+        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.gray], for: .normal)
+        if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
+            UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#8265E3")], for: .selected)
+        } else {
+            UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor], for: .selected)
+        }
     }
 
     func applicationWillResignActive(_: UIApplication) {
@@ -102,7 +120,8 @@ extension AppDelegate: AWSCognitoIdentityInteractiveAuthenticationDelegate {
 
                 navigationController!.popToRootViewController(animated: true)
                 if !navigationController!.isViewLoaded
-                    || navigationController!.view.window == nil {
+                    || navigationController!.view.window == nil
+                {
                     window?.rootViewController?.present(navigationController!,
                                                         animated: true,
                                                         completion: nil)
@@ -116,7 +135,8 @@ extension AppDelegate: AWSCognitoIdentityInteractiveAuthenticationDelegate {
 
             navigationController!.popToRootViewController(animated: true)
             if !navigationController!.isViewLoaded
-                || navigationController!.view.window == nil {
+                || navigationController!.view.window == nil
+            {
                 window?.rootViewController?.present(navigationController!,
                                                     animated: true,
                                                     completion: nil)
@@ -132,7 +152,8 @@ extension AppDelegate: AWSCognitoIdentityInteractiveAuthenticationDelegate {
         }
         DispatchQueue.main.async {
             if !self.mfaViewController!.isViewLoaded
-                || self.mfaViewController!.view.window == nil {
+                || self.mfaViewController!.view.window == nil
+            {
                 // display mfa as popover on current view controller
                 let viewController = self.window?.rootViewController!
                 viewController?.present(self.mfaViewController!,

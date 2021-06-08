@@ -20,6 +20,7 @@ import UIKit
 protocol ScheduleActionDelegate {
     func headerViewDidTappedFor(section: Int)
     func paramStateChangedat(indexPath: IndexPath)
+    func expandSection(expand: Bool, section: Int)
 }
 
 class DeviceHeaderView: UITableViewHeaderFooterView {
@@ -42,6 +43,7 @@ class DeviceHeaderView: UITableViewHeaderFooterView {
                 device.selectedParams += 1
             }
             delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
+            delegate?.expandSection(expand: true, section: section)
         } else if device.selectedParams == device.params?.count {
             selectDeviceButton.setImage(UIImage(named: "checkbox_unselect"), for: .normal)
             for param in device.params! {
@@ -49,6 +51,7 @@ class DeviceHeaderView: UITableViewHeaderFooterView {
             }
             device.selectedParams = 0
             delegate?.paramStateChangedat(indexPath: IndexPath(row: 0, section: section))
+            delegate?.expandSection(expand: false, section: section)
         } else {
             selectDeviceButton.setImage(UIImage(named: "checkbox_unselect"), for: .normal)
             for param in device.params! {

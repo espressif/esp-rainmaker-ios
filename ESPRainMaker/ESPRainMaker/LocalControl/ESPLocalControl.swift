@@ -30,7 +30,7 @@ class ESPLocalControl: NSObject {
     private var services: [String: ESPLocalService] = [:]
     private var serviceBrowser = NetServiceBrowser()
     private var servicesBeingResolved: [NetService] = []
-    private var serviceTimeout: Timer = Timer()
+    private var serviceTimeout = Timer()
 
     let timeout: TimeInterval = 10.0
 
