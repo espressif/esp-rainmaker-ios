@@ -86,6 +86,9 @@ class Node: Codable {
     func getNodeStatus() -> String {
         var status = ""
         if fromLocalStorage {
+            if localNetwork {
+               return "Reachable on WLAN"
+            }
             return status
         }
         if localNetwork {
