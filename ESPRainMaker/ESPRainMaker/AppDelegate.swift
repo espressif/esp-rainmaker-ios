@@ -57,6 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Set tab bar appearance to match theme
         setTabBarAttribute()
+        updateUIViewAppearance()
 
         // Uncomment the next line to see library related logs.
 //        ESPProvisionManager.shared.enableLogs(true)
@@ -77,6 +78,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#8265E3")], for: .selected)
         } else {
             UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor], for: .selected)
+        }
+    }
+    
+    // Method to set background color of UI components according to App Theme.
+    private func updateUIViewAppearance() {
+        NotificationCenter.default.post(Notification(name: Notification.Name(Constants.uiViewUpdateNotification)))
+        var currentBGColor = UIColor(hexString: "#8265E3")
+        if let color = AppConstants.shared.appThemeColor {
+            PrimaryButton.appearance().backgroundColor = color
+            TopBarView.appearance().backgroundColor = color
+            currentBGColor = color
+        } else {
+            if let bgColor = Constants.backgroundColor {
+                PrimaryButton.appearance().backgroundColor = UIColor(hexString: bgColor)
+                TopBarView.appearance().backgroundColor = UIColor(hexString: bgColor)
+                currentBGColor = UIColor(hexString: bgColor)
+            }
+        }
+        if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
+            PrimaryButton.appearance().setTitleColor(UIColor(hexString: "#8265E3"), for: .normal)
+            BarButton.appearance().setTitleColor(UIColor(hexString: "#8265E3"), for: .normal)
+        } else {
+            PrimaryButton.appearance().setTitleColor(UIColor.white, for: .normal)
+            BarButton.appearance().setTitleColor(#colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1), for: .normal)
         }
     }
 
