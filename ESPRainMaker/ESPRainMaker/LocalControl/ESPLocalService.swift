@@ -52,6 +52,7 @@ enum ESPLocalServiceError {
 class ESPLocalService: NSObject {
     var netService: NetService
     var hostname = ""
+    var espLocalDevice = ESPLocalDevice(name: "espDevice", security: .unsecure, transport: .softap)
 
     private let control_endpoint = "esp_local_ctrl/control"
     private var paramValues: [String: Any] = [:]
@@ -60,6 +61,8 @@ class ESPLocalService: NSObject {
     init(service: NetService) {
         netService = service
         hostname = service.hostName ?? ""
+        espLocalDevice.espSoftApTransport = ESPSoftAPTransport(baseUrl: hostname)
+        espLocalDevice.hostname = hostname
     }
 
     /// Method to provide property info of a device on local netowrk.
@@ -69,7 +72,7 @@ class ESPLocalService: NSObject {
     func getPropertyInfo(completionHandler: @escaping ([String: Any]?, ESPLocalServiceError?) -> Swift.Void) {
         let data = try! createGetPropertyCountRequest()
         propertyInfo.removeAll()
-        SendHTTPData(data: data!) { response, error in
+        espLocalDevice.sendData(path: control_endpoint, data: data!) { response, error in
             if error != nil {
                 completionHandler(nil, .httpError(error!))
                 return
@@ -86,7 +89,7 @@ class ESPLocalService: NSObject {
     ///   - completionHandler: Callback that gives information on success/failure of set method.
     func setProperty(json: [String: Any], completionHandler: @escaping (Bool, ESPLocalServiceError?) -> Swift.Void) {
         let data = try! createSetPropertyInfoRequest(json: json)
-        SendHTTPData(data: data!) { response, error in
+        espLocalDevice.sendData(path: control_endpoint, data: data!) { response, error in
             if error != nil {
                 completionHandler(false, .httpError(error!))
                 return
@@ -96,32 +99,32 @@ class ESPLocalService: NSObject {
     }
 
     private func getPropertyValues(count: UInt32, completionHandler: @escaping ([String: Any]?, ESPLocalServiceError?) -> Swift.Void) {
-        var requestProcessedWithoutError = true
         if count < 1 {
             completionHandler(nil, .zeroProperty)
         } else {
-            let group = DispatchGroup()
-            for i in 0 ..< count {
-                do {
-                    let propValRequest = try createGetPropertyValueRequest(index: i)
-                    group.enter()
-                    SendHTTPData(data: propValRequest!) { response, error in
-                        if error != nil {
-                            completionHandler(nil, .httpError(error!))
-                            return
-                        }
-                        requestProcessedWithoutError = self.processGetPropertyInfoResponse(response: response!, completionHandler: completionHandler)
-                        group.leave()
+            self.getPropertValue(count: count, currentCount: 0, completionHandler: completionHandler)
+        }
+    }
+    
+    private func getPropertValue(count: UInt32, currentCount:UInt32, completionHandler: @escaping ([String: Any]?, ESPLocalServiceError?) -> Swift.Void) {
+        do {
+            let propValRequest = try createGetPropertyValueRequest(index: currentCount)
+            espLocalDevice.sendData(path: control_endpoint, data: propValRequest!) { response, error in
+                if error != nil {
+                    completionHandler(nil, .httpError(error!))
+                    return
+                }
+                let processResult = self.processGetPropertyInfoResponse(response: response!, completionHandler: completionHandler)
+                if count == currentCount + 1 {
+                    if processResult {
+                        completionHandler(self.propertyInfo, nil)
                     }
-                } catch {
-                    completionHandler(nil, .encodingError(error))
+                } else {
+                    self.getPropertValue(count: count, currentCount: currentCount+1, completionHandler: completionHandler)
                 }
             }
-            group.notify(queue: DispatchQueue.main) {
-                if requestProcessedWithoutError {
-                    completionHandler(self.propertyInfo, nil)
-                }
-            }
+        } catch {
+            completionHandler(nil, .encodingError(error))
         }
     }
 
@@ -197,33 +200,10 @@ class ESPLocalService: NSObject {
                 propertyInfo[prop?.name ?? ""] = json
                 return true
             } else {
-                completionHandler(nil, .failure(response.respGetPropVals.status))
                 return false
             }
         } catch {
-            completionHandler(nil, .decodingError(error))
             return false
         }
-    }
-
-    private func SendHTTPData(data: Data, completionHandler: @escaping (Data?, Error?) -> Swift.Void) {
-        let url = URL(string: "http://\(hostname)/\(control_endpoint)")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.timeoutInterval = 2.0
-        request.httpBody = data
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {
-                completionHandler(nil, error)
-                return
-            }
-
-            let httpStatus = response as? HTTPURLResponse
-            if httpStatus?.statusCode != 200 {
-                print("statusCode should be 200, but is \(String(describing: httpStatus?.statusCode))")
-            }
-            completionHandler(data, nil)
-        }
-        task.resume()
     }
 }

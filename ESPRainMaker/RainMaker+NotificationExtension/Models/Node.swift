@@ -31,6 +31,8 @@ class Node: Codable {
     var timestamp: Int = 0
     var isSchedulingSupported = false
     var localNetwork = false
+    var supportsEncryption = false
+    var pop = ""
     var fromLocalStorage = false
     var maxSchedulesCount = -1
     var currentSchedulesCount = 0
@@ -50,6 +52,8 @@ class Node: Codable {
         case services
         case maxSchedulesCount
         case currentSchedulesCount
+        case supportsEncryption
+        case pop
     }
 
     func encode(to encoder: Encoder) throws {
@@ -62,6 +66,8 @@ class Node: Codable {
         try container.encode(services, forKey: .services)
         try container.encode(maxSchedulesCount, forKey: .maxSchedulesCount)
         try container.encode(currentSchedulesCount, forKey: .currentSchedulesCount)
+        try container.encode(supportsEncryption, forKey: .supportsEncryption)
+        try container.encode(pop, forKey: .pop)
 
         var configContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
         try configContainer.encode(info, forKey: .info)
@@ -89,6 +95,8 @@ class Node: Codable {
         isSchedulingSupported = try container.decodeIfPresent(Bool.self, forKey: .isSchedulingSupported) ?? false
         maxSchedulesCount = try container.decodeIfPresent(Int.self, forKey: .maxSchedulesCount) ?? -1
         currentSchedulesCount = try container.decodeIfPresent(Int.self, forKey: .currentSchedulesCount) ?? 0
+        supportsEncryption = try container.decodeIfPresent(Bool.self, forKey: .supportsEncryption) ?? false
+        pop = try container.decodeIfPresent(String.self, forKey: .pop) ?? ""
         isConnected = false
         fromLocalStorage = true
     }
@@ -100,11 +108,17 @@ class Node: Codable {
         var status = ""
         if fromLocalStorage {
             if localNetwork {
+                if supportsEncryption {
+                    return "🔒 Reachable on WLAN"
+                }
                return "Reachable on WLAN"
             }
             return status
         }
         if localNetwork {
+            if supportsEncryption {
+                return "🔒 Reachable on WLAN"
+            }
             status = "Reachable on WLAN"
         } else {
             if isConnected {

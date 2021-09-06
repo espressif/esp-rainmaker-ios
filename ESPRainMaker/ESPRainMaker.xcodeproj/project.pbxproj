@@ -70,8 +70,8 @@
 		F10B077225D2726800723254 /* NewNodeGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077125D2726800723254 /* NewNodeGroupViewController.swift */; };
 		F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */; };
 		F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10C2B2925EB82D800B60696 /* User.storyboard */; };
+		F10D8DF8270EF1A80056E986 /* ESPLocalStorageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10D8DF7270EF1A80056E986 /* ESPLocalStorageHandler.swift */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
-		F1105D9525492EC00047DF1B /* ESPLocalStorageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D9425492EC00047DF1B /* ESPLocalStorageHandler.swift */; };
 		F1110429252D8E2D0030A1D3 /* ESPLocalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */; };
 		F111042D252D924F0030A1D3 /* esp_local_ctrl.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F111042C252D924F0030A1D3 /* esp_local_ctrl.pb.swift */; };
 		F1110431252D927F0030A1D3 /* constants.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110430252D927F0030A1D3 /* constants.pb.swift */; };
@@ -194,6 +194,7 @@
 		F1C352CB26D4E92600A88893 /* ESPNotificationHandler+UpdateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C352CA26D4E92500A88893 /* ESPNotificationHandler+UpdateData.swift */; };
 		F1C352CD26D56CC800A88893 /* ESPLocalStorageNodes+GetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C352CC26D56CC800A88893 /* ESPLocalStorageNodes+GetNode.swift */; };
 		F1C352CE26D56CC800A88893 /* ESPLocalStorageNodes+GetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C352CC26D56CC800A88893 /* ESPLocalStorageNodes+GetNode.swift */; };
+		F1C352D026DBC40900A88893 /* ESPLocalDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C352CF26DBC40900A88893 /* ESPLocalDevice.swift */; };
 		F1C76D522687C6AF009E217D /* ESPNotificationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C76D512687C6AF009E217D /* ESPNotificationProtocol.swift */; };
 		F1C76D542687C7B0009E217D /* ESPNotificationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C76D532687C7B0009E217D /* ESPNotificationEvent.swift */; };
 		F1C76D592687D463009E217D /* ESPNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C76D582687D463009E217D /* ESPNotificationHandler.swift */; };
@@ -376,8 +377,8 @@
 		F10C2AEB25E584C300B60696 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		F10C2AEF25E58B9800B60696 /* AddSharingNotificationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSharingNotificationTableViewCell.swift; sourceTree = "<group>"; };
 		F10C2B2925EB82D800B60696 /* User.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = User.storyboard; sourceTree = "<group>"; };
+		F10D8DF7270EF1A80056E986 /* ESPLocalStorageHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPLocalStorageHandler.swift; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
-		F1105D9425492EC00047DF1B /* ESPLocalStorageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalStorageHandler.swift; sourceTree = "<group>"; };
 		F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalService.swift; sourceTree = "<group>"; };
 		F111042C252D924F0030A1D3 /* esp_local_ctrl.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = esp_local_ctrl.pb.swift; sourceTree = "<group>"; };
 		F1110430252D927F0030A1D3 /* constants.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = constants.pb.swift; sourceTree = "<group>"; };
@@ -492,6 +493,7 @@
 		F1C1AD4F25EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundHueSliderTableViewCell.xib; sourceTree = "<group>"; };
 		F1C352CA26D4E92500A88893 /* ESPNotificationHandler+UpdateData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPNotificationHandler+UpdateData.swift"; sourceTree = "<group>"; };
 		F1C352CC26D56CC800A88893 /* ESPLocalStorageNodes+GetNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPLocalStorageNodes+GetNode.swift"; sourceTree = "<group>"; };
+		F1C352CF26DBC40900A88893 /* ESPLocalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalDevice.swift; sourceTree = "<group>"; };
 		F1C611A324F79804007EEFC6 /* ESP ScheduleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ESP ScheduleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1C76D512687C6AF009E217D /* ESPNotificationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNotificationProtocol.swift; sourceTree = "<group>"; };
 		F1C76D532687C7B0009E217D /* ESPNotificationEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNotificationEvent.swift; sourceTree = "<group>"; };
@@ -868,6 +870,7 @@
 			children = (
 				F117CDEE252C75CD00ADB856 /* ESPLocalControl.swift */,
 				F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */,
+				F1C352CF26DBC40900A88893 /* ESPLocalDevice.swift */,
 			);
 			path = LocalControl;
 			sourceTree = "<group>";
@@ -1067,9 +1070,9 @@
 		F1C76D712688AD0F009E217D /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				F10D8DF7270EF1A80056E986 /* ESPLocalStorageHandler.swift */,
 				F1C76D63268872C9009E217D /* ESPLocalStorageSchedules.swift */,
 				F1DF2E3A268CA8F000D3C8D6 /* ESPLocalStorageNodeGroups.swift */,
-				F1105D9425492EC00047DF1B /* ESPLocalStorageHandler.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -1515,6 +1518,7 @@
 				0C80AA2726FDBD4B00480C53 /* ESPAPIParser.swift in Sources */,
 				F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */,
 				F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */,
+				F1C352D026DBC40900A88893 /* ESPLocalDevice.swift in Sources */,
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
 				F195745925B5AD09005F6601 /* MembersInfoTableViewCell.swift in Sources */,
 				F1C76D7C2688D742009E217D /* ESPSilentNotificationHandler.swift in Sources */,
@@ -1570,6 +1574,7 @@
 				F1C76D62268871F3009E217D /* ESPLocalStorage.swift in Sources */,
 				F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */,
 				0C80AA2A26FDBD4B00480C53 /* ESPTokenWorker.swift in Sources */,
+				F10D8DF8270EF1A80056E986 /* ESPLocalStorageHandler.swift in Sources */,
 				F1B0ACFA25DBCB7B004057BD /* DeviceGroupCollectionViewCell.swift in Sources */,
 				0C80AA2926FDBD4B00480C53 /* ESPAPIErrorWorker.swift in Sources */,
 				F18744212695F19400971591 /* AddSharingNotificationTableViewCell.swift in Sources */,
@@ -1650,7 +1655,6 @@
 				0CF69240270A308B0098F515 /* ESPAlexaAPIWorker.swift in Sources */,
 				F17EF2B42652690E002AC7BE /* TimeZoneTableViewCell.swift in Sources */,
 				F1FB153C234D91000053B0ED /* SliderTableViewCell.swift in Sources */,
-				F1105D9525492EC00047DF1B /* ESPLocalStorageHandler.swift in Sources */,
 				F190B9C624C0D842006D136D /* DeviceHeaderView.swift in Sources */,
 				0CF69242270A34140098F515 /* AppDelegate+ESPAlexa.swift in Sources */,
 				F195745325B5AA41005F6601 /* AddMemberTableViewCell.swift in Sources */,

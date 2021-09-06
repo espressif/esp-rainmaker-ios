@@ -81,7 +81,9 @@ For more details :
 
 - This feature allows discovering devices on local Wi-Fi network using Bonjour (mDNS) and controlling them using HTTP as per the [ESP Local Control](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/protocols/esp_local_ctrl.html) specifications.
 
-- Local Control ensures your devices are reachable even when your internet connection is poor or there is no internet over connected Wi-Fi
+- Local Control ensures your devices are reachable even when your internet connection is poor or there is no internet over connected Wi-Fi.
+
+- Supports both secure and unsecure communication with device over local network.
 
 Local Control feature is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Local Control` key from `App Configuration` to `NO`.
 
