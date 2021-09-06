@@ -180,6 +180,7 @@ class DevicesViewController: UIViewController {
                 self.loadingIndicator.isHidden = true
                 User.shared.associatedNodeList = nil
                 if error != nil {
+                    self.searchForDevicesOnWLAN()
                     self.unhideInitialView(error: error)
                     self.collectionView.isUserInteractionEnabled = true
                     return
@@ -188,12 +189,7 @@ class DevicesViewController: UIViewController {
 
                 if Configuration.shared.appConfiguration.supportGrouping {
                     NodeGroupManager.shared.getNodeGroups { _, error in
-                        DispatchQueue.main.async {
-                            // Start local discovery if its enabled
-                            if Configuration.shared.appConfiguration.supportLocalControl {
-                                User.shared.startServiceDiscovery()
-                            }
-                        }
+                        self.searchForDevicesOnWLAN()
                         if error != nil {
                             Utility.showToastMessage(view: self.view, message: error!.description, duration: 5.0)
                         }
@@ -201,9 +197,7 @@ class DevicesViewController: UIViewController {
                         self.prepareView()
                     }
                 } else {
-                    if Configuration.shared.appConfiguration.supportLocalControl {
-                        User.shared.startServiceDiscovery()
-                    }
+                    self.searchForDevicesOnWLAN()
                     self.prepareView()
                 }
             }
@@ -278,6 +272,15 @@ class DevicesViewController: UIViewController {
     }
 
     // MARK: - Private Methods
+    
+    private func searchForDevicesOnWLAN() {
+        DispatchQueue.main.async {
+            // Start local discovery if its enabled
+            if Configuration.shared.appConfiguration.supportLocalControl {
+                User.shared.startServiceDiscovery()
+            }
+        }
+    }
 
     private func goToBleProvision() {
         let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
