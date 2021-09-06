@@ -33,8 +33,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var rememberDeviceCompletionSource: AWSTaskCompletionSource<NSNumber>?
     var user: AWSCognitoIdentityUser?
     var isInitialized = false
+    let apiManager = ESPAPIManager()
+    var deviceToken: String?
 
-    func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
         // Override point for customization after application launch.
         // fetch the user pool client we initialized in above step
         storyboard = UIStoryboard(name: "Login", bundle: nil)
@@ -56,7 +59,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setTabBarAttribute()
 
         // Uncomment the next line to see library related logs.
-        // ESPProvisionManager.shared.enableLogs(true)
+//        ESPProvisionManager.shared.enableLogs(true)
+
+        UNUserNotificationCenter.current().delegate = self
+        
         return true
     }
 
@@ -90,7 +96,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-//        VersionManager.shared.checkForAppUpdate()
     }
 
     func applicationWillTerminate(_: UIApplication) {
@@ -142,6 +147,12 @@ extension AppDelegate: AWSCognitoIdentityInteractiveAuthenticationDelegate {
                                                     completion: nil)
             }
         }
+        
+        // Additional check to remove local storage before login screen is presented.
+        let localStorageHandler = ESPLocalStorageHandler()
+        localStorageHandler.cleanupData()
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        
         return signInViewController!
     }
 

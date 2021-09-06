@@ -39,6 +39,7 @@ class DevicesViewController: UIViewController {
     @IBOutlet var groupMenuButton: UIButton!
 
     let controlStoryBoard = UIStoryboard(name: "DeviceDetail", bundle: nil)
+    let localStorageHandler = ESPLocalStorageHandler()
 
     var user: AWSCognitoIdentityUser?
     var pool: AWSCognitoIdentityUserPool?
@@ -60,15 +61,19 @@ class DevicesViewController: UIViewController {
         }
 
         // Get info of user from user default
-        if (UserDefaults.standard.value(forKey: Constants.userInfoKey) as? [String: Any]) != nil {
+        if User.shared.isUserSessionActive {
             collectionView.isUserInteractionEnabled = false
             collectionView.isHidden = false
             // Fetch associated nodes from local storage
-            User.shared.associatedNodeList = ESPLocalStorage.shared.fetchNodeDetails()
+            User.shared.associatedNodeList = localStorageHandler.fetchNodeDetails()
             if Configuration.shared.appConfiguration.supportGrouping {
-                NodeGroupManager.shared.nodeGroup = ESPLocalStorage.shared.fetchNodeGroups()
+                NodeGroupManager.shared.nodeGroups = localStorageHandler.fetchNodeGroups() ?? []
             }
+            User.shared.associatedNodeList = localStorageHandler.fetchNodeDetails()
             refreshDeviceList()
+            
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+            appDelegate?.configureRemoteNotifications()
         } else {
             refresh()
         }
@@ -115,11 +120,9 @@ class DevicesViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        addButton.setImage(UIImage(named: "add_icon"), for: .normal)
-        dropDownMenu.isHidden = true
+        addButton?.setImage(UIImage(named: "add_icon"), for: .normal)
+        dropDownMenu?.isHidden = true
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.networkUpdateNotification), object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -128,6 +131,8 @@ class DevicesViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(localNetworkUpdate), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadCollectionView), name: Notification.Name(Constants.reloadCollectionView), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshDeviceList), name: Notification.Name(Constants.refreshDeviceList), object: nil)
         tabBarController?.tabBar.isHidden = false
     }
 
@@ -306,7 +311,11 @@ class DevicesViewController: UIViewController {
     private func updateUserInfo() {
         User.shared.getcognitoIdToken { idToken in
             if idToken != nil {
-                self.getUserInfo(token: idToken!, provider: .cognito)
+                User.shared.updateUserInfo(token: idToken!, provider: .cognito)
+                self.refreshDeviceList()
+                // Configure remote notification if not done.
+                let appDelegate = UIApplication.shared.delegate as? AppDelegate
+                appDelegate?.configureRemoteNotifications()
             } else {
                 Utility.hideLoader(view: self.view)
                 self.refreshDeviceList()
@@ -341,13 +350,13 @@ class DevicesViewController: UIViewController {
         absoluteSegmentPosition = []
 
         var segmentPosition: CGFloat = 0
-        for i in 0 ... NodeGroupManager.shared.nodeGroup.count {
+        for i in 0 ... NodeGroupManager.shared.nodeGroups.count {
             var stringBoundingbox: CGSize = .zero
             if i == 0 {
                 stringBoundingbox = "All Devices".size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.5, weight: .semibold)])
                 segmentControl.insertSegment(withTitle: "All Devices", at: i, animated: false)
             } else {
-                let groupName = NodeGroupManager.shared.nodeGroup[i - 1].group_name ?? ""
+                let groupName = NodeGroupManager.shared.nodeGroups[i - 1].group_name ?? ""
                 stringBoundingbox = (groupName as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17.5, weight: .semibold)])
                 segmentControl.insertSegment(withTitle: groupName, at: i, animated: false)
             }
@@ -355,8 +364,8 @@ class DevicesViewController: UIViewController {
             absoluteSegmentPosition.append(segmentPosition)
             segmentControl.setWidth(stringBoundingbox.width + 20, forSegmentAt: i)
         }
-        if currentPage > NodeGroupManager.shared.nodeGroup.count {
-            segmentControl.selectedSegmentIndex = NodeGroupManager.shared.nodeGroup.count
+        if currentPage > NodeGroupManager.shared.nodeGroups.count {
+            segmentControl.selectedSegmentIndex = NodeGroupManager.shared.nodeGroups.count
         } else {
             segmentControl.selectedSegmentIndex = currentPage
         }
@@ -364,20 +373,6 @@ class DevicesViewController: UIViewController {
 
     private func getFontWidthForString(text: NSString) -> CGSize {
         return text.size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.5, weight: .semibold)])
-    }
-
-    private func getUserInfo(token: String, provider: ServiceProvider) {
-        do {
-            let json = try decode(jwt: token)
-            User.shared.userInfo.username = json.body["cognito:username"] as? String ?? ""
-            User.shared.userInfo.email = json.body["email"] as? String ?? ""
-            User.shared.userInfo.userID = json.body["custom:user_id"] as? String ?? ""
-            User.shared.userInfo.loggedInWith = provider
-            User.shared.userInfo.saveUserInfo()
-        } catch {
-            print("error parsing token")
-        }
-        refreshDeviceList()
     }
 
     private func getSingleDeviceNodeCount(forNodeList: [Node]?) -> Int {
@@ -404,7 +399,7 @@ class DevicesViewController: UIViewController {
     }
 
     private func unhideInitialView(error: ESPNetworkError?) {
-        User.shared.associatedNodeList = ESPLocalStorage.shared.fetchNodeDetails()
+        User.shared.associatedNodeList = localStorageHandler.fetchNodeDetails()
         if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
             infoLabel.text = "No devices to show\n" + (error?.description ?? "Something went wrong!!")
             emptyListIcon.image = nil
@@ -420,7 +415,7 @@ class DevicesViewController: UIViewController {
             Utility.showToastMessage(view: view, message: "Network error: \(error?.description ?? "Something went wrong!!")")
         }
         if Configuration.shared.appConfiguration.supportGrouping {
-            NodeGroupManager.shared.nodeGroup = ESPLocalStorage.shared.fetchNodeGroups()
+            NodeGroupManager.shared.nodeGroups = localStorageHandler.fetchNodeGroups() ?? []
             setupSegmentControl()
             prepareView()
         }
@@ -468,14 +463,14 @@ extension DevicesViewController: UICollectionViewDelegate {
 extension DevicesViewController: UICollectionViewDataSource {
     func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
         if Configuration.shared.appConfiguration.supportGrouping {
-            if NodeGroupManager.shared.nodeGroup.count == 0 {
+            if NodeGroupManager.shared.nodeGroups.count == 0 {
                 if User.shared.associatedNodeList == nil || User.shared.associatedNodeList?.count == 0 {
                     return 0
                 } else {
                     return 1
                 }
             }
-            return NodeGroupManager.shared.nodeGroup.count + 1
+            return NodeGroupManager.shared.nodeGroups.count + 1
         }
         return 1
     }
@@ -486,7 +481,7 @@ extension DevicesViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.item > 0 {
-            let group = NodeGroupManager.shared.nodeGroup[indexPath.item - 1]
+            let group = NodeGroupManager.shared.nodeGroups[indexPath.item - 1]
             if group.nodes?.count ?? 0 < 1 {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "deviceGroupEmptyDeviceCVC", for: indexPath) as! DeviceGroupEmptyDeviceCollectionViewCell
                 cell.addDeviceButtonAction = {
@@ -504,7 +499,7 @@ extension DevicesViewController: UICollectionViewDataSource {
             cell.singleDeviceNodeCount = getSingleDeviceNodeCount(forNodeList: User.shared.associatedNodeList)
             cell.datasource = User.shared.associatedNodeList ?? []
         } else {
-            let nodeList = NodeGroupManager.shared.nodeGroup[indexPath.item - 1].nodeList
+            let nodeList = NodeGroupManager.shared.nodeGroups[indexPath.item - 1].nodeList
             cell.singleDeviceNodeCount = getSingleDeviceNodeCount(forNodeList: nodeList)
             cell.datasource = nodeList ?? []
         }

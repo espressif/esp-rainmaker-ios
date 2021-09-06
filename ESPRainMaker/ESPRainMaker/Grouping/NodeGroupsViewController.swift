@@ -124,7 +124,7 @@ class NodeGroupsViewController: UIViewController {
     private func setupInitialView() {
         // Check if group count is more than zero.
         // Display group list in table view.
-        if NodeGroupManager.shared.nodeGroup.count > 0 {
+        if NodeGroupManager.shared.nodeGroups.count > 0 {
             displayTableView()
             tableView.reloadData()
         } else {
@@ -136,7 +136,7 @@ class NodeGroupsViewController: UIViewController {
 
 extension NodeGroupsViewController: UITableViewDataSource {
     func numberOfSections(in _: UITableView) -> Int {
-        return NodeGroupManager.shared.nodeGroup.count
+        return NodeGroupManager.shared.nodeGroups.count
     }
 
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
@@ -145,7 +145,7 @@ extension NodeGroupsViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "nodeGroupsTVC", for: indexPath) as! NodeGroupTableViewCell
-        let nodeGroup = NodeGroupManager.shared.nodeGroup[indexPath.section]
+        let nodeGroup = NodeGroupManager.shared.nodeGroups[indexPath.section]
         cell.groupLabel.text = nodeGroup.group_name
         var totalDeviceCount = 0
         var deviceList: [String] = []
@@ -172,7 +172,7 @@ extension NodeGroupsViewController: UITableViewDataSource {
 extension NodeGroupsViewController: UITableViewDelegate {
     func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         // On selection of any group, go to edit page
-        let selectedGroup = NodeGroupManager.shared.nodeGroup[indexPath.section]
+        let selectedGroup = NodeGroupManager.shared.nodeGroups[indexPath.section]
         let nodeGroupStoryBoard = UIStoryboard(name: "NodeGrouping", bundle: nil)
         let editNodeGroupVC = nodeGroupStoryBoard.instantiateViewController(withIdentifier: "editNodeGroupVC") as! EditNodeGroupViewController
         editNodeGroupVC.currentNodeGroup = selectedGroup
@@ -188,15 +188,15 @@ extension NodeGroupsViewController: UITableViewDelegate {
             let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
                 Utility.showLoader(message: "Removing group...", view: self.view)
                 // Perform remove node group operation for selected group
-                NodeGroupManager.shared.performNodeGroupOperation(group: NodeGroupManager.shared.nodeGroup[indexPath.section], parameter: nil, method: .delete) { success, error in
+                NodeGroupManager.shared.performNodeGroupOperation(group: NodeGroupManager.shared.nodeGroups[indexPath.section], parameter: nil, method: .delete) { success, error in
                     Utility.hideLoader(view: self.view)
                     // Check if remove node group operation is successful
                     if success {
                         DispatchQueue.main.async {
-                            NodeGroupManager.shared.nodeGroup.remove(at: indexPath.section)
+                            NodeGroupManager.shared.nodeGroups.remove(at: indexPath.section)
                             tableView.deleteSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
                             User.shared.updateDeviceList = true
-                            if NodeGroupManager.shared.nodeGroup.count < 1 {
+                            if NodeGroupManager.shared.nodeGroups.count < 1 {
                                 // Load initial view if group list is empty
                                 self.hideTableView()
                             }

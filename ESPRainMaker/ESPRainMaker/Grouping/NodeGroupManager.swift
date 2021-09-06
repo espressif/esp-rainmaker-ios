@@ -24,7 +24,7 @@ class NodeGroupManager {
     private let apiManager = ESPAPIManager()
     private let nodeGroupURL = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/node_group"
 
-    var nodeGroup: [NodeGroup] = []
+    var nodeGroups: [NodeGroup] = []
     static let shared = NodeGroupManager()
     var listUpdated = false
 
@@ -53,8 +53,8 @@ class NodeGroupManager {
                     groups.groups.sort(by: { $0.group_name?.lowercased() ?? "" < $1.group_name?.lowercased() ?? "" })
                     // Adding reference of node object in groups
                     self.updateNodeListInNodeGroup(nodeGroup: groups.groups)
-                    self.nodeGroup = groups.groups
-                    ESPLocalStorage.shared.saveNodeGroupInfo()
+                    self.nodeGroups = groups.groups
+                    ESPLocalStorageHandler().saveNodeGroups(self.nodeGroups)
                     completionHandler(groups.groups, nil)
                     return
                 }

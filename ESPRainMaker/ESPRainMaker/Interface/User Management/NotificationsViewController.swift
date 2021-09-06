@@ -22,22 +22,37 @@ class NotificationsViewController: UIViewController {
     @IBOutlet var tableView: UITableView!
     @IBOutlet var initialView: UIView!
     var pendingRequests: [SharingRequest] = []
+    var pastNotifications: [ESPNotifications] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.showsVerticalScrollIndicator = false
-        getSharingRequests()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 400.0
     }
 
     @IBAction func backButtonPressed(_: Any) {
         navigationController?.popViewController(animated: true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        refreshData()
+    }
+    
+    func refreshData() {
+        pastNotifications = ESPLocalStorageHandler().getDeliveredESPNotifications() ?? []
+        getSharingRequests()
     }
 
     // MARK: - Private Methods
 
     // Method to fetch and filter pending sharing requests.
     private func getSharingRequests() {
-        Utility.showLoader(message: "Fetching sharing requests...", view: view)
+        Utility.showLoader(message: "", view: view)
         NodeSharingManager.shared.getSharingRequests(primaryUser: false) { requests, error in
             Utility.hideLoader(view: self.view)
             guard let _ = error else {
@@ -50,31 +65,25 @@ class NotificationsViewController: UIViewController {
                             self.pendingRequests.append(request)
                         }
                     }
-                    DispatchQueue.main.async {
-                        if self.pendingRequests.count > 0 {
-                            self.tableView.isHidden = false
-                            self.initialView.isHidden = true
-                            self.tableView.reloadData()
-                        }
-                    }
                 }
 
-                self.checkPendinRequests()
+                self.updateNotificationView()
                 return
             }
-            DispatchQueue.main.async {
-                self.tableView.isHidden = true
-                self.initialView.isHidden = false
-            }
+            self.updateNotificationView()
         }
     }
 
     // Method to show table view based on count of pending sharing requests.
-    private func checkPendinRequests() {
-        if pendingRequests.count < 1 {
-            DispatchQueue.main.async {
+    private func updateNotificationView() {
+        DispatchQueue.main.async {
+            if self.pendingRequests.count < 1 && self.pastNotifications.count < 1 {
                 self.tableView.isHidden = true
                 self.initialView.isHidden = false
+            } else {
+                self.tableView.isHidden = false
+                self.initialView.isHidden = true
+                self.tableView.reloadData()
             }
         }
     }
@@ -98,7 +107,7 @@ class NotificationsViewController: UIViewController {
                         }
                     }
                     // Check count for pending requests.
-                    self.checkPendinRequests()
+                    self.updateNotificationView()
                 } else {
                     // Error while denying sharing request.
                     Utility.showToastMessage(view: self.view, message: "Unknown error: Unable to deny sharing request.", duration: 5.0)
@@ -129,7 +138,7 @@ class NotificationsViewController: UIViewController {
                         }
                     }
                     // Check for request count to show appropriate UI.
-                    self.checkPendinRequests()
+                    self.updateNotificationView()
                 } else {
                     // Error while accepting sharing request.
                     Utility.showToastMessage(view: self.view, message: "Unknown error: Unable to deny sharing request.", duration: 5.0)
@@ -139,34 +148,22 @@ class NotificationsViewController: UIViewController {
             Utility.showToastMessage(view: self.view, message: apiError.description, duration: 5.0)
         }
     }
-}
-
-extension NotificationsViewController: UITableViewDelegate {
-    func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
-        return 120.0
-    }
-
-    func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
-        return 25.0
-    }
-}
-
-extension NotificationsViewController: UITableViewDataSource {
-    func numberOfSections(in _: UITableView) -> Int {
-        return pendingRequests.count
-    }
-
-    func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        return 1
-    }
-
-    func tableView(_: UITableView, viewForFooterInSection _: Int) -> UIView? {
-        return UIView()
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    
+    private func getNotificationTableViewCell(for indexPath:IndexPath) -> NotificationsTableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "notificationsTVC", for: indexPath) as! NotificationsTableViewCell
-        let request = pendingRequests[indexPath.section]
+        let notification = pastNotifications[indexPath.section - pendingRequests.count]
+        cell.bodyLabel.text = notification.body
+        
+        let timeDetails = notification.timestamp.dateTimeString()
+        cell.timeLabel.text = timeDetails.time
+        cell.dateLabel.text = timeDetails.date
+        
+        return cell
+    }
+    
+    private func getAddSharingNotificationTableViewCell(for indexPath:IndexPath) -> AddSharingNotificationTableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "addSharingNotificationsTVC", for: indexPath) as! AddSharingNotificationTableViewCell
+        let request = pendingRequests[indexPath.row]
         let primaryUserID = request.primary_user_name ?? ""
         let nodeIDs = request.node_ids?.joined(separator: ", ")
         if let deviceList = request.metadata, deviceList.count > 0 {
@@ -196,5 +193,33 @@ extension NotificationsViewController: UITableViewDataSource {
             self.acceptButtonAction(request: request)
         }
         return cell
+    }
+}
+
+extension NotificationsViewController: UITableViewDelegate {
+    func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
+        return 25.0
+    }
+}
+
+extension NotificationsViewController: UITableViewDataSource {
+    func numberOfSections(in _: UITableView) -> Int {
+        return pendingRequests.count + pastNotifications.count
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+
+    func tableView(_: UITableView, viewForFooterInSection _: Int) -> UIView? {
+        return UIView()
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.section < pendingRequests.count {
+            return getAddSharingNotificationTableViewCell(for: indexPath)
+        } else {
+           return getNotificationTableViewCell(for: indexPath)
+        }
     }
 }

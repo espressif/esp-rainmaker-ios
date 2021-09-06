@@ -255,6 +255,7 @@ class NodeDetailsViewController: UIViewController {
             let input = UIAlertController(title: "Add Member", message: "", preferredStyle: .alert)
             input.addTextField { textField in
                 textField.placeholder = "Enter email"
+                textField.keyboardType = .emailAddress
                 textField.delegate = self
                 textField.addTarget(self, action: #selector(self.textFieldDidChange(textField:)), for: .editingChanged)
             }

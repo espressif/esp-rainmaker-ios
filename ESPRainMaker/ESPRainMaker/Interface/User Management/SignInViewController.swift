@@ -260,12 +260,17 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                                              headers: headers) { response in
             if let json = response {
                 if let idToken = json["id_token"] as? String, let refreshToken = json["refresh_token"] as? String, let accessToken = json["access_token"] as? String {
-                    self.getUserInfo(token: idToken, provider: .other)
+                    User.shared.updateUserInfo(token: idToken, provider: .other)
+                    User.shared.updateDeviceList = true
                     let refreshTokenInfo = ["token": refreshToken, "time": Date(), "expire_in": json["expires_in"] as? Int ?? 3600] as [String: Any]
                     User.shared.accessToken = accessToken
                     UserDefaults.standard.set(refreshTokenInfo, forKey: Constants.refreshTokenKey)
                     UserDefaults.standard.set(accessToken, forKey: Constants.accessTokenKey)
                     DispatchQueue.main.async {
+                        // Configure remote notification if not done.
+                        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+                        appDelegate?.configureRemoteNotifications()
+                        
                         self.dismiss(animated: true, completion: nil)
                     }
                 }
@@ -441,20 +446,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
         modalPresentationStyle = .popover
         documentVC.documentLink = url
         present(documentVC, animated: true, completion: nil)
-    }
-
-    func getUserInfo(token: String, provider: ServiceProvider) {
-        do {
-            let json = try decode(jwt: token)
-            User.shared.userInfo.username = json.body["cognito:username"] as? String ?? ""
-            User.shared.userInfo.email = json.body["email"] as? String ?? ""
-            User.shared.userInfo.userID = json.body["custom:user_id"] as? String ?? ""
-            User.shared.userInfo.loggedInWith = provider
-            User.shared.userInfo.saveUserInfo()
-        } catch {
-            print("error parsing token")
-        }
-        User.shared.updateDeviceList = true
     }
 
     func goToConfirmUserScreen() {

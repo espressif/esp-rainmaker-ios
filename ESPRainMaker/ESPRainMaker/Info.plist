@@ -56,6 +56,11 @@
 	<string>App requires access to local network in order to control your devices locally.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>App requires your location permission in order to get current WiFi network ssid</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

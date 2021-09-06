@@ -102,12 +102,22 @@ class DeviceTraitListViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(paramUpdated), name: Notification.Name(Constants.paramUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkOfflineStatus), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadParamTableView), name: Notification.Name(Constants.reloadParamTableView), object: nil)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        tableView.reloadData()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         pollingTimer.invalidate()
         NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc func reloadParamTableView() {
+        tableView.reloadData()
     }
 
     @objc func appEnterForeground() {

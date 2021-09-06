@@ -88,8 +88,8 @@ class NewNodeGroupViewController: UIViewController {
             NodeGroupManager.shared.createNodeGroup(group: newNodeGroup) { newGroup, error in
                 Utility.hideLoader(view: self.view)
                 guard let createGroupError = error else {
-                    let insertionIndex = NodeGroupManager.shared.nodeGroup.insertionIndexOf(newGroup!, isOrderedBefore: { $0.group_name ?? "" < $1.group_name ?? "" })
-                    NodeGroupManager.shared.nodeGroup.insert(newGroup!, at: insertionIndex)
+                    let insertionIndex = NodeGroupManager.shared.nodeGroups.insertionIndexOf(newGroup!, isOrderedBefore: { $0.group_name ?? "" < $1.group_name ?? "" })
+                    NodeGroupManager.shared.nodeGroups.insert(newGroup!, at: insertionIndex)
                     NodeGroupManager.shared.listUpdated = true
                     User.shared.updateDeviceList = true
                     DispatchQueue.main.async {

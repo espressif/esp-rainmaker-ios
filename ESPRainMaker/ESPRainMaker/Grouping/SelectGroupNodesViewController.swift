@@ -54,8 +54,8 @@ class SelectGroupNodesViewController: UIViewController {
             guard let createGroupError = error else {
                 // No error group is created
                 // Insert new group in sorted manner
-                let insertionIndex = NodeGroupManager.shared.nodeGroup.insertionIndexOf(group!, isOrderedBefore: { $0.group_name ?? "" < $1.group_name ?? "" })
-                NodeGroupManager.shared.nodeGroup.insert(group!, at: insertionIndex)
+                let insertionIndex = NodeGroupManager.shared.nodeGroups.insertionIndexOf(group!, isOrderedBefore: { $0.group_name ?? "" < $1.group_name ?? "" })
+                NodeGroupManager.shared.nodeGroups.insert(group!, at: insertionIndex)
                 // Set flag for list update
                 User.shared.updateDeviceList = true
                 NodeGroupManager.shared.listUpdated = true

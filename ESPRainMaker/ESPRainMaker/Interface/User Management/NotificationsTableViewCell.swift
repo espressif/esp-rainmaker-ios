@@ -19,31 +19,9 @@
 import UIKit
 
 class NotificationsTableViewCell: UITableViewCell {
-    var acceptButtonAction: () -> Void = {}
-    var denyButtonAction: () -> Void = {}
-
-    @IBOutlet var detailLabel: UILabel!
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-        // UI Customisation
-        contentView.layer.borderWidth = 1
-        contentView.layer.cornerRadius = 10
-        contentView.layer.borderColor = UIColor.lightGray.cgColor
-        contentView.layer.masksToBounds = true
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
-    @IBAction func acceptButtonTapped(_: Any) {
-        acceptButtonAction()
-    }
-
-    @IBAction func denyButtonTapped(_: Any) {
-        denyButtonAction()
-    }
+    
+    @IBOutlet var bodyLabel: UILabel!
+    @IBOutlet var timeLabel: UILabel!
+    @IBOutlet var dateLabel: UILabel!
+    
 }

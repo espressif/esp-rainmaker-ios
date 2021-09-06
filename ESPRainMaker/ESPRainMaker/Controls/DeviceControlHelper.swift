@@ -24,11 +24,13 @@ protocol ParamUpdateProtocol {
 }
 
 enum DeviceControlHelper {
-    static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?) {
+    static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?, completionHandler: ((ESPHTTPSRequestStatus) -> Void)? = nil) {
         NetworkManager.shared.setDeviceParam(nodeID: nodeID, parameter: parameter) { result in
             switch result {
             case .failure:
                 delegate?.failureInUpdatingParam()
+            case .success:
+                completionHandler?(result)
             default:
                 break
             }

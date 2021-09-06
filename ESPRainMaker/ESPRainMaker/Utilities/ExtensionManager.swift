@@ -234,20 +234,6 @@ extension UserDefaults {
     }
 }
 
-extension Int {
-    func getShortDate() -> String {
-        let date = Date(timeIntervalSince1970: Double(self) / 1000.0)
-        let dataFormatter = DateFormatter()
-        dataFormatter.timeZone = .current
-        if Calendar.current.isDateInToday(date) {
-            dataFormatter.dateFormat = "HH:mm"
-            return dataFormatter.string(from: date)
-        }
-        dataFormatter.dateFormat = "dd/MM/yy, HH:mm"
-        return dataFormatter.string(from: date)
-    }
-}
-
 extension UIView {
     func rotate360Degrees(duration: CFTimeInterval = 6) {
         let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")

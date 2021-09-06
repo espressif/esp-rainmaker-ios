@@ -55,6 +55,10 @@ class User {
         pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
         accessToken = UserDefaults.standard.value(forKey: Constants.accessTokenKey) as? String
     }
+    
+    var isUserSessionActive: Bool {
+        return (UserDefaults.standard.value(forKey: Constants.userInfoKey) != nil)
+    }
 
     /// Get current signed-in user detail of cognito user
     ///
@@ -129,6 +133,20 @@ class User {
             })
         } else {
             completionHandler(nil)
+        }
+    }
+    
+    
+    func updateUserInfo(token: String, provider: ServiceProvider) {
+        do {
+            let json = try decode(jwt: token)
+            User.shared.userInfo.username = json.body["cognito:username"] as? String ?? ""
+            User.shared.userInfo.email = json.body["email"] as? String ?? ""
+            User.shared.userInfo.userID = json.body["custom:user_id"] as? String ?? ""
+            User.shared.userInfo.loggedInWith = provider
+            User.shared.userInfo.saveUserInfo()
+        } catch {
+            print("error parsing token")
         }
     }
 
