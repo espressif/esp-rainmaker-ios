@@ -61,6 +61,7 @@ class ScheduleListViewController: UIViewController {
             Utility.showLoader(message: "", view: view)
             refreshScheduleList(self)
         } else {
+            ESPScheduler.shared.currentScheduleKey = nil
             showScheduleList()
         }
         checkNetworkUpdate()

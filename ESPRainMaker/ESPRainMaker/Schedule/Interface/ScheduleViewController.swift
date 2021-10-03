@@ -86,6 +86,8 @@ class ScheduleViewController: UIViewController {
             datePicker.topAnchor.constraint(equalTo: timeView.topAnchor, constant: 0).isActive = true
             datePicker.bottomAnchor.constraint(equalTo: timeView.bottomAnchor, constant: 0).isActive = true
         }
+        removeButton.layer.borderColor = UIColor(hexString: "#f45c10").cgColor
+        removeButton.backgroundColor = UIColor(hexString: "#FFECE4")
         setRepeatStatus()
     }
 

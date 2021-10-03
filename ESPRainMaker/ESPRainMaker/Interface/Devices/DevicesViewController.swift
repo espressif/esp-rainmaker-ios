@@ -595,7 +595,6 @@ extension DevicesViewController: ESPExtendSessionPresentationLogic {
     }
 }
 
-
 extension DevicesViewController: ESPUserPresentationLogic {
     
     func userDetailsFetched(error: ESPAPIError?) {
