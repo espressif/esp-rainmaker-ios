@@ -42,33 +42,6 @@ class Utility {
     var configUUIDMap: [String: CBCharacteristic] = [:]
     var deviceVersionInfo: NSDictionary?
 
-    /// Method to process descriptor values read from BLE devices
-    ///
-    /// - Parameters:
-    ///   - descriptor: Contains BLE charactersitic and path value supported by BLE device
-    func processDescriptor(descriptor: CBDescriptor) {
-        if let value = descriptor.value as? String {
-            if value.contains(Constants.scanCharacteristic) {
-                scanPath = value
-                configUUIDMap.updateValue(descriptor.characteristic, forKey: scanPath)
-            } else if value.contains(Constants.sessionCharacterstic) {
-                sessionPath = value
-                peripheralConfigured = true
-                sessionCharacteristic = descriptor.characteristic
-                configUUIDMap.updateValue(descriptor.characteristic, forKey: sessionPath)
-            } else if value.contains(Constants.configCharacterstic) {
-                configPath = value
-                configUUIDMap.updateValue(descriptor.characteristic, forKey: configPath)
-            } else if value.contains(Constants.versionCharacterstic) {
-                versionPath = value
-                configUUIDMap.updateValue(descriptor.characteristic, forKey: versionPath)
-            } else if value.contains(Constants.associationCharacterstic) {
-                associationPath = value
-                configUUIDMap.updateValue(descriptor.characteristic, forKey: associationPath)
-            }
-        }
-    }
-
     /// Method to store SSID of connected WI-Fi before provisioning
     ///
     class func setActiveSSID() {
