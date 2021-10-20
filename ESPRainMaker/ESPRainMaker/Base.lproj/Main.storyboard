@@ -1728,7 +1728,7 @@ Unable to add device</string>
         <scene sceneID="I7V-Tr-kgO">
             <objects>
                 <viewControllerPlaceholder storyboardName="User" id="fbW-Pw-mxo" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="User" image="user" selectedImage="user_selected" id="wLe-5C-0W7">
+                    <tabBarItem key="tabBarItem" title="Settings" selectedImage="user_selected" id="wLe-5C-0W7">
                         <inset key="imageInsets" minX="0.0" minY="24" maxX="0.0" maxY="24"/>
                     </tabBarItem>
                 </viewControllerPlaceholder>
@@ -2319,7 +2319,6 @@ Unable to add device</string>
         <image name="softAP" width="620" height="620"/>
         <image name="status_icon" width="620" height="620"/>
         <image name="switch_on" width="70" height="70"/>
-        <image name="user" width="70" height="70"/>
         <image name="user_selected" width="70" height="70"/>
         <image name="wifi" width="620" height="620"/>
         <image name="wifi_security" width="13" height="14"/>

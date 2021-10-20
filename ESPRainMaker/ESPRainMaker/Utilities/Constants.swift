@@ -83,6 +83,7 @@ struct Constants {
     static let setParam = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/params"
     static let sharing = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/sharing"
     static let pushNotification = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/push_notification/mobile_platform_endpoint"
+    static let deleteUserAccount = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user"
 
     // UserDefault keys
     static let newDeviceAdded = Constants.bundleIdentifier + ".newDeviceAdded"
@@ -158,4 +159,10 @@ struct Constants {
 
     static let serviceType = "_esp_local_ctrl._tcp."
     static let serviceDomain = "local"
+    
+    
+    // APIs JSON keys
+    static let successKey = "success"
+    static let descriptionKey = "description"
+    static let statusKey = "status"
 }

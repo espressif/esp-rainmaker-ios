@@ -21,7 +21,7 @@ import Foundation
 import JWTDecode
 import SafariServices
 
-class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
+class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextViewDelegate {
     
     @IBOutlet var checkBox: UIButton!
     @IBOutlet var signInTopSpace: NSLayoutConstraint!
@@ -38,7 +38,10 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
     @IBOutlet var googleLoginButton: UIButton!
     @IBOutlet var appleLoginButton: UIButton!
     @IBOutlet var appVersionLabel: UILabel!
-    @IBOutlet var signupLabel: UILabel!
+    @IBOutlet var signupTextView: UITextView!
+    @IBOutlet weak var agreementTextView: UITextView!
+    @IBOutlet weak var agreementView: UIView!
+    @IBOutlet weak var agreementBox: UIButton!
     var sentTo: String?
 
     @IBOutlet var registerPassword: UITextField!
@@ -48,6 +51,11 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
     var usernameText: String?
     var session: SFAuthenticationSession!
     var checked = false
+    var agreementChecked = false
+    
+    // String constants
+    let privacyLink = "privacy"
+    let termsOfUseLink = "termsOfUse"
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -100,6 +108,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .normal)
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .selected)
         segmentControl.changeUnderlineColor(color: currentBGColor)
+        agreementView.isHidden = false
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -138,20 +147,25 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
         }
         segmentControl.addUnderlineForSelectedSegment()
         appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
+        agreementTextView.delegate = self
+        signupTextView.delegate = self
 
-        let text = "I have read and agree to the Privacy Policy and Terms of Use."
-        let underlineAttriString = NSMutableAttributedString(string: text)
-        let range1 = (text as NSString).range(of: "Terms of Use")
-        underlineAttriString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range1)
-        underlineAttriString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.blue, range: range1)
-        underlineAttriString.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: 14.0), range: range1)
-        let range2 = (text as NSString).range(of: "Privacy Policy")
-        underlineAttriString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range2)
-        underlineAttriString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.blue, range: range2)
-        underlineAttriString.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: 14.0), range: range2)
-        signupLabel.attributedText = underlineAttriString
-        signupLabel.isUserInteractionEnabled = true
-        signupLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapLabel(gesture:))))
+        let regularText = NSMutableAttributedString(string: "By proceeding, I confirm that I have read and agree to the ", attributes: [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
+
+        // Sets attributes for clickable text in the UITextView string.
+        let attributes:[NSAttributedString.Key : Any] = [NSAttributedString.Key.underlineStyle: 1, NSAttributedString.Key.underlineColor: UIColor.blue, NSAttributedString.Key.foregroundColor: UIColor.blue, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]
+        let privacyText = NSMutableAttributedString(string: "Privacy Policy")
+        privacyText.addAttributes(attributes, range: NSMakeRange(0, privacyText.length))
+        privacyText.addAttributes([NSAttributedString.Key.link: privacyLink], range: NSMakeRange(0, privacyText.length))
+        regularText.append(privacyText)
+        regularText.append(NSMutableAttributedString(string: " and ", attributes: [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]))
+        let termsOfUseText = NSMutableAttributedString(string: "Terms of Use.")
+        termsOfUseText.addAttributes(attributes, range: NSMakeRange(0, termsOfUseText.length))
+        termsOfUseText.addAttributes([NSAttributedString.Key.link: termsOfUseLink], range: NSMakeRange(0, termsOfUseText.length))
+        regularText.append(termsOfUseText)
+        
+        signupTextView.attributedText = regularText
+        agreementTextView.attributedText = regularText
     }
 
     override func viewDidLayoutSubviews() {
@@ -163,7 +177,19 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
             signUpConfirmationViewController.sentTo = sentTo
         }
     }
-
+    
+    // UITextViewDelegate method to handle callbacks for clickable text.
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        if URL.absoluteString == privacyLink {
+            openPrivacy(self)
+            return false
+        } else if URL.absoluteString == termsOfUseLink {
+            openTC(self)
+            return false
+        }
+        return true
+    }
+    
     @IBAction func segmentChange(sender _: UISegmentedControl) {
         changeSegment()
     }
@@ -190,17 +216,6 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
             }
         }
         segmentControl.changeUnderlinePosition()
-    }
-
-    @IBAction func tapLabel(gesture: UITapGestureRecognizer) {
-        let termsRange = (signupLabel.text! as NSString).range(of: "Terms of Use")
-        let privacyRange = (signupLabel.text! as NSString).range(of: "Privacy Policy")
-
-        if gesture.didTapAttributedTextInLabel(label: signupLabel, inRange: termsRange) {
-            openTC(self)
-        } else if gesture.didTapAttributedTextInLabel(label: signupLabel, inRange: privacyRange) {
-            openPrivacy(self)
-        }
     }
 
     @IBAction func loginWithGoogle(_: Any) {
@@ -405,6 +420,33 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
         
         let service = ESPCreateUserService(presenter: self)
         service.createNewUser(name: username.text ?? "", password: password.text ?? "")
+    }
+    
+    // MARK: Landing View
+    
+    @IBAction func agreementBoxClicked(_ sender: Any) {
+        agreementChecked = !agreementChecked
+        if agreementChecked {
+            agreementBox.setImage(UIImage(named: "checkbox_checked"), for: .normal)
+        } else {
+            agreementBox.setImage(UIImage(named: "checkbox_unchecked"), for: .normal)
+        }
+    }
+    
+    @IBAction func proceedClicked(_ sender: Any) {
+        if !agreementChecked {
+            let alertController = UIAlertController(title: "Error!!",
+                                                    message: "Please accept our terms and condition before signing up",
+                                                    preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+            alertController.addAction(okAction)
+            present(alertController, animated: true, completion: nil)
+            return
+        } else {
+            UIView.transition(with: agreementView, duration: 1.0, options: .transitionFlipFromRight) {
+                self.agreementView.isHidden = true
+            }
+        }
     }
 }
 
