@@ -135,4 +135,12 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
             param?.value = controlValue as Any
         }
     }
+    
+    override func paramTapped(_ sender: Any) {
+        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
+        let chartVC = deviceStoryboard.instantiateViewController(withIdentifier: "chartsVC") as! ESPChartsViewController
+        chartVC.param = param
+        chartVC.device = device
+        parentViewController?.navigationController?.pushViewController(chartVC, animated: true)
+    }
 }

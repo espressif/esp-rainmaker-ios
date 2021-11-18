@@ -30,7 +30,8 @@ class GenericControlTableViewCell: UITableViewCell {
     @IBOutlet var checkButton: UIButton!
     @IBOutlet var leadingSpaceConstraint: NSLayoutConstraint!
     @IBOutlet var trailingSpaceConstraint: NSLayoutConstraint!
-
+    @IBOutlet weak var tapButton: UIButton!
+    
     // Stored properties
     var scheduleDelegate: ScheduleActionDelegate?
     var indexPath: IndexPath!
@@ -65,4 +66,6 @@ class GenericControlTableViewCell: UITableViewCell {
     @IBAction func checkBoxPressed(_: Any) {}
 
     @IBAction func editButtonTapped(_: Any) {}
+    
+    @IBAction func paramTapped(_ sender: Any) {}
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -43,18 +43,30 @@
                                     <action selector="editButtonTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="I0S-jX-j6a"/>
                                 </connections>
                             </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Uf7-bF-QqE">
+                                <rect key="frame" x="0.0" y="0.0" width="290" height="60"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="20" maxY="0.0"/>
+                                <state key="normal" image="right_arrow"/>
+                                <connections>
+                                    <action selector="paramTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="9pC-tM-owZ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.96470588235294119" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="MDY-dV-8Ts" firstAttribute="leading" secondItem="uIA-4d-qmP" secondAttribute="leading" constant="16" id="Ntk-xU-73d"/>
                             <constraint firstItem="DJP-Qv-1T8" firstAttribute="leading" secondItem="MDY-dV-8Ts" secondAttribute="leading" id="TuR-5Z-kSL"/>
                             <constraint firstItem="My5-9a-qjK" firstAttribute="leading" secondItem="DJP-Qv-1T8" secondAttribute="trailing" constant="10" id="XsJ-qD-0lp"/>
+                            <constraint firstAttribute="trailing" secondItem="Uf7-bF-QqE" secondAttribute="trailing" id="YQY-Dg-LQe"/>
                             <constraint firstItem="MDY-dV-8Ts" firstAttribute="top" secondItem="uIA-4d-qmP" secondAttribute="top" constant="8" id="Zam-8E-pp0"/>
                             <constraint firstItem="DJP-Qv-1T8" firstAttribute="top" secondItem="MDY-dV-8Ts" secondAttribute="bottom" constant="6" id="adk-Zt-dcX"/>
                             <constraint firstAttribute="height" constant="60" id="cKI-Ac-niM"/>
                             <constraint firstItem="My5-9a-qjK" firstAttribute="leading" secondItem="MDY-dV-8Ts" secondAttribute="trailing" constant="10" id="gnf-vS-d6Z"/>
+                            <constraint firstItem="Uf7-bF-QqE" firstAttribute="top" secondItem="uIA-4d-qmP" secondAttribute="top" id="k63-bT-021"/>
                             <constraint firstAttribute="trailing" secondItem="My5-9a-qjK" secondAttribute="trailing" constant="16" id="kjK-0Y-ERa"/>
+                            <constraint firstAttribute="bottom" secondItem="Uf7-bF-QqE" secondAttribute="bottom" id="p9Z-ar-2FC"/>
                             <constraint firstItem="My5-9a-qjK" firstAttribute="top" secondItem="uIA-4d-qmP" secondAttribute="top" constant="16" id="sNg-zK-GNe"/>
+                            <constraint firstItem="Uf7-bF-QqE" firstAttribute="leading" secondItem="uIA-4d-qmP" secondAttribute="leading" id="yKQ-Qv-58w"/>
                         </constraints>
                     </view>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LCw-Qw-onE">
@@ -88,6 +100,7 @@
                 <outlet property="controlValueLabel" destination="DJP-Qv-1T8" id="Ih4-4C-dwt"/>
                 <outlet property="editButton" destination="My5-9a-qjK" id="zqH-9t-frJ"/>
                 <outlet property="leadingSpaceConstraint" destination="LFP-CP-6bR" id="nIu-P1-ICf"/>
+                <outlet property="tapButton" destination="Uf7-bF-QqE" id="9oA-2g-4Fj"/>
                 <outlet property="trailingSpaceConstraint" destination="zUO-Nb-tdY" id="kZo-yU-dd0"/>
             </connections>
             <point key="canvasLocation" x="137.68115942028987" y="83.035714285714278"/>
@@ -95,5 +108,6 @@
     </objects>
     <resources>
         <image name="checkbox_empty" width="16" height="16"/>
+        <image name="right_arrow" width="6.5" height="12"/>
     </resources>
 </document>
