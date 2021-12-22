@@ -84,10 +84,10 @@ extension ScheduleSliderTableViewCell: ScheduleActionAllowedProtocol {
             hueSlider.isEnabled = param?.selected ?? false
             slider.isEnabled = param?.selected ?? false
         default:
+            self.alpha = 0.6
             checkButton.isEnabled = false
             hueSlider.isEnabled = false
             slider.isEnabled = false
-            self.alpha = 0.6
             scheduleDelegate?.takeScheduleNotAllowedAction(action: device.scheduleAction)
         }
     }

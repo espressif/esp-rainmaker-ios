@@ -15,12 +15,11 @@
 // limitations under the License.
 //
 
-import AWSCognitoIdentityProvider
 import Foundation
+import UIKit
 
 class ConfirmSignUpViewController: UIViewController {
     var sentTo: String?
-    var user: AWSCognitoIdentityUser?
     var confirmExistingUser = false
 
     @IBOutlet var sentToLabel: UILabel!
@@ -28,8 +27,9 @@ class ConfirmSignUpViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        sentToLabel.text = user!.username
-        sentToLabel.text = "Code sent to: \(sentTo!)"
+        if let sent = sentTo {
+            sentToLabel.text = sent
+        }
         code.layer.sublayerTransform = CATransform3DMakeTranslation(5, 0, 0)
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationItem.backBarButtonItem?.title = ""
@@ -56,69 +56,15 @@ class ConfirmSignUpViewController: UIViewController {
             return
         }
         Utility.showLoader(message: "", view: view)
-        user?.confirmSignUp(code.text!, forceAliasCreation: true).continueWith { [weak self] (task: AWSTask) -> AnyObject? in
-            DispatchQueue.main.async {
-                if let viewContainer = self?.view {
-                    Utility.hideLoader(view: viewContainer)
-                }
-            }
-            guard let strongSelf = self else { return nil }
-            DispatchQueue.main.async {
-                if let error = task.error as NSError? {
-                    let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                            message: error.userInfo["message"] as? String,
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-                    alertController.addAction(okAction)
-
-                    strongSelf.present(alertController, animated: true, completion: nil)
-                } else {
-                    if strongSelf.confirmExistingUser {
-                        strongSelf.confirmExistingUser = false
-                        let alertController = UIAlertController(title: "Success",
-                                                                message: "User has been confirmed. Please enter your credentials in login page to sign in with this user.",
-                                                                preferredStyle: .alert)
-                        let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                            strongSelf.navigationController?.popToRootViewController(animated: true)
-                        }
-
-                        alertController.addAction(okAction)
-
-                        strongSelf.present(alertController, animated: true, completion: nil)
-                    } else {
-                        User.shared.automaticLogin = true
-                        _ = strongSelf.navigationController?.popToRootViewController(animated: true)
-                    }
-                }
-            }
-            return nil
-        }
+        let service = ESPCreateUserService(presenter: self)
+        service.confirmUser(name: sentTo!, verificationCode: code.text!)
     }
 
     // handle code resend action
     @IBAction func resend(_: AnyObject) {
-        user?.resendConfirmationCode().continueWith { [weak self] (task: AWSTask) -> AnyObject? in
-            guard let _ = self else { return nil }
-            DispatchQueue.main.async {
-                if let error = task.error as NSError? {
-                    let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                            message: error.userInfo["message"] as? String,
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-                    alertController.addAction(okAction)
-
-                    self?.present(alertController, animated: true, completion: nil)
-                } else if let result = task.result {
-                    let alertController = UIAlertController(title: "Code Resent",
-                                                            message: "Code resent to \(result.codeDeliveryDetails?.destination! ?? " no message")",
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-                    alertController.addAction(okAction)
-                    self?.present(alertController, animated: true, completion: nil)
-                }
-            }
-            return nil
-        }
+        
+        let service = ESPCreateUserService(presenter: self)
+        service.createNewUser(name: User.shared.username, password: User.shared.password)
     }
 }
 
@@ -127,5 +73,48 @@ extension ConfirmSignUpViewController: UITextFieldDelegate {
         code.resignFirstResponder()
         confirm(textField)
         return true
+    }
+}
+
+extension ConfirmSignUpViewController: ESPCreateUserPresentationLogic {
+    
+    func verifyUser(withName name: String, andPassword password: String, withError error: ESPAPIError?) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            if error != nil {
+                self.handleError(error: error, buttonTitle: "Retry")
+            } else {
+                let alertController = UIAlertController(title: "Code Resent",
+                                                        message: User.shared.username,
+                                                        preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                alertController.addAction(okAction)
+                self.present(alertController, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    func userVerified(withError error: ESPAPIError?) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+        }
+        if error == nil {
+            if self.confirmExistingUser {
+                self.confirmExistingUser = false
+                let alertController = UIAlertController(title: "Success",
+                                                        message: "User has been confirmed. Please enter your credentials in login page to sign in with this user.",
+                                                        preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+                alertController.addAction(okAction)
+                self.present(alertController, animated: true, completion: nil)
+            } else {
+                User.shared.automaticLogin = true
+                _ = self.navigationController?.popToRootViewController(animated: true)
+            }
+        } else {
+            self.handleError(error: error, buttonTitle: "Ok")
+        }
     }
 }

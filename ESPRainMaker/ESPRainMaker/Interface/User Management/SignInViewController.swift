@@ -17,13 +17,12 @@
 
 import Alamofire
 import AuthenticationServices
-import AWSCognitoIdentityProvider
-import AWSMobileClient
 import Foundation
 import JWTDecode
 import SafariServices
 
-class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
+class SignInViewController: UIViewController, ESPNoRefreshTokenLogic {
+    
     @IBOutlet var checkBox: UIButton!
     @IBOutlet var signInTopSpace: NSLayoutConstraint!
     @IBOutlet var signUpTopView: NSLayoutConstraint!
@@ -40,17 +39,12 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     @IBOutlet var appleLoginButton: UIButton!
     @IBOutlet var appVersionLabel: UILabel!
     @IBOutlet var signupLabel: UILabel!
-    //    let passwordButtonRightView = UIButton(frame: CGRect(x: 0, y: 0, width: 22.0, height: 16.0))
-
-    var pool: AWSCognitoIdentityUserPool?
     var sentTo: String?
-    var user: AWSCognitoIdentityUser?
 
     @IBOutlet var registerPassword: UITextField!
     @IBOutlet var confirmPassword: UITextField!
     @IBOutlet var email: UITextField!
 
-    var passwordAuthenticationCompletion: AWSTaskCompletionSource<AWSCognitoIdentityPasswordAuthenticationDetails>?
     var usernameText: String?
     var session: SFAuthenticationSession!
     var checked = false
@@ -128,7 +122,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         presentationController?.delegate = self
-        pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
         // Looks for single or multiple taps.
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
@@ -168,7 +161,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if let signUpConfirmationViewController = segue.destination as? ConfirmSignUpViewController {
             signUpConfirmationViewController.sentTo = sentTo
-            signUpConfirmationViewController.user = pool?.getUser(email.text!)
         }
     }
 
@@ -224,32 +216,9 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
     }
 
     func loginWith(idProvider: String) {
-        let loginURL = Configuration.shared.awsConfiguration.authURL + "/authorize" + "?identity_provider=" + idProvider + "&redirect_uri=" + Configuration.shared.awsConfiguration.redirectURL + "&response_type=CODE&client_id="
-        session = SFAuthenticationSession(url: URL(string: loginURL + Configuration.shared.awsConfiguration.appClientId!)!, callbackURLScheme: Configuration.shared.awsConfiguration.redirectURL) { url, error in
-            if error != nil {
-                return
-            }
-            if let responseURL = url?.absoluteString {
-                let components = responseURL.components(separatedBy: "#")
-                for item in components {
-                    if item.contains("code") {
-                        let tokens = item.components(separatedBy: "&")
-                        for token in tokens {
-                            if token.contains("code") {
-                                let idTokenInfo = token.components(separatedBy: "=")
-                                if idTokenInfo.count > 1 {
-                                    let code = idTokenInfo[1]
-                                    self.requestToken(code: code)
-                                    return
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            self.showAlert()
-        }
-        session.start()
+        
+        let service = ESPIdProviderLoginService(presenter: self)
+        service.loginWith(idProvider: idProvider)
     }
 
     func requestToken(code: String) {
@@ -302,10 +271,9 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
 
     func signIn(username: String, password: String) {
         Utility.showLoader(message: "Signing in", view: view)
-        let authDetails = AWSCognitoIdentityPasswordAuthenticationDetails(username: username, password: password)
         User.shared.username = username
-        UserDefaults.standard.setValue(User.shared.username, forKey: Constants.usernameKey)
-        passwordAuthenticationCompletion?.set(result: authDetails)
+        let service = ESPLoginService(presenter: self)
+        service.loginUser(name: username, password: password)
     }
 
     func showAlert() {
@@ -328,7 +296,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                                                         preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                 alertController.addAction(okAction)
-
                 present(alertController, animated: true, completion: nil)
                 return
             }
@@ -339,7 +306,6 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                                                         preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                 alertController.addAction(okAction)
-
                 present(alertController, animated: true, completion: nil)
                 return
             }
@@ -350,50 +316,15 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
                                                         preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                 alertController.addAction(okAction)
-
                 present(alertController, animated: true, completion: nil)
                 return
             }
             signUpButton.isEnabled = false
             Utility.showLoader(message: "", view: view)
 
-            var attributes = [AWSCognitoIdentityUserAttributeType]()
-
-            if let emailValue = email.text, !emailValue.isEmpty {
-                let email = AWSCognitoIdentityUserAttributeType()
-                email?.name = "email"
-                email?.value = emailValue
-                attributes.append(email!)
-            }
-
             // sign up the user
-            pool?.signUp(userNameValue, password: passwordValue, userAttributes: attributes, validationData: nil).continueWith { [weak self] (task) -> Any? in
-                guard let strongSelf = self else { return nil }
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: strongSelf.view)
-                    strongSelf.signUpButton.isEnabled = true
-                    if let error = task.error as NSError? {
-                        let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                                message: error.userInfo["message"] as? String,
-                                                                preferredStyle: .alert)
-                        let retryAction = UIAlertAction(title: "Retry", style: .default, handler: nil)
-                        alertController.addAction(retryAction)
-
-                        self?.present(alertController, animated: true, completion: nil)
-                    } else if let result = task.result {
-                        User.shared.username = userNameValue
-                        User.shared.password = passwordValue
-                        // handle the case where user has to confirm his identity via email / SMS
-                        if result.user.confirmedStatus != AWSCognitoIdentityUserStatus.confirmed {
-                            strongSelf.sentTo = result.codeDeliveryDetails?.destination
-                            strongSelf.performSegue(withIdentifier: "confirmSignUpSegue", sender: sender)
-                        } else {
-                            _ = strongSelf.navigationController?.popToRootViewController(animated: true)
-                        }
-                    }
-                }
-                return nil
-            }
+            let service = ESPCreateUserService(presenter: self)
+            service.createNewUser(name: userNameValue, password: passwordValue)
         }
     }
 
@@ -447,72 +378,33 @@ class SignInViewController: UIViewController, AWSCognitoAuthDelegate {
         documentVC.documentLink = url
         present(documentVC, animated: true, completion: nil)
     }
+    
+    func getUserInfo(token: String, provider: ServiceProvider) {
+        do {
+            let json = try decode(jwt: token)
+            User.shared.userInfo.username = json.body["cognito:username"] as? String ?? ""
+            User.shared.userInfo.email = json.body["email"] as? String ?? ""
+            User.shared.userInfo.userID = json.body["custom:user_id"] as? String ?? ""
+            User.shared.userInfo.loggedInWith = provider
+            User.shared.userInfo.saveUserInfo()
+        } catch {
+            print("error parsing token")
+        }
+        User.shared.updateDeviceList = true
+    }
 
     func goToConfirmUserScreen() {
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         let confirmUserVC = storyboard.instantiateViewController(withIdentifier: "confirmSignUpVC") as! ConfirmSignUpViewController
         confirmUserVC.confirmExistingUser = true
-        confirmUserVC.user = user
         confirmUserVC.sentTo = username.text ?? ""
         navigationController?.pushViewController(confirmUserVC, animated: true)
     }
 
     func resendConfirmationCode() {
-        user = pool?.getUser(username.text ?? "")
-        user?.resendConfirmationCode().continueWith { [weak self] (task: AWSTask) -> AnyObject? in
-            guard let strongSelf = self else { return nil }
-            DispatchQueue.main.async {
-                if let error = task.error as NSError? {
-                    let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                            message: error.userInfo["message"] as? String,
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-                    alertController.addAction(okAction)
-
-                    self?.present(alertController, animated: true, completion: nil)
-                } else if task.result != nil {
-                    strongSelf.goToConfirmUserScreen()
-                }
-            }
-            return nil
-        }
-    }
-}
-
-extension SignInViewController: AWSCognitoIdentityPasswordAuthentication {
-    public func getDetails(_ authenticationInput: AWSCognitoIdentityPasswordAuthenticationInput, passwordAuthenticationCompletionSource: AWSTaskCompletionSource<AWSCognitoIdentityPasswordAuthenticationDetails>) {
-        passwordAuthenticationCompletion = passwordAuthenticationCompletionSource
-
-        DispatchQueue.main.async {
-            if self.usernameText == nil {
-                self.usernameText = authenticationInput.lastKnownUsername
-            }
-        }
-    }
-
-    public func didCompleteStepWithError(_ error: Error?) {
-        DispatchQueue.main.async {
-            Utility.hideLoader(view: self.view)
-            self.signInButton.isEnabled = true
-            if let error = error as NSError? {
-                if error.code == 33 {
-                    self.resendConfirmationCode()
-                    return
-                }
-                let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                        message: error.userInfo["message"] as? String,
-                                                        preferredStyle: .alert)
-                let retryAction = UIAlertAction(title: "Retry", style: .default, handler: nil)
-                alertController.addAction(retryAction)
-
-                self.present(alertController, animated: true, completion: nil)
-            } else {
-                self.username.text = nil
-                self.password.text = nil
-                User.shared.updateUserInfo = true
-                self.dismiss(animated: true, completion: nil)
-            }
-        }
+        
+        let service = ESPCreateUserService(presenter: self)
+        service.createNewUser(name: username.text ?? "", password: password.text ?? "")
     }
 }
 
@@ -548,5 +440,97 @@ extension SignInViewController: UITextFieldDelegate {
             return true
         }
         return true
+    }
+}
+
+extension SignInViewController: ESPLoginPresentationLogic {
+    func loginCompleted(withError error: ESPAPIError?) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            self.signInButton.isEnabled = true
+            if error != nil {
+                var title: String? = "Error"
+                var message: String? = ""
+                switch error {
+                case .serverError(let serverError):
+                    if (serverError as NSError).code == 33 {
+                        self.resendConfirmationCode()
+                        return
+                    }
+                    if let text = (serverError as NSError).userInfo["__type"] as? String {
+                        title = text
+                    }
+                    if let text = (serverError as NSError).userInfo["message"] as? String {
+                        message = text
+                    }
+                case .errorCode(let errorCode, let desc):
+                    if errorCode == ESPErrorCodeDescription.emailNotVerifiedKey {
+                        self.resendConfirmationCode()
+                        return
+                    }
+                    message = desc
+                default:
+                    break
+                }
+                let alertController = UIAlertController(title: title,
+                                                        message: message,
+                                                        preferredStyle: .alert)
+                let retryAction = UIAlertAction(title: "Retry",
+                                                style: .default,
+                                                handler: nil)
+                alertController.addAction(retryAction)
+                self.present(alertController, animated: true, completion: nil)
+            } else {
+                self.username.text = nil
+                self.password.text = nil
+                User.shared.updateUserInfo = true
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
+    }
+}
+
+extension SignInViewController: ESPCreateUserPresentationLogic {
+    
+    func verifyUser(withName name: String, andPassword password: String, withError error: ESPAPIError?) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            self.signUpButton.isEnabled = true
+            if error != nil {
+                self.handleError(error: error, buttonTitle: "Retry")
+            } else {
+                User.shared.username = name
+                User.shared.password = password
+                self.sentTo = name
+                self.performSegue(withIdentifier: "confirmSignUpSegue", sender: self.signUpButton)
+            }
+        }
+    }
+    
+    func userVerified(withError error: ESPAPIError?) {}
+}
+
+extension SignInViewController: ESPIdProviderLoginPresenter {
+    
+    func loginFailed() {
+        self.showAlert()
+    }
+    
+    func loginSuccess(requestToken: RequestToken) {
+        let umTokenWorker = ESPTokenWorker.shared
+        if let refreshToken = requestToken.refreshToken {
+            umTokenWorker.save(value: refreshToken, key: Constants.refreshTokenKey)
+        }
+        if let idToken = requestToken.idToken {
+            umTokenWorker.save(value: idToken, key: Constants.idTokenKey)
+            self.getUserInfo(token: idToken, provider: .other)
+        }
+        if let accessToken = requestToken.accessToken {
+            User.shared.accessToken = accessToken
+            umTokenWorker.save(value: accessToken, key: Constants.accessTokenKey)
+            DispatchQueue.main.async {
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
     }
 }

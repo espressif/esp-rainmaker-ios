@@ -17,8 +17,6 @@
 //
 
 import Alamofire
-import AWSAuthCore
-import AWSCognitoIdentityProvider
 import Foundation
 import JWTDecode
 import MBProgressHUD
@@ -40,26 +38,19 @@ class DevicesViewController: UIViewController {
 
     let controlStoryBoard = UIStoryboard(name: "DeviceDetail", bundle: nil)
     let localStorageHandler = ESPLocalStorageHandler()
-
-    var user: AWSCognitoIdentityUser?
-    var pool: AWSCognitoIdentityUserPool?
     var checkDeviceAssociation = false
-
     private var currentPage = 0
     private var absoluteSegmentPosition: [CGFloat] = []
-
+    
     // MARK: - Overriden Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Check if user session is valid
-        _ = User.shared.currentUser()
-        pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
-        if user == nil {
-            user = pool?.currentUser()
-        }
-
+        let service = ESPExtendSessionService(presenter: self)
+        service.validateUserSession()
+        
         // Get info of user from user default
         if User.shared.isUserSessionActive {
             collectionView.isUserInteractionEnabled = false
@@ -110,7 +101,7 @@ class DevicesViewController: UIViewController {
             User.shared.updateUserInfo = false
             updateUserInfo()
         }
-        if (UserDefaults.standard.value(forKey: Constants.userInfoKey) as? [String: Any]) != nil {
+        if User.shared.isUserSessionActive {
             if User.shared.updateDeviceList {
                 refreshDeviceList()
             }
@@ -312,27 +303,38 @@ class DevicesViewController: UIViewController {
     }
 
     private func updateUserInfo() {
-        User.shared.getcognitoIdToken { idToken in
-            if idToken != nil {
-                User.shared.updateUserInfo(token: idToken!, provider: .cognito)
-                self.refreshDeviceList()
-                // Configure remote notification if not done.
-                let appDelegate = UIApplication.shared.delegate as? AppDelegate
-                appDelegate?.configureRemoteNotifications()
+        let sessionWorker = ESPExtendUserSessionWorker()
+        sessionWorker.checkUserSession() { _, error in
+            if error == nil, let idToken = ESPTokenWorker.shared.idTokenString {
+                if User.shared.userInfo.loggedInWith == .cognito {
+                    self.getUserInfo(token: idToken, provider: .cognito)
+                } else {
+                    self.getUserInfo(token: idToken, provider: .other)
+                }
             } else {
                 Utility.hideLoader(view: self.view)
                 self.refreshDeviceList()
             }
         }
     }
-
-    private func refresh() {
-        user?.getDetails().continueOnSuccessWith { (_) -> AnyObject? in
-            DispatchQueue.main.async {
-                self.updateUserInfo()
-            }
-            return nil
+    
+    private func getUserInfo(token: String, provider: ServiceProvider) {
+        do {
+            let json = try decode(jwt: token)
+            User.shared.userInfo.username = json.body["cognito:username"] as? String ?? ""
+            User.shared.userInfo.email = json.body["email"] as? String ?? ""
+            User.shared.userInfo.userID = json.body["custom:user_id"] as? String ?? ""
+            User.shared.userInfo.loggedInWith = provider
+            User.shared.userInfo.saveUserInfo()
+        } catch {
+            print("error parsing token")
         }
+        refreshDeviceList()
+    }
+    
+    private func refresh() {
+        let service = ESPUserService(presenter: self)
+        service.fetchUserDetails()
     }
 
     private func setViewForNoNodes() {
@@ -574,5 +576,33 @@ extension DevicesViewController: UIGestureRecognizerDelegate {
         }
 
         return true
+    }
+}
+
+
+extension DevicesViewController: ESPExtendSessionPresentationLogic {
+    
+    func sessionValidated(withError error: ESPAPIError?) {
+        if error != nil {
+            let storyboard = UIStoryboard(name: "Login", bundle: nil)
+            if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {
+                if let _ = nav.viewControllers.first as? SignInViewController, let tab = self.tabBarController {
+                    nav.modalPresentationStyle = .fullScreen
+                    tab.present(nav, animated: true, completion: nil)
+                }
+            }
+        }
+    }
+}
+
+
+extension DevicesViewController: ESPUserPresentationLogic {
+    
+    func userDetailsFetched(error: ESPAPIError?) {
+        if error == nil {
+            DispatchQueue.main.async {
+                self.updateUserInfo()
+            }
+        }
     }
 }

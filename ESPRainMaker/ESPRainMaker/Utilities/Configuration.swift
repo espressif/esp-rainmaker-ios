@@ -16,7 +16,6 @@
 //  ESPRainMaker
 //
 
-import AWSCognitoIdentityProvider
 import ESPProvision
 import Foundation
 
@@ -50,24 +49,27 @@ class Configuration: ESPConfiguration {
     }
 }
 
+extension Configuration {
+    
+    func getAWSBaseURL() -> String {
+        var url = ""
+        if let str = self.awsConfiguration.baseURL {
+            url = str+"/\(Constants.apiVersion)"
+        }
+        return url
+    }
+}
+
 struct AWSConfiguration {
-    var poolID: String!
     var appClientId: String!
-    var awsRegion: AWSRegionType!
     var authURL: String!
     var baseURL: String!
     var claimURL: String!
     var redirectURL = ""
 
     init(config: [String: Any]) {
-        guard let userPoolID = config["UserPool ID"] as? String, !userPoolID.isEmpty else {
-            fatalError("UserPool ID is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"UserPool ID\" as key.")
-        }
         guard let clientID = config["App Client ID"] as? String, !clientID.isEmpty else {
             fatalError("App Client ID is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"App Client ID\" as key.")
-        }
-        guard let region = config["UserPool Region"] as? Int else {
-            fatalError("AWS region is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"UserPool Region\" as key.")
         }
         guard let authenticationURL = config["Authentication URL"] as? String, !authenticationURL.isEmpty else {
             fatalError("Authentication URL is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"Authentication URL\" as key.")
@@ -75,9 +77,7 @@ struct AWSConfiguration {
         guard let endpointBaseURL = config["Base URL"] as? String, !endpointBaseURL.isEmpty else {
             fatalError("Base URL is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"Base URL\" as key.")
         }
-        poolID = userPoolID
         appClientId = clientID
-        awsRegion = AWSRegionType(rawValue: region)
         authURL = authenticationURL
         baseURL = endpointBaseURL
         claimURL = config["Claim URL"] as? String ?? ""

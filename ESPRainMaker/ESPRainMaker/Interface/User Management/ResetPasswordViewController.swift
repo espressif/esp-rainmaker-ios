@@ -15,20 +15,21 @@
 // limitations under the License.
 //
 
-import AWSCognitoIdentityProvider
 import Foundation
+import UIKit
 
 class ResetPasswordViewController: UIViewController {
-    var user: AWSCognitoIdentityUser?
 
     @IBOutlet var confirmationCode: UITextField!
     @IBOutlet var proposedPassword: UITextField!
     @IBOutlet var confirmNewPassword: UITextField!
     @IBOutlet var infoLabel: UILabel!
+    
+    var userName: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let username = user?.username {
+        if let username = userName {
             infoLabel.text = "To set a new password we have sent a verification code to " + username
         }
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -68,24 +69,11 @@ class ResetPasswordViewController: UIViewController {
             return
         }
 
-        // confirm forgot password with input from ui.
-        user?.confirmForgotPassword(confirmationCodeValue, password: proposedPassword.text!).continueWith { [weak self] (task: AWSTask) -> AnyObject? in
-            guard let strongSelf = self else { return nil }
-            DispatchQueue.main.async {
-                if let error = task.error as NSError? {
-                    let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                            message: error.userInfo["message"] as? String,
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-                    alertController.addAction(okAction)
-
-                    self?.present(alertController, animated: true, completion: nil)
-                } else {
-                    _ = strongSelf.navigationController?.popToRootViewController(animated: true)
-                }
-            }
-            return nil
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
         }
+        let service = ESPForgotPasswordService(presenter: self)
+        service.confirmForgotPassword(name: self.userName ?? "", password: proposedPassword.text!, verificationCode: confirmationCodeValue)
     }
 
     func showAlert(title: String, message: String) {
@@ -118,4 +106,21 @@ extension ResetPasswordViewController: UITextFieldDelegate {
         }
         return true
     }
+}
+
+extension ResetPasswordViewController: ESPForgotPasswordPresentationLogic {
+    
+    func requestedForgotPassword(withError error: ESPAPIError?) {}
+    
+    func confirmForgotPassword(withError error: ESPAPIError?) {
+        DispatchQueue.main.async { [self] in
+            Utility.hideLoader(view: self.view)
+            if let _ = error {
+                self.handleError(error: error, buttonTitle: "Ok")
+            } else {
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+        }
+    }
+    
 }

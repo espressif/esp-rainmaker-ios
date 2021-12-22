@@ -15,18 +15,16 @@
 // limitations under the License.
 //
 
-import AWSCognitoIdentityProvider
+import UIKit
 import Foundation
 
 class ForgotPasswordViewController: UIViewController {
-    var pool: AWSCognitoIdentityUserPool?
-    var user: AWSCognitoIdentityUser?
-
+    
     @IBOutlet var username: UITextField!
+    var sender: AnyObject!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        pool = AWSCognitoIdentityUserPool(forKey: Constants.AWSCognitoUserPoolsSignInProviderKey)
     }
 
     override func viewWillAppear(_: Bool) {
@@ -35,7 +33,7 @@ class ForgotPasswordViewController: UIViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if let newPasswordViewController = segue.destination as? ResetPasswordViewController {
-            newPasswordViewController.user = user
+            newPasswordViewController.userName = self.username.text
         }
     }
 
@@ -47,6 +45,7 @@ class ForgotPasswordViewController: UIViewController {
 
     // handle forgot password
     @IBAction func forgotPassword(_ sender: AnyObject) {
+        self.sender = sender
         guard let username = self.username.text, !username.isEmpty else {
             let alertController = UIAlertController(title: "Missing UserName",
                                                     message: "Please enter a valid user name.",
@@ -57,25 +56,12 @@ class ForgotPasswordViewController: UIViewController {
             present(alertController, animated: true, completion: nil)
             return
         }
-
-        user = pool?.getUser(self.username.text!)
-        user?.forgotPassword().continueWith { [weak self] (task: AWSTask) -> AnyObject? in
-            guard let strongSelf = self else { return nil }
-            DispatchQueue.main.async {
-                if let error = task.error as NSError? {
-                    let alertController = UIAlertController(title: error.userInfo["__type"] as? String,
-                                                            message: error.userInfo["message"] as? String,
-                                                            preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-                    alertController.addAction(okAction)
-
-                    self?.present(alertController, animated: true, completion: nil)
-                } else {
-                    strongSelf.performSegue(withIdentifier: "confirmForgotPasswordSegue", sender: sender)
-                }
-            }
-            return nil
+        
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
         }
+        let service = ESPForgotPasswordService(presenter: self)
+        service.requestForgotPassword(name: self.username.text!)
     }
 }
 
@@ -85,4 +71,23 @@ extension ForgotPasswordViewController: UITextFieldDelegate {
         forgotPassword(textField)
         return true
     }
+}
+
+extension ForgotPasswordViewController: ESPForgotPasswordPresentationLogic {
+    
+    func requestedForgotPassword(withError error: ESPAPIError?) {
+        DispatchQueue.main.async { [self] in
+            Utility.hideLoader(view: self.view)
+            if let err = error {
+                self.handleError(error: error, buttonTitle: "Ok")
+            } else {
+                if let sender = self.sender {
+                    self.performSegue(withIdentifier: "confirmForgotPasswordSegue", sender: sender)
+                }
+            }
+        }
+    }
+    
+    func confirmForgotPassword(withError error: ESPAPIError?) {}
+    
 }

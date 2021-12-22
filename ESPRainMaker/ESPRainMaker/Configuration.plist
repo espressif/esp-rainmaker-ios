@@ -4,12 +4,8 @@
 <dict>
 	<key>AWS Configuration</key>
 	<dict>
-		<key>UserPool ID</key>
-		<string>us-east-1_kWz4M6MfD</string>
 		<key>App Client ID</key>
 		<string>60i6kac5f9rjuetqnq5mnmaqv6</string>
-		<key>UserPool Region</key>
-		<integer>1</integer>
 		<key>Authentication URL</key>
 		<string>https://auth.rainmaker.espressif.com/oauth2</string>
 		<key>Base URL</key>
