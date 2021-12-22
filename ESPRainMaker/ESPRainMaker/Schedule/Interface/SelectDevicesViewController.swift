@@ -46,6 +46,8 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate {
 
     // MARK: - ScheduleActionDelegate
 
+    func takeScheduleNotAllowedAction(action _: ScheduleActionStatus) {}
+
     func headerViewDidTappedFor(section: Int) {
         availableDeviceCopy[section].collapsed = !availableDeviceCopy[section].collapsed
         tableView.reloadSections(IndexSet(arrayLiteral: section), with: .automatic)
@@ -299,6 +301,7 @@ extension SelectDevicesViewController: UITableViewDataSource {
         headerView.section = section
         headerView.device = device
         headerView.delegate = self
+        headerView.deviceStatusLabel.text = device.scheduleAction.description
         if device.collapsed {
             headerView.arrowImageView.image = UIImage(named: "right_arrow")
         } else {

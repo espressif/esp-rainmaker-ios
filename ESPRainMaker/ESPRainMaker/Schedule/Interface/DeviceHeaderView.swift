@@ -21,15 +21,30 @@ protocol ScheduleActionDelegate {
     func headerViewDidTappedFor(section: Int)
     func paramStateChangedat(indexPath: IndexPath)
     func expandSection(expand: Bool, section: Int)
+    func takeScheduleNotAllowedAction(action: ScheduleActionStatus)
 }
 
 class DeviceHeaderView: UITableViewHeaderFooterView {
     @IBOutlet var deviceLabel: UILabel!
     @IBOutlet var arrowImageView: UIImageView!
     @IBOutlet var selectDeviceButton: UIButton!
+    @IBOutlet var deviceStatusLabel: UILabel!
     var delegate: ScheduleActionDelegate?
     var section: Int!
     var device: Device!
+
+    override func layoutSubviews() {
+        if let device = device {
+            switch device.scheduleAction {
+            case .allowed:
+                selectDeviceButton.isEnabled = true
+                deviceLabel.textColor = UIColor.black
+            default:
+                selectDeviceButton.isEnabled = false
+                deviceLabel.textColor = UIColor.lightGray
+            }
+        }
+    }
 
     @IBAction func headerViewTapped(_: Any) {
         delegate?.headerViewDidTappedFor(section: section)

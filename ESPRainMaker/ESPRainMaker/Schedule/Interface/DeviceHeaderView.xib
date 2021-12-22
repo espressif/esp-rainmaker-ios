@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -37,6 +37,12 @@
                                 <action selector="headerViewTapped:" destination="W18-VU-z48" eventType="touchUpInside" id="zOM-dM-a1r"/>
                             </connections>
                         </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="knQ-HI-4tm">
+                            <rect key="frame" x="44" y="96" width="0.0" height="0.0"/>
+                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="10"/>
+                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1m5-br-yB4">
                             <rect key="frame" x="0.0" y="0.0" width="40" height="102"/>
                             <constraints>
@@ -58,9 +64,11 @@
                         <constraint firstItem="7FO-Vv-VzQ" firstAttribute="top" secondItem="1mG-2U-Tdy" secondAttribute="top" id="BjR-mo-5bA"/>
                         <constraint firstAttribute="trailing" secondItem="sKO-bp-L9u" secondAttribute="trailing" constant="20" id="FSm-GI-kIR"/>
                         <constraint firstItem="1m5-br-yB4" firstAttribute="top" secondItem="1mG-2U-Tdy" secondAttribute="top" id="J0i-Wc-YIy"/>
+                        <constraint firstAttribute="bottom" secondItem="knQ-HI-4tm" secondAttribute="bottom" constant="6" id="J6e-py-z0I"/>
                         <constraint firstAttribute="trailing" secondItem="7FO-Vv-VzQ" secondAttribute="trailing" id="P8x-SW-DRD"/>
                         <constraint firstItem="UrC-BF-sYW" firstAttribute="centerY" secondItem="1mG-2U-Tdy" secondAttribute="centerY" id="UcV-ff-6Im"/>
                         <constraint firstAttribute="bottom" secondItem="7FO-Vv-VzQ" secondAttribute="bottom" id="mpa-pc-0eA"/>
+                        <constraint firstItem="knQ-HI-4tm" firstAttribute="leading" secondItem="7FO-Vv-VzQ" secondAttribute="leading" constant="4" id="wDq-LX-ToU"/>
                         <constraint firstItem="sKO-bp-L9u" firstAttribute="centerY" secondItem="1mG-2U-Tdy" secondAttribute="centerY" id="zi8-gI-pPP"/>
                     </constraints>
                     <userDefinedRuntimeAttributes>
@@ -87,6 +95,7 @@
             <connections>
                 <outlet property="arrowImageView" destination="sKO-bp-L9u" id="aDN-o7-Xrg"/>
                 <outlet property="deviceLabel" destination="UrC-BF-sYW" id="egh-Ut-NlH"/>
+                <outlet property="deviceStatusLabel" destination="knQ-HI-4tm" id="oiF-j0-9Ry"/>
                 <outlet property="selectDeviceButton" destination="1m5-br-yB4" id="9uX-gs-0gN"/>
             </connections>
             <point key="canvasLocation" x="113.768115942029" y="-145.3125"/>

@@ -211,7 +211,7 @@ class DeviceTraitListViewController: UIViewController {
         } else if device?.node?.isConnected ?? true {
             offlineLabel.isHidden = true
         } else {
-            offlineLabel.text = device?.node?.getNodeStatus() ?? ""
+            offlineLabel.text = device?.node?.nodeStatus ?? ""
             offlineLabel.isHidden = false
             tableView.isUserInteractionEnabled = false
         }

@@ -60,10 +60,21 @@ struct JSONParser {
                 if Configuration.shared.appConfiguration.supportSchedule { // Check whether scheduling is supported in the node
                     if let services = config["services"] as? [[String: Any]] {
                         for service in services {
-                            if let type = service["type"] as? String, type == Constants.scheduleServiceType, let params = service["params"] as? [[String: Any]] {
-                                for param in params {
-                                    if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
-                                        node.isSchedulingSupported = true
+                            if let type = service["type"] as? String, type == Constants.scheduleServiceType {
+                                if let name = service["name"] as? String, name.count > 0 {
+                                    node.scheduleName = name
+                                }
+                                if let params = service["params"] as? [[String: Any]] {
+                                    for param in params {
+                                        if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
+                                            node.isSchedulingSupported = true
+                                            if let name = param["name"] as? String, name.count > 0 {
+                                                node.schedulesName = name
+                                            }
+                                        }
+                                        if let bounds = param["bounds"] as? [String: Any], let max = bounds["max"] as? Int, max >= 0 {
+                                            node.maxSchedulesCount = max
+                                        }
                                     }
                                 }
                             }
@@ -168,7 +179,8 @@ struct JSONParser {
                 }
 
                 if Configuration.shared.appConfiguration.supportSchedule {
-                    if let schedule = paramInfo[Constants.scheduleKey] as? [String: Any], let schedules = schedule[Constants.schedulesKey] as? [[String: Any]] {
+                    if let schedule = paramInfo[node.scheduleName] as? [String: Any], let schedules = schedule[node.schedulesName] as? [[String: Any]] {
+                        node.currentSchedulesCount = schedules.count
                         for scheduleJSON in schedules {
                             ESPScheduler.shared.saveScheduleListFromJSON(nodeID: node.node_id ?? "", scheduleJSON: scheduleJSON)
                         }

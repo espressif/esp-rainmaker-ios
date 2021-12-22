@@ -246,7 +246,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
 }
 
 extension ScannerViewController: ESPDeviceConnectionDelegate {
-    func getProofOfPossesion(forDevice _: ESPDevice, completionHandler: @escaping (String) -> Void) {
+    func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (String) -> Void) {
         completionHandler("")
     }
 }

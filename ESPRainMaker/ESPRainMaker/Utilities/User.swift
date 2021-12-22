@@ -203,6 +203,17 @@ class User {
             self.localControl.searchForServicesOfType(type: Constants.serviceType, domain: Constants.serviceDomain)
         }
     }
+    
+    /// Returns node from associated node list
+    /// - Parameter id: node id
+    /// - Returns: node for given node id or nil if it doesn't exist
+    func getNode(id: String) -> Node? {
+        let predicate = NSPredicate(format: "SELF == %@", id)
+        let node = associatedNodeList?.first(where: {
+            predicate.evaluate(with: ($0.node_id))
+        })
+        return node ?? nil
+    }
 }
 
 extension User: ESPLocalControlDelegate {

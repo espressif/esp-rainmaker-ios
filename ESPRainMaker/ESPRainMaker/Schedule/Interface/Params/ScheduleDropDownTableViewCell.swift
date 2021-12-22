@@ -27,6 +27,7 @@ class ScheduleDropDownTableViewCell: DropDownTableViewCell {
         trailingSpaceConstraint.constant = 0
         leadingSpaceConstraint.constant = 30.0
         backView.backgroundColor = .white
+        setupSelections()
     }
 
     @IBAction override func checkBoxPressed(_: Any) {
@@ -68,6 +69,24 @@ class ScheduleDropDownTableViewCell: DropDownTableViewCell {
             DispatchQueue.main.async {
                 controlValueLabel.text = item
             }
+        }
+    }
+}
+
+extension ScheduleDropDownTableViewCell: ScheduleActionAllowedProtocol {
+    func setupSelections() {
+        switch device.scheduleAction {
+        case .allowed:
+            self.alpha = 1.0
+            checkButton.isEnabled = true
+            dropDownButton.isEnabled = param?.selected ?? false
+            dropDownButton.isHidden = false
+        default:
+            self.alpha = 0.6
+            checkButton.isEnabled = false
+            dropDownButton.isEnabled = false
+            dropDownButton.isHidden = true
+            scheduleDelegate?.takeScheduleNotAllowedAction(action: device.scheduleAction)
         }
     }
 }

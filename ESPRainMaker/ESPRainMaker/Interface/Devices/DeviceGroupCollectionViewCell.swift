@@ -132,7 +132,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
         }
 
-        cell.offlineLabel.text = device.node?.getNodeStatus() ?? ""
+        cell.offlineLabel.text = device.node?.nodeStatus ?? ""
 
         var primaryKeyFound = false
 

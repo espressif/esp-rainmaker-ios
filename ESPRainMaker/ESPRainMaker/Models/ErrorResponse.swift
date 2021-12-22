@@ -19,7 +19,39 @@
 import Foundation
 
 class ESPCloudResponse: Codable {
+    var node_id: String?
     var status: String
     var error_code: Int?
     var description: String
 }
+
+enum ESPCloudResponseStatus: Error {
+    case emptyConfigData
+    case emptyResultCount
+    case emptyToken
+    case userIDNotPresent
+    case emptyNodeList
+    case success
+    case failure
+    case unknown
+}
+
+class ESPCloudResponseParser {
+    
+    /// Method returns list of nodes for which param API succeeded and failed
+    /// - Parameter response: List of nodes returned from param API
+    /// - Returns: tuple with list of nodes for which param API succeeded and failed
+    func getNodesWithStatus(response: [ESPCloudResponse]) -> (successResponse: [ESPCloudResponse], failureResponse: [ESPCloudResponse]) {
+        var nodesSuccess = [ESPCloudResponse]()
+        var nodesFailed = [ESPCloudResponse]()
+        for node in response {
+            if node.status.lowercased() == "success" {
+                nodesSuccess.append(node)
+            } else {
+                nodesFailed.append(node)
+            }
+        }
+        return (nodesSuccess, nodesFailed)
+    }
+}
+

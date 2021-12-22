@@ -23,6 +23,8 @@ class ScheduleListTableViewCell: UITableViewCell {
     @IBOutlet var actionLabel: UILabel!
     @IBOutlet var timerLabel: UILabel!
     @IBOutlet var daysLabel: UILabel!
+    
+    weak var delegate: ScheduleListTableViewCellDelegate?
 
     var index: Int!
     var schedule: ESPSchedule!
@@ -39,13 +41,16 @@ class ScheduleListTableViewCell: UITableViewCell {
         ESPScheduler.shared.currentSchedule.operation = .edit
         let view = parentViewController?.parent?.view ?? contentView
         Utility.showLoader(message: "", view: view)
-        ESPScheduler.shared.shouldEnableSchedule(onView: view) { result in
+        ESPScheduler.shared.shouldEnableSchedule(onView: view) { result  in
             Utility.hideLoader(view: view)
             DispatchQueue.main.async {
-                if !result {
+                switch result {
+                case .failure:
                     self.scheduleSwitch.isOn = !sender.isOn
                     ESPScheduler.shared.currentSchedule.enabled = currentState
-                } else {}
+                case .success(let nodesFailed):
+                    self.delegate?.scheduleStateChanged(index: self.index, enabled: ESPScheduler.shared.currentSchedule.enabled, shouldRefresh: nodesFailed)
+                }
             }
         }
     }
@@ -53,4 +58,9 @@ class ScheduleListTableViewCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
+}
+
+/// Protocol to be invoked when state of schedule table view cell changes
+@objc protocol ScheduleListTableViewCellDelegate {
+    func scheduleStateChanged(index: Int, enabled: Bool, shouldRefresh: Bool)
 }

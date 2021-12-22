@@ -48,6 +48,33 @@ class ESPAPIManager {
 
         return certificate
     }
+    
+    /// Method to update device thing shadow
+    /// Any changes of the device params from the app trigger this method
+    ///
+    /// - Parameters:
+    ///   - parameter: list of paramters to be updated
+    ///   - completionHandler: handler called when response to setDeviceParam is recieved
+    func setMultipleDeviceParam(parameter: [[String: Any]], completionHandler: (([ESPCloudResponse]?, ESPNetworkError?) -> Void)? = nil) {
+        self.genericAuthorizedMultiParamDataRequest(url: Constants.setParam, parameter: parameter) { response, error in
+            if error == nil {
+                guard let data = response else {
+                    completionHandler?(nil, .noData)
+                    return
+                }
+                do {
+                    let decoder = JSONDecoder()
+                    let response = try decoder.decode([ESPCloudResponse].self, from: data)
+                    completionHandler?(response, nil)
+                } catch {
+                    completionHandler?(nil, .parsingError(error.localizedDescription))
+                }
+            } else {
+                completionHandler?(nil, error)
+            }
+        }
+    }
+
 
     // MARK: - Node APIs
 
@@ -314,13 +341,13 @@ class ESPAPIManager {
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
     ///   - completionHandler: handler called when response to setDeviceParam is recieved
-    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: ((ESPHTTPSRequestStatus) -> Void)? = nil) {
+    func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: ((ESPCloudResponseStatus) -> Void)? = nil) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if let nodeid = nodeID {
-            User.shared.getAccessToken(completionHandler: { idToken in
-                if idToken != nil {
+            User.shared.getAccessToken(completionHandler: { accessToken in
+                if accessToken != nil {
                     let url = Constants.setParam + "?nodeid=" + nodeid
-                    let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": idToken!]
+                    let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
 
                     self.session.request(url, method: .put, parameters: parameter, encoding: ESPCustomJsonEncoder.default, headers: headers).responseJSON { response in
                         switch response.result {
@@ -423,4 +450,35 @@ class ESPAPIManager {
             }
         })
     }
+    
+    /// Method to make generic authorized data request with array as param
+    ///
+    /// - Parameters:
+    ///   - url: URL of the api
+    ///   - parameter: Parameter to be included in the api call
+    ///   - method: HTTP method
+    ///   - completionHandler: Callback invoked after api response is recieved
+    func genericAuthorizedMultiParamDataRequest(url: String, parameter: [[String: Any]]?, method: HTTPMethod = .post, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
+        User.shared.getAccessToken() { accessToken in
+            if accessToken != nil {
+                let url = Constants.setParam
+                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": accessToken!]
+                let params = [ESPCustomJsonEncoder.key: parameter as Any]
+                self.session.request(url, method: .put, parameters: params, encoding: ESPCustomJsonEncoder.default, headers: headers).responseData { response in
+                    switch response.result {
+                    case let .success(value):
+                        completionHandler(value, nil)
+                        return
+                    case let .failure(error):
+                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        return
+                    }
+                }
+            } else {
+                completionHandler(nil, .emptyToken)
+            }
+        }
+    }
+    
+    
 }
