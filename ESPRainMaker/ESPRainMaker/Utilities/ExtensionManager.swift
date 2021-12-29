@@ -459,6 +459,17 @@ extension String {
 
 extension UIViewController {
     
+    func showErrorAlert(title: String, message: String, buttonTitle: String, callback: @escaping () -> Void) {
+        let alertController = UIAlertController(title: title,
+                                                message: message,
+                                                preferredStyle: .alert)
+        let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: {_ in
+            callback()
+        })
+        alertController.addAction(dismissAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     func handleError(error: ESPAPIError?, buttonTitle: String) {
         if let err = error {
             var title = "Error"

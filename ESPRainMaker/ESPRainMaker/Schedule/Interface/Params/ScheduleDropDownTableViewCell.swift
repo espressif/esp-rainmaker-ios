@@ -20,6 +20,9 @@ import DropDown
 import UIKit
 
 class ScheduleDropDownTableViewCell: DropDownTableViewCell {
+    
+    var cellType: DeviceServiceType = .none
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         // Cutomised appearance of control element for schedule action
@@ -73,15 +76,15 @@ class ScheduleDropDownTableViewCell: DropDownTableViewCell {
     }
 }
 
-extension ScheduleDropDownTableViewCell: ScheduleActionAllowedProtocol {
+extension ScheduleDropDownTableViewCell: ScheduleSceneActionAllowedProtocol {
     func setupSelections() {
-        switch device.scheduleAction {
-        case .allowed:
+        let isAllowed = isCellEnabled(cellType: cellType, device: device)
+        if isAllowed {
             self.alpha = 1.0
             checkButton.isEnabled = true
             dropDownButton.isEnabled = param?.selected ?? false
             dropDownButton.isHidden = false
-        default:
+        } else {
             self.alpha = 0.6
             checkButton.isEnabled = false
             dropDownButton.isEnabled = false

@@ -112,10 +112,12 @@ struct Constants {
     static let switchDevice = "esp.device.switch"
 
     // UI types
+    static let slider = "esp.ui.slider"
     static let hue = "esp.ui.hue-slider"
     static let toggle = "esp.ui.toggle"
     static let hueCircle = "esp.ui.hue-circle"
     static let bigSwitch = "esp.ui.push-btn-big"
+    static let dropdown = "esp.ui.dropdown"
 
     // Service types
     static let timezoneServiceName = "esp.service.time"
@@ -160,9 +162,15 @@ struct Constants {
     static let serviceType = "_esp_local_ctrl._tcp."
     static let serviceDomain = "local"
     
-    
     // APIs JSON keys
     static let successKey = "success"
     static let descriptionKey = "description"
     static let statusKey = "status"
+
+    static let sceneServiceType = "esp.service.scenes"
+    static let sceneParamType = "esp.param.scenes"
+    static let sceneKey = "Scene"
+    static let scenesKey = "Scenes"
+    
+    static let edit = "Edit"
 }

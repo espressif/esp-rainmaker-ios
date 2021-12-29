@@ -1,4 +1,4 @@
-// Copyright 2021 Espressif Systems
+// Copyright 2022 Espressif Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ScheduleActionAllowedProtocol.swift
+//  CommonDeviceServices+UpdateActions.swift
 //  ESPRainMaker
 //
 
 import Foundation
 
-protocol ScheduleActionAllowedProtocol {
-    func setupSelections()
+protocol ServiceUpdateActionsDelegate: AnyObject {
+    
+    func serviceAdded()
+    func serviceUpdated()
+    func serviceRemoved()
 }

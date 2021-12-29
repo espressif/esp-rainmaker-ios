@@ -102,6 +102,9 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         if Configuration.shared.appConfiguration.supportSchedule {
                             ESPScheduler.shared.refreshScheduleList()
                         }
+                        if Configuration.shared.appConfiguration.supportScene {
+                            ESPSceneManager.shared.refreshSceneList()
+                        }
                         ESPNetworkMonitor.shared.setNetworkConnection(connected: true)
                         if let json = value as? [String: Any] {
                             if let nodeArray = json["node_details"] as? [[String: Any]] {

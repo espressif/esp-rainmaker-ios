@@ -107,6 +107,18 @@ Local Control feature is optional but enabled by default. It can be disabled fro
 
 Schedule feature is optional but enabled by default. Schedule can be disabled from the `Configuration.plist` by setting `Enable Schedule` key from `App Configuration` to `NO`.
 
+### Scenes
+
+ Scene is a group of parameters with specific values, for one or more devices (optionally) spanning across multiple nodes. As an example, an "Evening" scene may turn on all the lights and set them to a warm colour. A "Night" scene may turn off all the lights, turn on a bedside lamp set to minimal brightness and turn on the fan/ac. 
+ List of operations that are supported for scene :
+ 
+ - Add.
+ - Edit.
+ - Remove.
+ - Activate.
+
+Scene feature is optional but enabled by default. Scenes can be disabled from the `Configuration.plist` by setting `Enable Scene` key from `App Configuration` to `NO`.
+
 ### Node Grouping
 
 Node Grouping allows you to create abstract or logical groups of devices like lights, switches, fans etc. List of operations that are supported in node grouping :
@@ -151,7 +163,6 @@ ESPRainMaker app supports remote notifiations in order to notify app in realtime
 2. Actionable notification: In case a node sharing request is received, user will be be alerted with an actionable notification. This will enable the user to accept or decline the sharing request from the notification center.
 
 3. Silent notifications: This notification is triggered at the time when any of the user device param changes. It will update the app with latest param value in case when app is in foreground.
-  
 
 ### Alexa App to App Linking
 

@@ -18,6 +18,9 @@
 import UIKit
 
 class ScheduleSwitchTableViewCell: SwitchTableViewCell {
+    
+    var cellType: DeviceServiceType = .none
+    
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -56,14 +59,14 @@ class ScheduleSwitchTableViewCell: SwitchTableViewCell {
     }
 }
 
-extension ScheduleSwitchTableViewCell: ScheduleActionAllowedProtocol {
+extension ScheduleSwitchTableViewCell: ScheduleSceneActionAllowedProtocol {
     func setupSelections() {
-        switch device.scheduleAction {
-        case .allowed:
+        let isAllowed = isCellEnabled(cellType: cellType, device: device)
+        if isAllowed {
             self.alpha = 1.0
             checkButton.isEnabled = true
             toggleSwitch.isEnabled = param?.selected ?? false
-        default:
+        } else {
             self.alpha = 0.6
             checkButton.isEnabled = false
             toggleSwitch.isEnabled = false

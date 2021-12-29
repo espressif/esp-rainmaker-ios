@@ -1,4 +1,4 @@
-// Copyright 2020 Espressif Systems
+// Copyright 2022 Espressif Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,54 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  SelectDevicesViewController.swift
+//  SceneSelectDevicesVC.swift
 //  ESPRainMaker
 //
+
 import UIKit
 
-class SelectDevicesViewController: UIViewController, ScheduleActionDelegate, SelectDeviceActionCellDelegate {
-    @IBOutlet var tableView: UITableView!
+class SceneSelectDevicesVC: UIViewController, SelectDeviceActionCellDelegate {
+    
+    static func getVC() -> SceneSelectDevicesVC {
+        let storyboard = UIStoryboard(name: "Scene", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: SceneSelectDevicesVC.storyboardId) as! SceneSelectDevicesVC
+        return vc
+    }
+    
+    static let storyboardId = "SceneSelectDevicesVC"
     var availableDeviceCopy: [Device]!
     var selectedIndexPath: [IndexPath] = []
-
+    
+    @IBOutlet weak var tableView: UITableView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        //register cells for tableview
         self.registerCells(tableView)
     }
-
-    // MARK: - IBActions
-
-    @IBAction func cancelButtonPressed(_: Any) {
+    
+    @IBAction func cancelPressed(_ sender: Any) {
         navigationController?.popViewController(animated: true)
-        ESPScheduler.shared.configureDeviceForCurrentSchedule()
+        ESPSceneManager.shared.configureDeviceForCurrentScene()
     }
-
-    @IBAction func doneButtonPressed(_: Any) {
+    
+    @IBAction func donePressed(_ sender: Any) {
         navigationController?.popViewController(animated: true)
-    }
-
-    // MARK: - ScheduleActionDelegate
-
-    func takeScheduleNotAllowedAction(action _: ScheduleActionStatus) {}
-
-    func headerViewDidTappedFor(section: Int) {
-        availableDeviceCopy[section].collapsed = !availableDeviceCopy[section].collapsed
-        tableView.reloadSections(IndexSet(arrayLiteral: section), with: .automatic)
-    }
-
-    func paramStateChangedat(indexPath: IndexPath) {
-        tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
-    }
-
-    func expandSection(expand: Bool, section: Int) {
-        availableDeviceCopy[section].collapsed = !expand
-        tableView.reloadSections(IndexSet(arrayLiteral: section), with: .automatic)
     }
 }
 
-extension SelectDevicesViewController: UITableViewDelegate {
+extension SceneSelectDevicesVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
         return 60.5
     }
@@ -71,9 +61,7 @@ extension SelectDevicesViewController: UITableViewDelegate {
     func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
         return 25.0
     }
-}
-
-extension SelectDevicesViewController: UITableViewDataSource {
+    
     func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         if availableDeviceCopy[section].collapsed {
             return 0
@@ -82,7 +70,7 @@ extension SelectDevicesViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = getTableViewCellBasedOn(tableView: tableView, availableDeviceCopy: availableDeviceCopy, serviceType: .schedule, scheduleDelegate: self, indexPath: indexPath)
+        let cell = getTableViewCellBasedOn(tableView: tableView, availableDeviceCopy: availableDeviceCopy, serviceType: .scene, scheduleDelegate: self, indexPath: indexPath)
         cell.borderWidth = 0.5
         cell.borderColor = .lightGray
         return cell
@@ -91,12 +79,12 @@ extension SelectDevicesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "deviceHV") as! DeviceHeaderView
         let device = availableDeviceCopy[section]
-        headerView.cellType = .schedule
+        headerView.cellType = .scene
         headerView.deviceLabel.text = device.deviceName
         headerView.section = section
         headerView.device = device
         headerView.delegate = self
-        headerView.deviceStatusLabel.text = device.scheduleAction.description
+        headerView.deviceStatusLabel.text = device.sceneAction.description
         if device.collapsed {
             headerView.arrowImageView.image = UIImage(named: "right_arrow")
         } else {
@@ -120,5 +108,23 @@ extension SelectDevicesViewController: UITableViewDataSource {
 
     func numberOfSections(in _: UITableView) -> Int {
         return availableDeviceCopy.count
+    }
+}
+
+extension SceneSelectDevicesVC: ScheduleActionDelegate {
+    func takeScheduleNotAllowedAction(action _: ScheduleActionStatus) {}
+
+    func headerViewDidTappedFor(section: Int) {
+        availableDeviceCopy[section].collapsed = !availableDeviceCopy[section].collapsed
+        tableView.reloadSections(IndexSet(arrayLiteral: section), with: .automatic)
+    }
+
+    func paramStateChangedat(indexPath: IndexPath) {
+        tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+    }
+
+    func expandSection(expand: Bool, section: Int) {
+        availableDeviceCopy[section].collapsed = !expand
+        tableView.reloadSections(IndexSet(arrayLiteral: section), with: .automatic)
     }
 }

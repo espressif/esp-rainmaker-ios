@@ -75,6 +75,9 @@ class ScheduleListViewController: UIViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if segue.identifier == Constants.addScheduleSegue || segue.identifier == Constants.addNewScheduleSegue {
+            if let vc = segue.destination as? ScheduleViewController {
+                vc.delegate = self
+            }
             ESPScheduler.shared.addSchedule()
         }
     }
@@ -176,39 +179,53 @@ class ScheduleListViewController: UIViewController {
 }
 
 extension ScheduleListViewController: UITableViewDelegate {
-    func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
+    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row % 2 != 0 {
+            return 20.0
+        }
         return 80.0
     }
 
     func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row % 2 != 0 {
+            return
+        }
         tableView.deselectRow(at: indexPath, animated: false)
         let scheduleVC = storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController
-        ESPScheduler.shared.currentSchedule = ESPScheduler.shared.schedules[scheduleList[indexPath.section]]!
-        scheduleVC.scheduleKey = scheduleList[indexPath.section]
-        ESPScheduler.shared.currentScheduleKey = scheduleList[indexPath.section]
+        scheduleVC.delegate = self
+        ESPScheduler.shared.currentSchedule = ESPScheduler.shared.schedules[scheduleList[indexPath.row/2]]!
+        scheduleVC.scheduleKey = scheduleList[indexPath.row/2]
+        ESPScheduler.shared.currentScheduleKey = scheduleList[indexPath.row/2]
         navigationController?.pushViewController(scheduleVC, animated: true)
     }
 
     func tableView(_: UITableView, viewForHeaderInSection _: Int) -> UIView? {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        let view = UIView(frame: CGRect.zero)
         return view
     }
 
     func tableView(_: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if indexPath.row % 2 != 0 {
+            return
+        }
         if editingStyle == .delete {
             let alertController = UIAlertController(title: "Are you sure?", message: "", preferredStyle: .alert)
             let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
             let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
                 DispatchQueue.main.async {
                     Utility.showLoader(message: "", view: self.view)
-                    ESPScheduler.shared.deleteScheduleAt(key: self.scheduleList[indexPath.section], onView: self.view) { result  in
+                    ESPScheduler.shared.deleteScheduleAt(key: self.scheduleList[indexPath.row/2], onView: self.view) { result  in
                         switch result {
-                        case .success(_):
+                        case .success(let nodesFailed):
                             DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
+                                if !nodesFailed {
+                                    Utility.showToastMessage(view: self.view, message: "Schedule deleted successfully.", duration: 2.0)
+                                }
                                 self.refreshScheduleList(self)
                             })
                         default:
                             Utility.hideLoader(view: self.view)
+                            Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionFailed, duration: 2.0)
                         }
                     }
                 }
@@ -222,8 +239,16 @@ extension ScheduleListViewController: UITableViewDelegate {
 
 extension ScheduleListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.row % 2 != 0 {
+            let cell = UITableViewCell(frame: CGRect(x: 0.0, y: 0.0, width: tableView.frame.width, height: 20.0))
+            cell.contentView.backgroundColor = .clear
+            cell.isUserInteractionEnabled = false
+            cell.backgroundColor = .clear
+            cell.isHidden = true
+            return cell
+        }
         let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleListTVC", for: indexPath) as! ScheduleListTableViewCell
-        let schedule = ESPScheduler.shared.schedules[scheduleList[indexPath.section]]!
+        let schedule = ESPScheduler.shared.schedules[scheduleList[indexPath.row/2]]!
         ESPScheduler.shared.currentSchedule = schedule
         ESPScheduler.shared.configureDeviceForCurrentSchedule()
         cell.schedule = schedule
@@ -244,17 +269,17 @@ extension ScheduleListViewController: UITableViewDataSource {
         }
         cell.scheduleSwitch.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         cell.scheduleSwitch.setOn(schedule.enabled, animated: true)
-        cell.index = indexPath.section
+        cell.index = indexPath.row/2
         cell.delegate = self
         return cell
     }
 
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        return 1
+        return 2*scheduleList.count
     }
 
     func numberOfSections(in _: UITableView) -> Int {
-        return scheduleList.count
+        return 1
     }
 }
 
@@ -266,5 +291,19 @@ extension ScheduleListViewController: ScheduleListTableViewCellDelegate {
         } else {
             self.refreshScheduleList(self)
         }
+    }
+}
+
+extension ScheduleListViewController: ServiceUpdateActionsDelegate {
+    func serviceAdded() {
+        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleAddSuccess, duration: 2.0)
+    }
+    
+    func serviceUpdated() {
+        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdateSuccess, duration: 2.0)
+    }
+    
+    func serviceRemoved() {
+        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionSuccess, duration: 2.0)
     }
 }

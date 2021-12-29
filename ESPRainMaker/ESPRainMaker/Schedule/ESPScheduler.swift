@@ -18,14 +18,7 @@
 import Foundation
 import UIKit
 
-/// Enum with states for response from cloud regarding the param API response
-enum ESPScheduleAPIResponseStatus {
-    
-    case success(Bool) //API success with flag giving info on whether some nodes failed or not true for success and false for no nodes failed
-    case failure //API failure
-}
-
-class ESPScheduler {
+class ESPScheduler: CommonDeviceServicesProtocol {
     static let shared = ESPScheduler()
     var schedules: [String: ESPSchedule] = [:]
     var availableDevices: [String: Device] = [:]
@@ -40,10 +33,6 @@ class ESPScheduler {
     let editScheduleFailureMessage: String = "Unable to edit schedule for"
     let deleteScheduleFailureMessage: String = "Unable to delete schedule for"
     
-    // Is date and name changed:
-    var isDateChanged: Bool = false
-    var isNameChanged: Bool = false
-
     // MARK: - Schedule Operations
 
     /// Save or edit schedule parameters for a particular Schedule.
@@ -51,7 +40,7 @@ class ESPScheduler {
     /// - Parameters:
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is recieved
-    func saveSchedule(onView: UIView, completionHandler: @escaping (ESPScheduleAPIResponseStatus) -> Void) {
+    func saveSchedule(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             var jsonString: [String: Any] = [:]
             jsonString["name"] = currentSchedule.name
@@ -60,22 +49,7 @@ class ESPScheduler {
             jsonString["triggers"] = [["d": currentSchedule.trigger.days!, "m": currentSchedule.trigger.minutes!]]
             let actions = createActionsFromDeviceList()
             if actions.keys.count > 0 {
-                var actionsList = [[String: Any]]()
-                actions.keys.forEach {
-                    var deviceJSON: [String: Any] = [:]
-                    actions[$0]!.forEach {
-                        var actionJSON: [String: Any] = [:]
-                        $0.params!.filter { $0.selected == true }
-                                        .forEach { actionJSON[$0.name ?? ""] = $0.value }
-                        deviceJSON[$0.name ?? ""] = actionJSON
-                    }
-                    jsonString["action"] = deviceJSON
-                    let (scheduleKey, schedulesKey)  = getScheduleKeys(id: $0)
-                    let payload = [scheduleKey: [schedulesKey: [jsonString]]]
-                    actionsList.append([nodeIdKey: $0 as Any,
-                                        payloadKey:  payload as Any])
-                }
-                callParamsAPIWithActions(list: actionsList, actions: actions, onView: onView, text: saveScheduleFailureMessage) { result  in
+                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: saveScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: true, onView: onView) { result in
                     completionHandler(result)
                 }
             } else {
@@ -91,7 +65,7 @@ class ESPScheduler {
     /// - Parameters:
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is recieved
-    func shouldEnableSchedule(onView: UIView, completionHandler: @escaping (ESPScheduleAPIResponseStatus) -> Void) {
+    func shouldEnableSchedule(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             configureDeviceForCurrentSchedule()
             var jsonString: [String: Any] = [:]
@@ -99,14 +73,7 @@ class ESPScheduler {
             jsonString["operation"] = currentSchedule.enabled == true ? "enable" : "disable"
             let actions = createActionsFromDeviceList()
             if actions.keys.count > 0 {
-                var actionsList = [[String: Any]]()
-                actions.keys.forEach {
-                    let (scheduleKey, schedulesKey)  = getScheduleKeys(id: $0)
-                    let payload = [scheduleKey: [schedulesKey: [jsonString]]]
-                    actionsList.append([nodeIdKey: $0 as Any,
-                                        payloadKey: payload as Any])
-                }
-                callParamsAPIWithActions(list: actionsList, actions: actions, onView: onView, text: editScheduleFailureMessage) { result  in
+                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: editScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
                     completionHandler(result)
                 }
             } else {
@@ -124,21 +91,14 @@ class ESPScheduler {
     ///   - onView: UIView to show message in case of failure.
     ///   - nodeIDs: List of node IDs to be deleted
     ///   - completionHandler: Callback invoked after api response is recieved
-    func deleteScheduleNodes(key: String, onView: UIView, nodeIDs: [String], completionHandler: @escaping (ESPScheduleAPIResponseStatus) -> Void) {
+    func deleteScheduleNodes(key: String, onView: UIView, nodeIDs: [String], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             if let schedule = ESPScheduler.shared.schedules[key] {
                 var jsonString: [String: Any] = [:]
                 jsonString["name"] = schedule.name
                 jsonString["id"] = schedule.id
                 jsonString["operation"] = "remove"
-                var actionsList = [[String: Any]]()
-                nodeIDs.forEach {
-                    let (scheduleKey, schedulesKey)  = getScheduleKeys(id: $0)
-                    let payload = [scheduleKey: [schedulesKey: [jsonString]]]
-                    actionsList.append([nodeIdKey: $0 as Any,
-                                        payloadKey: payload as Any])
-                }
-                callParamsAPIWithActions(list: actionsList, actions: schedule.actions, onView: onView, text: deleteScheduleFailureMessage) { result  in
+                self.invokeServiceAction(apiManager: apiManager, keys: nodeIDs, jsonString: jsonString, text: deleteScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: schedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
                     completionHandler(result)
                 }
             } else {
@@ -154,7 +114,7 @@ class ESPScheduler {
     /// - Parameters:
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is recieved
-    func deleteScheduleAt(key: String, onView: UIView, completionHandler: @escaping (ESPScheduleAPIResponseStatus) -> Void) {
+    func deleteScheduleAt(key: String, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             currentSchedule = ESPScheduler.shared.schedules[key]!
             configureDeviceForCurrentSchedule()
@@ -162,14 +122,7 @@ class ESPScheduler {
             jsonString["name"] = currentSchedule.name
             jsonString["id"] = currentSchedule.id
             jsonString["operation"] = "remove"
-            var actionsList = [[String: Any]]()
-            currentSchedule.actions.keys.forEach {
-                let (scheduleKey, schedulesKey)  = getScheduleKeys(id: $0)
-                let payload = [scheduleKey: [schedulesKey: [jsonString]]]
-                actionsList.append([nodeIdKey: $0 as Any,
-                                    payloadKey: payload as Any])
-            }
-            callParamsAPIWithActions(list: actionsList, actions: self.currentSchedule.actions, onView: onView, text: deleteScheduleFailureMessage) { result  in
+            self.invokeServiceAction(apiManager: apiManager, keys: [String](currentSchedule.actions.keys), jsonString: jsonString, text: deleteScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: self.currentSchedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
                 completionHandler(result)
             }
         } else {
@@ -193,7 +146,7 @@ class ESPScheduler {
 
     /// In list of available devices select param and update param values as given in the current schedule.
     func configureDeviceForCurrentSchedule() {
-        resetAvailableDeviceStatus()
+        resetAvailableDeviceStatus(availableDevices: &availableDevices)
         if let schedule = ESPScheduler.shared.currentSchedule, schedule.actions.count > 0 {
             for key in schedule.actions.keys {
                 for device in schedule.actions[key]! {
@@ -211,8 +164,6 @@ class ESPScheduler {
             }
         }
     }
-
-    // MARK: -
 
     /// Creates list of Schedules from the schedule JSON of a particular node.
     ///
@@ -286,7 +237,7 @@ class ESPScheduler {
                         copyDevice.params = []
                         if let params = device.params {
                             for param in params {
-                                if param.canBeScheduled {
+                                if param.canUseDeviceServices {
                                     copyDevice.params?.append(Param(param: param))
                                 }
                             }
@@ -311,27 +262,21 @@ class ESPScheduler {
             deviceExist.deviceName = deviceName
         }
     }
-
-    /// Gives list of devices under a schedule.
+    
+    /// Gives list of devices under a schedule
     ///
-    /// - Returns: Comma seperated string of devices that are part of a particular schedule.
+    /// - Returns: Comma seperated string of devices that are part of a schedule
     func getActionList() -> String {
-        var actionList: [String] = []
-        for device in ESPScheduler.shared.availableDevices.values {
-            if device.selectedParams > 0 {
-                actionList.append(device.deviceName)
-            }
-        }
-        if actionList.count > 0 {
-            actionList = actionList.sorted(by: <)
-            return actionList.compactMap { $0 }.joined(separator: ", ")
-        } else {
-            return ""
-        }
+        return self.getActionList(availableDevices: availableDevices)
     }
 
     // MARK: - Private Methods
 
+    /// Method returns dictionary with:
+    ///  key: node ID
+    ///  value: devices for which some  action has been selected for schedule
+    ///
+    /// - Returns: dictionary with above key and values
     private func createActionsFromDeviceList() -> [String: [Device]] {
         var actions: [String: [Device]] = [:]
         for device in availableDevices.values {
@@ -344,109 +289,5 @@ class ESPScheduler {
             }
         }
         return actions
-    }
-
-    /// Reset available devices parameter .
-    private func resetAvailableDeviceStatus() {
-        for device in availableDevices.values {
-            device.selectedParams = 0
-            device.collapsed = true
-            if let params = device.params {
-                for param in params {
-                    param.selected = false
-                }
-            }
-        }
-    }
-    
-    /// Get device names of a node for which schedule operation is performed
-    private func getDeviceListFromActions(action: [String: [Device]], forNodes nodes: [ESPCloudResponse]) -> String {
-        var deviceNames: [String] = [String]()
-        nodes.forEach {
-            if let node_id = $0.node_id, let devices = action[node_id] {
-                devices.forEach {
-                    let key = [node_id, $0.name].compactMap { $0 }.joined(separator: ".")
-                    if let availableDevice = availableDevices[key] {
-                        deviceNames.append(availableDevice.deviceName)
-                    } else {
-                        deviceNames.append($0.name ?? "")
-                    }
-                }
-            }
-        }
-        return deviceNames.joined(separator: ", ")
-    }
-
-    /// Get device names of a node for which schedule operation is performed
-    private func getDeviceListFromAction(action: [String: [Device]], forKey: String) -> String {
-        if let devices = action[forKey] {
-            var deviceNames: [String] = []
-            for device in devices {
-                let key = [forKey, device.name].compactMap { $0 }.joined(separator: ".")
-                if let availableDevice = availableDevices[key] {
-                    deviceNames.append(availableDevice.deviceName)
-                } else {
-                    deviceNames.append(device.name ?? "")
-                }
-            }
-            return deviceNames.joined(separator: ", ")
-        }
-        return forKey
-    }
-    
-    /// Method returns the service & param name for schedules
-    /// - Parameter id: node id
-    /// - Returns: service name, param name
-    private func getScheduleKeys(id: String) -> (String, String) {
-        if let node = User.shared.getNode(id: id) {
-            return (node.scheduleName, node.schedulesName)
-        }
-        return (Constants.scheduleKey, Constants.schedulesKey)
-    }
-    
-    /// Call params API
-    /// - Parameters:
-    ///   - list: list of user actions
-    ///   - actions: dictionary of node ids and their devices
-    ///   - onView: UIView to show message in case of failure.
-    ///   - text: error text to be shown
-    ///   - completionHandler: Callback invoked after api response is recieved
-    private func callParamsAPIWithActions(list: [[String: Any]], actions: [String: [Device]], onView: UIView, text: String, completionHandler: @escaping (ESPScheduleAPIResponseStatus) -> Void) {
-        apiManager.setMultipleDeviceParam(parameter: list) { cloudResponse, error in
-            if error == nil {
-                self.handleResponse(cloudResponse: cloudResponse, actions: actions, onView: onView, errorText: text, completionHandler: completionHandler)
-            } else {
-                completionHandler(.failure)
-            }
-        }
-    }
-    
-    /// Handle response from cloud
-    /// - Parameters:
-    ///   - cloudResponse: list of ESPCloudResponse objects
-    ///   - actions: dictionary of node ids and their devices
-    ///   - onView: UIView to show message in case of failure.
-    ///   - errorText: error text to be shown
-    ///   - completionHandler: Callback invoked after api response is recieved
-    private func handleResponse(cloudResponse: [ESPCloudResponse]?, actions: [String: [Device]], onView: UIView, errorText: String, completionHandler: @escaping (ESPScheduleAPIResponseStatus) -> Void) {
-        var failureString = ""
-        if let response = cloudResponse, response.count > 0 {
-            let (successResponse: successNodes, failureResponse: failedNodes) = ESPCloudResponseParser().getNodesWithStatus(response: response)
-            if failedNodes.count > 0 {
-                failureString = self.getDeviceListFromActions(action: actions, forNodes: failedNodes)
-                Utility.showToastMessage(view: onView, message: "\(errorText) \(failureString)")
-            }
-            if successNodes.count > 0 {
-                if failureString.count > 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        completionHandler(.success(true))
-                    }
-                } else {
-                    completionHandler(.success(false))
-                }
-            } else {
-                completionHandler(.failure)
-            }
-        }
     }
 }
