@@ -74,6 +74,8 @@ class NewNodeGroupViewController: UIViewController {
     }
 
     @IBAction func nextButtonPressed(_: Any) {
+        // Hides keyboard
+        view.endEditing(true)
         // Navigate to screen for selecting node in the new group
         let newNodeGroup = NodeGroup()
         newNodeGroup.group_name = nameTextField.text
