@@ -150,6 +150,9 @@ struct Constants {
     // TODO: Read service/param key from node config.
     static let scheduleServiceType = "esp.service.schedule"
     static let scheduleParamType = "esp.param.schedules"
+    static let localControlServiceType = "esp.service.local_control"
+    static let localControlParamType = "esp.param.local_control_type"
+    static let popParamType = "esp.param.local_control_pop"
     static let scheduleKey = "Schedule"
     static let schedulesKey = "Schedules"
 

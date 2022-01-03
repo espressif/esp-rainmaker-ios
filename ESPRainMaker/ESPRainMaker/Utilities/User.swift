@@ -89,6 +89,7 @@ class User {
                 if localServices.keys.contains(node.node_id ?? "") {
                     node.localNetwork = true
                     notifyLocalNetworkUpdate = false
+                    setEncryptionOnLocalControl(node: node)
                     group.enter()
                     NetworkManager.shared.getNodeInfo(nodeId: node.node_id ?? "") { node, _ in
                         if node != nil {
@@ -96,6 +97,7 @@ class User {
                         }
                         group.leave()
                     }
+                    
                 } else {
                     node.localNetwork = false
                 }
@@ -106,6 +108,16 @@ class User {
         }
         if notifyLocalNetworkUpdate {
             NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
+        }
+    }
+    
+    private func setEncryptionOnLocalControl(node: Node) {
+        if let service = localServices[node.node_id ?? ""] {
+            if node.supportsEncryption {
+                service.espLocalDevice = ESPLocalDevice(name: "esp", security: .secure, transport: .softap, proofOfPossession: node.pop, softAPPassword: nil, advertisementData: nil)
+                service.espLocalDevice.espSoftApTransport = ESPSoftAPTransport(baseUrl: service.hostname)
+            }
+            service.espLocalDevice.hostname = service.hostname
         }
     }
 

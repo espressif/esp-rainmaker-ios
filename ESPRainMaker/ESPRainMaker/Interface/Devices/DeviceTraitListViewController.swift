@@ -206,7 +206,11 @@ class DeviceTraitListViewController: UIViewController {
 
     @objc func checkOfflineStatus() {
         if device?.node?.localNetwork ?? false {
-            offlineLabel.text = "Reachable on WLAN"
+            if device.node?.supportsEncryption ?? false {
+                offlineLabel.text = "🔒 Reachable on WLAN"
+            } else {
+                offlineLabel.text = "Reachable on WLAN"
+            }
             offlineLabel.isHidden = false
         } else if device?.node?.isConnected ?? true {
             offlineLabel.isHidden = true

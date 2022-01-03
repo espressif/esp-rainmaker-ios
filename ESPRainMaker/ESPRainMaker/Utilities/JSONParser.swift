@@ -193,6 +193,21 @@ struct JSONParser {
                             param.value = serviceInfo[param.name ?? ""]
                         }
                     }
+                    // Fetches info related with local control services.
+                    if service.type == Constants.localControlServiceType {
+                        for param in service.params ?? [] {
+                            if param.type == Constants.localControlParamType {
+                                if let paramValue = param.value as? Int, paramValue == 1 {
+                                    node.supportsEncryption = true
+                                }
+                            }
+                            if param.type == Constants.popParamType {
+                                if let paramValue = param.value as? String {
+                                    node.pop = paramValue
+                                }
+                            }
+                        }
+                    }
                 }
             }
             if node.devices?.count == 1 {
