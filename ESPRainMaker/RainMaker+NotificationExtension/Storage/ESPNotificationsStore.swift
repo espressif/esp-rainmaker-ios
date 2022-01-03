@@ -41,7 +41,6 @@ class ESPNotificationsStore: ESPLocalStorage, ESPNotificationsStoreProtocol {
         if let notificationData = getDataFromSharedUserDefault(key: ESPLocalStorageKeys.notificationStore) {
             do {
                 var storedNotifications: [ESPNotifications] = []
-                print(String(data: notificationData, encoding: .utf8))
                 storedNotifications = try JSONDecoder().decode([ESPNotifications].self, from: notificationData)
                 storedNotifications.sort(by: { $0.timestamp > $1.timestamp})
                 return storedNotifications

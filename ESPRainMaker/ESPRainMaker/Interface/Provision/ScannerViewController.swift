@@ -32,6 +32,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     var previewLayer: AVCaptureVideoPreviewLayer?
     @IBOutlet var scannerView: UIView!
     @IBOutlet var noCameraView: UIView!
+    @IBOutlet var manualActionButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -157,6 +158,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             actionSheet.addAction(bleAction)
             actionSheet.addAction(softapAction)
             actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            actionSheet.popoverPresentationController?.sourceView = manualActionButton
             present(actionSheet, animated: true, completion: nil)
         }
     }

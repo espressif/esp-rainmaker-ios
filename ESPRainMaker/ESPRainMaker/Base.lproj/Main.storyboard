@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -568,7 +568,7 @@
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wifiListCell" id="cHM-rp-6Qs" customClass="WifiListTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="24.5" width="350" height="43.5"/>
+                                                <rect key="frame" x="0.0" y="44.5" width="350" height="43.5"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cHM-rp-6Qs" id="KGP-NE-uxb">
                                                     <rect key="frame" x="0.0" y="0.0" width="350" height="43.5"/>
@@ -1695,6 +1695,7 @@ Unable to add device</string>
                     </view>
                     <navigationItem key="navigationItem" id="1be-9s-gtr"/>
                     <connections>
+                        <outlet property="manualActionButton" destination="qgB-dE-ozw" id="nhw-Xu-Ztv"/>
                         <outlet property="noCameraView" destination="9Mm-zA-GSN" id="8e7-v9-IGA"/>
                         <outlet property="scannerView" destination="u9q-nq-nBJ" id="FCp-DR-6f3"/>
                     </connections>
@@ -1711,7 +1712,7 @@ Unable to add device</string>
                     <tabBar key="tabBar" hidden="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="djK-iE-0fU">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
                         <segue destination="mgC-Sj-4EB" kind="relationship" relationship="viewControllers" id="CUe-vv-Lux"/>
@@ -1991,7 +1992,7 @@ Unable to add device</string>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="bleDeviceCell" rowHeight="70" id="e2b-VG-MGG" customClass="BLEDeviceListViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="24.5" width="414" height="70"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="414" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e2b-VG-MGG" id="tEp-Iw-EPl">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="70"/>
