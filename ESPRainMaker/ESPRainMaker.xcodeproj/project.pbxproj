@@ -71,6 +71,7 @@
 		F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */; };
 		F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10C2B2925EB82D800B60696 /* User.storyboard */; };
 		F10D8DF8270EF1A80056E986 /* ESPLocalStorageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10D8DF7270EF1A80056E986 /* ESPLocalStorageHandler.swift */; };
+		F10D8DFB271EF8C80056E986 /* UserAccount.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10D8DFA271EF8C80056E986 /* UserAccount.storyboard */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
 		F1110429252D8E2D0030A1D3 /* ESPLocalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */; };
 		F111042D252D924F0030A1D3 /* esp_local_ctrl.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F111042C252D924F0030A1D3 /* esp_local_ctrl.pb.swift */; };
@@ -176,6 +177,9 @@
 		F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB511A23321B7E002401F9 /* JSONParser.swift */; };
 		F1AE33C6263611B300694B52 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AE33C5263611B300694B52 /* NotificationService.swift */; };
 		F1AE33CA263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F1AE33C3263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F1AFB2562720320200418969 /* DeleteAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFB2552720320200418969 /* DeleteAccountViewController.swift */; };
+		F1AFB25A2721F98D00418969 /* UserAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFB2592721F98D00418969 /* UserAccountViewController.swift */; };
+		F1AFB25C2721FEAF00418969 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFB25B2721FEAF00418969 /* AboutViewController.swift */; };
 		F1B0ACFA25DBCB7B004057BD /* DeviceGroupCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B0ACF925DBCB7A004057BD /* DeviceGroupCollectionViewCell.swift */; };
 		F1B1011C269EC627004B5537 /* Double+DateTimeString.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B1011B269EC627004B5537 /* Double+DateTimeString.swift */; };
 		F1B1011E26A06867004B5537 /* ESPNodeDisassociatedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B1011D26A06866004B5537 /* ESPNodeDisassociatedEvent.swift */; };
@@ -378,6 +382,7 @@
 		F10C2AEF25E58B9800B60696 /* AddSharingNotificationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSharingNotificationTableViewCell.swift; sourceTree = "<group>"; };
 		F10C2B2925EB82D800B60696 /* User.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = User.storyboard; sourceTree = "<group>"; };
 		F10D8DF7270EF1A80056E986 /* ESPLocalStorageHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPLocalStorageHandler.swift; sourceTree = "<group>"; };
+		F10D8DFA271EF8C80056E986 /* UserAccount.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = UserAccount.storyboard; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
 		F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPLocalService.swift; sourceTree = "<group>"; };
 		F111042C252D924F0030A1D3 /* esp_local_ctrl.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = esp_local_ctrl.pb.swift; sourceTree = "<group>"; };
@@ -479,6 +484,9 @@
 		F1AE33C3263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ESPRainMakerPushNotificationExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1AE33C5263611B300694B52 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		F1AE33C7263611B300694B52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1AFB2552720320200418969 /* DeleteAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountViewController.swift; sourceTree = "<group>"; };
+		F1AFB2592721F98D00418969 /* UserAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAccountViewController.swift; sourceTree = "<group>"; };
+		F1AFB25B2721FEAF00418969 /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F1B0ACF925DBCB7A004057BD /* DeviceGroupCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceGroupCollectionViewCell.swift; sourceTree = "<group>"; };
 		F1B1011B269EC627004B5537 /* Double+DateTimeString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+DateTimeString.swift"; sourceTree = "<group>"; };
 		F1B1011D26A06866004B5537 /* ESPNodeDisassociatedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNodeDisassociatedEvent.swift; sourceTree = "<group>"; };
@@ -865,6 +873,16 @@
 			path = Grouping;
 			sourceTree = "<group>";
 		};
+		F10D8DF9271EF8A10056E986 /* User Account */ = {
+			isa = PBXGroup;
+			children = (
+				F10D8DFA271EF8C80056E986 /* UserAccount.storyboard */,
+				F1AFB2552720320200418969 /* DeleteAccountViewController.swift */,
+				F1AFB2592721F98D00418969 /* UserAccountViewController.swift */,
+			);
+			path = "User Account";
+			sourceTree = "<group>";
+		};
 		F117CDED252C758800ADB856 /* LocalControl */ = {
 			isa = PBXGroup;
 			children = (
@@ -917,10 +935,12 @@
 		F132F752244985B100CA713B /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				F10D8DF9271EF8A10056E986 /* User Account */,
 				0CF69228270A308B0098F515 /* Alexa */,
 				F1EAAC8B23E2078300E9A6A8 /* AppSettingsViewController.swift */,
 				F19F6FF222F02B3400C70DE3 /* SettingsPageViewController.swift */,
 				F119C3F1265EAF6F006F4088 /* VoiceServicesViewController.swift */,
+				F1AFB25B2721FEAF00418969 /* AboutViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1375,6 +1395,7 @@
 				F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */,
 				F18C23BF25F1838C009E232D /* CentralSwitchTableViewCell.xib in Resources */,
 				F11DC9A02577772F00603BF5 /* DropDownTableViewCell.xib in Resources */,
+				F10D8DFB271EF8C80056E986 /* UserAccount.storyboard in Resources */,
 				F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */,
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
 				F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */,
@@ -1525,6 +1546,7 @@
 				F1110431252D927F0030A1D3 /* constants.pb.swift in Sources */,
 				F1124F5B268CF1F500FA0B9E /* ESPNodeSharingAddEvent+Actions.swift in Sources */,
 				F1B1011C269EC627004B5537 /* Double+DateTimeString.swift in Sources */,
+				F1AFB25A2721F98D00418969 /* UserAccountViewController.swift in Sources */,
 				F1EAACAA23E2A74300E9A6A8 /* ColorPickerView.swift in Sources */,
 				0CF69239270A308B0098F515 /* ESPEnableAlexaSkillService.swift in Sources */,
 				0C69D72826E9ED9800AF6985 /* NodeExtension.swift in Sources */,
@@ -1543,6 +1565,7 @@
 				F1E37E9523D772EC00A5043F /* ThumbTextSlider.swift in Sources */,
 				F1CA0C7E2579F27D0085E19A /* ParamSliderTableViewCell.swift in Sources */,
 				F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */,
+				F1AFB25C2721FEAF00418969 /* AboutViewController.swift in Sources */,
 				0CC79253265BCDDF00C2CDF6 /* ScheduleActionAllowedProtocol.swift in Sources */,
 				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
 				0CF6923E270A308B0098F515 /* ESPAlexaWebViewController.swift in Sources */,
@@ -1585,6 +1608,7 @@
 				F18C23BE25F1838C009E232D /* CentralSwitchTableViewCell.swift in Sources */,
 				F133495525E24CE200CCB308 /* NodeSharingManager.swift in Sources */,
 				0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */,
+				F1AFB2562720320200418969 /* DeleteAccountViewController.swift in Sources */,
 				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
 				0C80AA3026FDBD4B00480C53 /* ESPExtendSessionService.swift in Sources */,
 				F1124F64268D099300FA0B9E /* ESPNodeSharingAcceptedEvent.swift in Sources */,

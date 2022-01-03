@@ -23,19 +23,14 @@ import UIKit
 class SettingsPageViewController: UIViewController {
     @IBOutlet var emailLabel: UILabel!
     @IBOutlet var privacyView: UIView!
-    @IBOutlet var changePasswordView: UIView!
-    @IBOutlet var appVersionLabel: UILabel!
     @IBOutlet var notificationCount: UILabel!
     @IBOutlet var notificationView: UIView!
     @IBOutlet var pendingActionView: UIView!
-    @IBOutlet var changepasswordTopConstraint: NSLayoutConstraint!
-    @IBOutlet var changepasswordHeightConstraint: NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateUIView), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
-        appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
         navigationController?.navigationBar.isHidden = true
 
         if !Configuration.shared.appConfiguration.supportSharing {
@@ -62,16 +57,6 @@ class SettingsPageViewController: UIViewController {
 
         tabBarController?.tabBar.isHidden = false
         emailLabel.text = User.shared.userInfo.email
-
-        if User.shared.userInfo.loggedInWith == .other {
-            changePasswordView.isHidden = true
-            changepasswordHeightConstraint.constant = 0
-            changepasswordTopConstraint.constant = 0
-        } else {
-            changePasswordView.isHidden = false
-            changepasswordHeightConstraint.constant = min(50.0, view.frame.size.height * 0.0701)
-            changepasswordTopConstraint.constant = 2
-        }
 
         if Configuration.shared.appConfiguration.supportSharing {
             var pendingRequestCount = 0
@@ -107,32 +92,14 @@ class SettingsPageViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
 
-    @IBAction func openPrivacy(_: Any) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            showDocumentVC(url: Configuration.shared.externalLinks.privacyPolicyURL)
-        }
-    }
-
-    @IBAction func openTC(_: Any) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            showDocumentVC(url: Configuration.shared.externalLinks.termsOfUseURL)
-        }
-    }
-
-    @IBAction func openDocumentation(_: Any) {
-        showDocumentVC(url: Configuration.shared.externalLinks.documentationURL)
-    }
-
     @IBAction func backButtonPressed(_: Any) {
         navigationController?.popViewController(animated: true)
     }
-
-    func showDocumentVC(url: String) {
-        let storyboard = UIStoryboard(name: "Login", bundle: nil)
-        let documentVC = storyboard.instantiateViewController(withIdentifier: "documentVC") as! DocumentViewController
-        modalPresentationStyle = .popover
-        documentVC.documentLink = url
-        present(documentVC, animated: true, completion: nil)
+    
+    @IBAction func accountButtonPressed(_: Any) {
+        let storyboard = UIStoryboard(name: "UserAccount", bundle: nil)
+        let userAccountVC = storyboard.instantiateViewController(withIdentifier: "userAccountVC") as! UserAccountViewController
+        navigationController?.pushViewController(userAccountVC, animated: true)
     }
 
     func imageWith(name: String?) -> UIImage? {
