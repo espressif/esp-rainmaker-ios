@@ -495,6 +495,7 @@ extension ESPNoRefreshTokenLogic {
         UIApplication.shared.unregisterForRemoteNotifications()
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         ESPTokenWorker.shared.deleteAll()
+        ESPAlexaTokenWorker.shared.clearAllClientTokens()
         UserDefaults.standard.removeObject(forKey: Constants.wifiPassword)
         let localStorageHandler = ESPLocalStorageHandler()
         localStorageHandler.cleanupData()

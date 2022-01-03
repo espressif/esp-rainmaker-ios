@@ -134,7 +134,15 @@ Node Grouping is optional but enabled by default. It can be disabled from the `C
   - Accept/decline pending requests.
 
 Node Sharing is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Sharing` key from `App Configuration` to `NO`.
+
+### Alexa App to App Linking
   
+  This account linking flow enables users to link their Alexa user identity with their Rainmaker identity
+  by starting from Rainmaker app. When they start the account linking flow from the app, users can:
+  - Discover their Alexa skill through the app.
+  - Initiate skill enablement and account linking from within the app.
+  - Link their account without entering Alexa account credentials if already logged into Alexa app. They will have to login to Rainmaker once, when trying to link accounts.
+  - Link their account from your Rainmaker using [Login with Amazon (LWA)](https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html), when the Alexa app isn&#39;t installed on their device.
 
 ## Supports
 

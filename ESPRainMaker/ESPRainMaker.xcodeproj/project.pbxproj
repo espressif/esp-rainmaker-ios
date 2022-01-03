@@ -36,6 +36,17 @@
 		0C80AA3A26FDBEF200480C53 /* ESPKeychainWrappers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA3726FDBEF200480C53 /* ESPKeychainWrappers.swift */; };
 		0CB234E92705751A000D0663 /* AppDelegate+UserManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */; };
 		0CC79253265BCDDF00C2CDF6 /* ScheduleActionAllowedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC79252265BCDDE00C2CDF6 /* ScheduleActionAllowedProtocol.swift */; };
+		0CF69236270A308B0098F515 /* ESPAlexaConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922A270A308B0098F515 /* ESPAlexaConnectViewController.swift */; };
+		0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922B270A308B0098F515 /* ESPAlexaAPIEndpoint.swift */; };
+		0CF69238270A308B0098F515 /* ESPAlexaTokenWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922C270A308B0098F515 /* ESPAlexaTokenWorker.swift */; };
+		0CF69239270A308B0098F515 /* ESPEnableAlexaSkillService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922D270A308B0098F515 /* ESPEnableAlexaSkillService.swift */; };
+		0CF6923A270A308B0098F515 /* ESPAlexaAPIParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922E270A308B0098F515 /* ESPAlexaAPIParser.swift */; };
+		0CF6923C270A308B0098F515 /* ESPAlexaAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF69230270A308B0098F515 /* ESPAlexaAPIService.swift */; };
+		0CF6923D270A308B0098F515 /* ESPAlexa.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CF69231270A308B0098F515 /* ESPAlexa.storyboard */; };
+		0CF6923E270A308B0098F515 /* ESPAlexaWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF69232270A308B0098F515 /* ESPAlexaWebViewController.swift */; };
+		0CF6923F270A308B0098F515 /* ESPAlexaServiceConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF69233270A308B0098F515 /* ESPAlexaServiceConstants.swift */; };
+		0CF69240270A308B0098F515 /* ESPAlexaAPIWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF69234270A308B0098F515 /* ESPAlexaAPIWorker.swift */; };
+		0CF69242270A34140098F515 /* AppDelegate+ESPAlexa.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF69241270A34140098F515 /* AppDelegate+ESPAlexa.swift */; };
 		1431462720DE994B0017E119 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431462620DE994B0017E119 /* AppDelegate.swift */; };
 		1431462C20DE994B0017E119 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1431462A20DE994B0017E119 /* Main.storyboard */; };
 		1431462E20DE994C0017E119 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1431462D20DE994C0017E119 /* Assets.xcassets */; };
@@ -307,8 +318,28 @@
 		0C80AA3526FDBEF200480C53 /* ESPKeychainOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPKeychainOperations.swift; sourceTree = "<group>"; };
 		0C80AA3626FDBEF200480C53 /* ESPKeychainErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPKeychainErrors.swift; sourceTree = "<group>"; };
 		0C80AA3726FDBEF200480C53 /* ESPKeychainWrappers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPKeychainWrappers.swift; sourceTree = "<group>"; };
+		0C8948C7273E693800381936 /* AmazonEmberDisplay_Lt.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonEmberDisplay_Lt.ttf; sourceTree = "<group>"; };
+		0C8948C8273E693800381936 /* AmazonEmberDisplay_Md.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonEmberDisplay_Md.ttf; sourceTree = "<group>"; };
+		0C8948C9273E693800381936 /* AmazonEmberDisplay_He.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonEmberDisplay_He.ttf; sourceTree = "<group>"; };
+		0C8948CA273E693800381936 /* AmazonEmberDisplay_Bd.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonEmberDisplay_Bd.ttf; sourceTree = "<group>"; };
+		0C8948CB273E693800381936 /* AmazonEmberDisplay_Rg.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonEmberDisplay_Rg.ttf; sourceTree = "<group>"; };
+		0C8948CE273E695E00381936 /* Bookerly-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Bookerly-Italic.ttf"; sourceTree = "<group>"; };
+		0C8948CF273E695E00381936 /* Bookerly-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Bookerly-BoldItalic.ttf"; sourceTree = "<group>"; };
+		0C8948D0273E695E00381936 /* Bookerly-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Bookerly-Regular.ttf"; sourceTree = "<group>"; };
+		0C8948D1273E695E00381936 /* Bookerly-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Bookerly-Bold.ttf"; sourceTree = "<group>"; };
 		0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "AppDelegate+UserManagement.swift"; path = "ESPRainMaker/AppDelegate+UserManagement.swift"; sourceTree = SOURCE_ROOT; };
 		0CC79252265BCDDE00C2CDF6 /* ScheduleActionAllowedProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleActionAllowedProtocol.swift; sourceTree = "<group>"; };
+		0CF6922A270A308B0098F515 /* ESPAlexaConnectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaConnectViewController.swift; sourceTree = "<group>"; };
+		0CF6922B270A308B0098F515 /* ESPAlexaAPIEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaAPIEndpoint.swift; sourceTree = "<group>"; };
+		0CF6922C270A308B0098F515 /* ESPAlexaTokenWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaTokenWorker.swift; sourceTree = "<group>"; };
+		0CF6922D270A308B0098F515 /* ESPEnableAlexaSkillService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPEnableAlexaSkillService.swift; sourceTree = "<group>"; };
+		0CF6922E270A308B0098F515 /* ESPAlexaAPIParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaAPIParser.swift; sourceTree = "<group>"; };
+		0CF69230270A308B0098F515 /* ESPAlexaAPIService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaAPIService.swift; sourceTree = "<group>"; };
+		0CF69231270A308B0098F515 /* ESPAlexa.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ESPAlexa.storyboard; sourceTree = "<group>"; };
+		0CF69232270A308B0098F515 /* ESPAlexaWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaWebViewController.swift; sourceTree = "<group>"; };
+		0CF69233270A308B0098F515 /* ESPAlexaServiceConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaServiceConstants.swift; sourceTree = "<group>"; };
+		0CF69234270A308B0098F515 /* ESPAlexaAPIWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaAPIWorker.swift; sourceTree = "<group>"; };
+		0CF69241270A34140098F515 /* AppDelegate+ESPAlexa.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppDelegate+ESPAlexa.swift"; sourceTree = "<group>"; };
 		0E78E823824B7739458B5136 /* Pods_ESPRainMaker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ESPRainMaker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1431462320DE994B0017E119 /* ESP RainMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ESP RainMaker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1431462620DE994B0017E119 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -615,6 +646,56 @@
 			path = ESPRainMaker/KeychainWrapper;
 			sourceTree = SOURCE_ROOT;
 		};
+		0C8948C6273E691500381936 /* Font */ = {
+			isa = PBXGroup;
+			children = (
+				0C8948CD273E694E00381936 /* Bookerly */,
+				0C8948CC273E693C00381936 /* AmazonEmberDisplay */,
+			);
+			path = Font;
+			sourceTree = "<group>";
+		};
+		0C8948CC273E693C00381936 /* AmazonEmberDisplay */ = {
+			isa = PBXGroup;
+			children = (
+				0C8948CA273E693800381936 /* AmazonEmberDisplay_Bd.ttf */,
+				0C8948C9273E693800381936 /* AmazonEmberDisplay_He.ttf */,
+				0C8948C7273E693800381936 /* AmazonEmberDisplay_Lt.ttf */,
+				0C8948C8273E693800381936 /* AmazonEmberDisplay_Md.ttf */,
+				0C8948CB273E693800381936 /* AmazonEmberDisplay_Rg.ttf */,
+			);
+			path = AmazonEmberDisplay;
+			sourceTree = "<group>";
+		};
+		0C8948CD273E694E00381936 /* Bookerly */ = {
+			isa = PBXGroup;
+			children = (
+				0C8948D1273E695E00381936 /* Bookerly-Bold.ttf */,
+				0C8948CF273E695E00381936 /* Bookerly-BoldItalic.ttf */,
+				0C8948CE273E695E00381936 /* Bookerly-Italic.ttf */,
+				0C8948D0273E695E00381936 /* Bookerly-Regular.ttf */,
+			);
+			path = Bookerly;
+			sourceTree = "<group>";
+		};
+		0CF69228270A308B0098F515 /* Alexa */ = {
+			isa = PBXGroup;
+			children = (
+				0C8948C6273E691500381936 /* Font */,
+				0CF6922A270A308B0098F515 /* ESPAlexaConnectViewController.swift */,
+				0CF6922B270A308B0098F515 /* ESPAlexaAPIEndpoint.swift */,
+				0CF6922C270A308B0098F515 /* ESPAlexaTokenWorker.swift */,
+				0CF6922D270A308B0098F515 /* ESPEnableAlexaSkillService.swift */,
+				0CF6922E270A308B0098F515 /* ESPAlexaAPIParser.swift */,
+				0CF69230270A308B0098F515 /* ESPAlexaAPIService.swift */,
+				0CF69231270A308B0098F515 /* ESPAlexa.storyboard */,
+				0CF69232270A308B0098F515 /* ESPAlexaWebViewController.swift */,
+				0CF69233270A308B0098F515 /* ESPAlexaServiceConstants.swift */,
+				0CF69234270A308B0098F515 /* ESPAlexaAPIWorker.swift */,
+			);
+			path = Alexa;
+			sourceTree = "<group>";
+		};
 		1431461A20DE994B0017E119 = {
 			isa = PBXGroup;
 			children = (
@@ -658,6 +739,7 @@
 				1431468F20E387C60017E119 /* proto */,
 				143146B120EB221E0017E119 /* Interface */,
 				1431462620DE994B0017E119 /* AppDelegate.swift */,
+				0CF69241270A34140098F515 /* AppDelegate+ESPAlexa.swift */,
 				0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */,
 				F10C2B2925EB82D800B60696 /* User.storyboard */,
 				F1012F61251110B300839F06 /* Schedule.storyboard */,
@@ -832,6 +914,7 @@
 		F132F752244985B100CA713B /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				0CF69228270A308B0098F515 /* Alexa */,
 				F1EAAC8B23E2078300E9A6A8 /* AppSettingsViewController.swift */,
 				F19F6FF222F02B3400C70DE3 /* SettingsPageViewController.swift */,
 				F119C3F1265EAF6F006F4088 /* VoiceServicesViewController.swift */,
@@ -1297,6 +1380,7 @@
 				F195745425B5AA41005F6601 /* AddMemberTableViewCell.xib in Resources */,
 				F195745A25B5AD09005F6601 /* MembersInfoTableViewCell.xib in Resources */,
 				F10B073325CD714100723254 /* NodeGrouping.storyboard in Resources */,
+				0CF6923D270A308B0098F515 /* ESPAlexa.storyboard in Resources */,
 				F15EABFF23E05A51008A766B /* Localizable.strings in Resources */,
 				F1FB153D234D91000053B0ED /* SliderTableViewCell.xib in Resources */,
 				1431463120DE994C0017E119 /* LaunchScreen.storyboard in Resources */,
@@ -1401,6 +1485,7 @@
 				F17CEBE8263B23E800BA9E0C /* NotificationsViewController.swift in Sources */,
 				F1F45150232B7A780009DCE0 /* DeviceTraitListViewController.swift in Sources */,
 				F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */,
+				0CF69236270A308B0098F515 /* ESPAlexaConnectViewController.swift in Sources */,
 				F1FBF05625EED1D200627C07 /* RadialHueColorPaletteDelegate.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
 				F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */,
@@ -1437,6 +1522,7 @@
 				F1124F5B268CF1F500FA0B9E /* ESPNodeSharingAddEvent+Actions.swift in Sources */,
 				F1B1011C269EC627004B5537 /* Double+DateTimeString.swift in Sources */,
 				F1EAACAA23E2A74300E9A6A8 /* ColorPickerView.swift in Sources */,
+				0CF69239270A308B0098F515 /* ESPEnableAlexaSkillService.swift in Sources */,
 				0C69D72826E9ED9800AF6985 /* NodeExtension.swift in Sources */,
 				0C80AA2F26FDBD4B00480C53 /* ESPIdProviderLoginService.swift in Sources */,
 				F10B074825CD7EBC00723254 /* NodeGroupsViewController.swift in Sources */,
@@ -1455,6 +1541,7 @@
 				F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */,
 				0CC79253265BCDDF00C2CDF6 /* ScheduleActionAllowedProtocol.swift in Sources */,
 				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
+				0CF6923E270A308B0098F515 /* ESPAlexaWebViewController.swift in Sources */,
 				F1124F5D268CF58100FA0B9E /* ESPNotificationHandler+Actions.swift in Sources */,
 				F191CD462511231C00BDCEF1 /* ConnectViewController.swift in Sources */,
 				F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */,
@@ -1472,6 +1559,7 @@
 				F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */,
 				F1124F67268D0A0900FA0B9E /* ESPNodeSharingDeclinedEvent.swift in Sources */,
 				F195746625B69DDB005F6601 /* NodeDetailsHeaderView.swift in Sources */,
+				0CF6923C270A308B0098F515 /* ESPAlexaAPIService.swift in Sources */,
 				0C80AA2326FDBD4B00480C53 /* ESPProtocol.swift in Sources */,
 				F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */,
 				F1E37E9323D6CF4800A5043F /* PasswordTextField.swift in Sources */,
@@ -1487,9 +1575,11 @@
 				F18744212695F19400971591 /* AddSharingNotificationTableViewCell.swift in Sources */,
 				F10B075225CEE44200723254 /* NodeGroup.swift in Sources */,
 				F190B9BA24BF7775006D136D /* ScheduleViewController.swift in Sources */,
+				0CF69238270A308B0098F515 /* ESPAlexaTokenWorker.swift in Sources */,
 				143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */,
 				F18C23BE25F1838C009E232D /* CentralSwitchTableViewCell.swift in Sources */,
 				F133495525E24CE200CCB308 /* NodeSharingManager.swift in Sources */,
+				0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */,
 				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
 				0C80AA3026FDBD4B00480C53 /* ESPExtendSessionService.swift in Sources */,
 				F1124F64268D099300FA0B9E /* ESPNodeSharingAcceptedEvent.swift in Sources */,
@@ -1523,6 +1613,7 @@
 				F1FFC8FD25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift in Sources */,
 				F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */,
 				F133494225DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift in Sources */,
+				0CF6923F270A308B0098F515 /* ESPAlexaServiceConstants.swift in Sources */,
 				144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */,
 				F164A30825824EC700B879BC /* Configuration.swift in Sources */,
 				F133495E25E2B84100CCB308 /* SharingTableViewCell.swift in Sources */,
@@ -1556,10 +1647,12 @@
 				0C80AA2226FDBD4B00480C53 /* ESPPresenter.swift in Sources */,
 				F1B1012926AEFD52004B5537 /* UserNavigationHandler.swift in Sources */,
 				F1C352CB26D4E92600A88893 /* ESPNotificationHandler+UpdateData.swift in Sources */,
+				0CF69240270A308B0098F515 /* ESPAlexaAPIWorker.swift in Sources */,
 				F17EF2B42652690E002AC7BE /* TimeZoneTableViewCell.swift in Sources */,
 				F1FB153C234D91000053B0ED /* SliderTableViewCell.swift in Sources */,
 				F1105D9525492EC00047DF1B /* ESPLocalStorageHandler.swift in Sources */,
 				F190B9C624C0D842006D136D /* DeviceHeaderView.swift in Sources */,
+				0CF69242270A34140098F515 /* AppDelegate+ESPAlexa.swift in Sources */,
 				F195745325B5AA41005F6601 /* AddMemberTableViewCell.swift in Sources */,
 				F1C76D66268875A7009E217D /* ESPLocalStorageNodes.swift in Sources */,
 				F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */,
@@ -1573,6 +1666,7 @@
 				0C80AA3226FDBD4B00480C53 /* ESPChangePasswordService.swift in Sources */,
 				F133495125E23C4400CCB308 /* NodeDetailsTableViewCell.swift in Sources */,
 				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
+				0CF6923A270A308B0098F515 /* ESPAlexaAPIParser.swift in Sources */,
 				F1124F5F268CFDB400FA0B9E /* ESPNotificationKeys+Additional.swift in Sources */,
 				F17EF2B02651661E002AC7BE /* ESPTimezone.swift in Sources */,
 			);

@@ -19,10 +19,15 @@
 import UIKit
 
 class VoiceServicesViewController: UIViewController {
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
+    
+    override func viewWillAppear(_ animated: Bool) {
+        tabBarController?.tabBar.isHidden = true
+    }
+    
     func showDocumentVC(url: String) {
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         let documentVC = storyboard.instantiateViewController(withIdentifier: "documentVC") as! DocumentViewController
@@ -33,7 +38,13 @@ class VoiceServicesViewController: UIViewController {
 
     @IBAction func openAlexaVoiceAssistant(_: Any) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            showDocumentVC(url: "https://rainmaker.espressif.com/docs/3rd-party.html#enabling-alexa")
+            if ESPEnableAlexaSkillService.isAlexaConfigValid() {
+                if let connectToAlexaVC = ESPEnableAlexaSkillService.getConnectToAlexaVC() {
+                    self.navigationController?.pushViewController(connectToAlexaVC, animated: true)
+                }
+            } else {
+                showDocumentVC(url: "https://rainmaker.espressif.com/docs/3rd-party.html#enabling-alexa")
+            }
         }
     }
 
@@ -47,3 +58,4 @@ class VoiceServicesViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
 }
+

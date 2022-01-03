@@ -52,5 +52,22 @@
 	<string>group.com.espressif.rainmaker.softap</string>
 	<key>App Theme Color</key>
 	<string>#FFFFFF</string>
+	<key>ESP Alexa Configuration</key>
+	<dict>
+		<key>Alexa Client Id</key>
+		<string></string>
+		<key>Alexa Client Secret</key>
+		<string></string>
+		<key>Alexa RM Client Id</key>
+		<string></string>
+		<key>Skill Id</key>
+		<string></string>
+		<key>Skill Stage</key>
+		<string></string>
+		<key>Redirect URL</key>
+		<string></string>
+		<key>Alexa Access Token URL</key>
+		<string></string>
+	</dict>
 </dict>
 </plist>

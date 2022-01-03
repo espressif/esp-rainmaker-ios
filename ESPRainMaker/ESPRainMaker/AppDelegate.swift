@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
-
+    
     // Method to set appearance of Tab Bar
     private func setTabBarAttribute() {
         var currentBGColor = UIColor(hexString: "#8265E3")
