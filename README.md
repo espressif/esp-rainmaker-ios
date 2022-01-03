@@ -137,8 +137,24 @@ Node Grouping is optional but enabled by default. It can be disabled from the `C
 
 Node Sharing is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Sharing` key from `App Configuration` to `NO`.
 
-### Alexa App to App Linking
+
+### Push Notifications
+
+ESPRainMaker app supports remote notifiations in order to notify app in realtime for any updates. Types of notification enabled in the app :
+
+1. Alert notification: User will be updated by sending alert notification in case of below events:
+   - A new node is added to the user.
+   - Existing node is removed from the user account.
+   - Node sharing request is accepted/declined by secondary user.
+   - Alerts triggered from the node.
+ 
+2. Actionable notification: In case a node sharing request is received, user will be be alerted with an actionable notification. This will enable the user to accept or decline the sharing request from the notification center.
+
+3. Silent notifications: This notification is triggered at the time when any of the user device param changes. It will update the app with latest param value in case when app is in foreground.
   
+
+### Alexa App to App Linking
+
   This account linking flow enables users to link their Alexa user identity with their Rainmaker identity
   by starting from Rainmaker app. When they start the account linking flow from the app, users can:
   - Discover their Alexa skill through the app.
@@ -151,7 +167,7 @@ Node Sharing is optional but enabled by default. It can be disabled from the `Co
 
 - iOS 12.0 or greater.
 
-- Xcode 12.0
+- Xcode 13.0
 
 - Swift 5+
 
