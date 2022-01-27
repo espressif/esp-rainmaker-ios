@@ -43,7 +43,7 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
 
     @IBAction override func editButtonTapped(_: Any) {
         var input: UIAlertController!
-        if param?.type == "esp.param.name" {
+        if param?.type == Constants.deviceNameParam {
             input = UIAlertController(title: attributeKey, message: "Enter device name of length 1-32 characters", preferredStyle: .alert)
         } else {
             input = UIAlertController(title: attributeKey, message: "Enter new value", preferredStyle: .alert)
@@ -111,7 +111,7 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                     showAlert(message: "Please enter a valid boolean value.")
                 }
             } else {
-                if param?.type == "esp.param.name" {
+                if param?.type == Constants.deviceNameParam {
                     if value.count < 1 || value.count > 32 || value.isEmpty || value.trimmingCharacters(in: .whitespaces).isEmpty {
                         showAlert(message: "Please enter a valid device name within a range of 1-32 characters")
                         return

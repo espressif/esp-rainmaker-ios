@@ -52,7 +52,7 @@ class DevicesCollectionViewCell: UICollectionViewCell {
         device = nil
         switchValue = false
         primaryValue.text = ""
-        deviceImageView.image = UIImage(named: "dummy_device_icon")
+        deviceImageView.image = UIImage(named: Constants.dummyDeviceImage)
         deviceName.text = ""
         statusView.isHidden = true
     }

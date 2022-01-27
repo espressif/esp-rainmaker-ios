@@ -189,6 +189,8 @@
 		F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */; };
 		F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */; };
 		F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB511A23321B7E002401F9 /* JSONParser.swift */; };
+		F1AC6D8B27AD54490051F6E7 /* ESPRMDeviceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC6D8A27AD54490051F6E7 /* ESPRMDeviceType.swift */; };
+		F1AC6D8D27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC6D8C27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift */; };
 		F1AE33C6263611B300694B52 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AE33C5263611B300694B52 /* NotificationService.swift */; };
 		F1AE33CA263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F1AE33C3263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F1AFB2562720320200418969 /* DeleteAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFB2552720320200418969 /* DeleteAccountViewController.swift */; };
@@ -509,6 +511,8 @@
 		F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericControlTableViewCell.swift; sourceTree = "<group>"; };
 		F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericControlTableViewCell.xib; sourceTree = "<group>"; };
 		F1AB511A23321B7E002401F9 /* JSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
+		F1AC6D8A27AD54490051F6E7 /* ESPRMDeviceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPRMDeviceType.swift; sourceTree = "<group>"; };
+		F1AC6D8C27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ESPRMDeviceType+GetImage.swift"; sourceTree = "<group>"; };
 		F1AE33C3263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ESPRainMakerPushNotificationExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1AE33C5263611B300694B52 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		F1AE33C7263611B300694B52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1028,6 +1032,7 @@
 		F194B60622CDD79D00417347 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F1AC6D8A27AD54490051F6E7 /* ESPRMDeviceType.swift */,
 				F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */,
 				F13A01B923E98B680067F8B8 /* UserInfo.swift */,
 				F10B075125CEE44200723254 /* NodeGroup.swift */,
@@ -1109,6 +1114,7 @@
 		F1B1011A269EC520004B5537 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				F1AC6D8C27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift */,
 				F1B1011B269EC627004B5537 /* Double+DateTimeString.swift */,
 				0CE3E9F6279017F9002138DA /* String+GetViewHeight.swift */,
 				0CDDC34927E89D50004F9486 /* UILabel+GetViewHeight.swift */,
@@ -1630,12 +1636,14 @@
 				F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */,
 				0CDDC34A27E89D50004F9486 /* UILabel+GetViewHeight.swift in Sources */,
 				F1AFB25C2721FEAF00418969 /* AboutViewController.swift in Sources */,
+				F1AC6D8D27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift in Sources */,
 				0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */,
 				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
 				0CF6923E270A308B0098F515 /* ESPAlexaWebViewController.swift in Sources */,
 				F1124F5D268CF58100FA0B9E /* ESPNotificationHandler+Actions.swift in Sources */,
 				F191CD462511231C00BDCEF1 /* ConnectViewController.swift in Sources */,
 				F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */,
+				F1AC6D8B27AD54490051F6E7 /* ESPRMDeviceType.swift in Sources */,
 				0C80AA2526FDBD4B00480C53 /* ESPServerParams.swift in Sources */,
 				F1C76D542687C7B0009E217D /* ESPNotificationEvent.swift in Sources */,
 				0C1C7C802760BCCC0062867A /* SceneViewController.swift in Sources */,
