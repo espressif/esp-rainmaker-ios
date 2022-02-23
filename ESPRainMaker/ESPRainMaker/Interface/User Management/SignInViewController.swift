@@ -56,6 +56,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     // String constants
     let privacyLink = "privacy"
     let termsOfUseLink = "termsOfUse"
+    let appDelegate = UIApplication.shared.delegate as? AppDelegate
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -251,10 +252,8 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
                     UserDefaults.standard.set(refreshTokenInfo, forKey: Constants.refreshTokenKey)
                     UserDefaults.standard.set(accessToken, forKey: Constants.accessTokenKey)
                     DispatchQueue.main.async {
-                        // Configure remote notification if not done.
-                        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-                        appDelegate?.configureRemoteNotifications()
-                        
+                        // Configure remote notification.
+                        self.appDelegate?.configureRemoteNotifications()
                         self.dismiss(animated: true, completion: nil)
                     }
                 }
@@ -526,6 +525,8 @@ extension SignInViewController: ESPLoginPresentationLogic {
                 self.username.text = nil
                 self.password.text = nil
                 User.shared.updateUserInfo = true
+                // Configure remote notification.
+                self.appDelegate?.configureRemoteNotifications()
                 self.dismiss(animated: true, completion: nil)
             }
         }
@@ -571,6 +572,8 @@ extension SignInViewController: ESPIdProviderLoginPresenter {
             User.shared.accessToken = accessToken
             umTokenWorker.save(value: accessToken, key: Constants.accessTokenKey)
             DispatchQueue.main.async {
+                // Configure remote notification.
+                self.appDelegate?.configureRemoteNotifications()
                 self.dismiss(animated: true, completion: nil)
             }
         }
