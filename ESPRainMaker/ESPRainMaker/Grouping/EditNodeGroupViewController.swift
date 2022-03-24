@@ -46,6 +46,7 @@ class EditNodeGroupViewController: UIViewController {
         // Configure collection view for display of group nodes
         getSingleDeviceNodeCount()
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        collectionView.collectionViewLayout = GroupDevicesFlowLayout()
         // Add name of current group in label
         nameLabel.text = currentNodeGroup.group_name ?? ""
     }
@@ -179,7 +180,7 @@ class EditNodeGroupViewController: UIViewController {
     }
 }
 
-extension EditNodeGroupViewController: UICollectionViewDelegate {
+extension EditNodeGroupViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout _: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if section == 0, singleDeviceNodeCount > 0 {
             return CGSize(width: 0, height: 10.0)
@@ -324,29 +325,5 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
             }
             return footerView
         }
-    }
-}
-
-extension EditNodeGroupViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_: UICollectionView, layout _: UICollectionViewLayout, sizeForItemAt _: IndexPath) -> CGSize {
-        let width = UIScreen.main.bounds.width
-        var cellWidth: CGFloat = 0
-        if width > 450 {
-            cellWidth = (width - 80) / 3.0
-        } else {
-            cellWidth = (width - 80) / 2.0
-        }
-        return CGSize(width: cellWidth, height: 110.0)
-    }
-
-    func collectionView(_: UICollectionView, layout _: UICollectionViewLayout, minimumLineSpacingForSectionAt _: Int) -> CGFloat {
-        if UIScreen.main.bounds.width > 450 {
-            return 20.0
-        }
-        return 25.0
-    }
-
-    func collectionView(_: UICollectionView, layout _: UICollectionViewLayout, insetForSectionAt _: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 10, left: 30, bottom: 20, right: 30)
     }
 }
