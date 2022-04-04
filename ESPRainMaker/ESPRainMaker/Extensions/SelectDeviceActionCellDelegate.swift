@@ -33,6 +33,7 @@ extension SelectDeviceActionCellDelegate {
         tableView.register(UINib(nibName: String(describing: DeviceHeaderView.self), bundle: nil), forHeaderFooterViewReuseIdentifier: DeviceHeaderView.reuseIdentifier)
         tableView.register(UINib(nibName: String(describing: SliderTableViewCell.self), bundle: nil), forCellReuseIdentifier: String(describing: SliderTableViewCell.self))
         tableView.register(UINib(nibName: String(describing: DropDownTableViewCell.self), bundle: nil), forCellReuseIdentifier: DropDownTableViewCell.reuseIdentifier)
+        tableView.register(UINib(nibName: String(describing: TriggerTableViewCell.self), bundle: nil), forCellReuseIdentifier: TriggerTableViewCell.reuseIdentifier)
     }
     
     /// Get table view cell
@@ -216,6 +217,28 @@ extension SelectDeviceActionCellDelegate {
                     }
                     return cell
                 }
+            } else if param.uiType == Constants.trigger, let dataType = param.dataType?.lowercased(), dataType == "bool" {
+                let triggerCell = tableView.dequeueReusableCell(withIdentifier: "triggerTVC", for: indexPath) as! TriggerTableViewCell
+                object_setClass(triggerCell, ScheduleTriggerTableViewCell.self)
+                let cell = triggerCell as! ScheduleTriggerTableViewCell
+                cell.controlName.text = param.name?.deletingPrefix(device.name!)
+                cell.device = device
+                cell.param = param
+                cell.scheduleDelegate = scheduleDelegate
+                cell.indexPath = indexPath
+                cell.triggerButton.isUserInteractionEnabled = false
+                
+                if let attributeName = param.name {
+                    cell.paramName = attributeName
+                }
+                if param.selected {
+                    cell.checkButton.setImage(UIImage(named: "selected"), for: .normal)
+                    cell.triggerButton.alpha = 1.0
+                } else {
+                    cell.checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
+                    cell.triggerButton.alpha = 0.5
+                }
+                return cell
             }
             return getTableViewGenericCell(tableView: tableView, availableDeviceCopy: availableDeviceCopy, cellType: serviceType, scheduleDelegate: scheduleDelegate, param: param, indexPath: indexPath)
         }

@@ -189,6 +189,10 @@
 		F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */; };
 		F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */; };
 		F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB511A23321B7E002401F9 /* JSONParser.swift */; };
+		F1AC6D7E27A447B20051F6E7 /* TriggerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC6D7C27A447B20051F6E7 /* TriggerTableViewCell.swift */; };
+		F1AC6D7F27A447B20051F6E7 /* TriggerTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1AC6D7D27A447B20051F6E7 /* TriggerTableViewCell.xib */; };
+		F1AC6D8127A91A420051F6E7 /* ParamTriggerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC6D8027A91A420051F6E7 /* ParamTriggerTableViewCell.swift */; };
+		F1AC6D8327AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC6D8227AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift */; };
 		F1AC6D8B27AD54490051F6E7 /* ESPRMDeviceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC6D8A27AD54490051F6E7 /* ESPRMDeviceType.swift */; };
 		F1AC6D8D27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AC6D8C27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift */; };
 		F1AE33C6263611B300694B52 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AE33C5263611B300694B52 /* NotificationService.swift */; };
@@ -244,6 +248,7 @@
 		F1CA0C94257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA0C93257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift */; };
 		F1CA0C98257A2E270085E19A /* ParamDropDownTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA0C97257A2E270085E19A /* ParamDropDownTableViewCell.swift */; };
 		F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CA4BC0260FE7EC00F12D14 /* JoinNetworkViewController.swift */; };
+		F1D0F30627A2D3030032DB80 /* ESPRMDeviceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D0F30527A2D3030032DB80 /* ESPRMDeviceType.swift */; };
 		F1DB6F62232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */; };
 		F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A322A8EA140092DAB9 /* Utility.swift */; };
 		F1DD70A622A8EA2A0092DAB9 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A522A8EA2A0092DAB9 /* Constants.swift */; };
@@ -511,6 +516,10 @@
 		F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericControlTableViewCell.swift; sourceTree = "<group>"; };
 		F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericControlTableViewCell.xib; sourceTree = "<group>"; };
 		F1AB511A23321B7E002401F9 /* JSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
+		F1AC6D7C27A447B20051F6E7 /* TriggerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerTableViewCell.swift; sourceTree = "<group>"; };
+		F1AC6D7D27A447B20051F6E7 /* TriggerTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TriggerTableViewCell.xib; sourceTree = "<group>"; };
+		F1AC6D8027A91A420051F6E7 /* ParamTriggerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParamTriggerTableViewCell.swift; sourceTree = "<group>"; };
+		F1AC6D8227AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTriggerTableViewCell.swift; sourceTree = "<group>"; };
 		F1AC6D8A27AD54490051F6E7 /* ESPRMDeviceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPRMDeviceType.swift; sourceTree = "<group>"; };
 		F1AC6D8C27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ESPRMDeviceType+GetImage.swift"; sourceTree = "<group>"; };
 		F1AE33C3263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ESPRainMakerPushNotificationExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -555,6 +564,7 @@
 		F1CA0C93257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleDropDownTableViewCell.swift; sourceTree = "<group>"; };
 		F1CA0C97257A2E270085E19A /* ParamDropDownTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParamDropDownTableViewCell.swift; sourceTree = "<group>"; };
 		F1CA4BC0260FE7EC00F12D14 /* JoinNetworkViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinNetworkViewController.swift; sourceTree = "<group>"; };
+		F1D0F30527A2D3030032DB80 /* ESPRMDeviceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPRMDeviceType.swift; sourceTree = "<group>"; };
 		F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesCollectionViewCell.swift; sourceTree = "<group>"; };
 		F1DD70A322A8EA140092DAB9 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		F1DD70A522A8EA2A0092DAB9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -961,6 +971,8 @@
 				F11DC99F2577772F00603BF5 /* DropDownTableViewCell.swift */,
 				F11DC99E2577772E00603BF5 /* DropDownTableViewCell.xib */,
 				F11DC9D62578D5D100603BF5 /* DeviceControlHelper.swift */,
+				F1AC6D7C27A447B20051F6E7 /* TriggerTableViewCell.swift */,
+				F1AC6D7D27A447B20051F6E7 /* TriggerTableViewCell.xib */,
 			);
 			path = Controls;
 			sourceTree = "<group>";
@@ -981,6 +993,7 @@
 			children = (
 				F190B9CF24C82C02006D136D /* ScheduleSliderTableViewCell.swift */,
 				F123428124D0113600CAD4A2 /* ScheduleSwitchTableViewCell.swift */,
+				F1AC6D8227AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift */,
 				F123428524D0131200CAD4A2 /* ScheduleGenericTableViewCell.swift */,
 				F1CA0C93257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift */,
 				0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */,
@@ -1038,6 +1051,7 @@
 				F10B075125CEE44200723254 /* NodeGroup.swift */,
 				F10B075525CF147C00723254 /* ErrorResponse.swift */,
 				F133495825E24D3900CCB308 /* SharingRequest.swift */,
+				F1D0F30527A2D3030032DB80 /* ESPRMDeviceType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1332,6 +1346,7 @@
 				F1CA0C8B257A08700085E19A /* GenericParamTableViewCell.swift */,
 				F1CA0C97257A2E270085E19A /* ParamDropDownTableViewCell.swift */,
 				F1C1AD4E25EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift */,
+				F1AC6D8027A91A420051F6E7 /* ParamTriggerTableViewCell.swift */,
 				F1C1AD4F25EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib */,
 				F1FBF05525EED1D200627C07 /* RadialHueColorPaletteDelegate.swift */,
 				F18C23AE25F0B3D4009E232D /* RadialHuePalette.swift */,
@@ -1464,6 +1479,7 @@
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
 				F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
+				F1AC6D7F27A447B20051F6E7 /* TriggerTableViewCell.xib in Resources */,
 				F164A2F92581E73000B879BC /* Configuration.plist in Resources */,
 				F195745425B5AA41005F6601 /* AddMemberTableViewCell.xib in Resources */,
 				F195745A25B5AD09005F6601 /* MembersInfoTableViewCell.xib in Resources */,
@@ -1605,6 +1621,7 @@
 				0CE79FF827ABBE8F00972F22 /* CommonDeviceServices+Utils.swift in Sources */,
 				F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */,
 				F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */,
+				F1AC6D8327AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift in Sources */,
 				F1C352D026DBC40900A88893 /* ESPLocalDevice.swift in Sources */,
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
 				F195745925B5AD09005F6601 /* MembersInfoTableViewCell.swift in Sources */,
@@ -1627,11 +1644,13 @@
 				0C1C7C82276162CC0062867A /* SceneSelectDevicesVC.swift in Sources */,
 				F1EAACAE23E2A74300E9A6A8 /* DefaultValues.swift in Sources */,
 				F1E46CA1253ED6BA007000FB /* ESPAPIManager.swift in Sources */,
+				F1D0F30627A2D3030032DB80 /* ESPRMDeviceType.swift in Sources */,
 				0C80AA2E26FDBD4B00480C53 /* ESPCreateUserService.swift in Sources */,
 				F18744252696087A00971591 /* ESPNotificationsStore.swift in Sources */,
 				F1C1AD5025EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift in Sources */,
 				F1EAACAB23E2A74300E9A6A8 /* UIColor+Extension.swift in Sources */,
 				F1E37E9523D772EC00A5043F /* ThumbTextSlider.swift in Sources */,
+				F1AC6D8127A91A420051F6E7 /* ParamTriggerTableViewCell.swift in Sources */,
 				F1CA0C7E2579F27D0085E19A /* ParamSliderTableViewCell.swift in Sources */,
 				F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */,
 				0CDDC34A27E89D50004F9486 /* UILabel+GetViewHeight.swift in Sources */,
@@ -1762,6 +1781,7 @@
 				F190B9C624C0D842006D136D /* DeviceHeaderView.swift in Sources */,
 				0CF69242270A34140098F515 /* AppDelegate+ESPAlexa.swift in Sources */,
 				F195745325B5AA41005F6601 /* AddMemberTableViewCell.swift in Sources */,
+				F1AC6D7E27A447B20051F6E7 /* TriggerTableViewCell.swift in Sources */,
 				F1C76D66268875A7009E217D /* ESPLocalStorageNodes.swift in Sources */,
 				F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */,
 				F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */,

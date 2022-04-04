@@ -117,6 +117,8 @@ struct Constants {
     static let hueCircle = "esp.ui.hue-circle"
     static let bigSwitch = "esp.ui.push-btn-big"
     static let dropdown = "esp.ui.dropdown"
+    static let trigger = "esp.ui.trigger"
+    static let hidden = "esp.ui.hidden"
 
     // Service types
     static let timezoneServiceName = "esp.service.time"

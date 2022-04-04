@@ -146,7 +146,7 @@ struct JSONParser {
                                 dynamicAttr.valid_strs = attr["valid_strs"] as? [String]
 
                                 if dynamicAttr.properties?.contains("write") ?? false {
-                                    if dynamicAttr.type != Constants.deviceNameParam {
+                                    if dynamicAttr.type != Constants.deviceNameParam, dynamicAttr.uiType != Constants.hidden {
                                         dynamicAttr.canUseDeviceServices = true
                                     }
                                 }
@@ -283,7 +283,7 @@ struct JSONParser {
             dynamicAttr.valid_strs = attr["valid_strs"] as? [String]
 
             if dynamicAttr.properties?.contains("write") ?? false {
-                if dynamicAttr.type != Constants.deviceNameParam {
+                if dynamicAttr.type != Constants.deviceNameParam, dynamicAttr.uiType != Constants.hidden {
                     dynamicAttr.canUseDeviceServices = true
                 }
             }

@@ -45,6 +45,7 @@ class DeviceTraitListViewController: UIViewController {
         tableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
         tableView.register(UINib(nibName: "CentralSwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "centralSwitchTVC")
         tableView.register(UINib(nibName: "RoundHueSliderTableViewCell", bundle: nil), forCellReuseIdentifier: "roundHueSliderTVC")
+        tableView.register(UINib(nibName: String(describing: TriggerTableViewCell.self), bundle: nil), forCellReuseIdentifier: TriggerTableViewCell.reuseIdentifier)
         tableView.register(ParamSwitchTableViewCell.self, forCellReuseIdentifier: "switchParamTableViewCell")
 
         titleLabel.text = device?.getDeviceName() ?? "Details"
@@ -90,6 +91,8 @@ class DeviceTraitListViewController: UIViewController {
                 }
             }
         }
+        // Remove hidden UI type parameters from list.
+        dataSource = dataSource.filter({ $0.uiType != Constants.hidden })
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -462,6 +465,25 @@ class DeviceTraitListViewController: UIViewController {
                 }
                 return cell
             }
+        } else if dynamicAttribute.uiType == Constants.trigger, let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "bool" {
+            let triggerCell = tableView.dequeueReusableCell(withIdentifier: "triggerTVC", for: indexPath) as! TriggerTableViewCell
+            object_setClass(triggerCell, ParamTriggerTableViewCell.self)
+            let cell = triggerCell as! ParamTriggerTableViewCell
+            cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
+            cell.device = device
+            cell.param = dynamicAttribute
+            cell.paramDelegate = self
+            if let attributeName = dynamicAttribute.name {
+                cell.paramName = attributeName
+            }
+            if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
+                cell.triggerButton.isEnabled = true
+                cell.triggerButton.alpha = 1.0
+            } else {
+                cell.triggerButton.isEnabled = false
+                cell.triggerButton.alpha = 0.5
+            }
+            return cell
         }
 
         return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
