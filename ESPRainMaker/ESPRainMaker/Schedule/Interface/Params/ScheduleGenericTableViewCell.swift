@@ -18,6 +18,9 @@
 import UIKit
 
 class ScheduleGenericTableViewCell: GenericControlTableViewCell {
+    
+    var cellType: DeviceServiceType = .none
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         checkButton.isHidden = false
@@ -114,14 +117,14 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
     }
 }
 
-extension ScheduleGenericTableViewCell: ScheduleActionAllowedProtocol {
+extension ScheduleGenericTableViewCell: ScheduleSceneActionAllowedProtocol {
     func setupSelections() {
-        switch device.scheduleAction {
-        case .allowed:
+        let isAllowed = isCellEnabled(cellType: cellType, device: device)
+        if isAllowed {
             self.alpha = 1.0
             checkButton.isEnabled = true
             editButton.isHidden = param?.selected ?? false
-        default:
+        } else {
             self.alpha = 0.6
             checkButton.isEnabled = false
             editButton.isHidden = true

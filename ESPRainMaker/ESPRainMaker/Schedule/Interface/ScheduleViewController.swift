@@ -15,6 +15,7 @@
 //  ScheduleViewController.swift
 //  ESPRainMaker
 //
+
 import UIKit
 
 class ScheduleViewController: UIViewController {
@@ -34,6 +35,9 @@ class ScheduleViewController: UIViewController {
     @IBOutlet var timeLabel: UILabel!
     @IBOutlet var timeView: UIView!
     @IBOutlet var removeButton: RemoveScheduleButton!
+    @IBOutlet weak var nameViewHeight: NSLayoutConstraint!
+    
+    var isNewSchedule = false
 
     var isCollapsed = true
     var scheduleKey = ""
@@ -42,6 +46,8 @@ class ScheduleViewController: UIViewController {
     var selectedNodeIDs: [String] = [String]()
     
     var failedSchedule: ESPSchedule?
+    
+    weak var delegate: ServiceUpdateActionsDelegate?
 
     // MARK: - Overriden Methods
 
@@ -65,11 +71,14 @@ class ScheduleViewController: UIViewController {
         datePicker.backgroundColor = UIColor.white
         if ESPScheduler.shared.currentSchedule.id != nil {
             scheduleNameLabel.text = ESPScheduler.shared.currentSchedule.name
+            setNameViewHeight(label: scheduleNameLabel)
             let lastSelectedDateStr = ESPScheduler.shared.currentSchedule.trigger.getTimeDetails()
             datePicker.setDate(from: lastSelectedDateStr, format: "h:mm a", animated: true)
             removeButton.isHidden = false
             removeButton.setTitle("Remove", for: .normal)
             removeButton.setImage(UIImage(named: "trash"), for: .normal)
+        } else {
+            isNewSchedule = true
         }
 
         actionListTextView.textContainer.heightTracksTextView = true
@@ -134,8 +143,11 @@ class ScheduleViewController: UIViewController {
                     DispatchQueue.main.async {
                         Utility.hideLoader(view: self.view)
                         switch result {
-                        case .success(_):
+                        case .success(let nodesFailed):
                             User.shared.updateDeviceList = true
+                            if !nodesFailed {
+                                self.delegate?.serviceRemoved()
+                            }
                             self.navigationController?.popViewController(animated: true)
                         default:
                             break
@@ -167,10 +179,11 @@ class ScheduleViewController: UIViewController {
                 return
             }
             self.scheduleNameLabel.text = name
+            self.setNameViewHeight(label: self.scheduleNameLabel)
         }))
         present(input, animated: true, completion: nil)
     }
-
+    
     @IBAction func repeatButtonPressed(_: Any) {
         if isCollapsed {
             isCollapsed = false
@@ -242,6 +255,7 @@ class ScheduleViewController: UIViewController {
                     Utility.hideLoader(view: self.view)
                     if schedulesDeleted {
                         User.shared.updateDeviceList = true
+                        self.delegate?.serviceRemoved()
                         self.navigationController?.popToRootViewController(animated: false)
                     }
                 } else {
@@ -276,7 +290,7 @@ class ScheduleViewController: UIViewController {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 Utility.hideLoader(view: self.view)
                 switch result {
-                case .success(_):
+                case .success(let nodesFailed):
                     // Result is success. Navigate back to schedule list and refetch the list.
                     // To check if schedule is successfully added.
                     User.shared.updateDeviceList = true
@@ -289,7 +303,16 @@ class ScheduleViewController: UIViewController {
                             DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
                                 Utility.hideLoader(view: self.view)
                                 switch result {
-                                case .success(_):
+                                case .success(let nodesFailed):
+                                    if !nodesFailed {
+                                        if self.isNewSchedule {
+                                            self.delegate?.serviceAdded()
+                                        } else {
+                                            self.delegate?.serviceUpdated()
+                                        }
+                                        self.navigationController?.popToRootViewController(animated: false)
+                                        return
+                                    }
                                     break
                                 case .failure:
                                     Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your connection!!")
@@ -298,16 +321,23 @@ class ScheduleViewController: UIViewController {
                             })
                         })
                     } else {
+                        if !nodesFailed {
+                            if self.isNewSchedule {
+                                self.delegate?.serviceAdded()
+                            } else {
+                                self.delegate?.serviceUpdated()
+                            }
+                        }
                         self.navigationController?.popToRootViewController(animated: false)
                     }
                 case .failure:
                     if let failed = self.failedSchedule {
-                        if let _ = ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey] {
+                        if let key = ESPScheduler.shared.currentScheduleKey, let _ = ESPScheduler.shared.schedules[key] {
                             ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey] = failed
                             ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey]?.actions = ESPScheduler.shared.currentSchedule.actions
                         }
                     }
-                    Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your connection!!")
+                    Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdateFailed)
                     if schedulesDeleted {
                         User.shared.updateDeviceList = true
                         self.navigationController?.popToRootViewController(animated: false)
@@ -390,6 +420,13 @@ class ScheduleViewController: UIViewController {
     }
     
     // MARK: - Private Methods
+    
+    /// Set height for the schedule name label
+    /// - Parameter label: schedule name label
+    private func setNameViewHeight(label: UILabel) {
+        let height = self.scheduleNameLabel.getNameViewHeight(height: self.nameViewHeight.constant, width: self.view.frame.width - 127.0)
+        self.nameViewHeight.constant = height
+    }
     
     /// Set schedule action status for a device to allowed (if said device is online) if schedule already has a device from the same node
     /// - Parameter availableDevices: list of available devices

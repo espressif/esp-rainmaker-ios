@@ -30,6 +30,7 @@ class Device: Codable {
     var deviceName = ""
     var deviceNameParam = ""
     var scheduleActionStatus: ScheduleActionStatus?
+    var sceneActionStatus: SceneActionStatus?
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -162,5 +163,70 @@ extension Device: DeviceScheduler {
             }
         }
         return scheduleActionStatus!
+    }
+}
+
+/// Enum denotes the schedule actions available for device.
+/// .allowed: scene creation/edit is allowed
+/// .deviceOffline: device is not connected to cloud
+/// .maxScheduleReached: max scenes created for node
+enum SceneActionStatus {
+    
+    case allowed
+    case deviceOffline
+    case maxSceneReached(Int)
+    
+    /// Returns string for device based on its scene status
+    var description: String {
+        switch self {
+        case .allowed:
+            return ""
+        case .deviceOffline:
+            return "Offline"
+        case .maxSceneReached(let maxCount):
+            return "Max supported count \(maxCount) reached"
+        }
+    }
+}
+
+
+/// Protocol defines computed properties for the device as per its scene status
+protocol DeviceSceneHandler {
+    var isDeviceSceneAllowed: Bool { get }
+    var isDeviceSceneEnabled: Bool { get }
+    var sceneAction: SceneActionStatus { get }
+}
+
+extension Device: DeviceSceneHandler {
+    /// Returns true if scene feature is allowed for the node the device is associated with
+    var isDeviceSceneAllowed: Bool {
+        if let node = node {
+            return node.isSceneAllowed
+        }
+        return false
+    }
+    
+    /// Returns true if device already is included in a scene
+    var isDeviceSceneEnabled: Bool {
+        if selectedParams > 0 {
+            return true
+        }
+        return false
+    }
+    
+    /// Returns the scene status of a device [.allowed, .deviceOffline, .maxSceneReached]
+    var sceneAction: SceneActionStatus {
+        if let status = sceneActionStatus {
+            return status
+        }
+        sceneActionStatus = .allowed
+        if let node = node, !node.isConnected {
+            sceneActionStatus = .deviceOffline
+        } else if !isDeviceSceneAllowed, !isDeviceSceneEnabled {
+            if let maxCount = self.node?.maxScenesCount {
+                sceneActionStatus = .maxSceneReached(maxCount)
+            }
+        }
+        return sceneActionStatus!
     }
 }

@@ -34,6 +34,8 @@
 		<true/>
 		<key>Enable Sharing</key>
 		<true/>
+		<key>Enable Scene</key>
+		<true/>
 	</dict>
 	<key>Provision Settings</key>
 	<dict>

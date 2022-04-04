@@ -304,7 +304,7 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func getTableViewCellBasedOn(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
-        if dynamicAttribute.uiType == "esp.ui.slider" {
+        if dynamicAttribute.uiType == Constants.slider {
             if let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "int" || dataType == "float" {
                 if let bounds = dynamicAttribute.bounds {
                     let maxValue = bounds["max"] as? Float ?? 100
@@ -348,7 +348,7 @@ class DeviceTraitListViewController: UIViewController {
                     }
                 }
             }
-        } else if dynamicAttribute.uiType == "esp.ui.toggle" || dynamicAttribute.uiType == Constants.bigSwitch, dynamicAttribute.dataType?.lowercased() == "bool" {
+        } else if dynamicAttribute.uiType == Constants.toggle || dynamicAttribute.uiType == Constants.bigSwitch, dynamicAttribute.dataType?.lowercased() == "bool" {
             let switchCell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
             object_setClass(switchCell, ParamSwitchTableViewCell.self)
             let cell = switchCell as! ParamSwitchTableViewCell
@@ -373,7 +373,7 @@ class DeviceTraitListViewController: UIViewController {
                 cell.toggleSwitch.isEnabled = false
             }
             return cell
-        } else if dynamicAttribute.uiType == "esp.ui.hue-slider" || dynamicAttribute.uiType == Constants.hueCircle {
+        } else if dynamicAttribute.uiType == Constants.hue || dynamicAttribute.uiType == Constants.hueCircle {
             var minValue = 0
             var maxValue = 360
             if let bounds = dynamicAttribute.bounds {
@@ -419,7 +419,7 @@ class DeviceTraitListViewController: UIViewController {
             cell.title.text = dynamicAttribute.name ?? ""
 
             return cell
-        } else if dynamicAttribute.uiType == "esp.ui.dropdown" {
+        } else if dynamicAttribute.uiType == Constants.dropdown {
             if let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "int" || dataType == "string" {
                 let dropDownCell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
                 object_setClass(dropDownCell, ParamDropDownTableViewCell.self)

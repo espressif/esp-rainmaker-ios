@@ -48,7 +48,7 @@ class Param: Attribute {
     var dataType: String?
     var type: String?
     var selected = false
-    var canBeScheduled = false
+    var canUseDeviceServices = false
     var valid_strs: [String]?
 
     enum CodingKeys: String, CodingKey {
@@ -58,7 +58,7 @@ class Param: Attribute {
         case attributeKey
         case dataType = "data_type"
         case type
-        case canBeScheduled
+        case canUseDeviceServices
         case value
         case valid_strs
     }
@@ -70,7 +70,7 @@ class Param: Attribute {
         try container.encode(bounds as? [String: Float], forKey: .bounds)
         try container.encode(dataType, forKey: .dataType)
         try container.encode(type, forKey: .type)
-        try container.encode(canBeScheduled, forKey: .canBeScheduled)
+        try container.encode(canUseDeviceServices, forKey: .canUseDeviceServices)
         try container.encode(attributeKey, forKey: .attributeKey)
         try container.encode(valid_strs, forKey: .valid_strs)
 
@@ -97,7 +97,7 @@ class Param: Attribute {
         bounds = try container.decodeIfPresent([String: Float].self, forKey: .bounds)
         uiType = try container.decodeIfPresent(String.self, forKey: .uiType)
         attributeKey = try container.decodeIfPresent(String.self, forKey: .attributeKey)
-        canBeScheduled = try container.decodeIfPresent(Bool.self, forKey: .canBeScheduled) ?? false
+        canUseDeviceServices = try container.decodeIfPresent(Bool.self, forKey: .canUseDeviceServices) ?? false
         valid_strs = try container.decodeIfPresent([String].self, forKey: .valid_strs)
 
         try super.init(from: decoder)
@@ -130,7 +130,7 @@ class Param: Attribute {
         dataType = param.dataType
         type = param.type
         selected = param.selected
-        canBeScheduled = param.canBeScheduled
+        canUseDeviceServices = param.canUseDeviceServices
         valid_strs = param.valid_strs
     }
 }

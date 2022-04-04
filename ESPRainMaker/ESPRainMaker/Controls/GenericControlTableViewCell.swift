@@ -19,6 +19,9 @@
 import UIKit
 
 class GenericControlTableViewCell: UITableViewCell {
+    
+    static let reuseIdentifier = "genericControlCell"
+    
     // IB Outlets
     @IBOutlet var backView: UIView!
     @IBOutlet var controlName: UILabel!

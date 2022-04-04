@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20019"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -1717,7 +1717,8 @@ Unable to add device</string>
                     <connections>
                         <segue destination="mgC-Sj-4EB" kind="relationship" relationship="viewControllers" id="CUe-vv-Lux"/>
                         <segue destination="GDd-Nd-OaX" kind="relationship" relationship="viewControllers" id="BqB-YH-p4F"/>
-                        <segue destination="fbW-Pw-mxo" kind="relationship" relationship="viewControllers" id="mVe-FD-IaF"/>
+                        <segue destination="OOM-a9-vxc" kind="relationship" relationship="viewControllers" id="j2B-bb-hMe"/>
+                        <segue destination="fbW-Pw-mxo" kind="relationship" relationship="viewControllers" id="q34-GO-vEa"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4iA-yg-Cwb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1728,7 +1729,7 @@ Unable to add device</string>
         <scene sceneID="I7V-Tr-kgO">
             <objects>
                 <viewControllerPlaceholder storyboardName="User" id="fbW-Pw-mxo" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Settings" selectedImage="user_selected" id="wLe-5C-0W7">
+                    <tabBarItem key="tabBarItem" title="Settings" image="settings_selected" selectedImage="settings" id="wLe-5C-0W7">
                         <inset key="imageInsets" minX="0.0" minY="24" maxX="0.0" maxY="24"/>
                     </tabBarItem>
                 </viewControllerPlaceholder>
@@ -2293,12 +2294,24 @@ Unable to add device</string>
             </objects>
             <point key="canvasLocation" x="1642" y="-1298"/>
         </scene>
+        <!--Scene-->
+        <scene sceneID="0vW-os-XL4">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Scene" id="OOM-a9-vxc" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Scenes" image="circle" selectedImage="circle_selected" id="0sY-W0-6cL"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="nzX-MW-I05" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-4705" y="-1168"/>
+        </scene>
     </scenes>
     <resources>
         <image name="add_icon" width="32" height="32"/>
         <image name="background_image" width="562.5" height="1218"/>
         <image name="bluetooth_icon" width="128" height="128"/>
         <image name="checkbox_unchecked" width="24" height="24"/>
+        <image name="circle" width="65" height="65"/>
+        <image name="circle_selected" width="65" height="65"/>
         <image name="claimIcon" width="128" height="128"/>
         <image name="cross_icon" width="14" height="14"/>
         <image name="devices" width="70" height="70"/>
@@ -2316,10 +2329,11 @@ Unable to add device</string>
         <image name="schedule_selected" width="70" height="70"/>
         <image name="secure" width="70" height="70"/>
         <image name="selected" width="20" height="20"/>
+        <image name="settings" width="70" height="70"/>
+        <image name="settings_selected" width="70" height="70"/>
         <image name="softAP" width="620" height="620"/>
         <image name="status_icon" width="620" height="620"/>
         <image name="switch_on" width="70" height="70"/>
-        <image name="user_selected" width="70" height="70"/>
         <image name="wifi" width="620" height="620"/>
         <image name="wifi_security" width="13" height="14"/>
         <image name="wifi_symbol" width="18" height="14"/>

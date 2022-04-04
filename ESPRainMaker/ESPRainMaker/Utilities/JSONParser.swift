@@ -57,6 +57,31 @@ struct JSONParser {
                     node.services = nodeServices
                 }
 
+                if Configuration.shared.appConfiguration.supportScene { // Check whether scene is supported in the node
+                    if let services = config["services"] as? [[String: Any]] {
+                        for service in services {
+                            if let type = service["type"] as? String, type == Constants.sceneServiceType {
+                                if let name = service["name"] as? String, name.count > 0 {
+                                    node.sceneName = name
+                                }
+                                if let params = service["params"] as? [[String: Any]] {
+                                    for param in params {
+                                        if let paramType = param["type"] as? String, paramType == Constants.sceneParamType {
+                                            node.isSceneSupported = true
+                                            if let name = param["name"] as? String, name.count > 0 {
+                                                node.scenesName = name
+                                            }
+                                        }
+                                        if let bounds = param["bounds"] as? [String: Any], let max = bounds["max"] as? Int, max >= 0 {
+                                            node.maxScenesCount = max
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 if Configuration.shared.appConfiguration.supportSchedule { // Check whether scheduling is supported in the node
                     if let services = config["services"] as? [[String: Any]] {
                         for service in services {
@@ -122,7 +147,7 @@ struct JSONParser {
 
                                 if dynamicAttr.properties?.contains("write") ?? false {
                                     if dynamicAttr.type != Constants.deviceNameParam {
-                                        dynamicAttr.canBeScheduled = true
+                                        dynamicAttr.canUseDeviceServices = true
                                     }
                                 }
 
@@ -186,6 +211,13 @@ struct JSONParser {
                         }
                     }
                 }
+                
+                if let scene = paramInfo[node.sceneName] as? [String: Any], let scenes = scene[node.scenesName] as? [[String: Any]] {
+                    node.currentScenesCount = scenes.count
+                    for scene in scenes {
+                        ESPSceneManager.shared.saveScenesFromJSON(nodeID: node.node_id ?? "", sceneJSON: scene)
+                    }
+                }
 
                 for service in node.services ?? [] {
                     if service.type != "esp.service.schedule", let serviceInfo = paramInfo[service.name ?? ""] as? [String: Any] {
@@ -226,6 +258,11 @@ struct JSONParser {
                 ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
             }
         }
+        if Configuration.shared.appConfiguration.supportScene {
+            if !forSingleNode {
+                ESPSceneManager.shared.getAvailableDeviceWithSceneCapability(nodeList: nodeList)
+            }
+        }
         return nodeList
     }
 
@@ -247,7 +284,7 @@ struct JSONParser {
 
             if dynamicAttr.properties?.contains("write") ?? false {
                 if dynamicAttr.type != Constants.deviceNameParam {
-                    dynamicAttr.canBeScheduled = true
+                    dynamicAttr.canUseDeviceServices = true
                 }
             }
 

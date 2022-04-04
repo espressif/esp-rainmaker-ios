@@ -25,6 +25,8 @@ protocol ScheduleActionDelegate {
 }
 
 class DeviceHeaderView: UITableViewHeaderFooterView {
+    
+    static let reuseIdentifier = "deviceHV"
     @IBOutlet var deviceLabel: UILabel!
     @IBOutlet var arrowImageView: UIImageView!
     @IBOutlet var selectDeviceButton: UIButton!
@@ -32,16 +34,29 @@ class DeviceHeaderView: UITableViewHeaderFooterView {
     var delegate: ScheduleActionDelegate?
     var section: Int!
     var device: Device!
+    var cellType: DeviceServiceType = .none
 
     override func layoutSubviews() {
         if let device = device {
-            switch device.scheduleAction {
-            case .allowed:
-                selectDeviceButton.isEnabled = true
-                deviceLabel.textColor = UIColor.black
+            switch cellType {
+            case .scene:
+                switch device.sceneAction {
+                case .allowed:
+                    selectDeviceButton.isEnabled = true
+                    deviceLabel.textColor = UIColor.black
+                default:
+                    selectDeviceButton.isEnabled = false
+                    deviceLabel.textColor = UIColor.lightGray
+                }
             default:
-                selectDeviceButton.isEnabled = false
-                deviceLabel.textColor = UIColor.lightGray
+                switch device.scheduleAction {
+                case .allowed:
+                    selectDeviceButton.isEnabled = true
+                    deviceLabel.textColor = UIColor.black
+                default:
+                    selectDeviceButton.isEnabled = false
+                    deviceLabel.textColor = UIColor.lightGray
+                }
             }
         }
     }

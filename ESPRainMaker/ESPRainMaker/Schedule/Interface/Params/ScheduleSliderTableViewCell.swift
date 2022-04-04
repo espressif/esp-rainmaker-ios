@@ -18,6 +18,9 @@
 import UIKit
 
 class ScheduleSliderTableViewCell: SliderTableViewCell {
+    
+    var cellType: DeviceServiceType = .none
+    
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -75,15 +78,15 @@ class ScheduleSliderTableViewCell: SliderTableViewCell {
     }
 }
 
-extension ScheduleSliderTableViewCell: ScheduleActionAllowedProtocol {
+extension ScheduleSliderTableViewCell: ScheduleSceneActionAllowedProtocol {
     func setupSelections() {
-        switch device.scheduleAction {
-        case .allowed:
+        let isAllowed = isCellEnabled(cellType: cellType, device: device)
+        if isAllowed {
             self.alpha = 1.0
             checkButton.isEnabled = true
             hueSlider.isEnabled = param?.selected ?? false
             slider.isEnabled = param?.selected ?? false
-        default:
+        } else {
             self.alpha = 0.6
             checkButton.isEnabled = false
             hueSlider.isEnabled = false

@@ -23,7 +23,12 @@ import Foundation
     @objc optional var isSchedulingAllowed: Bool { get }
 }
 
-extension Node: MaxScheduleProtocol {
+/// Protocol defined for getting scene status for node
+@objc protocol MaxSceneProtocol: AnyObject {
+    @objc optional var isSceneAllowed: Bool { get }
+}
+
+extension Node: MaxScheduleProtocol, MaxSceneProtocol {
     /// Returns true if scheuling is allowed
     var isSchedulingAllowed: Bool {
         if isSchedulingSupported {
@@ -33,4 +38,15 @@ extension Node: MaxScheduleProtocol {
         }
         return false
     }
+    
+    var isSceneAllowed: Bool {
+        if isSceneSupported {
+            if (maxScenesCount > 0 && currentScenesCount < maxScenesCount) || maxScenesCount == -1 {
+                return true
+            }
+        }
+        return false
+    }
 }
+
+

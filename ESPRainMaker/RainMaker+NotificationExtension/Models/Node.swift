@@ -38,6 +38,12 @@ class Node: Codable {
     var currentSchedulesCount = 0
     var scheduleName = "Schedule"
     var schedulesName = "Schedules"
+    
+    var isSceneSupported = false
+    var maxScenesCount = -1
+    var currentScenesCount = 0
+    var sceneName = "Scene"
+    var scenesName = "Scenes"
 
     enum CodingKeys: String, CodingKey {
         case node_id = "id"

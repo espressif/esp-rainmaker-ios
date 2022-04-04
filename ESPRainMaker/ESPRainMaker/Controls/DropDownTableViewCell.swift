@@ -20,6 +20,9 @@ import DropDown
 import UIKit
 
 class DropDownTableViewCell: UITableViewCell {
+    
+    static let reuseIdentifier = "dropDownTableViewCell"
+    
     // IB outlets
     @IBOutlet var backView: UIView!
     @IBOutlet var controlName: UILabel!

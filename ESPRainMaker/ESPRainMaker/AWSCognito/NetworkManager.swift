@@ -51,7 +51,11 @@ class NetworkManager {
                     }
                     return
                 }
-                if let node = JSONParser.parseNodeArray(data: [response!], forSingleNode: true)?[0] {
+                var responseJSON = response!
+                if nodeId.count > 0 {
+                    responseJSON["id"] = nodeId
+                }
+                if let node = JSONParser.parseNodeArray(data: [responseJSON], forSingleNode: true)?[0] {
                     node.node_id = nodeId
                     if node.devices?.count ?? 0 < 1 {
                         completionHandler(nil, .unknownError)

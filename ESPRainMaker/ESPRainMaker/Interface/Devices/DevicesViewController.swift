@@ -91,6 +91,9 @@ class DevicesViewController: UIViewController {
         if !Configuration.shared.appConfiguration.supportSchedule {
             tabBarController?.viewControllers?.remove(at: 1)
         }
+        if !Configuration.shared.appConfiguration.supportScene {
+            tabBarController?.viewControllers?.remove(at: 2)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
