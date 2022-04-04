@@ -103,13 +103,12 @@ struct Constants {
 
     // Device param keys
     static let deviceNameParam = "esp.param.name"
+    static let deviceBrightnessParam = "esp.param.brightness"
+    static let deviceSaturationParam = "esp.param.saturation"
+    static let deviceCCTParam = "esp.param.cct"
 
     static let cognito = "Cognito"
     static let github = "Github"
-
-    // Device types
-    static let lightBulb = "esp.device.lightbulb"
-    static let switchDevice = "esp.device.switch"
 
     // UI types
     static let slider = "esp.ui.slider"
@@ -173,4 +172,7 @@ struct Constants {
     static let scenesKey = "Scenes"
     
     static let edit = "Edit"
+    
+    // Image names
+    static let dummyDeviceImage = "dummy_device_icon"
 }

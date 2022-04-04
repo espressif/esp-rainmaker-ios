@@ -468,13 +468,13 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     private func setIconsForSliderCell(cell: ParamSliderTableViewCell, param: Param) {
-        if param.type?.lowercased() == "esp.param.brightness" {
+        if param.type?.lowercased() == Constants.deviceBrightnessParam {
             cell.minImage.image = UIImage(named: "brightness_low")
             cell.maxImage.image = UIImage(named: "brightness_high")
-        } else if param.type?.lowercased() == "esp.param.saturation" {
+        } else if param.type?.lowercased() == Constants.deviceSaturationParam {
             cell.minImage.image = UIImage(named: "saturation_low")
             cell.maxImage.image = UIImage(named: "saturation_high")
-        } else if param.type?.lowercased() == "esp.param.cct" {
+        } else if param.type?.lowercased() == Constants.deviceCCTParam {
             cell.minImage.image = UIImage(named: "cct_low")
             cell.maxImage.image = UIImage(named: "cct_high")
         } else {

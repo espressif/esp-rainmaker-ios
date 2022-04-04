@@ -264,30 +264,7 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
         cell.layer.shadowOpacity = 0.5
         cell.layer.masksToBounds = false
 
-        if let deviceType = device.type {
-            var deviceImage: UIImage!
-            switch deviceType {
-            case "esp.device.switch":
-                deviceImage = UIImage(named: "switch")
-            case "esp.device.lightbulb":
-                deviceImage = UIImage(named: "light")
-            case "esp.device.fan":
-                deviceImage = UIImage(named: "fan")
-            case "esp.device.thermostat":
-                deviceImage = UIImage(named: "thermostat")
-            case "esp.device.temperature-sensor":
-                deviceImage = UIImage(named: "temperature_sensor")
-            case "esp.device.lock":
-                deviceImage = UIImage(named: "lock")
-            case "esp.device.sensor":
-                deviceImage = UIImage(named: "sensor_icon")
-            case "esp.device.outlet":
-                deviceImage = UIImage(named: "outlet")
-            default:
-                deviceImage = UIImage(named: "dummy_device_icon")
-            }
-            cell.deviceImageView.image = deviceImage
-        }
+        cell.deviceImageView.image = ESPRMDeviceType(rawValue: device.type ?? "")?.getImageFromDeviceType() ?? UIImage(named: Constants.dummyDeviceImage)
         return cell
     }
 
