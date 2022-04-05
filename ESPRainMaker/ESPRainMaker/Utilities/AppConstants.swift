@@ -23,6 +23,7 @@ import Foundation
 import UIKit
 
 class AppConstants {
+    let defaultBGColor = "#8265E3"
     static let shared = AppConstants()
     var appThemeColor: UIColor?
     var appBGImage: UIImage?
@@ -31,4 +32,21 @@ class AppConstants {
         appThemeColor = UserDefaults.standard.backgroundColor
         appBGImage = UserDefaults.standard.imageForKey(key: Constants.appBGKey)
     }
+    
+    func getBGColor() -> UIColor {
+        var currentBGColor: UIColor!
+        if let color = AppConstants.shared.appThemeColor {
+            currentBGColor = color
+        } else {
+            if let bgColor = Constants.backgroundColor {
+                currentBGColor = UIColor(hexString: bgColor)
+            }
+        }
+        if currentBGColor == #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1) {
+            currentBGColor = UIColor(hexString: defaultBGColor)
+        }
+        return currentBGColor
+    }
+    
+    
 }

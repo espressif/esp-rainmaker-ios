@@ -16,6 +16,7 @@ target 'ESPRainMaker' do
   pod 'ESPProvision', '2.0.14'
   pod 'DropDown'
   pod 'FlexColorPicker'
+  pod 'SwiftCharts', '~> 0.6.5'
 
 end
 

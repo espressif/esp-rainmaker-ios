@@ -22,6 +22,10 @@ import MBProgressHUD
 import UIKit
 
 class DeviceTraitListViewController: UIViewController {
+    
+    // Constant keys
+    let timeSeriesProperty = "time_series"
+    
     var device: Device!
     var pollingTimer: Timer!
     var skipNextAttributeUpdate = false
@@ -62,7 +66,6 @@ class DeviceTraitListViewController: UIViewController {
         } else {
             checkForCentralParam()
         }
-
         checkOfflineStatus()
     }
 
@@ -155,8 +158,6 @@ class DeviceTraitListViewController: UIViewController {
 
     func refreshDeviceAttributes() {
         if device?.isReachable() ?? false {
-            tableView.alpha = 1.0
-            tableView.isUserInteractionEnabled = true
             NetworkManager.shared.getDeviceParam(device: device) { error in
                 if error != nil {
                     return
@@ -166,9 +167,6 @@ class DeviceTraitListViewController: UIViewController {
                     self.tableView.reloadData()
                 }
             }
-        } else {
-            tableView.alpha = 0.5
-            tableView.isUserInteractionEnabled = false
         }
     }
 
@@ -220,7 +218,6 @@ class DeviceTraitListViewController: UIViewController {
         } else {
             offlineLabel.text = device?.node?.nodeStatus ?? ""
             offlineLabel.isHidden = false
-            tableView.isUserInteractionEnabled = false
         }
     }
 
@@ -270,6 +267,13 @@ class DeviceTraitListViewController: UIViewController {
         } else {
             cell.editButton.isHidden = true
         }
+        
+        if attribute.properties?.contains(timeSeriesProperty) ?? false {
+            cell.tapButton.isHidden = false
+        } else {
+            cell.tapButton.isHidden = true
+        }
+        
         if let data_type = attribute.dataType {
             cell.dataType = data_type
         }
@@ -557,12 +561,7 @@ extension DeviceTraitListViewController: UITableViewDataSource {
             let control = dataSource[indexPath.section]
             paramCell = getTableViewCellBasedOn(dynamicAttribute: control, indexPath: indexPath)
         }
-
-        if device?.isReachable() ?? false {
-            paramCell.isUserInteractionEnabled = true
-        } else {
-            paramCell.isUserInteractionEnabled = false
-        }
+        paramCell.isUserInteractionEnabled = true
         return paramCell
     }
 }
