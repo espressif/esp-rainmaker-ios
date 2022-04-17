@@ -20,6 +20,12 @@ import Foundation
 
 class Group: Decodable {
     var groups: [NodeGroup]
+    var nextID: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case groups
+        case nextID = "next_id"
+    }
 }
 
 class NodeGroup: Codable {

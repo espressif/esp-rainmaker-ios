@@ -34,8 +34,12 @@ class NodeGroupManager {
     ///
     /// - Parameters:
     ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
-    func getNodeGroups(completionHandler: @escaping ([NodeGroup]?, ESPNetworkError?) -> Void) {
-        apiManager.genericAuthorizedDataRequest(url: nodeGroupURL + "?node_list=true", parameter: nil, method: .get) { result, error in
+    func getNodeGroups(partialNodeGroupList: [NodeGroup]? = nil, nextID: String? = nil, completionHandler: @escaping ([NodeGroup]?, ESPNetworkError?) -> Void) {
+        var url = nodeGroupURL + "?node_list=true"
+        if let nextID = nextID {
+            url = url + "&start_id=" + nextID
+        }
+        apiManager.genericAuthorizedDataRequest(url: url, parameter: nil, method: .get) { result, error in
             guard let response = result else {
                 completionHandler(nil, error!)
                 return
@@ -49,13 +53,24 @@ class NodeGroupManager {
                 } else {
                     // Initializing Group objects from response data
                     let groups = try decoder.decode(Group.self, from: response)
-                    // Sorting Groups by their name ascending
-                    groups.groups.sort(by: { $0.group_name?.lowercased() ?? "" < $1.group_name?.lowercased() ?? "" })
-                    // Adding reference of node object in groups
-                    self.updateNodeListInNodeGroup(nodeGroup: groups.groups)
-                    self.nodeGroups = groups.groups
-                    ESPLocalStorageHandler().saveNodeGroups(self.nodeGroups)
-                    completionHandler(groups.groups, nil)
+                    
+                    // Check if additional node group is present
+                    var groupList:[NodeGroup] = []
+                    if let partialNodeGroupList = partialNodeGroupList {
+                        groupList = partialNodeGroupList
+                    }
+                    groupList.append(contentsOf: groups.groups)
+                    if let nextID = groups.nextID {
+                        self.getNodeGroups(partialNodeGroupList: groupList, nextID: nextID, completionHandler: completionHandler)
+                    } else {
+                        // Sorting Groups by their name ascending
+                        groupList.sort(by: { $0.group_name?.lowercased() ?? "" < $1.group_name?.lowercased() ?? "" })
+                        // Adding reference of node object in groups
+                        self.updateNodeListInNodeGroup(nodeGroup: groupList)
+                        self.nodeGroups = groupList
+                        ESPLocalStorageHandler().saveNodeGroups(self.nodeGroups)
+                        completionHandler(groupList, nil)
+                    }
                     return
                 }
             } catch {
