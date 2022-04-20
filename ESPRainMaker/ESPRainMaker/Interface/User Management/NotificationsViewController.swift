@@ -163,7 +163,7 @@ class NotificationsViewController: UIViewController {
     
     private func getAddSharingNotificationTableViewCell(for indexPath:IndexPath) -> AddSharingNotificationTableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "addSharingNotificationsTVC", for: indexPath) as! AddSharingNotificationTableViewCell
-        let request = pendingRequests[indexPath.row]
+        let request = pendingRequests[indexPath.section]
         let primaryUserID = request.primary_user_name ?? ""
         let nodeIDs = request.node_ids?.joined(separator: ", ")
         if let deviceList = request.metadata, deviceList.count > 0 {
