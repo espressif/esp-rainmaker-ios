@@ -71,22 +71,25 @@ class DeleteAccountViewController: UIViewController {
         let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         let confirmAction = UIAlertAction(title: "Proceed", style: .destructive) { _ in
             Utility.showLoader(message: "", view: self.view)
-            self.apiManager.genericAuthorizedJSONRequest(url: Constants.deleteUserAccount + "?request=true", parameter: nil, method: .delete) { response, error in
-                Utility.hideLoader(view: self.view)
-                if let statusJSON = response as? [String: Any], let status = statusJSON[Constants.statusKey] as? String {
-                    let description = statusJSON[Constants.descriptionKey] as? String
-                    if status.lowercased() == Constants.successKey {
-                        DispatchQueue.main.async {
-                            // Verification code is sent to the user email.
-                            // Shows UI for entering the code.
-                            self.confirmationView.isHidden = false
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+            appDelegate?.disablePlatformApplicationARN() {
+                self.apiManager.genericAuthorizedJSONRequest(url: Constants.deleteUserAccount + "?request=true", parameter: nil, method: .delete) { response, error in
+                    Utility.hideLoader(view: self.view)
+                    if let statusJSON = response as? [String: Any], let status = statusJSON[Constants.statusKey] as? String {
+                        let description = statusJSON[Constants.descriptionKey] as? String
+                        if status.lowercased() == Constants.successKey {
+                            DispatchQueue.main.async {
+                                // Verification code is sent to the user email.
+                                // Shows UI for entering the code.
+                                self.confirmationView.isHidden = false
+                            }
+                            return
                         }
+                        Utility.showToastMessage(view: self.view, message: description ?? "Unable to process request.", duration: 5.0)
+                    } else if let apiError = error {
+                        Utility.showToastMessage(view: self.view, message: apiError.description, duration: 5.0)
                         return
                     }
-                    Utility.showToastMessage(view: self.view, message: description ?? "Unable to process request.", duration: 5.0)
-                } else if let apiError = error {
-                    Utility.showToastMessage(view: self.view, message: apiError.description, duration: 5.0)
-                    return
                 }
             }
         }

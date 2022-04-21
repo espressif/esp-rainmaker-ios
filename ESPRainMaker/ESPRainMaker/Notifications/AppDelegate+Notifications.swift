@@ -52,10 +52,13 @@ extension AppDelegate {
     }
     
     // Method to delete endpoints for current user on logout.
-    func disablePlatformApplicationARN() {
+    func disablePlatformApplicationARN(_ completionHandler: @escaping () -> Void) {
         if let deviceToken = self.deviceToken {
             apiManager.genericAuthorizedJSONRequest(url: Constants.pushNotification + "?mobile_device_token=" + deviceToken, parameter: nil, method: .delete) { response, error in
+                completionHandler()
             }
+        } else {
+            completionHandler()
         }
     }
 

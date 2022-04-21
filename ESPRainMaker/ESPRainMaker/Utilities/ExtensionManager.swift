@@ -501,8 +501,6 @@ extension ESPNoRefreshTokenLogic {
     
     /// Clear user data on logging out
     func clearUserData() {
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        appDelegate?.disablePlatformApplicationARN()
         UIApplication.shared.unregisterForRemoteNotifications()
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         ESPTokenWorker.shared.deleteAll()
