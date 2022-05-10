@@ -110,11 +110,15 @@ class ESPLocalService: NSObject {
         do {
             let propValRequest = try createGetPropertyValueRequest(index: currentCount)
             espLocalDevice.sendData(path: control_endpoint, data: propValRequest!) { response, error in
-                if error != nil {
-                    completionHandler(nil, .httpError(error!))
+                guard let response = response else {
+                    guard let error = error else {
+                        completionHandler(nil, .zeroProperty)
+                        return
+                    }
+                    completionHandler(nil, .httpError(error))
                     return
                 }
-                let processResult = self.processGetPropertyInfoResponse(response: response!, completionHandler: completionHandler)
+                let processResult = self.processGetPropertyInfoResponse(response: response, completionHandler: completionHandler)
                 if count == currentCount + 1 {
                     if processResult {
                         completionHandler(self.propertyInfo, nil)
