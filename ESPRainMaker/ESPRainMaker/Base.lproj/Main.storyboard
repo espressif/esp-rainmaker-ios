@@ -1718,6 +1718,7 @@ Unable to add device</string>
                         <segue destination="mgC-Sj-4EB" kind="relationship" relationship="viewControllers" id="CUe-vv-Lux"/>
                         <segue destination="GDd-Nd-OaX" kind="relationship" relationship="viewControllers" id="BqB-YH-p4F"/>
                         <segue destination="OOM-a9-vxc" kind="relationship" relationship="viewControllers" id="j2B-bb-hMe"/>
+                        <segue destination="FHX-8I-dYw" kind="relationship" relationship="viewControllers" id="dar-Ro-eeB"/>
                         <segue destination="fbW-Pw-mxo" kind="relationship" relationship="viewControllers" id="q34-GO-vEa"/>
                     </connections>
                 </tabBarController>
@@ -2294,6 +2295,16 @@ Unable to add device</string>
             </objects>
             <point key="canvasLocation" x="1642" y="-1298"/>
         </scene>
+        <!--DeviceAutomation-->
+        <scene sceneID="JE9-aQ-KsC">
+            <objects>
+                <viewControllerPlaceholder storyboardIdentifier="DeviceAutomations" storyboardName="DeviceAutomation" id="FHX-8I-dYw" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="Rt3-Zi-9FR"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="nar-b4-9jP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-5376" y="364"/>
+        </scene>
         <!--Scene-->
         <scene sceneID="0vW-os-XL4">
             <objects>
@@ -2302,7 +2313,7 @@ Unable to add device</string>
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nzX-MW-I05" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4705" y="-1168"/>
+            <point key="canvasLocation" x="-4983" y="89"/>
         </scene>
     </scenes>
     <resources>

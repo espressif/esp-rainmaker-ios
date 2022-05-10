@@ -17,14 +17,54 @@
 //
 
 import Foundation
+import Alamofire
 
 enum ESPAPIError: Error {
-    
     case serverError(Error)
     case errorCode(code: String, description: String)
     case errorDescription(String)
     case parsingError(error: String = "Response parsing failed")
     case noRefreshToken
+    case noAccessToken
+    case noData
+    
+    var description: String {
+        switch self {
+        case .serverError(let error):
+            if let afError = error as? AFError, let urlError = afError.underlyingError as? URLError, (urlError.code == URLError.Code.notConnectedToInternet || urlError.code == URLError.Code.dataNotAllowed) {
+                return "No internet connection"
+            }
+            return error.localizedDescription
+        case .errorCode(_, let description):
+            return description
+        case .errorDescription(let string):
+            return string
+        case .parsingError(let error):
+            return error
+        case .noRefreshToken:
+            return "User not authenticated. Please logout and sign in again."
+        case .noAccessToken:
+            return "Authentication failed, try refreshing"
+        case .noData:
+            return "Unable to get response."
+        }
+    }
+}
+
+struct ESPAPIStatus: Codable {
+    var node_id: String?
+    var status: String
+    var error_code: Int?
+    var description: String
+    
+    func isRequestSuccessfull() -> Bool {
+        switch status.lowercased() {
+        case "success":
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 struct ESPErrorCodeDescription {

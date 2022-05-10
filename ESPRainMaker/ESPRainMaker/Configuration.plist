@@ -36,6 +36,8 @@
 		<true/>
 		<key>Enable Scene</key>
 		<true/>
+		<key>Enable Device Automation</key>
+		<true/>
 	</dict>
 	<key>Provision Settings</key>
 	<dict>

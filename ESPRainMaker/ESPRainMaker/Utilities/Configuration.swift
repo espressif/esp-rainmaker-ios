@@ -93,6 +93,7 @@ struct AppConfiguration {
     var supportGrouping = true
     var supportSharing = true
     var supportScene = true
+    var supportDeviceAutomation = true
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -101,6 +102,7 @@ struct AppConfiguration {
             supportLocalControl = configDict["Enable Local Control"] as? Bool ?? true
             supportGrouping = configDict["Enable Grouping"] as? Bool ?? true
             supportSharing = configDict["Enable Sharing"] as? Bool ?? true
+            supportDeviceAutomation = configDict["Enable Device Automation"] as? Bool ?? true
         }
     }
 }

@@ -48,6 +48,9 @@ class DeviceHeaderView: UITableViewHeaderFooterView {
                     selectDeviceButton.isEnabled = false
                     deviceLabel.textColor = UIColor.lightGray
                 }
+            case .automation:
+                selectDeviceButton.isEnabled = true
+                deviceLabel.textColor = .black
             default:
                 switch device.scheduleAction {
                 case .allowed:
