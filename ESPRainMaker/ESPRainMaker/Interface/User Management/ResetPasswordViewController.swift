@@ -26,6 +26,7 @@ class ResetPasswordViewController: UIViewController {
     @IBOutlet var infoLabel: UILabel!
     
     var userName: String!
+    weak var forgotPasswordDelegate: FlowCancelledDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,6 +49,7 @@ class ResetPasswordViewController: UIViewController {
     // MARK: - IBActions
 
     @IBAction func cancelPressed(_: Any) {
+        self.forgotPasswordDelegate?.flowCancelled()
         navigationController?.popToRootViewController(animated: true)
     }
 

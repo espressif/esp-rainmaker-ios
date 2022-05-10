@@ -21,6 +21,10 @@ import Foundation
 import JWTDecode
 import SafariServices
 
+protocol FlowCancelledDelegate: AnyObject {
+    func flowCancelled()
+}
+
 class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextViewDelegate {
     
     @IBOutlet var checkBox: UIButton!
@@ -57,6 +61,8 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     let privacyLink = "privacy"
     let termsOfUseLink = "termsOfUse"
     let appDelegate = UIApplication.shared.delegate as? AppDelegate
+    
+    var showAgreementView: Bool = true
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -109,7 +115,8 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .normal)
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .selected)
         segmentControl.changeUnderlineColor(color: currentBGColor)
-        agreementView.isHidden = false
+        agreementView.isHidden = !showAgreementView
+        showAgreementView = true
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -178,6 +185,9 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if let signUpConfirmationViewController = segue.destination as? ConfirmSignUpViewController {
             signUpConfirmationViewController.sentTo = sentTo
+            signUpConfirmationViewController.signupDelegate = self
+        }  else if let forgotPasswordViewController = segue.destination as? ForgotPasswordViewController {
+            forgotPasswordViewController.forgotPasswordDelegate = self
         }
     }
     
@@ -579,5 +589,12 @@ extension SignInViewController: ESPIdProviderLoginPresenter {
                 self.dismiss(animated: true, completion: nil)
             }
         }
+    }
+}
+
+extension SignInViewController: FlowCancelledDelegate {
+    
+    func flowCancelled() {
+        showAgreementView = false
     }
 }

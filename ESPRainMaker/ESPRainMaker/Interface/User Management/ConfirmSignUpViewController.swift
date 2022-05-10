@@ -24,6 +24,7 @@ class ConfirmSignUpViewController: UIViewController {
 
     @IBOutlet var sentToLabel: UILabel!
     @IBOutlet var code: UITextField!
+    weak var signupDelegate: FlowCancelledDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +41,7 @@ class ConfirmSignUpViewController: UIViewController {
     // MARK: IBActions
 
     @IBAction func cancelClicked(_: Any) {
+        self.signupDelegate?.flowCancelled()
         navigationController?.popToRootViewController(animated: true)
     }
 

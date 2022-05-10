@@ -22,6 +22,7 @@ class ForgotPasswordViewController: UIViewController {
     
     @IBOutlet var username: UITextField!
     var sender: AnyObject!
+    weak var forgotPasswordDelegate: FlowCancelledDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,11 +34,13 @@ class ForgotPasswordViewController: UIViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if let newPasswordViewController = segue.destination as? ResetPasswordViewController {
+            newPasswordViewController.forgotPasswordDelegate = self
             newPasswordViewController.userName = self.username.text
         }
     }
 
     @IBAction func cancelPressed(_: Any) {
+        self.forgotPasswordDelegate?.flowCancelled()
         navigationController?.popViewController(animated: true)
     }
 
@@ -90,4 +93,11 @@ extension ForgotPasswordViewController: ESPForgotPasswordPresentationLogic {
     
     func confirmForgotPassword(withError error: ESPAPIError?) {}
     
+}
+
+extension ForgotPasswordViewController: FlowCancelledDelegate {
+    
+    func flowCancelled() {
+        self.forgotPasswordDelegate?.flowCancelled()
+    }
 }
