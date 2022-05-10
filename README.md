@@ -187,6 +187,14 @@ ESPRainMaker app supports remote notifiations in order to notify app in realtime
   - Link their account without entering Alexa account credentials if already logged into Alexa app. They will have to login to Rainmaker once, when trying to link accounts.
   - Link their account from your Rainmaker using [Login with Amazon (LWA)](https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html), when the Alexa app isn&#39;t installed on their device.
 
+### Time Series
+
+- Time series allows a user to see historical values of parameters plotted as a bar or line chart.
+- Users can select different time durations to see reported parameter values like 1 day, 7 days, 4 weeks and 1 year.
+- Users can see graph for raw data and can also select from different aggregate types like avg, min, max, count and latest.
+
+Note : Time series feature requires support in firmware. It will be available only for the parameters that have "time_series" property.
+
 ## Supports
 
 

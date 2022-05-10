@@ -205,6 +205,8 @@
 		F195745A25B5AD09005F6601 /* MembersInfoTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */; };
 		F195746625B69DDB005F6601 /* NodeDetailsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */; };
 		F195746A25B69DF0005F6601 /* NodeDetailsHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195746925B69DF0005F6601 /* NodeDetailsHeaderView.xib */; };
+		F198AE36289CFF2B00ABA406 /* ESPTimeStampInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F198AE35289CFF2B00ABA406 /* ESPTimeStampInfo.swift */; };
+		F198AE3828A2241300ABA406 /* UIColor+Darker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F198AE3728A2241200ABA406 /* UIColor+Darker.swift */; };
 		F199217A25B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F199217925B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift */; };
 		F19A9D1322C0D23E00A450C3 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19A9D1222C0D23E00A450C3 /* SignInViewController.swift */; };
 		F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19A9D1422C0ED4C00A450C3 /* ForgotPasswordViewController.swift */; };
@@ -307,6 +309,10 @@
 		F1CC125B2784871A0007634C /* ESPTimeLabelGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC125A2784871A0007634C /* ESPTimeLabelGenerator.swift */; };
 		F1CC125D2784E0630007634C /* ESPTSArguments+NextDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC125C2784E0630007634C /* ESPTSArguments+NextDuration.swift */; };
 		F1CC12612787786C0007634C /* Double+Rounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC12602787786B0007634C /* Double+Rounded.swift */; };
+		F1CE295C2861D015009EFC8E /* Date+DayOfWeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE295A2861D015009EFC8E /* Date+DayOfWeek.swift */; };
+		F1CE295D2861D015009EFC8E /* Double+TimeString.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE295B2861D015009EFC8E /* Double+TimeString.swift */; };
+		F1CE29602861D030009EFC8E /* ESPChartPointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE295E2861D02F009EFC8E /* ESPChartPointView.swift */; };
+		F1CE29612861D030009EFC8E /* ESPChartPointView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1CE295F2861D030009EFC8E /* ESPChartPointView.xib */; };
 		F1D0F30627A2D3030032DB80 /* ESPRMDeviceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D0F30527A2D3030032DB80 /* ESPRMDeviceType.swift */; };
 		F1DB6F62232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */; };
 		F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DD70A322A8EA140092DAB9 /* Utility.swift */; };
@@ -597,6 +603,8 @@
 		F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MembersInfoTableViewCell.xib; sourceTree = "<group>"; };
 		F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeDetailsHeaderView.swift; sourceTree = "<group>"; };
 		F195746925B69DF0005F6601 /* NodeDetailsHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NodeDetailsHeaderView.xib; sourceTree = "<group>"; };
+		F198AE35289CFF2B00ABA406 /* ESPTimeStampInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPTimeStampInfo.swift; sourceTree = "<group>"; };
+		F198AE3728A2241200ABA406 /* UIColor+Darker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Darker.swift"; sourceTree = "<group>"; };
 		F199217925B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveNodeTableViewFooterView.swift; sourceTree = "<group>"; };
 		F19A9D1222C0D23E00A450C3 /* SignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		F19A9D1422C0ED4C00A450C3 /* ForgotPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForgotPasswordViewController.swift; sourceTree = "<group>"; };
@@ -686,6 +694,10 @@
 		F1CC125A2784871A0007634C /* ESPTimeLabelGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTimeLabelGenerator.swift; sourceTree = "<group>"; };
 		F1CC125C2784E0630007634C /* ESPTSArguments+NextDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPTSArguments+NextDuration.swift"; sourceTree = "<group>"; };
 		F1CC12602787786B0007634C /* Double+Rounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Rounded.swift"; sourceTree = "<group>"; };
+		F1CE295A2861D015009EFC8E /* Date+DayOfWeek.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+DayOfWeek.swift"; sourceTree = "<group>"; };
+		F1CE295B2861D015009EFC8E /* Double+TimeString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Double+TimeString.swift"; sourceTree = "<group>"; };
+		F1CE295E2861D02F009EFC8E /* ESPChartPointView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPChartPointView.swift; sourceTree = "<group>"; };
+		F1CE295F2861D030009EFC8E /* ESPChartPointView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ESPChartPointView.xib; sourceTree = "<group>"; };
 		F1D0F30527A2D3030032DB80 /* ESPRMDeviceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPRMDeviceType.swift; sourceTree = "<group>"; };
 		F1DB6F61232FA6CB004B1FA1 /* DevicesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesCollectionViewCell.swift; sourceTree = "<group>"; };
 		F1DD70A322A8EA140092DAB9 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
@@ -1384,6 +1396,7 @@
 				F1FA24B82771869D00447050 /* Model */,
 				F1D37CF327B4C238002BACEB /* Extensions */,
 				F1C2DE592743C27D0037EB3F /* ESPTimeSeriesAPIManager.swift */,
+				F198AE35289CFF2B00ABA406 /* ESPTimeStampInfo.swift */,
 				F1A057B72797BF0900485C23 /* ESPTimeInterval+StringInfo.swift */,
 				F1CC1249277F4B160007634C /* ESPChartSettings.swift */,
 				F16BD36F275DF1840089049C /* UInt+DateFormatter.swift */,
@@ -1490,10 +1503,13 @@
 		F1D37CF327B4C238002BACEB /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				F1CE295A2861D015009EFC8E /* Date+DayOfWeek.swift */,
+				F1CE295B2861D015009EFC8E /* Double+TimeString.swift */,
 				F1CC12602787786B0007634C /* Double+Rounded.swift */,
 				F1A057AD278DF8E400485C23 /* UIView+DropShadow.swift */,
 				F1A057AF278EA9C100485C23 /* UIView+AddGradient.swift */,
 				F172F96A27B2A5D400E62017 /* Double+StartEndDate.swift */,
+				F198AE3728A2241200ABA406 /* UIColor+Darker.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1650,6 +1666,8 @@
 		F1FA24BB2771F74200447050 /* Interface */ = {
 			isa = PBXGroup;
 			children = (
+				F1CE295E2861D02F009EFC8E /* ESPChartPointView.swift */,
+				F1CE295F2861D030009EFC8E /* ESPChartPointView.xib */,
 				F1C2DE612744DB120037EB3F /* ESPChartsViewController.swift */,
 				F1FA24B4276F866300447050 /* ESPLineChartViewProvider.swift */,
 				F1FA24BC2771F7C800447050 /* ESPBarChartViewProvider.swift */,
@@ -1790,6 +1808,7 @@
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
 				F10C2B2A25EB82DA00B60696 /* Settings.storyboard in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
+				F1CE29612861D030009EFC8E /* ESPChartPointView.xib in Resources */,
 				F1AC6D7F27A447B20051F6E7 /* TriggerTableViewCell.xib in Resources */,
 				F164A2F92581E73000B879BC /* Configuration.plist in Resources */,
 				F195745425B5AA41005F6601 /* AddMemberTableViewCell.xib in Resources */,
@@ -1904,12 +1923,15 @@
 				F1CC1259278116E50007634C /* ESPTSArguments+PrevDuration.swift in Sources */,
 				F17CEBE8263B23E800BA9E0C /* NotificationsViewController.swift in Sources */,
 				F1A057B82797BF0900485C23 /* ESPTimeInterval+StringInfo.swift in Sources */,
+				F1CE29602861D030009EFC8E /* ESPChartPointView.swift in Sources */,
 				F1F45150232B7A780009DCE0 /* DeviceTraitListViewController.swift in Sources */,
 				F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */,
 				0CF69236270A308B0098F515 /* ESPAlexaConnectViewController.swift in Sources */,
 				F1FBF05625EED1D200627C07 /* RadialHueColorPaletteDelegate.swift in Sources */,
 				F1390F4727D9E81800F80DFB /* ESPAutomationPresenter.swift in Sources */,
+				F1CE295D2861D015009EFC8E /* Double+TimeString.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
+				F1CE295C2861D015009EFC8E /* Date+DayOfWeek.swift in Sources */,
 				F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */,
 				F1FFC8F925D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift in Sources */,
 				F1943A7724C9DF230001564A /* ESPDays.swift in Sources */,
@@ -1992,6 +2014,7 @@
 				0CDDC34A27E89D50004F9486 /* UILabel+GetViewHeight.swift in Sources */,
 				F1AFB25C2721FEAF00418969 /* AboutViewController.swift in Sources */,
 				F1AC6D8D27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift in Sources */,
+				F198AE36289CFF2B00ABA406 /* ESPTimeStampInfo.swift in Sources */,
 				0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */,
 				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
 				0CF6923E270A308B0098F515 /* ESPAlexaWebViewController.swift in Sources */,
@@ -2107,6 +2130,7 @@
 				F1A057B427968CFD00485C23 /* Utility+Environment.swift in Sources */,
 				F190B9B824BF5208006D136D /* ScheduleListTableViewCell.swift in Sources */,
 				F190B9BE24C07CB5006D136D /* SelectDaysViewController.swift in Sources */,
+				F198AE3828A2241300ABA406 /* UIColor+Darker.swift in Sources */,
 				F10B077225D2726800723254 /* NewNodeGroupViewController.swift in Sources */,
 				F1072BC6256F9BD400D7CE2C /* BLEDeviceListViewCell.swift in Sources */,
 				F1A057B2278F563200485C23 /* ESPEnvironment.swift in Sources */,
@@ -2360,7 +2384,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.7.0;
+				MARKETING_VERSION = 2.8.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;

@@ -30,23 +30,34 @@ struct ESPYAxisGenerator {
     func getYAxis() -> ChartAxisModel {
         
         let labelSettings = ChartLabelSettings(font: ESPChartSettings.defaultLabel)
-        
-        // Default multiplier
-        var multiplier = 5.0
-        // Set multiplier depending on the range of value
-        if (range.lastValue - range.firstValue)/5.0 > 18.0 {
-            multiplier = (range.lastValue - range.firstValue)/18.0
-        }
+        //Let range
+        let offsets = calculateMultiplier()
         
         // Generate Y-Axis label
-        let generator = ChartAxisGeneratorMultiplier(multiplier)
+        let generator = ChartAxisGeneratorMultiplier(Double(offsets.multiplier))
         let labelsGenerator = ChartAxisLabelsGeneratorFunc {scalar in
-            return ChartAxisLabel(text: "\(scalar.roundToDecimal(2))", settings: labelSettings)
+            return ChartAxisLabel(text: "\(Int(scalar))", settings: labelSettings)
         }
         // Generate Y-Axis model
-        let yModel = ChartAxisModel(firstModelValue: range.firstValue - multiplier, lastModelValue: range.lastValue + 5.0, axisTitleLabels: [], axisValuesGenerator: generator, labelsGenerator: labelsGenerator)
+        let yModel = ChartAxisModel(firstModelValue: Double(offsets.firstValue), lastModelValue: Double(offsets.lastValue), axisTitleLabels: [], axisValuesGenerator: generator, labelsGenerator: labelsGenerator)
         
         return yModel
+    }
+    
+    
+    /// Method to calucate offsets for Y-axis
+    /// - Returns: tuple containing value for first and last point with multiplier.
+    func calculateMultiplier() -> (firstValue: Int, lastValue: Int, multiplier:Int) {
+        let firstIntegerValue = Int(range.firstValue)
+        let lastIntegerValue = Int(range.lastValue)
+        let firstModulus = abs(firstIntegerValue%10)
+        let lastModulus = abs(lastIntegerValue%10)
+        var firstOffset = firstIntegerValue + (firstIntegerValue > 0 ? -firstModulus - 10 :firstModulus - 10)
+        let lastOffset = lastIntegerValue + (lastIntegerValue > 0 ? -lastModulus + 10 :lastModulus + 10)
+        firstOffset = (range.firstValue > 0 && firstOffset < 0) ? 0: firstOffset
+        var multiplier = (lastOffset - firstOffset)/5
+        multiplier = (multiplier - multiplier%10) > 0 ? (multiplier - multiplier%10):10
+        return (firstValue: firstOffset, lastValue: lastOffset, multiplier:multiplier)
     }
     
 }

@@ -18,50 +18,28 @@
 
 import Foundation
 import SwiftCharts
+import UIKit
 
 struct ESPBarChartViewProvider {
     var tsArguments: ESPTSArguments
     var frame: CGRect
     var barChartPoints: [ChartPoint]!
     var timezone:String?
+    var view: UIView?
+    var chart: Chart?
     
     /// Method to get instance of Bar Chart object.
     ///
     /// - Returns: `Chart` object with Bar plotting.
     func barsChart() -> Chart {
         
-        let barViewGenerator = {(chartPointModel: ChartPointLayerModel, layer: ChartPointsViewsLayer, chart: Chart) -> UIView? in
-            let bottomLeft = layer.modelLocToScreenLoc(x: 0, y: 0)
-            
-            let barWidth = self.calculateBarWidth()
-            
-            let settings = ChartBarViewSettings(animDuration: 0.5)
-            
-            let (p1, p2): (CGPoint, CGPoint) = {
-                return (CGPoint(x: chartPointModel.screenLoc.x, y: bottomLeft.y), CGPoint(x: chartPointModel.screenLoc.x, y: chartPointModel.screenLoc.y))
-            }()
-            let chartPointViewBar = ChartPointViewBar(p1: p1, p2: p2, width: barWidth, bgColor: AppConstants.shared.getBGColor(), settings: settings)
-            chartPointViewBar.cornerRadius = 4.0
-            chartPointViewBar.addGradientLayer()
-            return chartPointViewBar
-        }
-        
         // Set Chart properties
         let chartFrame = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height - 100.0)
+        
         var chartSettings = Env.iPad ? ESPChartSettings.iPadChartSettings:ESPChartSettings.iPhoneChartSettings
-        chartSettings.zoomPan.panEnabled = true
-        chartSettings.zoomPan.zoomEnabled = true
         
         // Configure X-Axis for different time duration
-        var xModel: ChartAxisModel!
-        switch tsArguments.timeInterval {
-            case .week:
-                xModel = ESPTimeAxisGenerator(timeInterval: tsArguments.timeInterval, startTime: Double(barChartPoints[0].x.scalar), endTime: Double(tsArguments.duration.endTime), label: "", timezone: timezone).getTimeXAxis()
-            case .hour:
-                xModel = ESPTimeAxisGenerator(timeInterval: tsArguments.timeInterval, startTime: Double(tsArguments.duration.startTime), endTime: Double(tsArguments.duration.endTime), label: "", timezone: timezone).getTimeXAxis()
-            default:
-                xModel = ESPTimeAxisGenerator(timeInterval: tsArguments.timeInterval, startTime: Double(tsArguments.duration.startTime), endTime: Double(tsArguments.duration.endTime), label: "", timezone: timezone).getTimeXAxis()
-        }
+        let xModel = ESPTimeAxisGenerator(timeInterval: tsArguments.timeInterval, startTime: Double(tsArguments.duration.startTime), endTime: Double(tsArguments.duration.endTime), label: "", timezone: timezone).getTimeXAxis()
         
         // Prepare Y-Axis using Chart data.
         var yValues:[Double] = []
@@ -73,10 +51,57 @@ struct ESPBarChartViewProvider {
         let coordsSpace = ChartCoordsSpaceLeftBottomSingleAxis(chartSettings: chartSettings, chartFrame: chartFrame, xModel: xModel, yModel: yModel)
         let (xAxisLayer, yAxisLayer, innerFrame) = (coordsSpace.xAxisLayer, coordsSpace.yAxisLayer, coordsSpace.chartInnerFrame)
         
-        let chartPointsLayer = ChartPointsViewsLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: barChartPoints, viewGenerator: barViewGenerator)
-        
         let settings = ChartGuideLinesDottedLayerSettings(linesColor: UIColor.black, linesWidth: 0.1)
         let guidelinesLayer = ChartGuideLinesDottedLayer(xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, settings: settings)
+        
+        var groups:[ChartPointsBarGroup] = []
+        for barChartPoint in barChartPoints {
+            let bars = ChartBarModel(constant: ChartAxisValueDouble(Double(barChartPoint.x.scalar)), axisValue1: ChartAxisValue(scalar: 0), axisValue2: barChartPoint.y, bgColor: AppConstants.shared.getBGColor())
+            groups.append(ChartPointsBarGroup(constant: ChartAxisValueDouble(Double(barChartPoint.x.scalar)), bars: [bars]))
+        }
+        
+        // Current tapped bar
+        var currentSelectedGroupBar: ChartTappedGroupBar?
+        // Current chart point view
+        var currentDescriptionView: UIView?
+        // Handle tap action in Bar chart view
+        let barViewSettings = ChartBarViewSettings(animDuration: 0.5, roundedCorners: .allCorners)
+        let groupsLayer = ChartGroupedPlainBarsLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, groups: groups, horizontal: false, barWidth: self.calculateBarWidth(), barSpacing: 0, groupSpacing: 0, settings: barViewSettings, tapHandler: { tappedGroupBar /*ChartTappedGroupBar*/ in
+            currentSelectedGroupBar?.tappedBar.view.backgroundColor = AppConstants.shared.getBGColor()
+            currentDescriptionView?.removeFromSuperview()
+            currentSelectedGroupBar = tappedGroupBar
+            currentSelectedGroupBar?.tappedBar.view.backgroundColor = AppConstants.shared.getBGColor().darker(by: 20.0)
+            
+            let tappedBarView = tappedGroupBar.tappedBar.view
+            let chartPointView = ESPChartPointView.instanceFromNib()
+            chartPointView.valueLabel.textColor = AppConstants.shared.getBGColor()
+            chartPointView.timeLabel.textColor = AppConstants.shared.getBGColor()
+            chartPointView.timeLabel.text = ESPTimeStampInfo(timestamp: tappedGroupBar.tappedBar.model.constant.scalar).timeDescription(aggregate: tsArguments.aggregate, timeInterval: tsArguments.timeInterval)
+            chartPointView.valueLabel.text = "\(tappedGroupBar.tappedBar.model.axisValue2.scalar.roundToDecimal(2))"
+            tappedBarView.superview?.bringSubviewToFront(tappedBarView)
+            currentDescriptionView = chartPointView
+            if tappedBarView.frame.minX + chartPointView.frame.width > UIScreen.main.bounds.width {
+                chartPointView.frame.origin.x = -(tappedBarView.frame.minX - chartPointView.frame.width)
+            }
+            tappedBarView.addSubview(chartPointView)
+        })
+        
+        // Remove point description on tap of chart view area.
+        let thumbSettings = ChartPointsLineTrackerLayerThumbSettings(thumbSize: Env.iPad ? 20 : 10, thumbBorderWidth: Env.iPad ? 4 : 2, thumbBorderColor: UIColor.gray)
+        let trackerLayerSettings = ChartPointsLineTrackerLayerSettings(thumbSettings: thumbSettings)
+        // Handle touch on empty area of Bar chart
+        let chartPointsTrackerLayer = ChartPointsLineTrackerLayer<ChartPoint, Any>(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lines: [barChartPoints], lineColor: UIColor.clear, animDuration: 1, animDelay: 2, settings: trackerLayerSettings, positionUpdateHandler: { chartPointsWithScreenLoc in
+            currentDescriptionView?.removeFromSuperview()
+            currentSelectedGroupBar?.tappedBar.view.backgroundColor = AppConstants.shared.getBGColor()
+        })
+        
+        // Add zoom functionality if aggregate is of Raw type.
+        if tsArguments.aggregate == .raw {
+            chartSettings.zoomPan.panEnabled = true
+            chartSettings.zoomPan.zoomEnabled = true
+            chartSettings.zoomPan.maxZoomX = 5.0
+            chartSettings.zoomPan.gestureMode = .onlyX
+        }
         
         return Chart(
             frame: chartFrame,
@@ -86,7 +111,8 @@ struct ESPBarChartViewProvider {
                 xAxisLayer,
                 yAxisLayer,
                 guidelinesLayer,
-                chartPointsLayer
+                chartPointsTrackerLayer,
+                groupsLayer
             ]
         )
     }
