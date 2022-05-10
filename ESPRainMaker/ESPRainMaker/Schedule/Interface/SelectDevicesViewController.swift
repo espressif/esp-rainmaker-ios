@@ -18,6 +18,7 @@
 import UIKit
 
 class SelectDevicesViewController: UIViewController, ScheduleActionDelegate, SelectDeviceActionCellDelegate {
+    
     @IBOutlet var tableView: UITableView!
     var availableDeviceCopy: [Device]!
     var selectedIndexPath: [IndexPath] = []
@@ -52,7 +53,7 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate, Sel
     func paramStateChangedat(indexPath: IndexPath) {
         tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
     }
-
+    
     func expandSection(expand: Bool, section: Int) {
         availableDeviceCopy[section].collapsed = !expand
         tableView.reloadSections(IndexSet(arrayLiteral: section), with: .automatic)

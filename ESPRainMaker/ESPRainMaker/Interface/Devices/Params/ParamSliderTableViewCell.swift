@@ -42,15 +42,23 @@ class ParamSliderTableViewCell: SliderTableViewCell {
     }
 
     @IBAction override func sliderValueChanged(_ sender: UISlider) {
-        if dataType.lowercased() == "int" {
-            sliderValue = paramName + ": \(Int(slider.value))"
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]], delegate: paramDelegate)
-            param.value = Int(sender.value)
-        } else {
-            sliderValue = paramName + ": \(slider.value)"
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: sender.value]], delegate: paramDelegate)
-            param.value = sender.value
+        guard let value = getSliderFinalValue(sender, nil, .slider) else {
+            return
         }
+        var val: Float = 0.0
+        if dataType.lowercased() == "int" {
+            sliderValue = paramName + ": \(Int(value))"
+            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(value)]], delegate: paramDelegate)
+            param.value = Int(value)
+            val = Float(Int(value))
+        } else {
+            sliderValue = paramName + ": \(value)"
+            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: value]], delegate: paramDelegate)
+            param.value = value
+            val = value
+        }
+        sliderInitialValue = val
+        sender.setValue(val, animated: true)
     }
 
     @IBAction override func hueSliderValueDragged(_ sender: GradientSlider) {
@@ -58,11 +66,13 @@ class ParamSliderTableViewCell: SliderTableViewCell {
     }
 
     @IBAction override func hueSliderValueChanged(_ sender: GradientSlider) {
-        if currentHueValue != sender.value {
-            hueSlider.thumbColor = UIColor(hue: CGFloat(sender.value / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(sender.value)]], delegate: paramDelegate)
-            currentHueValue = sender.value
-            param.value = Int(sender.value)
+        guard let value = getSliderFinalValue(nil, sender, .hueSlider) else {
+            return
         }
+        hueSlider.thumbColor = UIColor(hue: CGFloat(value / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: Int(value)]], delegate: paramDelegate)
+        param.value = Int(value)
+        sliderInitialValue = Float(Int(value))
+        sender.setValue(CGFloat(value))
     }
 }
