@@ -51,6 +51,7 @@ class ESPTimeSeriesAPIManager {
         if let endTime = endTime {
             url.append("&end_time=\(endTime)")
         }
+        url.append("&timezone=\(TimeZone.current.identifier)")
         
         let urlString = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         

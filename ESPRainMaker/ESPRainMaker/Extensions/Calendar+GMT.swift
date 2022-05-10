@@ -21,9 +21,7 @@ import UIKit
 extension Calendar {
     static func gmtCalendar() -> Calendar {
         var calendar = Calendar.current
-        if let timezone = TimeZone(identifier: "GMT") {
-            calendar.timeZone = timezone
-        }
+        calendar.timeZone = TimeZone.current
         return calendar
     }
 }
