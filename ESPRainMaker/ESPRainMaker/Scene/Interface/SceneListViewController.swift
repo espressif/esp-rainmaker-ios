@@ -194,6 +194,10 @@ class SceneListViewController: UIViewController {
 }
 
 extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "Remove"
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row % 2 != 0 {
             return 20.0
@@ -255,7 +259,6 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
                 let scene = ESPSceneManager.shared.scenes[id]!
                 ESPSceneManager.shared.currentScene = scene
                 ESPSceneManager.shared.configureDeviceForCurrentScene()
-//                cell.scene = scene
                 cell.scene = ESPSceneManager.shared.currentScene
                 if let scene = ESPSceneManager.shared.scenes[id] {
                     cell.sceneName.text = scene.name

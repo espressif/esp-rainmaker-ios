@@ -28,9 +28,9 @@ class ESPScheduleConstants {
     static let scheduleUpdationFailureMessage = "Failed to update schedule"
     static let scheduleUpdationPartialFailureMessage = "Failed to update schedule for"
     
-    static let scheduleDeletionSuccessMessage = "Schedule deleted successfully"
-    static let scheduleDeletionFailureMessage = "Failed to delete schedule"
-    static let scheduleDeletionPartialFailureMessage = "Failed to delete schedule for"
+    static let scheduleDeletionSuccessMessage = "Schedule removed successfully"
+    static let scheduleDeletionFailureMessage = "Failed to remove schedule"
+    static let scheduleDeletionPartialFailureMessage = "Failed to remove schedule for"
     
     static let addScheduleNameTitle = "Add name"
     static let addScheduleNameMessage = "Choose name for your schedule"
