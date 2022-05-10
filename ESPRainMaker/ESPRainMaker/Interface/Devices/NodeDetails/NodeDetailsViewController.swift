@@ -110,8 +110,8 @@ class NodeDetailsViewController: UIViewController {
             }
         }
         let noAction = UIAlertAction(title: "No", style: .default, handler: nil)
-        confirmAction.addAction(yesAction)
         confirmAction.addAction(noAction)
+        confirmAction.addAction(yesAction)
         present(confirmAction, animated: true, completion: nil)
     }
 

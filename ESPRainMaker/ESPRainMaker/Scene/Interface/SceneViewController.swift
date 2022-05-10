@@ -309,8 +309,8 @@ class SceneViewController: UIViewController {
     
     @IBAction func removeScene(_ sender: Any) {
         let alertController = UIAlertController(title: "Are you sure?", message: "", preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
-        let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+        let cancelAction = UIAlertAction(title: "No", style: .default, handler: nil)
+        let confirmAction = UIAlertAction(title: "Yes", style: .destructive) { _ in
             if let key = ESPSceneManager.shared.currentSceneKey {
                 Utility.showLoader(message: "", view: self.view)
                 ESPSceneManager.shared.deleteSceneAt(key: key, onView: self.view) { result in
