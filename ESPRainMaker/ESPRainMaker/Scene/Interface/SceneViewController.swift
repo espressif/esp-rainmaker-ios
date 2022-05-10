@@ -220,8 +220,19 @@ class SceneViewController: UIViewController {
                             ESPSceneManager.shared.scenes[ESPSceneManager.shared.currentSceneKey]?.actions = ESPSceneManager.shared.currentScene.actions
                         }
                     }
-                    Utility.showToastMessage(view: self.view, message: ESPSceneConstants.failedToUpdateErrorMessage)
                     if scenesDeleted {
+                        var allOffline = true
+                        for device in ESPSceneManager.shared.availableDevices.values {
+                            if let node = device.node {
+                                if device.selectedParams > 0, node.isConnected {
+                                    allOffline = false
+                                    break
+                                }
+                            }
+                        }
+                        if allOffline {
+                            self.delegate?.serviceUpdated()
+                        }
                         User.shared.updateDeviceList = true
                         self.navigationController?.popToRootViewController(animated: false)
                     }
@@ -237,32 +248,33 @@ class SceneViewController: UIViewController {
     /// Calls delete action on deselected nodes and returns true if user has edited scene without removing all actions
     /// - Parameter callEditAction: called with flag informing if scene actions have been deleted
     private func deleteNodesForScene(_ callEditAction: @escaping (Bool) -> Void) {
-        DispatchQueue.main.async { Utility.showLoader(message: "", view: self.view) }
-        ESPSceneManager.shared.deleteSceneNodes(key: ESPSceneManager.shared.currentSceneKey, onView: view, nodeIDs: deSelectedNodeIDs) { result  in
-            //If user has deselected all devices, then set update device list to true and pop to scene list screen. Else call edit scene.
-            var sceneDevicesDeleted: Bool = false
-            switch result {
-            case .success(_):
-                sceneDevicesDeleted = true
-            default:
-                sceneDevicesDeleted = false
-            }
-            let actionList = ESPSceneManager.shared.getActionList()
-            DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
-                if actionList == "" {
-                    Utility.hideLoader(view: self.view)
-                    if sceneDevicesDeleted {
-                        User.shared.updateDeviceList = true
-                        if sceneDevicesDeleted {
-                            self.delegate?.serviceRemoved()
-                        }
-                        self.navigationController?.popToRootViewController(animated: false)
-                    }
-                } else {
-                    callEditAction(sceneDevicesDeleted)
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view) }
+            ESPSceneManager.shared.deleteSceneNodes(key: ESPSceneManager.shared.currentSceneKey, onView: view, nodeIDs: deSelectedNodeIDs) { result  in
+                //If user has deselected all devices, then set update device list to true and pop to scene list screen. Else call edit scene.
+                var sceneDevicesDeleted: Bool = false
+                switch result {
+                case .success(_):
+                    sceneDevicesDeleted = true
+                default:
+                    sceneDevicesDeleted = false
                 }
-            })
-        }
+                let actionList = ESPSceneManager.shared.getActionList()
+                DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
+                    if actionList == "" {
+                        Utility.hideLoader(view: self.view)
+                        if sceneDevicesDeleted {
+                            User.shared.updateDeviceList = true
+                            if sceneDevicesDeleted {
+                                self.delegate?.serviceUpdated()
+                            }
+                            self.navigationController?.popToRootViewController(animated: false)
+                        }
+                    } else {
+                        callEditAction(sceneDevicesDeleted)
+                    }
+                })
+            }
     }
     
     @IBAction func sceneNamePressed(_ sender: Any) {
@@ -312,7 +324,7 @@ class SceneViewController: UIViewController {
                             }
                             self.navigationController?.popViewController(animated: true)
                         case .failure:
-                            Utility.showToastMessage(view: self.view, message: ESPSceneConstants.deleteSceneFailureMessage)
+                            Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneDeletionFailureMessage)
                             break
                         }
                     }

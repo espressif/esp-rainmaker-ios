@@ -162,7 +162,7 @@ class ScheduleViewController: UIViewController {
     }
 
     @IBAction func scheduleNamePressed(_: Any) {
-        let input = UIAlertController(title: "Add name", message: "Choose name for your schedule", preferredStyle: .alert)
+        let input = UIAlertController(title: ESPScheduleConstants.addScheduleNameTitle, message: ESPScheduleConstants.addScheduleNameMessage, preferredStyle: .alert)
 
         input.addTextField { textField in
             textField.text = self.scheduleNameLabel.text ?? ""
@@ -221,7 +221,7 @@ class ScheduleViewController: UIViewController {
         // Check if the user has provided name for the schedule
         let scheduleName = scheduleNameLabel.text ?? ""
         if scheduleName == "" {
-            let alert = UIAlertController(title: "Error", message: "Please enter name of the schedule to proceed.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Error", message: ESPScheduleConstants.nameNotAddedErrorMessage, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
         } else {
@@ -255,7 +255,7 @@ class ScheduleViewController: UIViewController {
                     Utility.hideLoader(view: self.view)
                     if schedulesDeleted {
                         User.shared.updateDeviceList = true
-                        self.delegate?.serviceRemoved()
+                        self.delegate?.serviceUpdated()
                         self.navigationController?.popToRootViewController(animated: false)
                     }
                 } else {
@@ -337,8 +337,20 @@ class ScheduleViewController: UIViewController {
                             ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey]?.actions = ESPScheduler.shared.currentSchedule.actions
                         }
                     }
-                    Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdateFailed)
+                    Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdationFailureMessage)
                     if schedulesDeleted {
+                        var allOffline = true
+                        for device in ESPScheduler.shared.availableDevices.values {
+                            if let node = device.node {
+                                if device.selectedParams > 0, node.isConnected {
+                                    allOffline = false
+                                    break
+                                }
+                            }
+                        }
+                        if allOffline {
+                            self.delegate?.serviceUpdated()
+                        }
                         User.shared.updateDeviceList = true
                         self.navigationController?.popToRootViewController(animated: false)
                     }

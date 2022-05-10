@@ -157,8 +157,12 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
             jsonString["info"] = currentScene.info ?? ""
             jsonString["operation"] = currentScene.operation?.rawValue ?? "add"
             let actions = createActionsFromDeviceList()
+            var message = ESPSceneConstants.sceneUpdationPartialFailureMessage
+            if let op = currentScene.operation, op == .add {
+                message = ESPSceneConstants.sceneCreationPartialFailureMessage
+            }
             if actions.keys.count > 0 {
-                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: ESPSceneConstants.saveSceneFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .scene, isSave: true, onView: onView) { result in
+                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: message, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .scene, isSave: true, onView: onView) { result in
                     completionHandler(result)
                 }
             } else {
@@ -183,7 +187,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
                 jsonString["name"] = scene.name
                 jsonString["id"] = scene.id
                 jsonString["operation"] = "remove"
-                self.invokeServiceAction(apiManager: apiManager, keys: nodeIDs, jsonString: jsonString, text: ESPSceneConstants.partialDeleteSceneFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: self.currentScene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
+                self.invokeServiceAction(apiManager: apiManager, keys: nodeIDs, jsonString: jsonString, text: ESPSceneConstants.sceneDeletionPartialFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: self.currentScene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
                     completionHandler(result)
                 }
             } else {
@@ -207,7 +211,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
             var jsonString: [String: Any] = [:]
             jsonString["id"] = currentScene.id
             jsonString["operation"] = "remove"
-            self.invokeServiceAction(apiManager: apiManager, keys: [String](currentScene.actions.keys), jsonString: jsonString, text: ESPSceneConstants.partialDeleteSceneFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: self.currentScene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
+            self.invokeServiceAction(apiManager: apiManager, keys: [String](currentScene.actions.keys), jsonString: jsonString, text: ESPSceneConstants.sceneDeletionPartialFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: self.currentScene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
                 completionHandler(result)
             }
         } else {
@@ -226,7 +230,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
             var jsonString: [String: Any] = [:]
             jsonString["id"] = scene.id
             jsonString["operation"] = "activate"
-            self.invokeServiceAction(apiManager: apiManager, keys: [String](scene.actions.keys), jsonString: jsonString, text: ESPSceneConstants.partialActivateSceneFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: scene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
+            self.invokeServiceAction(apiManager: apiManager, keys: [String](scene.actions.keys), jsonString: jsonString, text: ESPSceneConstants.sceneActivationPartialFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: scene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
                 completionHandler(result)
             }
         } else {

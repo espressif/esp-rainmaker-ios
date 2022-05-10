@@ -20,9 +20,19 @@ import Foundation
 
 class ESPScheduleConstants {
     
-    static let scheduleDeletionFailed = "Failed to delete schedule"
-    static let scheduleUpdateFailed = "Failed to update schedule"
-    static let scheduleAddSuccess = "Schedule added successfully"
-    static let scheduleUpdateSuccess = "Schedule updated successfully"
-    static let scheduleDeletionSuccess = "Schedule deleted successfully"
+    static let scheduleCreationSuccessMessage = "Schedule created successfully"
+    static let scheduleCreationFailureMessage = "Failed to create schedule"
+    static let scheduleCreationPartialFailureMessage = "Failed to create schedule for"
+    
+    static let scheduleUpdationSuccessMessage = "Schedule updated successfully"
+    static let scheduleUpdationFailureMessage = "Failed to update schedule"
+    static let scheduleUpdationPartialFailureMessage = "Failed to update schedule for"
+    
+    static let scheduleDeletionSuccessMessage = "Schedule deleted successfully"
+    static let scheduleDeletionFailureMessage = "Failed to delete schedule"
+    static let scheduleDeletionPartialFailureMessage = "Failed to delete schedule for"
+    
+    static let addScheduleNameTitle = "Add name"
+    static let addScheduleNameMessage = "Choose name for your schedule"
+    static let nameNotAddedErrorMessage = "Please enter a name for the schedule to proceed."
 }

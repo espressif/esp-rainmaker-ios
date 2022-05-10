@@ -225,7 +225,7 @@ extension ScheduleListViewController: UITableViewDelegate {
                             })
                         default:
                             Utility.hideLoader(view: self.view)
-                            Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionFailed, duration: 2.0)
+                            Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionFailureMessage, duration: 2.0)
                         }
                     }
                 }
@@ -288,22 +288,28 @@ extension ScheduleListViewController: ScheduleListTableViewCellDelegate {
     func scheduleStateChanged(index: Int, enabled: Bool, shouldRefresh: Bool) {
         if !shouldRefresh, index < scheduleList.count {
             self.formatScheduleList(index: index, enabled: enabled)
-        } else {
-            self.refreshScheduleList(self)
         }
+        self.refreshScheduleList(self)
+        if !shouldRefresh {
+            Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdationSuccessMessage, duration: 2.0)
+        }
+    }
+    
+    func failedToUpdateSchedule() {
+        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdationFailureMessage, duration: 2.0)
     }
 }
 
 extension ScheduleListViewController: ServiceUpdateActionsDelegate {
     func serviceAdded() {
-        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleAddSuccess, duration: 2.0)
+        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleCreationSuccessMessage, duration: 2.0)
     }
     
     func serviceUpdated() {
-        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdateSuccess, duration: 2.0)
+        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdationSuccessMessage, duration: 2.0)
     }
     
     func serviceRemoved() {
-        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionSuccess, duration: 2.0)
+        Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionSuccessMessage, duration: 2.0)
     }
 }
