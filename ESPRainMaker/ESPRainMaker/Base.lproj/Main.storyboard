@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -750,9 +750,11 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ngp-U3-nxr">
-                                <rect key="frame" x="32" y="454.5" width="350" height="50.5"/>
-                                <string key="text">To provision your device: make sure it is turned ON.
-Connect your mobile phone to the Wi-Fi network with a name like PROV_XXXXXX</string>
+                                <rect key="frame" x="32" y="454.5" width="350" height="134"/>
+                                <string key="text">To provision your device make sure it is turned ON and follow below steps:
+1. Go to Settings app using the Connect button below.
+2. Navigate to the Wi-Fi section in the iOS Settings app.
+3. Connect your mobile phone to the Wi-Fi network with a name like PROV_XXXXXX and navigate back to this app.</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" red="0.50588235294117645" green="0.50588235294117645" blue="0.6588235294117647" alpha="0.84705882352941175" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
@@ -770,7 +772,7 @@ Connect your mobile phone to the Wi-Fi network with a name like PROV_XXXXXX</str
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" alpha="0.5" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5RK-YN-Cai" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="32" y="540" width="350" height="56"/>
+                                <rect key="frame" x="32" y="623.5" width="350" height="56"/>
                                 <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="350" id="umg-wP-hz2"/>

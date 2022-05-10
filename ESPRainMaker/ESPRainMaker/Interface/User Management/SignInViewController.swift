@@ -151,22 +151,24 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         agreementTextView.delegate = self
         signupTextView.delegate = self
 
-        let regularText = NSMutableAttributedString(string: "By proceeding, I confirm that I have read and agree to the ", attributes: [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)])
-
+        let regularText = NSMutableAttributedString(string: "By proceeding, I confirm that I am 18+ years of age and I have read and agree to the ", attributes: [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
         // Sets attributes for clickable text in the UITextView string.
-        let attributes:[NSAttributedString.Key : Any] = [NSAttributedString.Key.underlineStyle: 1, NSAttributedString.Key.underlineColor: UIColor.blue, NSAttributedString.Key.foregroundColor: UIColor.blue, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]
+        let attributes:[NSAttributedString.Key : Any] = [NSAttributedString.Key.underlineStyle: 1, NSAttributedString.Key.underlineColor: UIColor(hexString: "#8265E3"), NSAttributedString.Key.foregroundColor: UIColor(hexString: "#8265E3"), NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]
         let privacyText = NSMutableAttributedString(string: "Privacy Policy")
         privacyText.addAttributes(attributes, range: NSMakeRange(0, privacyText.length))
         privacyText.addAttributes([NSAttributedString.Key.link: privacyLink], range: NSMakeRange(0, privacyText.length))
         regularText.append(privacyText)
-        regularText.append(NSMutableAttributedString(string: " and ", attributes: [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]))
+        regularText.append(NSMutableAttributedString(string: " and ", attributes: [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]))
         let termsOfUseText = NSMutableAttributedString(string: "Terms of Use.")
         termsOfUseText.addAttributes(attributes, range: NSMakeRange(0, termsOfUseText.length))
         termsOfUseText.addAttributes([NSAttributedString.Key.link: termsOfUseLink], range: NSMakeRange(0, termsOfUseText.length))
         regularText.append(termsOfUseText)
-        
-        signupTextView.attributedText = regularText
+    
         agreementTextView.attributedText = regularText
+        agreementTextView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor(hexString: "#8265E3")]
+        regularText.addAttributes([NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)], range: NSMakeRange(0, regularText.length))
+        signupTextView.attributedText = regularText
+        signupTextView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor(hexString: "#8265E3")]
     }
 
     override func viewDidLayoutSubviews() {
@@ -326,7 +328,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
 
             if !checked {
                 let alertController = UIAlertController(title: "Error!!",
-                                                        message: "Please accept our terms and condition before signing up",
+                                                        message: "To proceed, please agree to privacy policy and terms of use.",
                                                         preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                 alertController.addAction(okAction)
@@ -435,7 +437,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     @IBAction func proceedClicked(_ sender: Any) {
         if !agreementChecked {
             let alertController = UIAlertController(title: "Error!!",
-                                                    message: "Please accept our terms and condition before signing up",
+                                                    message: "To proceed, please agree to privacy policy and terms of use.",
                                                     preferredStyle: .alert)
             let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
             alertController.addAction(okAction)

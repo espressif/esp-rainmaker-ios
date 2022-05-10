@@ -200,9 +200,11 @@ class ESPLocalService: NSObject {
             let response = try LocalCtrlMessage(serializedData: response)
             if response.respGetPropVals.status == .success {
                 let prop = response.respGetPropVals.props.first
-                let json = try! JSONSerialization.jsonObject(with: prop!.value, options: .allowFragments) as! [String: Any]
-                propertyInfo[prop?.name ?? ""] = json
-                return true
+                if let json = try JSONSerialization.jsonObject(with: prop!.value, options: .allowFragments) as? [String: Any] {
+                    propertyInfo[prop?.name ?? ""] = json
+                    return true
+                }
+                return false
             } else {
                 return false
             }
