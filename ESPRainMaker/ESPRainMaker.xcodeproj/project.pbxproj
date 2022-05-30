@@ -143,6 +143,7 @@
 		F1402AB8239677B300C989F8 /* StaticControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */; };
 		F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */; };
 		F14491D526C52A5A008817C7 /* Configuration.plist in Resources */ = {isa = PBXBuildFile; fileRef = F164A2F82581E73000B879BC /* Configuration.plist */; };
+		F14CAF53283DF46A008CBC00 /* SystemServicesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14CAF52283DF469008CBC00 /* SystemServicesTableViewCell.swift */; };
 		F151FEE0246E874F006F514E /* esp_rmaker_user_mapping.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151FEDF246E874E006F514E /* esp_rmaker_user_mapping.pb.swift */; };
 		F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151FF1D24827343006F514E /* WifiListTableViewCell.swift */; };
 		F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15EABF323E043DA008A766B /* CustomUIElements.swift */; };
@@ -157,6 +158,7 @@
 		F164A30825824EC700B879BC /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F164A30725824EC500B879BC /* Configuration.swift */; };
 		F1676F88269626F9005C22CB /* ESPNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18744222695F52E00971591 /* ESPNotifications.swift */; };
 		F1676F89269735B4005C22CB /* ESPNotificationsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18744242696087900971591 /* ESPNotificationsStore.swift */; };
+		F168F2CB28E44DC200E39433 /* UITableView+ScrollToBottom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F168F2CA28E44DC200E39433 /* UITableView+ScrollToBottom.swift */; };
 		F16BD3682758FDC20089049C /* ESPTSArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16BD3672758FDC20089049C /* ESPTSArguments.swift */; };
 		F16BD370275DF1840089049C /* UInt+DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16BD36F275DF1840089049C /* UInt+DateFormatter.swift */; };
 		F172F96927B1344A00E62017 /* Calendar+GMT.swift in Sources */ = {isa = PBXBuildFile; fileRef = F172F96827B1344A00E62017 /* Calendar+GMT.swift */; };
@@ -164,6 +166,7 @@
 		F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */ = {isa = PBXBuildFile; fileRef = F17581782418D1F400FF7407 /* amazonRootCA.der */; };
 		F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */; };
 		F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */; };
+		F17B313A2844B0F90052D80F /* ESPSystemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17B31392844B0F90052D80F /* ESPSystemService.swift */; };
 		F17B80E927EC68670096035A /* GroupDevicesFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17B80E827EC68660096035A /* GroupDevicesFlowLayout.swift */; };
 		F17B80EB27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17B80EA27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift */; };
 		F17B80ED27EF690C0096035A /* UISegmentControl+SetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17B80EC27EF690C0096035A /* UISegmentControl+SetAppearance.swift */; };
@@ -541,6 +544,7 @@
 		F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticControlTableViewCell.swift; sourceTree = "<group>"; };
 		F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StaticControlTableViewCell.xib; sourceTree = "<group>"; };
 		F14CAF48283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAutomationAddResponseParser.swift; sourceTree = "<group>"; };
+		F14CAF52283DF469008CBC00 /* SystemServicesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemServicesTableViewCell.swift; sourceTree = "<group>"; };
 		F151FEDF246E874E006F514E /* esp_rmaker_user_mapping.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = esp_rmaker_user_mapping.pb.swift; sourceTree = "<group>"; };
 		F151FF0B248253A7006F514E /* ESPRainMaker-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ESPRainMaker-Bridging-Header.h"; sourceTree = "<group>"; };
 		F151FF0C248253A7006F514E /* ESPRainMaker.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = ESPRainMaker.entitlements; sourceTree = "<group>"; };
@@ -556,6 +560,7 @@
 		F160AF1B26B7508C00578F00 /* ESPConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPConfiguration.swift; sourceTree = "<group>"; };
 		F164A2F82581E73000B879BC /* Configuration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Configuration.plist; sourceTree = "<group>"; };
 		F164A30725824EC500B879BC /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		F168F2CA28E44DC200E39433 /* UITableView+ScrollToBottom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableView+ScrollToBottom.swift"; sourceTree = "<group>"; };
 		F16BD3672758FDC20089049C /* ESPTSArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTSArguments.swift; sourceTree = "<group>"; };
 		F16BD36F275DF1840089049C /* UInt+DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt+DateFormatter.swift"; sourceTree = "<group>"; };
 		F172F96827B1344A00E62017 /* Calendar+GMT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+GMT.swift"; sourceTree = "<group>"; };
@@ -563,6 +568,7 @@
 		F17581782418D1F400FF7407 /* amazonRootCA.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = amazonRootCA.der; sourceTree = "<group>"; };
 		F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListCollectionReusableView.swift; sourceTree = "<group>"; };
 		F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCollectionViewLayout.swift; sourceTree = "<group>"; };
+		F17B31392844B0F90052D80F /* ESPSystemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPSystemService.swift; sourceTree = "<group>"; };
 		F17B80E827EC68660096035A /* GroupDevicesFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDevicesFlowLayout.swift; sourceTree = "<group>"; };
 		F17B80EA27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPAutomationActions+GetDescription.swift"; sourceTree = "<group>"; };
 		F17B80EC27EF690C0096035A /* UISegmentControl+SetAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UISegmentControl+SetAppearance.swift"; sourceTree = "<group>"; };
@@ -1277,6 +1283,7 @@
 				F10B075525CF147C00723254 /* ErrorResponse.swift */,
 				F133495825E24D3900CCB308 /* SharingRequest.swift */,
 				F1D0F30527A2D3030032DB80 /* ESPRMDeviceType.swift */,
+				F17B31392844B0F90052D80F /* ESPSystemService.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1319,6 +1326,7 @@
 				F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */,
 				F195746925B69DF0005F6601 /* NodeDetailsHeaderView.xib */,
 				F17EF2B32652690D002AC7BE /* TimeZoneTableViewCell.swift */,
+				F14CAF52283DF469008CBC00 /* SystemServicesTableViewCell.swift */,
 			);
 			path = NodeDetails;
 			sourceTree = "<group>";
@@ -1353,6 +1361,7 @@
 		F1B1011A269EC520004B5537 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				F168F2CA28E44DC200E39433 /* UITableView+ScrollToBottom.swift */,
 				F1AC6D8C27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift */,
 				F1B1011B269EC627004B5537 /* Double+DateTimeString.swift */,
 				0CE3E9F6279017F9002138DA /* String+GetViewHeight.swift */,
@@ -1941,6 +1950,7 @@
 				F1390F2427D86C5D00F80DFB /* DeviceAutomationsListVC.swift in Sources */,
 				F123428324D0113600CAD4A2 /* ScheduleSwitchTableViewCell.swift in Sources */,
 				F1DE5D092513621200973E30 /* ESPScheduler.swift in Sources */,
+				F168F2CB28E44DC200E39433 /* UITableView+ScrollToBottom.swift in Sources */,
 				F1390F3F27D8D6F400F80DFB /* ESPAddAutomationService.swift in Sources */,
 				F191CD472511231C00BDCEF1 /* ClaimViewController.swift in Sources */,
 				0C80AA3826FDBEF200480C53 /* ESPKeychainOperations.swift in Sources */,
@@ -1972,6 +1982,7 @@
 				F1CC12542780FC640007634C /* ESPYAxisGenerator.swift in Sources */,
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
 				F195745925B5AD09005F6601 /* MembersInfoTableViewCell.swift in Sources */,
+				F14CAF53283DF46A008CBC00 /* SystemServicesTableViewCell.swift in Sources */,
 				0CE3E9F7279017F9002138DA /* String+GetViewHeight.swift in Sources */,
 				F17B80EB27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift in Sources */,
 				0CBAC3C5278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift in Sources */,
@@ -2163,6 +2174,7 @@
 				0C80AA2226FDBD4B00480C53 /* ESPPresenter.swift in Sources */,
 				F1B1012926AEFD52004B5537 /* UserNavigationHandler.swift in Sources */,
 				F1A866A127EBC25100A9858B /* EditAutomationViewController.swift in Sources */,
+				F17B313A2844B0F90052D80F /* ESPSystemService.swift in Sources */,
 				0C04745027CFA36E00FCE611 /* ESPSceneConstants.swift in Sources */,
 				F1C352CB26D4E92600A88893 /* ESPNotificationHandler+UpdateData.swift in Sources */,
 				F1CC124C277F4C210007634C /* ESPTimeAxisGenerator.swift in Sources */,
@@ -2384,7 +2396,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;

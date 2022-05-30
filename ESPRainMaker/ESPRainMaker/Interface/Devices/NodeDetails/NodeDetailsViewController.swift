@@ -20,6 +20,8 @@ import Toast_Swift
 import UIKit
 
 class NodeDetailsViewController: UIViewController {
+    // Constants
+    let systemServices = "System Services"
     @IBOutlet var tableView: UITableView!
     @IBOutlet var loadingIndicator: SpinnerView!
     @IBOutlet var loadingLabel: UILabel!
@@ -27,7 +29,7 @@ class NodeDetailsViewController: UIViewController {
     var currentNode: Node!
 
     var dataSource: [[String]] = [[]]
-    var collapsed = [false, false, false]
+    var collapsed = [false, false, false, false]
     var pendingRequests: [SharingRequest] = []
     var sharingIndex = 0
     var timeZoneParam: Param!
@@ -48,7 +50,6 @@ class NodeDetailsViewController: UIViewController {
 
         tableView.estimatedRowHeight = 70.0
         tableView.tableFooterView = UIView()
-        tableView.showsVerticalScrollIndicator = false
 
         createDataSource()
 
@@ -176,6 +177,24 @@ class NodeDetailsViewController: UIViewController {
                 dataSource[index].append("Not Available")
             }
         }
+        
+        // Check for system services support
+        if let systemService = currentNode.services?.first(where: { $0.type == Constants.systemService}), let primary = currentNode.primary, primary.contains(User.shared.userInfo.email) {
+            var serviceParam: [String] = []
+            for param in systemService.params ?? [] {
+                if param.dataType?.lowercased() == Constants.boolType, let properties = param.properties, properties.contains(Constants.writeType), let paramType = ESPSystemService.init(rawValue: param.type ?? ""), let paramName = param.name {
+                    serviceParam.append(paramName)
+                    serviceParam.append(paramType.rawValue)
+                }
+            }
+            if serviceParam.count > 0 {
+                index += 1
+                dataSource.append([])
+                dataSource[index].append(systemServices)
+                dataSource[index].append(contentsOf: serviceParam)
+            }
+        }
+        
     }
 
     // MARK: - Private Methods
@@ -350,8 +369,9 @@ extension NodeDetailsViewController: UITableViewDelegate {
         if section == 0 {
             return UIView()
         }
+        let headerTitle = dataSource[section][0]
         let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "nodeDetailsHV") as! NodeDetailsHeaderView
-        headerView.headerLabel.text = dataSource[section][0]
+        headerView.headerLabel.text = headerTitle
         headerView.tintColor = .clear
         headerView.headerTappedAction = {
             self.collapsed[section] = !self.collapsed[section]
@@ -362,6 +382,12 @@ extension NodeDetailsViewController: UITableViewDelegate {
         } else {
             headerView.arrowImageView.image = UIImage(named: "down_arrow_icon")
         }
+        
+        // Check if device is offline
+        if headerTitle == systemServices, !currentNode.isConnected {
+            headerView.headerLabel.text = headerTitle + " (Offline)"
+        }
+        
         return headerView
     }
 
@@ -384,7 +410,7 @@ extension NodeDetailsViewController: UITableViewDelegate {
     }
 
     func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
-        return 16.0
+        return 0
     }
 
     func tableView(_: UITableView, willDisplayFooterView view: UIView, forSection _: Int) {
@@ -403,6 +429,10 @@ extension NodeDetailsViewController: UITableViewDataSource {
         }
         if section == sharingIndex {
             return dataSource[section].count - 1 + pendingRequests.count
+        }
+        let sectionValue = dataSource[section][0]
+        if sectionValue == systemServices {
+            return dataSource[section].count/2
         }
         return dataSource[section].count - 1
     }
@@ -470,6 +500,29 @@ extension NodeDetailsViewController: UITableViewDataSource {
                 return cell
             }
         }
+        
+        let sectionValue = dataSource[indexPath.section][0]
+        if sectionValue == systemServices {
+            let cell = tableView.dequeueReusableCell(withIdentifier: SystemServicesTableViewCell.reuseIdentifier, for: indexPath) as! SystemServicesTableViewCell
+            cell.paramName = dataSource[indexPath.section][indexPath.row*2 + 1]
+            cell.paramType = dataSource[indexPath.section][indexPath.row*2 + 2]
+            cell.resetButton.setTitle(cell.paramName, for: .normal)
+            cell.node = currentNode
+            cell.delegate = self
+            
+            // Check if device is connected
+            if currentNode.isConnected {
+                cell.alpha = 1.0
+                cell.resetButton.alpha = 1.0
+                cell.resetButton.isEnabled = true
+            } else {
+                cell.alpha = 0.5
+                cell.resetButton.alpha = 0.5
+                cell.resetButton.isEnabled = false
+            }
+            return cell
+        }
+        
         let value = dataSource[indexPath.section][indexPath.row + 1]
         if let firstIndex = value.firstIndex(of: ":") {
             let title = String(value[..<firstIndex])
@@ -509,4 +562,21 @@ extension NodeDetailsViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.text = ""
     }
+}
+
+extension NodeDetailsViewController: SystemServiceTableViewCellDelegate {
+    func systemServiceOperationPerformed() {
+        Utility.showLoader(message: "", view: view)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            Utility.hideLoader(view: self.view)
+        }
+    }
+    
+    func factoryResetPerformed() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            User.shared.updateDeviceList = true
+            self.navigationController?.popToRootViewController(animated: false)
+        }
+    }
+    
 }
