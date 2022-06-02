@@ -63,11 +63,14 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         ESPProvisionManager.shared.scanQRCode(scanView: scannerView) { espDevice, scanError in
             if let device = espDevice {
                 if self.isDeviceSupported(device: device) {
-                    DispatchQueue.main.async {
-                        Utility.showLoader(message: "Connecting to device", view: self.view)
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        self.connectDevice(espDevice: device)
+                    Utility.showLoader(message: "Connecting to device", view: self.view)
+                    switch device.transport {
+                        case .ble:
+                            self.connectDevice(espDevice: device)
+                        case .softap:
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                self.connectDevice(espDevice: device)
+                        }
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -87,6 +90,17 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                         }
                     }
                 }
+            }
+        } scanStatus: { status in
+            switch status {
+            case .readingCode:
+                Utility.showLoader(message: "Reading QR code", view: self.view)
+            case .searchingBLE(let device):
+                Utility.showLoader(message: "Searching BLE device: \(device)", view: self.view)
+            case .joiningSoftAP(let device):
+                Utility.showLoader(message: "Joining network: \(device)", view: self.view)
+            default:
+                break
             }
         }
     }
