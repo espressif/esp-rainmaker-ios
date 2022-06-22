@@ -73,7 +73,7 @@ enum UserNavigationHandler {
                         tabBarController.selectedViewController = viewController
                         tabBarController.tabBar.isHidden = true
                         let settingsPageViewController = (viewController as! UINavigationController).viewControllers.first
-                        let userStoryBoard = UIStoryboard(name: "User", bundle: nil)
+                        let userStoryBoard = UIStoryboard(name: "Settings", bundle: nil)
                         let notificationsViewController = userStoryBoard.instantiateViewController(withIdentifier: "notificationsVC") as! NotificationsViewController
                         settingsPageViewController?.navigationController?.pushViewController(notificationsViewController, animated: true)
                     }

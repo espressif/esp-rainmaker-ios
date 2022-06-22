@@ -82,7 +82,7 @@
 		F10B076E25D11CCD00723254 /* NodeGroupTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B076D25D11CCD00723254 /* NodeGroupTableViewCell.swift */; };
 		F10B077225D2726800723254 /* NewNodeGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077125D2726800723254 /* NewNodeGroupViewController.swift */; };
 		F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */; };
-		F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10C2B2925EB82D800B60696 /* User.storyboard */; };
+		F10C2B2A25EB82DA00B60696 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10C2B2925EB82D800B60696 /* Settings.storyboard */; };
 		F10D8DF8270EF1A80056E986 /* ESPLocalStorageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10D8DF7270EF1A80056E986 /* ESPLocalStorageHandler.swift */; };
 		F10D8DFB271EF8C80056E986 /* UserAccount.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F10D8DFA271EF8C80056E986 /* UserAccount.storyboard */; };
 		F1105D912548398E0047DF1B /* ESPNetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */; };
@@ -443,7 +443,7 @@
 		F10B077525D286EE00723254 /* SelectGroupNodesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGroupNodesViewController.swift; sourceTree = "<group>"; };
 		F10C2AEB25E584C300B60696 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		F10C2AEF25E58B9800B60696 /* AddSharingNotificationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSharingNotificationTableViewCell.swift; sourceTree = "<group>"; };
-		F10C2B2925EB82D800B60696 /* User.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = User.storyboard; sourceTree = "<group>"; };
+		F10C2B2925EB82D800B60696 /* Settings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Settings.storyboard; sourceTree = "<group>"; };
 		F10D8DF7270EF1A80056E986 /* ESPLocalStorageHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPLocalStorageHandler.swift; sourceTree = "<group>"; };
 		F10D8DFA271EF8C80056E986 /* UserAccount.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = UserAccount.storyboard; sourceTree = "<group>"; };
 		F1105D902548398E0047DF1B /* ESPNetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNetworkMonitor.swift; sourceTree = "<group>"; };
@@ -875,7 +875,7 @@
 				1431462620DE994B0017E119 /* AppDelegate.swift */,
 				0CF69241270A34140098F515 /* AppDelegate+ESPAlexa.swift */,
 				0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */,
-				F10C2B2925EB82D800B60696 /* User.storyboard */,
+				F10C2B2925EB82D800B60696 /* Settings.storyboard */,
 				F1012F61251110B300839F06 /* Schedule.storyboard */,
 				0C8BE95A275D32050032A8E1 /* Scene.storyboard */,
 				F10B073225CD714000723254 /* NodeGrouping.storyboard */,
@@ -1612,7 +1612,7 @@
 				F10D8DFB271EF8C80056E986 /* UserAccount.storyboard in Resources */,
 				F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */,
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
-				F10C2B2A25EB82DA00B60696 /* User.storyboard in Resources */,
+				F10C2B2A25EB82DA00B60696 /* Settings.storyboard in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
 				F1AC6D7F27A447B20051F6E7 /* TriggerTableViewCell.xib in Resources */,
 				F164A2F92581E73000B879BC /* Configuration.plist in Resources */,

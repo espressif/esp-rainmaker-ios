@@ -82,7 +82,7 @@ extension AppDelegate {
     /// Method gets an object of VoiceServicesViewController
     /// - Returns: instance of VoiceServicesViewController
     private func getVoicesVC() -> VoiceServicesViewController? {
-        let storyboard = UIStoryboard(name: "User", bundle: nil)
+        let storyboard = UIStoryboard(name: "Settings", bundle: nil)
         if let vc = storyboard.instantiateViewController(withIdentifier: "VoiceServicesViewController") as? VoiceServicesViewController {
             return vc
         }
