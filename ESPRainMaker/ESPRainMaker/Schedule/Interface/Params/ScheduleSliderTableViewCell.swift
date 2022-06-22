@@ -54,11 +54,19 @@ class ScheduleSliderTableViewCell: SliderTableViewCell {
     }
 
     @IBAction override func sliderValueChanged(_ slider: UISlider) {
-        if param.dataType?.lowercased() ?? "" == "int" {
-            param.value = Int(slider.value)
-        } else {
-            param.value = slider.value
+        guard let value = getSliderFinalValue(slider, nil, .slider) else {
+            return
         }
+        var val: Float = 0.0
+        if param.dataType?.lowercased() ?? "" == "int" {
+            param.value = Int(value)
+            val = Float(Int(value))
+        } else {
+            param.value = value
+            val = value
+        }
+        sliderInitialValue = val
+        slider.setValue(val, animated: true)
     }
 
     @IBAction override func hueSliderValueDragged(_ sender: GradientSlider) {
@@ -66,15 +74,20 @@ class ScheduleSliderTableViewCell: SliderTableViewCell {
     }
 
     @IBAction override func hueSliderValueChanged(_ sender: GradientSlider) {
-        if currentHueValue != sender.value {
-            hueSlider.thumbColor = UIColor(hue: CGFloat(sender.value / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-            if param.dataType?.lowercased() ?? "" == "int" {
-                param.value = Int(sender.value)
-            } else {
-                param.value = sender.value
-            }
-            currentHueValue = sender.value
+        guard let value = getSliderFinalValue(nil, sender, .hueSlider) else {
+            return
         }
+        hueSlider.thumbColor = UIColor(hue: CGFloat(value / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+        var val: Float = 0.0
+        if param.dataType?.lowercased() ?? "" == "int" {
+            param.value = Int(value)
+            val = Float(Int(value))
+        } else {
+            param.value = value
+            val = value
+        }
+        sliderInitialValue = val
+        sender.setValue(CGFloat(val))
     }
 }
 

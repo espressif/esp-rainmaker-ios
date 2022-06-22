@@ -60,6 +60,7 @@ extension SelectDeviceActionCellDelegate {
                             cell.cellType = serviceType
                             cell.hueSlider.isHidden = true
                             cell.slider.isHidden = false
+                            cell.setupParam(param, .slider)
                             if let bounds = param.bounds {
                                 cell.slider.minimumValue = bounds["min"] as? Float ?? 0
                                 cell.slider.maximumValue = bounds["max"] as? Float ?? 100
@@ -123,9 +124,13 @@ extension SelectDeviceActionCellDelegate {
             } else if param.uiType == Constants.hue {
                 var minValue = 0
                 var maxValue = 360
+                var stepValue: Float?
                 if let bounds = param.bounds {
                     minValue = bounds["min"] as? Int ?? 0
                     maxValue = bounds["max"] as? Int ?? 360
+                    if let step = bounds["step"] as? Float {
+                        stepValue = step
+                    }
                 }
 
                 let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
@@ -139,7 +144,7 @@ extension SelectDeviceActionCellDelegate {
                 cell.param = param
                 cell.hueSlider.minimumValue = CGFloat(minValue)
                 cell.hueSlider.maximumValue = CGFloat(maxValue)
-
+                cell.sliderStepValue = stepValue
                 if minValue == 0, maxValue == 360 {
                     cell.hueSlider.hasRainbow = true
                     cell.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
@@ -151,6 +156,7 @@ extension SelectDeviceActionCellDelegate {
 
                 let value = CGFloat(param.value as? Int ?? 0)
                 cell.hueSlider.value = CGFloat(value)
+                cell.sliderInitialValue = Float(value)
                 cell.minLabel.text = "\(minValue)"
                 cell.maxLabel.text = "\(maxValue)"
                 cell.hueSlider.thumbColor = UIColor(hue: value / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)

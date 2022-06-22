@@ -320,15 +320,11 @@ class DeviceTraitListViewController: UIViewController {
                         let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
                         object_setClass(sliderCell, ParamSliderTableViewCell.self)
                         let cell = sliderCell as! ParamSliderTableViewCell
-
+                        
                         cell.paramDelegate = self
                         cell.hueSlider.isHidden = true
                         cell.slider.isHidden = false
-                        cell.param = dynamicAttribute
-                        if let bounds = dynamicAttribute.bounds {
-                            cell.slider.minimumValue = bounds["min"] as? Float ?? 0
-                            cell.slider.maximumValue = bounds["max"] as? Float ?? 100
-                        }
+                        cell.setupParam(dynamicAttribute, .slider)
                         if dynamicAttribute.dataType!.lowercased() == "int" {
                             let value = Int(dynamicAttribute.value as? Float ?? 100)
                             cell.minLabel.text = "\(Int(cell.slider.minimumValue))"
@@ -383,52 +379,54 @@ class DeviceTraitListViewController: UIViewController {
         } else if dynamicAttribute.uiType == Constants.hue || dynamicAttribute.uiType == Constants.hueCircle {
             var minValue = 0
             var maxValue = 360
+            var stepValue: Float?
             if let bounds = dynamicAttribute.bounds {
                 minValue = bounds["min"] as? Int ?? 0
                 maxValue = bounds["max"] as? Int ?? 360
+                if let step = bounds["step"] as? Float {
+                    stepValue = step
+                }
             }
-
-            let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
-            object_setClass(sliderCell, ParamSliderTableViewCell.self)
-            let cell = sliderCell as! ParamSliderTableViewCell
-            cell.paramDelegate = self
-            cell.param = dynamicAttribute
-            cell.slider.isHidden = true
-            cell.hueSlider.isHidden = false
-
-            cell.hueSlider.minimumValue = CGFloat(minValue)
-            cell.hueSlider.maximumValue = CGFloat(maxValue)
-
-            if minValue == 0 && maxValue == 360 {
-                cell.hueSlider.hasRainbow = true
-                cell.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
-            } else {
-                cell.hueSlider.hasRainbow = false
-                cell.hueSlider.minColor = UIColor(hue: CGFloat(minValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                cell.hueSlider.maxColor = UIColor(hue: CGFloat(maxValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+            if minValue < maxValue {
+                let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
+                object_setClass(sliderCell, ParamSliderTableViewCell.self)
+                let cell = sliderCell as! ParamSliderTableViewCell
+                cell.paramDelegate = self
+                cell.param = dynamicAttribute
+                cell.slider.isHidden = true
+                cell.hueSlider.isHidden = false
+                cell.hueSlider.minimumValue = CGFloat(minValue)
+                cell.hueSlider.maximumValue = CGFloat(maxValue)
+                cell.sliderStepValue = stepValue
+                if minValue == 0 && maxValue == 360 {
+                    cell.hueSlider.hasRainbow = true
+                    cell.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
+                } else {
+                    cell.hueSlider.hasRainbow = false
+                    cell.hueSlider.minColor = UIColor(hue: CGFloat(minValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                    cell.hueSlider.maxColor = UIColor(hue: CGFloat(maxValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                }
+                let value = CGFloat(dynamicAttribute.value as? Int ?? 0)
+                cell.hueSlider.value = CGFloat(value)
+                cell.sliderInitialValue = Float(value)
+                cell.minLabel.text = "\(minValue)"
+                cell.maxLabel.text = "\(maxValue)"
+                cell.hueSlider.thumbColor = UIColor(hue: value / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                cell.device = device
+                cell.dataType = dynamicAttribute.dataType
+                if let attributeName = dynamicAttribute.name {
+                    cell.paramName = attributeName
+                }
+                if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
+                    cell.hueSlider.isEnabled = true
+                } else {
+                    cell.hueSlider.isEnabled = false
+                }
+                cell.title.text = dynamicAttribute.name ?? ""
+                cell.minImage.image = nil
+                cell.maxImage.image = nil
+                return cell
             }
-
-            let value = CGFloat(dynamicAttribute.value as? Int ?? 0)
-            cell.hueSlider.value = CGFloat(value)
-            cell.minLabel.text = "\(minValue)"
-            cell.maxLabel.text = "\(maxValue)"
-            cell.hueSlider.thumbColor = UIColor(hue: value / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
-            cell.device = device
-            cell.dataType = dynamicAttribute.dataType
-            if let attributeName = dynamicAttribute.name {
-                cell.paramName = attributeName
-            }
-            if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
-                cell.hueSlider.isEnabled = true
-            } else {
-                cell.hueSlider.isEnabled = false
-            }
-            cell.title.text = dynamicAttribute.name ?? ""
-            // Remove icons for hue parameter
-            cell.minImage.image = nil
-            cell.maxImage.image = nil
-
-            return cell
         } else if dynamicAttribute.uiType == Constants.dropdown {
             if let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "int" || dataType == "string" {
                 let dropDownCell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
