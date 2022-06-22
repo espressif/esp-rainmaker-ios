@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7xV-BH-yep">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7xV-BH-yep">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -646,50 +646,69 @@
                                             <segue destination="cgZ-yV-zRs" kind="show" id="r3c-0g-D1p"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nte-Hn-u6r">
-                                        <rect key="frame" x="57" y="504.66666666666663" width="110" height="28"/>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="9Aj-QR-1Dl">
+                                        <rect key="frame" x="20" y="493.66666666666663" width="374" height="50"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nte-Hn-u6r">
+                                                <rect key="frame" x="0.0" y="0.0" width="89" height="50"/>
+                                                <state key="normal">
+                                                    <attributedString key="attributedTitle">
+                                                        <fragment content="Documentation">
+                                                            <attributes>
+                                                                <color key="NSColor" red="0.50980392156862742" green="0.396078431372549" blue="0.8901960784313725" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                                <font key="NSFont" size="13" name="HelveticaNeue"/>
+                                                                <integer key="NSUnderline" value="1"/>
+                                                            </attributes>
+                                                        </fragment>
+                                                    </attributedString>
+                                                </state>
+                                                <connections>
+                                                    <action selector="openDocumentation:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="tGQ-UL-exd"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UHd-4C-Y0a">
+                                                <rect key="frame" x="151" y="0.0" width="84" height="50"/>
+                                                <state key="normal">
+                                                    <attributedString key="attributedTitle">
+                                                        <fragment content="Privacy Policy">
+                                                            <attributes>
+                                                                <color key="NSColor" red="0.50980392156862742" green="0.396078431372549" blue="0.8901960784313725" alpha="1" colorSpace="calibratedRGB"/>
+                                                                <font key="NSFont" metaFont="system"/>
+                                                                <integer key="NSUnderline" value="1"/>
+                                                            </attributes>
+                                                        </fragment>
+                                                    </attributedString>
+                                                </state>
+                                                <connections>
+                                                    <action selector="openPrivacy:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="iPg-3U-Hmr"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bdv-Bv-ccB">
+                                                <rect key="frame" x="297" y="0.0" width="77" height="50"/>
+                                                <state key="normal">
+                                                    <attributedString key="attributedTitle">
+                                                        <fragment content="Terms of Use">
+                                                            <attributes>
+                                                                <color key="NSColor" red="0.50980392156862742" green="0.396078431372549" blue="0.8901960784313725" alpha="1" colorSpace="calibratedRGB"/>
+                                                                <font key="NSFont" size="13" name="HelveticaNeue"/>
+                                                                <integer key="NSUnderline" value="1"/>
+                                                            </attributes>
+                                                        </fragment>
+                                                    </attributedString>
+                                                </state>
+                                                <connections>
+                                                    <action selector="openTC:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="f2l-Pt-Opg"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="110" id="SBl-e0-oFz"/>
+                                            <constraint firstAttribute="height" constant="50" id="fWa-u2-Trk"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
-                                        <state key="normal" title="Documentation">
-                                            <color key="titleColor" red="0.50588235294117645" green="0.50588235294117645" blue="0.6588235294117647" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="openDocumentation:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="tGQ-UL-exd"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UHd-4C-Y0a">
-                                        <rect key="frame" x="177" y="504.66666666666663" width="60" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="60" id="D5w-Yu-wdG"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                        <state key="normal" title="Privacy">
-                                            <color key="titleColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="calibratedRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="openPrivacy:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="iPg-3U-Hmr"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bdv-Bv-ccB">
-                                        <rect key="frame" x="237" y="504.66666666666663" width="140" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="140" id="1Yy-xT-6lD"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
-                                        <state key="normal" title="Terms of Use">
-                                            <color key="titleColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="calibratedRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="openTC:" destination="LX5-kB-9Sg" eventType="touchUpInside" id="f2l-Pt-Opg"/>
-                                        </connections>
-                                    </button>
+                                    </stackView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="S77-dl-nOK" firstAttribute="bottom" secondItem="rD6-gP-i6F" secondAttribute="bottom" id="4WY-xu-wVS"/>
-                                    <constraint firstItem="UHd-4C-Y0a" firstAttribute="centerX" secondItem="NOm-gh-05c" secondAttribute="centerX" id="5gb-BM-KZZ"/>
                                     <constraint firstAttribute="trailing" secondItem="HT5-AL-XVD" secondAttribute="trailing" priority="999" constant="32" id="61S-X1-OAH"/>
                                     <constraint firstItem="9ju-xn-L6Y" firstAttribute="height" secondItem="HT5-AL-XVD" secondAttribute="height" id="7wx-pz-dua"/>
                                     <constraint firstItem="xFD-Uk-9IC" firstAttribute="leading" secondItem="66L-qr-T3Y" secondAttribute="leading" id="8mc-9Z-hTS"/>
@@ -700,20 +719,19 @@
                                     <constraint firstItem="FFy-79-By5" firstAttribute="centerX" secondItem="NOm-gh-05c" secondAttribute="centerX" id="EUJ-n4-yTz"/>
                                     <constraint firstItem="9ju-xn-L6Y" firstAttribute="leading" secondItem="HT5-AL-XVD" secondAttribute="leading" id="IKc-NY-LMs"/>
                                     <constraint firstItem="HT5-AL-XVD" firstAttribute="leading" secondItem="66L-qr-T3Y" secondAttribute="leading" id="JIQ-U2-UFx"/>
-                                    <constraint firstItem="UHd-4C-Y0a" firstAttribute="centerY" secondItem="Nte-Hn-u6r" secondAttribute="centerY" id="K8a-A3-jqu"/>
                                     <constraint firstItem="S77-dl-nOK" firstAttribute="leading" secondItem="rD6-gP-i6F" secondAttribute="leading" constant="10" id="KZR-UX-11Y"/>
-                                    <constraint firstAttribute="bottom" secondItem="UHd-4C-Y0a" secondAttribute="bottom" constant="26" id="KiH-lX-fyV"/>
                                     <constraint firstItem="xFD-Uk-9IC" firstAttribute="trailing" secondItem="66L-qr-T3Y" secondAttribute="trailing" id="O5u-tB-tOn"/>
                                     <constraint firstItem="oXl-Q8-zlA" firstAttribute="leading" secondItem="xFD-Uk-9IC" secondAttribute="leading" constant="10" id="QaC-Fv-UjX"/>
                                     <constraint firstItem="oXl-Q8-zlA" firstAttribute="bottom" secondItem="xFD-Uk-9IC" secondAttribute="bottom" constant="-2" id="Qem-YZ-Rba"/>
                                     <constraint firstItem="S77-dl-nOK" firstAttribute="top" secondItem="rD6-gP-i6F" secondAttribute="top" id="U2G-c3-vao"/>
-                                    <constraint firstItem="UHd-4C-Y0a" firstAttribute="leading" secondItem="Nte-Hn-u6r" secondAttribute="trailing" constant="10" id="YTt-uN-yNh"/>
+                                    <constraint firstItem="9Aj-QR-1Dl" firstAttribute="leading" secondItem="NOm-gh-05c" secondAttribute="leading" constant="20" id="Xd2-jH-elO"/>
                                     <constraint firstItem="dkG-ck-a8M" firstAttribute="leading" secondItem="HT5-AL-XVD" secondAttribute="leading" id="bDN-g9-K9t"/>
                                     <constraint firstItem="rD6-gP-i6F" firstAttribute="leading" secondItem="HT5-AL-XVD" secondAttribute="leading" id="dj1-yj-Aas"/>
                                     <constraint firstItem="Gwd-74-f1T" firstAttribute="top" secondItem="66L-qr-T3Y" secondAttribute="top" constant="4" id="eA6-8o-c2w"/>
                                     <constraint firstItem="9ju-xn-L6Y" firstAttribute="top" secondItem="HT5-AL-XVD" secondAttribute="bottom" constant="4" id="eeJ-e0-8ZE"/>
                                     <constraint firstItem="HT5-AL-XVD" firstAttribute="centerX" secondItem="NOm-gh-05c" secondAttribute="centerX" id="etm-QG-jjq"/>
                                     <constraint firstItem="N0c-II-QAS" firstAttribute="centerX" secondItem="NOm-gh-05c" secondAttribute="centerX" id="f19-9K-ff5"/>
+                                    <constraint firstAttribute="trailing" secondItem="9Aj-QR-1Dl" secondAttribute="trailing" constant="20" id="fGm-IQ-JMK"/>
                                     <constraint firstItem="Gwd-74-f1T" firstAttribute="leading" secondItem="66L-qr-T3Y" secondAttribute="leading" constant="10" id="fIw-vz-xbM"/>
                                     <constraint firstItem="FFy-79-By5" firstAttribute="top" secondItem="66L-qr-T3Y" secondAttribute="bottom" constant="26" id="hbl-8i-9SI"/>
                                     <constraint firstItem="dkG-ck-a8M" firstAttribute="top" secondItem="9ju-xn-L6Y" secondAttribute="bottom" constant="16" id="hyY-Oy-fLL"/>
@@ -723,12 +741,10 @@
                                     <constraint firstItem="Gwd-74-f1T" firstAttribute="bottom" secondItem="66L-qr-T3Y" secondAttribute="bottom" constant="-4" id="p13-CI-QRl"/>
                                     <constraint firstItem="N0c-II-QAS" firstAttribute="top" secondItem="dkG-ck-a8M" secondAttribute="bottom" constant="24" id="tHD-ue-hMY"/>
                                     <constraint firstItem="66L-qr-T3Y" firstAttribute="height" secondItem="rD6-gP-i6F" secondAttribute="height" id="uMn-5f-8lI"/>
-                                    <constraint firstItem="bdv-Bv-ccB" firstAttribute="centerY" secondItem="Nte-Hn-u6r" secondAttribute="centerY" id="udD-OQ-1fj"/>
                                     <constraint firstItem="xFD-Uk-9IC" firstAttribute="height" secondItem="rD6-gP-i6F" secondAttribute="height" id="vMP-nZ-TqI"/>
                                     <constraint firstItem="66L-qr-T3Y" firstAttribute="top" secondItem="xFD-Uk-9IC" secondAttribute="bottom" constant="10" id="x7c-vX-Wz0"/>
                                     <constraint firstItem="HT5-AL-XVD" firstAttribute="top" secondItem="FFy-79-By5" secondAttribute="bottom" constant="10" id="zPI-rE-gyQ"/>
                                     <constraint firstItem="xFD-Uk-9IC" firstAttribute="top" secondItem="rD6-gP-i6F" secondAttribute="bottom" constant="10" id="zZY-98-p5r"/>
-                                    <constraint firstItem="bdv-Bv-ccB" firstAttribute="leading" secondItem="UHd-4C-Y0a" secondAttribute="trailing" id="zrc-4O-R4q"/>
                                 </constraints>
                             </view>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Atr-3P-rUd">
@@ -906,7 +922,7 @@
                                             <constraint firstAttribute="width" constant="300" id="Zv0-JF-PT4"/>
                                         </constraints>
                                     </imageView>
-                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="By proceeding, I confirm that I have read and agree to the Privacy Policy and Terms of Use." translatesAutoresizingMaskIntoConstraints="NO" id="8GC-uU-8Ov">
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="By proceeding, I confirm that I am 18+ years of age and I have read and agree to the  Privacy Policy and Terms of Use." translatesAutoresizingMaskIntoConstraints="NO" id="8GC-uU-8Ov">
                                         <rect key="frame" x="64" y="552" width="317" height="70"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
@@ -950,6 +966,7 @@
                             <constraint firstItem="YPW-4D-bnL" firstAttribute="leading" secondItem="QPE-t6-ANk" secondAttribute="leading" id="YJv-Zp-Rkw"/>
                             <constraint firstItem="YPW-4D-bnL" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" id="YR8-ha-dph"/>
                             <constraint firstItem="rD6-gP-i6F" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" multiplier="0.062" id="aIa-Ho-9u8"/>
+                            <constraint firstItem="QPE-t6-ANk" firstAttribute="bottom" secondItem="9Aj-QR-1Dl" secondAttribute="bottom" constant="45" id="dJu-x0-RSS"/>
                             <constraint firstItem="HT5-AL-XVD" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" multiplier="0.067" id="e0V-zT-oGp"/>
                             <constraint firstItem="FkL-Cb-9Ck" firstAttribute="height" secondItem="Seu-in-CWQ" secondAttribute="height" multiplier="0.2" id="eBa-9h-jOR"/>
                             <constraint firstItem="QPE-t6-ANk" firstAttribute="trailing" secondItem="NOm-gh-05c" secondAttribute="trailing" id="fSK-OO-x7U"/>
