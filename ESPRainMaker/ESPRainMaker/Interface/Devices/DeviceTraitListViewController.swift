@@ -424,6 +424,9 @@ class DeviceTraitListViewController: UIViewController {
                 cell.hueSlider.isEnabled = false
             }
             cell.title.text = dynamicAttribute.name ?? ""
+            // Remove icons for hue parameter
+            cell.minImage.image = nil
+            cell.maxImage.image = nil
 
             return cell
         } else if dynamicAttribute.uiType == Constants.dropdown {
