@@ -84,8 +84,11 @@ class SettingsPageViewController: UIViewController {
             DispatchQueue.main.async {
                 Utility.showLoader(message: "Logging Out", view: self.view)
             }
-            let service = ESPLogoutService(presenter: self)
-            service.logoutUser()            
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+            appDelegate?.disablePlatformApplicationARN() {
+                let service = ESPLogoutService(presenter: self)
+                service.logoutUser()
+            }
         }
         alertController.addAction(cancelAction)
         alertController.addAction(confirmAction)
