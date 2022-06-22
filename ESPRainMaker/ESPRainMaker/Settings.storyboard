@@ -390,11 +390,11 @@
                                     <constraint firstItem="hPn-5T-BZk" firstAttribute="centerX" secondItem="0du-oQ-Bqs" secondAttribute="centerX" id="rtI-gx-CEX"/>
                                 </constraints>
                             </view>
-                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Ggy-Nf-ueu">
-                                <rect key="frame" x="16" y="589" width="382" height="30"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Ggy-Nf-ueu">
+                                <rect key="frame" x="0.0" y="589" width="414" height="30"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JsB-WI-QGH">
-                                        <rect key="frame" x="0.0" y="0.0" width="118.33333333333333" height="30"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="145.66666666666666" height="30"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain">
                                             <attributedString key="attributedTitle">
@@ -412,7 +412,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VfX-k0-Kib">
-                                        <rect key="frame" x="131" y="0.0" width="111.33333333333331" height="30"/>
+                                        <rect key="frame" x="145.66666666666666" y="0.0" width="136.99999999999997" height="30"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain">
                                             <attributedString key="attributedTitle">
@@ -431,7 +431,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TQV-HQ-L90">
-                                        <rect key="frame" x="254.66666666666671" y="0.0" width="127.33333333333334" height="30"/>
+                                        <rect key="frame" x="282.66666666666669" y="0.0" width="131.33333333333331" height="30"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain">
                                             <attributedString key="attributedTitle">
@@ -490,9 +490,9 @@
                             <constraint firstItem="0du-oQ-Bqs" firstAttribute="leading" secondItem="Qem-PB-6Zf" secondAttribute="leading" id="FjC-uf-aUr"/>
                             <constraint firstItem="gmj-vw-LIW" firstAttribute="top" secondItem="7Jd-5o-DYv" secondAttribute="bottom" constant="20" id="GOJ-Ao-kTj"/>
                             <constraint firstItem="AIs-CR-iFN" firstAttribute="centerX" secondItem="Qem-PB-6Zf" secondAttribute="centerX" id="Ht5-EP-drw"/>
-                            <constraint firstItem="Ggy-Nf-ueu" firstAttribute="leading" secondItem="TVW-XB-JbO" secondAttribute="leading" constant="16" id="JpL-Jd-Ztg"/>
+                            <constraint firstItem="Ggy-Nf-ueu" firstAttribute="leading" secondItem="TVW-XB-JbO" secondAttribute="leading" id="JpL-Jd-Ztg"/>
                             <constraint firstItem="0du-oQ-Bqs" firstAttribute="top" secondItem="Qem-PB-6Zf" secondAttribute="top" id="PIl-ak-4Wy"/>
-                            <constraint firstItem="TVW-XB-JbO" firstAttribute="trailing" secondItem="Ggy-Nf-ueu" secondAttribute="trailing" constant="16" id="Xs8-AA-Mp8"/>
+                            <constraint firstItem="TVW-XB-JbO" firstAttribute="trailing" secondItem="Ggy-Nf-ueu" secondAttribute="trailing" id="Xs8-AA-Mp8"/>
                             <constraint firstItem="AIs-CR-iFN" firstAttribute="top" secondItem="gmj-vw-LIW" secondAttribute="bottom" constant="20" id="bVQ-d1-6dR"/>
                             <constraint firstItem="0du-oQ-Bqs" firstAttribute="height" secondItem="Qem-PB-6Zf" secondAttribute="height" multiplier="0.107" id="hGe-d1-UrZ"/>
                             <constraint firstItem="TVW-XB-JbO" firstAttribute="trailing" secondItem="0du-oQ-Bqs" secondAttribute="trailing" id="nHs-nL-etF"/>
