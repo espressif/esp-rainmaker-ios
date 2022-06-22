@@ -119,12 +119,30 @@
 		F133495E25E2B84100CCB308 /* SharingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F133495C25E2B84000CCB308 /* SharingTableViewCell.swift */; };
 		F133495F25E2B84100CCB308 /* SharingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F133495D25E2B84000CCB308 /* SharingTableViewCell.xib */; };
 		F1390EFC27D6428D00F80DFB /* CommonDeviceServices+UpdateActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390EFB27D6428D00F80DFB /* CommonDeviceServices+UpdateActions.swift */; };
+		F1390F2427D86C5D00F80DFB /* DeviceAutomationsListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F1B27D86C5D00F80DFB /* DeviceAutomationsListVC.swift */; };
+		F1390F2527D86C5D00F80DFB /* AutomationSelectDeviceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F1C27D86C5D00F80DFB /* AutomationSelectDeviceVC.swift */; };
+		F1390F2627D86C5E00F80DFB /* ESPAutomationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F1E27D86C5D00F80DFB /* ESPAutomationConstants.swift */; };
+		F1390F2827D86C5E00F80DFB /* ESPAutomationAPIWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F2027D86C5D00F80DFB /* ESPAutomationAPIWorker.swift */; };
+		F1390F2A27D86C5E00F80DFB /* ESPAutomationAPIEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F2227D86C5D00F80DFB /* ESPAutomationAPIEndpoint.swift */; };
+		F1390F2C27D86C7200F80DFB /* DeviceAutomation.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F1390F2B27D86C7200F80DFB /* DeviceAutomation.storyboard */; };
+		F1390F3B27D8D6A800F80DFB /* ESPGetAutomationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F3A27D8D6A800F80DFB /* ESPGetAutomationService.swift */; };
+		F1390F3D27D8D6BB00F80DFB /* ESPUpdateAutomationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F3C27D8D6BB00F80DFB /* ESPUpdateAutomationService.swift */; };
+		F1390F3F27D8D6F400F80DFB /* ESPAddAutomationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F3E27D8D6F400F80DFB /* ESPAddAutomationService.swift */; };
+		F1390F4127D8D70800F80DFB /* ESPDeleteAutomationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F4027D8D70800F80DFB /* ESPDeleteAutomationService.swift */; };
+		F1390F4427D9E6A100F80DFB /* DeviceAutomationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F4327D9E6A100F80DFB /* DeviceAutomationTableViewCell.swift */; };
+		F1390F4727D9E81800F80DFB /* ESPAutomationPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F4627D9E81800F80DFB /* ESPAutomationPresenter.swift */; };
+		F1390F4A27D9E9BD00F80DFB /* ESPAutomation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1390F4927D9E9BD00F80DFB /* ESPAutomation.swift */; };
 		F13A014023E359250067F8B8 /* DocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13A013F23E359250067F8B8 /* DocumentViewController.swift */; };
 		F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13A01B923E98B680067F8B8 /* UserInfo.swift */; };
+		F13B820E27E0C75F00511BBB /* ESPListUserDevicesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13B820D27E0C75F00511BBB /* ESPListUserDevicesService.swift */; };
+		F13B821027E4B42600511BBB /* ESPEventCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13B820F27E4B42500511BBB /* ESPEventCase.swift */; };
+		F13B821227E60E2500511BBB /* ESPParam+GetSliderBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13B821127E60E2500511BBB /* ESPParam+GetSliderBounds.swift */; };
+		F13B821427E77FAB00511BBB /* ESPAutomationTriggerAction+GetPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13B821327E77FAB00511BBB /* ESPAutomationTriggerAction+GetPayload.swift */; };
 		F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13F273D238CF6170003AABB /* ScannerViewController.swift */; };
 		F1402AB8239677B300C989F8 /* StaticControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */; };
 		F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */; };
 		F14491D526C52A5A008817C7 /* Configuration.plist in Resources */ = {isa = PBXBuildFile; fileRef = F164A2F82581E73000B879BC /* Configuration.plist */; };
+		F14CAF49283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14CAF48283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift */; };
 		F151FEE0246E874F006F514E /* esp_rmaker_user_mapping.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151FEDF246E874E006F514E /* esp_rmaker_user_mapping.pb.swift */; };
 		F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151FF1D24827343006F514E /* WifiListTableViewCell.swift */; };
 		F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15EABF323E043DA008A766B /* CustomUIElements.swift */; };
@@ -147,7 +165,10 @@
 		F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */; };
 		F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */; };
 		F17B80E927EC68670096035A /* GroupDevicesFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17B80E827EC68660096035A /* GroupDevicesFlowLayout.swift */; };
+		F17B80EB27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17B80EA27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift */; };
+		F17B80ED27EF690C0096035A /* UISegmentControl+SetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17B80EC27EF690C0096035A /* UISegmentControl+SetAppearance.swift */; };
 		F17CEBE8263B23E800BA9E0C /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17CEBE6263B23E800BA9E0C /* NotificationsViewController.swift */; };
+		F17E2F1527F33AE000938A45 /* ESPEnableAutomationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17E2F1427F33AE000938A45 /* ESPEnableAutomationService.swift */; };
 		F17EF2B02651661E002AC7BE /* ESPTimezone.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17EF2AF2651661D002AC7BE /* ESPTimezone.swift */; };
 		F17EF2B42652690E002AC7BE /* TimeZoneTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17EF2B32652690D002AC7BE /* TimeZoneTableViewCell.swift */; };
 		F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17F1411239F96C3008326A4 /* VersionManager.swift */; };
@@ -175,6 +196,7 @@
 		F191CD462511231C00BDCEF1 /* ConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F191CD442511231C00BDCEF1 /* ConnectViewController.swift */; };
 		F191CD472511231C00BDCEF1 /* ClaimViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F191CD452511231C00BDCEF1 /* ClaimViewController.swift */; };
 		F191CD492511235700BDCEF1 /* esp_rmaker_claim.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F191CD482511235600BDCEF1 /* esp_rmaker_claim.pb.swift */; };
+		F1924C36282AB7DC00E13FC8 /* ESPAutomationResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1924C35282AB7DC00E13FC8 /* ESPAutomationResponseParser.swift */; };
 		F1943A7724C9DF230001564A /* ESPDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1943A7624C9DF230001564A /* ESPDays.swift */; };
 		F194B60A22CDD83200417347 /* DeviceListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F194B60922CDD83200417347 /* DeviceListTableViewCell.swift */; };
 		F195745325B5AA41005F6601 /* AddMemberTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195745125B5AA41005F6601 /* AddMemberTableViewCell.swift */; };
@@ -197,6 +219,12 @@
 		F1A057B427968CFD00485C23 /* Utility+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A057B327968CFD00485C23 /* Utility+Environment.swift */; };
 		F1A057B62797B00600485C23 /* ESPTimeDurationSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A057B52797B00600485C23 /* ESPTimeDurationSegment.swift */; };
 		F1A057B82797BF0900485C23 /* ESPTimeInterval+StringInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A057B72797BF0900485C23 /* ESPTimeInterval+StringInfo.swift */; };
+		F1A8669F27EBC04B00A9858B /* AutomationActionSummaryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1A8669E27EBC04B00A9858B /* AutomationActionSummaryView.xib */; };
+		F1A866A127EBC25100A9858B /* EditAutomationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A866A027EBC25100A9858B /* EditAutomationViewController.swift */; };
+		F1A866A327EBC45300A9858B /* AutomationNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A866A227EBC45300A9858B /* AutomationNameTableViewCell.swift */; };
+		F1A866A527EBC4E200A9858B /* AutomationEventTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A866A427EBC4E200A9858B /* AutomationEventTableViewCell.swift */; };
+		F1A866A727EBC60900A9858B /* AutomationActionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A866A627EBC60900A9858B /* AutomationActionTableViewCell.swift */; };
+		F1A866AB27EBCDD400A9858B /* AutomationActionSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A866AA27EBCDD400A9858B /* AutomationActionSummaryView.swift */; };
 		F1AB5118233216FE002401F9 /* GenericControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */; };
 		F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */; };
 		F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB511A23321B7E002401F9 /* JSONParser.swift */; };
@@ -222,8 +250,15 @@
 		F1B1012926AEFD52004B5537 /* UserNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B1012826AEFD52004B5537 /* UserNavigationHandler.swift */; };
 		F1B1012B26AF4791004B5537 /* DevicesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B1012A26AF4790004B5537 /* DevicesNavigationController.swift */; };
 		F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */; };
+		F1B2D21927F6D64D00AE143D /* ESPAutomationTriggerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B2D21827F6D64D00AE143D /* ESPAutomationTriggerEvent.swift */; };
+		F1B2D21A27F6D64D00AE143D /* ESPAutomationTriggerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B2D21827F6D64D00AE143D /* ESPAutomationTriggerEvent.swift */; };
 		F1B3558923B8DC4C004552FC /* ExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B3558823B8DC4C004552FC /* ExtensionManager.swift */; };
 		F1BBD465255C1EE900CB0F42 /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */; };
+		F1BDFED127DCCF92005AF812 /* ESPAutomationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BDFED027DCCF92005AF812 /* ESPAutomationParser.swift */; };
+		F1BDFED327DCFC83005AF812 /* ESPAutomationTriggerAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BDFED227DCFC83005AF812 /* ESPAutomationTriggerAction.swift */; };
+		F1BDFED927DDD07B005AF812 /* SelectEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BDFED827DDD07B005AF812 /* SelectEventViewController.swift */; };
+		F1BDFEDC27DDD489005AF812 /* User+GetDeviceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BDFEDB27DDD489005AF812 /* User+GetDeviceList.swift */; };
+		F1BDFEDE27DDD6B8005AF812 /* SelectEventTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BDFEDD27DDD6B8005AF812 /* SelectEventTableViewCell.swift */; };
 		F1C1AD5025EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C1AD4E25EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift */; };
 		F1C1AD5125EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1C1AD4F25EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib */; };
 		F1C2DE5A2743C27D0037EB3F /* ESPTimeSeriesAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C2DE592743C27D0037EB3F /* ESPTimeSeriesAPIManager.swift */; };
@@ -477,11 +512,29 @@
 		F133495C25E2B84000CCB308 /* SharingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingTableViewCell.swift; sourceTree = "<group>"; };
 		F133495D25E2B84000CCB308 /* SharingTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SharingTableViewCell.xib; sourceTree = "<group>"; };
 		F1390EFB27D6428D00F80DFB /* CommonDeviceServices+UpdateActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CommonDeviceServices+UpdateActions.swift"; sourceTree = "<group>"; };
+		F1390F1B27D86C5D00F80DFB /* DeviceAutomationsListVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceAutomationsListVC.swift; sourceTree = "<group>"; };
+		F1390F1C27D86C5D00F80DFB /* AutomationSelectDeviceVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutomationSelectDeviceVC.swift; sourceTree = "<group>"; };
+		F1390F1E27D86C5D00F80DFB /* ESPAutomationConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAutomationConstants.swift; sourceTree = "<group>"; };
+		F1390F2027D86C5D00F80DFB /* ESPAutomationAPIWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAutomationAPIWorker.swift; sourceTree = "<group>"; };
+		F1390F2227D86C5D00F80DFB /* ESPAutomationAPIEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAutomationAPIEndpoint.swift; sourceTree = "<group>"; };
+		F1390F2B27D86C7200F80DFB /* DeviceAutomation.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = DeviceAutomation.storyboard; sourceTree = "<group>"; };
+		F1390F3A27D8D6A800F80DFB /* ESPGetAutomationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPGetAutomationService.swift; sourceTree = "<group>"; };
+		F1390F3C27D8D6BB00F80DFB /* ESPUpdateAutomationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPUpdateAutomationService.swift; sourceTree = "<group>"; };
+		F1390F3E27D8D6F400F80DFB /* ESPAddAutomationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPAddAutomationService.swift; sourceTree = "<group>"; };
+		F1390F4027D8D70800F80DFB /* ESPDeleteAutomationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPDeleteAutomationService.swift; sourceTree = "<group>"; };
+		F1390F4327D9E6A100F80DFB /* DeviceAutomationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAutomationTableViewCell.swift; sourceTree = "<group>"; };
+		F1390F4627D9E81800F80DFB /* ESPAutomationPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPAutomationPresenter.swift; sourceTree = "<group>"; };
+		F1390F4927D9E9BD00F80DFB /* ESPAutomation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPAutomation.swift; sourceTree = "<group>"; };
 		F13A013F23E359250067F8B8 /* DocumentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewController.swift; sourceTree = "<group>"; };
 		F13A01B923E98B680067F8B8 /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
+		F13B820D27E0C75F00511BBB /* ESPListUserDevicesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPListUserDevicesService.swift; sourceTree = "<group>"; };
+		F13B820F27E4B42500511BBB /* ESPEventCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPEventCase.swift; sourceTree = "<group>"; };
+		F13B821127E60E2500511BBB /* ESPParam+GetSliderBounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPParam+GetSliderBounds.swift"; sourceTree = "<group>"; };
+		F13B821327E77FAB00511BBB /* ESPAutomationTriggerAction+GetPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPAutomationTriggerAction+GetPayload.swift"; sourceTree = "<group>"; };
 		F13F273D238CF6170003AABB /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
 		F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticControlTableViewCell.swift; sourceTree = "<group>"; };
 		F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StaticControlTableViewCell.xib; sourceTree = "<group>"; };
+		F14CAF48283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAutomationAddResponseParser.swift; sourceTree = "<group>"; };
 		F151FEDF246E874E006F514E /* esp_rmaker_user_mapping.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = esp_rmaker_user_mapping.pb.swift; sourceTree = "<group>"; };
 		F151FF0B248253A7006F514E /* ESPRainMaker-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ESPRainMaker-Bridging-Header.h"; sourceTree = "<group>"; };
 		F151FF0C248253A7006F514E /* ESPRainMaker.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = ESPRainMaker.entitlements; sourceTree = "<group>"; };
@@ -505,7 +558,10 @@
 		F176A41523C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListCollectionReusableView.swift; sourceTree = "<group>"; };
 		F176A41723C4669300F2FCBC /* DeviceCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCollectionViewLayout.swift; sourceTree = "<group>"; };
 		F17B80E827EC68660096035A /* GroupDevicesFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDevicesFlowLayout.swift; sourceTree = "<group>"; };
+		F17B80EA27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPAutomationActions+GetDescription.swift"; sourceTree = "<group>"; };
+		F17B80EC27EF690C0096035A /* UISegmentControl+SetAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UISegmentControl+SetAppearance.swift"; sourceTree = "<group>"; };
 		F17CEBE6263B23E800BA9E0C /* NotificationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
+		F17E2F1427F33AE000938A45 /* ESPEnableAutomationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPEnableAutomationService.swift; sourceTree = "<group>"; };
 		F17EF2AF2651661D002AC7BE /* ESPTimezone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTimezone.swift; sourceTree = "<group>"; };
 		F17EF2B32652690D002AC7BE /* TimeZoneTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneTableViewCell.swift; sourceTree = "<group>"; };
 		F17F1411239F96C3008326A4 /* VersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionManager.swift; sourceTree = "<group>"; };
@@ -532,6 +588,7 @@
 		F191CD442511231C00BDCEF1 /* ConnectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectViewController.swift; sourceTree = "<group>"; };
 		F191CD452511231C00BDCEF1 /* ClaimViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClaimViewController.swift; sourceTree = "<group>"; };
 		F191CD482511235600BDCEF1 /* esp_rmaker_claim.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = esp_rmaker_claim.pb.swift; sourceTree = "<group>"; };
+		F1924C35282AB7DC00E13FC8 /* ESPAutomationResponseParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPAutomationResponseParser.swift; sourceTree = "<group>"; };
 		F1943A7624C9DF230001564A /* ESPDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPDays.swift; sourceTree = "<group>"; };
 		F194B60922CDD83200417347 /* DeviceListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListTableViewCell.swift; sourceTree = "<group>"; };
 		F195745125B5AA41005F6601 /* AddMemberTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMemberTableViewCell.swift; sourceTree = "<group>"; };
@@ -553,6 +610,12 @@
 		F1A057B327968CFD00485C23 /* Utility+Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utility+Environment.swift"; sourceTree = "<group>"; };
 		F1A057B52797B00600485C23 /* ESPTimeDurationSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTimeDurationSegment.swift; sourceTree = "<group>"; };
 		F1A057B72797BF0900485C23 /* ESPTimeInterval+StringInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPTimeInterval+StringInfo.swift"; sourceTree = "<group>"; };
+		F1A8669E27EBC04B00A9858B /* AutomationActionSummaryView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AutomationActionSummaryView.xib; sourceTree = "<group>"; };
+		F1A866A027EBC25100A9858B /* EditAutomationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAutomationViewController.swift; sourceTree = "<group>"; };
+		F1A866A227EBC45300A9858B /* AutomationNameTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationNameTableViewCell.swift; sourceTree = "<group>"; };
+		F1A866A427EBC4E200A9858B /* AutomationEventTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationEventTableViewCell.swift; sourceTree = "<group>"; };
+		F1A866A627EBC60900A9858B /* AutomationActionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationActionTableViewCell.swift; sourceTree = "<group>"; };
+		F1A866AA27EBCDD400A9858B /* AutomationActionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationActionSummaryView.swift; sourceTree = "<group>"; };
 		F1AB5116233216FE002401F9 /* GenericControlTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericControlTableViewCell.swift; sourceTree = "<group>"; };
 		F1AB5117233216FE002401F9 /* GenericControlTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericControlTableViewCell.xib; sourceTree = "<group>"; };
 		F1AB511A23321B7E002401F9 /* JSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
@@ -576,8 +639,14 @@
 		F1B1012826AEFD52004B5537 /* UserNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNavigationHandler.swift; sourceTree = "<group>"; };
 		F1B1012A26AF4790004B5537 /* DevicesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesNavigationController.swift; sourceTree = "<group>"; };
 		F1B13AD723D85125006DD949 /* ChangePasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewController.swift; sourceTree = "<group>"; };
+		F1B2D21827F6D64D00AE143D /* ESPAutomationTriggerEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPAutomationTriggerEvent.swift; sourceTree = "<group>"; };
 		F1B3558823B8DC4C004552FC /* ExtensionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionManager.swift; sourceTree = "<group>"; };
 		F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
+		F1BDFED027DCCF92005AF812 /* ESPAutomationParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPAutomationParser.swift; sourceTree = "<group>"; };
+		F1BDFED227DCFC83005AF812 /* ESPAutomationTriggerAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPAutomationTriggerAction.swift; sourceTree = "<group>"; };
+		F1BDFED827DDD07B005AF812 /* SelectEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectEventViewController.swift; sourceTree = "<group>"; };
+		F1BDFEDB27DDD489005AF812 /* User+GetDeviceList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User+GetDeviceList.swift"; sourceTree = "<group>"; };
+		F1BDFEDD27DDD6B8005AF812 /* SelectEventTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectEventTableViewCell.swift; sourceTree = "<group>"; };
 		F1C1AD4E25EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundHueSliderTableViewCell.swift; sourceTree = "<group>"; };
 		F1C1AD4F25EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundHueSliderTableViewCell.xib; sourceTree = "<group>"; };
 		F1C2DE592743C27D0037EB3F /* ESPTimeSeriesAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTimeSeriesAPIManager.swift; sourceTree = "<group>"; };
@@ -855,6 +924,7 @@
 			children = (
 				F1C2DE5827439B620037EB3F /* Time Series */,
 				0C80AA0B26FDBD4B00480C53 /* UserManagement */,
+				F1390F1627D86C5D00F80DFB /* Device Automation */,
 				F1B1011A269EC520004B5537 /* Extensions */,
 				F1C76D712688AD0F009E217D /* Storage */,
 				F1951121262985E3001B73E7 /* Notifications */,
@@ -875,6 +945,7 @@
 				1431462620DE994B0017E119 /* AppDelegate.swift */,
 				0CF69241270A34140098F515 /* AppDelegate+ESPAlexa.swift */,
 				0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */,
+				F1390F2B27D86C7200F80DFB /* DeviceAutomation.storyboard */,
 				F10C2B2925EB82D800B60696 /* Settings.storyboard */,
 				F1012F61251110B300839F06 /* Schedule.storyboard */,
 				0C8BE95A275D32050032A8E1 /* Scene.storyboard */,
@@ -907,6 +978,7 @@
 		143146B120EB221E0017E119 /* Interface */ = {
 			isa = PBXGroup;
 			children = (
+				F1390F4227D9C50B00F80DFB /* Device Automation */,
 				F1072BBB256F9B2C00D7CE2C /* Provision */,
 				F132F752244985B100CA713B /* Settings */,
 				F15EABF223E04386008A766B /* Generic Views */,
@@ -1074,6 +1146,79 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		F1390F1627D86C5D00F80DFB /* Device Automation */ = {
+			isa = PBXGroup;
+			children = (
+				F1BDFEDA27DDD470005AF812 /* Extensions */,
+				F1390F4827D9E9AB00F80DFB /* Model */,
+				F1390F1D27D86C5D00F80DFB /* Utility */,
+				F1BDFECF27DCCF66005AF812 /* Worker */,
+				F1390F3927D8D42800F80DFB /* Interactors */,
+				F1390F4527D9E78000F80DFB /* Presenter */,
+			);
+			path = "Device Automation";
+			sourceTree = "<group>";
+		};
+		F1390F1D27D86C5D00F80DFB /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				F1390F1E27D86C5D00F80DFB /* ESPAutomationConstants.swift */,
+				F1390F2027D86C5D00F80DFB /* ESPAutomationAPIWorker.swift */,
+				F1390F2227D86C5D00F80DFB /* ESPAutomationAPIEndpoint.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		F1390F3927D8D42800F80DFB /* Interactors */ = {
+			isa = PBXGroup;
+			children = (
+				F1390F3A27D8D6A800F80DFB /* ESPGetAutomationService.swift */,
+				F1390F3C27D8D6BB00F80DFB /* ESPUpdateAutomationService.swift */,
+				F1390F3E27D8D6F400F80DFB /* ESPAddAutomationService.swift */,
+				F1390F4027D8D70800F80DFB /* ESPDeleteAutomationService.swift */,
+				F17E2F1427F33AE000938A45 /* ESPEnableAutomationService.swift */,
+				F13B820D27E0C75F00511BBB /* ESPListUserDevicesService.swift */,
+			);
+			path = Interactors;
+			sourceTree = "<group>";
+		};
+		F1390F4227D9C50B00F80DFB /* Device Automation */ = {
+			isa = PBXGroup;
+			children = (
+				F1390F1B27D86C5D00F80DFB /* DeviceAutomationsListVC.swift */,
+				F1390F4327D9E6A100F80DFB /* DeviceAutomationTableViewCell.swift */,
+				F1BDFED827DDD07B005AF812 /* SelectEventViewController.swift */,
+				F1BDFEDD27DDD6B8005AF812 /* SelectEventTableViewCell.swift */,
+				F1390F1C27D86C5D00F80DFB /* AutomationSelectDeviceVC.swift */,
+				F1A8669E27EBC04B00A9858B /* AutomationActionSummaryView.xib */,
+				F1A866A027EBC25100A9858B /* EditAutomationViewController.swift */,
+				F1A866A227EBC45300A9858B /* AutomationNameTableViewCell.swift */,
+				F1A866A427EBC4E200A9858B /* AutomationEventTableViewCell.swift */,
+				F1A866A627EBC60900A9858B /* AutomationActionTableViewCell.swift */,
+				F1A866AA27EBCDD400A9858B /* AutomationActionSummaryView.swift */,
+			);
+			path = "Device Automation";
+			sourceTree = "<group>";
+		};
+		F1390F4527D9E78000F80DFB /* Presenter */ = {
+			isa = PBXGroup;
+			children = (
+				F1390F4627D9E81800F80DFB /* ESPAutomationPresenter.swift */,
+			);
+			path = Presenter;
+			sourceTree = "<group>";
+		};
+		F1390F4827D9E9AB00F80DFB /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				F1390F4927D9E9BD00F80DFB /* ESPAutomation.swift */,
+				F13B821327E77FAB00511BBB /* ESPAutomationTriggerAction+GetPayload.swift */,
+				F1BDFED227DCFC83005AF812 /* ESPAutomationTriggerAction.swift */,
+				F13B820F27E4B42500511BBB /* ESPEventCase.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		F15EABF223E04386008A766B /* Generic Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -1197,6 +1342,27 @@
 				F1390EFB27D6428D00F80DFB /* CommonDeviceServices+UpdateActions.swift */,
 				F1A057B327968CFD00485C23 /* Utility+Environment.swift */,
 				F172F96827B1344A00E62017 /* Calendar+GMT.swift */,
+				F13B821127E60E2500511BBB /* ESPParam+GetSliderBounds.swift */,
+				F17B80EC27EF690C0096035A /* UISegmentControl+SetAppearance.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		F1BDFECF27DCCF66005AF812 /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				F1BDFED027DCCF92005AF812 /* ESPAutomationParser.swift */,
+				F14CAF48283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift */,
+				F1924C35282AB7DC00E13FC8 /* ESPAutomationResponseParser.swift */,
+			);
+			path = Worker;
+			sourceTree = "<group>";
+		};
+		F1BDFEDA27DDD470005AF812 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F1BDFEDB27DDD489005AF812 /* User+GetDeviceList.swift */,
+				F17B80EA27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1230,6 +1396,7 @@
 				F1DF2E34268AF7A400D3C8D6 /* ESPNodeSharingAddEvent.swift */,
 				F1124F63268D099200FA0B9E /* ESPNodeSharingAcceptedEvent.swift */,
 				F1124F66268D0A0900FA0B9E /* ESPNodeSharingDeclinedEvent.swift */,
+				F1B2D21827F6D64D00AE143D /* ESPAutomationTriggerEvent.swift */,
 				F1124F69268D0AAA00FA0B9E /* ESPNodeAlertEvent.swift */,
 			);
 			path = Events;
@@ -1607,6 +1774,7 @@
 				F133495F25E2B84100CCB308 /* SharingTableViewCell.xib in Resources */,
 				F1012F62251110B300839F06 /* Schedule.storyboard in Resources */,
 				F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */,
+				F1A8669F27EBC04B00A9858B /* AutomationActionSummaryView.xib in Resources */,
 				F18C23BF25F1838C009E232D /* CentralSwitchTableViewCell.xib in Resources */,
 				F11DC9A02577772F00603BF5 /* DropDownTableViewCell.xib in Resources */,
 				F10D8DFB271EF8C80056E986 /* UserAccount.storyboard in Resources */,
@@ -1626,6 +1794,7 @@
 				1431463120DE994C0017E119 /* LaunchScreen.storyboard in Resources */,
 				F133494325DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib in Resources */,
 				F190B9CC24C765C4006D136D /* ControlSectionHeaderView.xib in Resources */,
+				F1390F2C27D86C7200F80DFB /* DeviceAutomation.storyboard in Resources */,
 				F15EAC0F23E1994E008A766B /* DeviceDetail.storyboard in Resources */,
 				F1C1AD5125EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib in Resources */,
 				F190B9CA24C0D892006D136D /* DeviceHeaderView.xib in Resources */,
@@ -1719,8 +1888,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				F18744232695F52E00971591 /* ESPNotifications.swift in Sources */,
+				F1B2D21927F6D64D00AE143D /* ESPAutomationTriggerEvent.swift in Sources */,
 				F13A014023E359250067F8B8 /* DocumentViewController.swift in Sources */,
 				F151FEE0246E874F006F514E /* esp_rmaker_user_mapping.pb.swift in Sources */,
+				F1390F2627D86C5E00F80DFB /* ESPAutomationConstants.swift in Sources */,
 				0C80AA2D26FDBD4B00480C53 /* ESPLogoutService.swift in Sources */,
 				F1CC1259278116E50007634C /* ESPTSArguments+PrevDuration.swift in Sources */,
 				F17CEBE8263B23E800BA9E0C /* NotificationsViewController.swift in Sources */,
@@ -1729,6 +1900,7 @@
 				F19A9D1822C0ED4C00A450C3 /* ForgotPasswordViewController.swift in Sources */,
 				0CF69236270A308B0098F515 /* ESPAlexaConnectViewController.swift in Sources */,
 				F1FBF05625EED1D200627C07 /* RadialHueColorPaletteDelegate.swift in Sources */,
+				F1390F4727D9E81800F80DFB /* ESPAutomationPresenter.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
 				F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */,
 				F1FFC8F925D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift in Sources */,
@@ -1736,10 +1908,13 @@
 				F1CC12612787786C0007634C /* Double+Rounded.swift in Sources */,
 				F1CC12502780EDE10007634C /* ESPChartsConstant.swift in Sources */,
 				F181CD9624D7F46300447296 /* NanoID.swift in Sources */,
+				F1390F2427D86C5D00F80DFB /* DeviceAutomationsListVC.swift in Sources */,
 				F123428324D0113600CAD4A2 /* ScheduleSwitchTableViewCell.swift in Sources */,
 				F1DE5D092513621200973E30 /* ESPScheduler.swift in Sources */,
+				F1390F3F27D8D6F400F80DFB /* ESPAddAutomationService.swift in Sources */,
 				F191CD472511231C00BDCEF1 /* ClaimViewController.swift in Sources */,
 				0C80AA3826FDBEF200480C53 /* ESPKeychainOperations.swift in Sources */,
+				F13B821027E4B42600511BBB /* ESPEventCase.swift in Sources */,
 				F190B9B624BF51AE006D136D /* ScheduleListViewController.swift in Sources */,
 				F10B074C25CEDB9F00723254 /* NodeGroupManager.swift in Sources */,
 				F1DF2E3B268CA8F000D3C8D6 /* ESPLocalStorageNodeGroups.swift in Sources */,
@@ -1758,6 +1933,7 @@
 				0C69D72526E9ED4500AF6985 /* Device.swift in Sources */,
 				F1CA0C8C257A08710085E19A /* GenericParamTableViewCell.swift in Sources */,
 				0C80AA2726FDBD4B00480C53 /* ESPAPIParser.swift in Sources */,
+				F1BDFEDE27DDD6B8005AF812 /* SelectEventTableViewCell.swift in Sources */,
 				0CE79FF827ABBE8F00972F22 /* CommonDeviceServices+Utils.swift in Sources */,
 				F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */,
 				F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */,
@@ -1767,14 +1943,18 @@
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
 				F195745925B5AD09005F6601 /* MembersInfoTableViewCell.swift in Sources */,
 				0CE3E9F7279017F9002138DA /* String+GetViewHeight.swift in Sources */,
+				F17B80EB27ECAF9E0096035A /* ESPAutomationActions+GetDescription.swift in Sources */,
 				0CBAC3C5278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift in Sources */,
 				F1C76D7C2688D742009E217D /* ESPSilentNotificationHandler.swift in Sources */,
 				F1C2DE5E274420A00037EB3F /* ESPTSParam.swift in Sources */,
 				F1110431252D927F0030A1D3 /* constants.pb.swift in Sources */,
 				F1124F5B268CF1F500FA0B9E /* ESPNodeSharingAddEvent+Actions.swift in Sources */,
+				F1390F2527D86C5D00F80DFB /* AutomationSelectDeviceVC.swift in Sources */,
 				F1B1011C269EC627004B5537 /* Double+DateTimeString.swift in Sources */,
 				F1AFB25A2721F98D00418969 /* UserAccountViewController.swift in Sources */,
+				F1A866AB27EBCDD400A9858B /* AutomationActionSummaryView.swift in Sources */,
 				F1EAACAA23E2A74300E9A6A8 /* ColorPickerView.swift in Sources */,
+				F1A866A727EBC60900A9858B /* AutomationActionTableViewCell.swift in Sources */,
 				0CF69239270A308B0098F515 /* ESPEnableAlexaSkillService.swift in Sources */,
 				0C69D72826E9ED9800AF6985 /* NodeExtension.swift in Sources */,
 				0C80AA2F26FDBD4B00480C53 /* ESPIdProviderLoginService.swift in Sources */,
@@ -1807,7 +1987,9 @@
 				0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */,
 				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
 				0CF6923E270A308B0098F515 /* ESPAlexaWebViewController.swift in Sources */,
+				F1390F4127D8D70800F80DFB /* ESPDeleteAutomationService.swift in Sources */,
 				F1124F5D268CF58100FA0B9E /* ESPNotificationHandler+Actions.swift in Sources */,
+				F1BDFEDC27DDD489005AF812 /* User+GetDeviceList.swift in Sources */,
 				F191CD462511231C00BDCEF1 /* ConnectViewController.swift in Sources */,
 				F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */,
 				F1AC6D8B27AD54490051F6E7 /* ESPRMDeviceType.swift in Sources */,
@@ -1825,6 +2007,7 @@
 				F1B1012326A70D52004B5537 /* ESPNodeAssociatedEvent.swift in Sources */,
 				F11DC9DD25791B8000603BF5 /* ParamSwitchTableViewCell.swift in Sources */,
 				F1FA24AF276F51BB00447050 /* ESPChartDataProvider.swift in Sources */,
+				F1390F3B27D8D6A800F80DFB /* ESPGetAutomationService.swift in Sources */,
 				F12261A422C620ED004D049F /* User.swift in Sources */,
 				F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */,
 				F1124F67268D0A0900FA0B9E /* ESPNodeSharingDeclinedEvent.swift in Sources */,
@@ -1841,18 +2024,22 @@
 				0C69D72326E9ED4500AF6985 /* Node.swift in Sources */,
 				F1C76D62268871F3009E217D /* ESPLocalStorage.swift in Sources */,
 				F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */,
+				F1924C36282AB7DC00E13FC8 /* ESPAutomationResponseParser.swift in Sources */,
 				0C80AA2A26FDBD4B00480C53 /* ESPTokenWorker.swift in Sources */,
 				F10D8DF8270EF1A80056E986 /* ESPLocalStorageHandler.swift in Sources */,
 				F1B0ACFA25DBCB7B004057BD /* DeviceGroupCollectionViewCell.swift in Sources */,
 				0C80AA2926FDBD4B00480C53 /* ESPAPIErrorWorker.swift in Sources */,
 				F18744212695F19400971591 /* AddSharingNotificationTableViewCell.swift in Sources */,
 				F10B075225CEE44200723254 /* NodeGroup.swift in Sources */,
+				F13B821227E60E2500511BBB /* ESPParam+GetSliderBounds.swift in Sources */,
 				F190B9BA24BF7775006D136D /* ScheduleViewController.swift in Sources */,
 				0CF69238270A308B0098F515 /* ESPAlexaTokenWorker.swift in Sources */,
 				143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */,
 				F18C23BE25F1838C009E232D /* CentralSwitchTableViewCell.swift in Sources */,
 				F133495525E24CE200CCB308 /* NodeSharingManager.swift in Sources */,
+				F1A866A327EBC45300A9858B /* AutomationNameTableViewCell.swift in Sources */,
 				0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */,
+				F14CAF49283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift in Sources */,
 				F1AFB2562720320200418969 /* DeleteAccountViewController.swift in Sources */,
 				F1FA24B5276F866300447050 /* ESPLineChartViewProvider.swift in Sources */,
 				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
@@ -1866,6 +2053,8 @@
 				F16BD370275DF1840089049C /* UInt+DateFormatter.swift in Sources */,
 				F1EAAC8E23E29D9B00E9A6A8 /* AppConstants.swift in Sources */,
 				F1AB511B23321B7E002401F9 /* JSONParser.swift in Sources */,
+				F1390F4A27D9E9BD00F80DFB /* ESPAutomation.swift in Sources */,
+				F1390F2A27D86C5E00F80DFB /* ESPAutomationAPIEndpoint.swift in Sources */,
 				F1B1012B26AF4791004B5537 /* DevicesNavigationController.swift in Sources */,
 				F1C76D64268872C9009E217D /* ESPLocalStorageSchedules.swift in Sources */,
 				F1CC125D2784E0630007634C /* ESPTSArguments+NextDuration.swift in Sources */,
@@ -1885,6 +2074,7 @@
 				F15FFF882402643A00E72D01 /* NoInternetConnection.swift in Sources */,
 				F1B1011E26A06867004B5537 /* ESPNodeDisassociatedEvent.swift in Sources */,
 				F199217A25B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift in Sources */,
+				F1390F4427D9E6A100F80DFB /* DeviceAutomationTableViewCell.swift in Sources */,
 				0C8BE957275D2DF10032A8E1 /* ESPScene.swift in Sources */,
 				F160AF1C26B7508C00578F00 /* ESPConfiguration.swift in Sources */,
 				F1C352CD26D56CC800A88893 /* ESPLocalStorageNodes+GetNode.swift in Sources */,
@@ -1893,12 +2083,15 @@
 				F19A9D1322C0D23E00A450C3 /* SignInViewController.swift in Sources */,
 				F190B9D124C82C02006D136D /* ScheduleSliderTableViewCell.swift in Sources */,
 				F1FFC8FD25D3345300DD26C6 /* SelectNodeHeaderCollectionReusableView.swift in Sources */,
+				F17B80ED27EF690C0096035A /* UISegmentControl+SetAppearance.swift in Sources */,
 				F1DD70A422A8EA150092DAB9 /* Utility.swift in Sources */,
 				0CA382D1275D49A100EB3417 /* SceneListCell.swift in Sources */,
 				F133494225DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift in Sources */,
 				0CF6923F270A308B0098F515 /* ESPAlexaServiceConstants.swift in Sources */,
 				144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */,
+				F1BDFED127DCCF92005AF812 /* ESPAutomationParser.swift in Sources */,
 				F164A30825824EC700B879BC /* Configuration.swift in Sources */,
+				F1390F3D27D8D6BB00F80DFB /* ESPUpdateAutomationService.swift in Sources */,
 				F133495E25E2B84100CCB308 /* SharingTableViewCell.swift in Sources */,
 				F1C2DE5A2743C27D0037EB3F /* ESPTimeSeriesAPIManager.swift in Sources */,
 				F1124F6A268D0AAA00FA0B9E /* ESPNodeAlertEvent.swift in Sources */,
@@ -1919,8 +2112,10 @@
 				F1124F59268CEA3000FA0B9E /* ESPNotificationCategory.swift in Sources */,
 				F1A057AE278DF8E400485C23 /* UIView+DropShadow.swift in Sources */,
 				F191CD41251122D300BDCEF1 /* AssistedClaiming.swift in Sources */,
+				F1390F2827D86C5E00F80DFB /* ESPAutomationAPIWorker.swift in Sources */,
 				F1FFC90725D4872C00DD26C6 /* SelectNodeFooterCollectionReusableView.swift in Sources */,
 				F1B1012026A47105004B5537 /* ESPNotificationKeys.swift in Sources */,
+				F17E2F1527F33AE000938A45 /* ESPEnableAutomationService.swift in Sources */,
 				0C65879C27D5FA9100C5E0DB /* ESPScheduleConstants.swift in Sources */,
 				F19F6FF522F45A1500C70DE3 /* DeviceListTableView.swift in Sources */,
 				F119C3F2265EAF73006F4088 /* VoiceServicesViewController.swift in Sources */,
@@ -1935,9 +2130,11 @@
 				F1FA24A7275F358900447050 /* ESPXAxisNameFormater.swift in Sources */,
 				0C80AA2226FDBD4B00480C53 /* ESPPresenter.swift in Sources */,
 				F1B1012926AEFD52004B5537 /* UserNavigationHandler.swift in Sources */,
+				F1A866A127EBC25100A9858B /* EditAutomationViewController.swift in Sources */,
 				0C04745027CFA36E00FCE611 /* ESPSceneConstants.swift in Sources */,
 				F1C352CB26D4E92600A88893 /* ESPNotificationHandler+UpdateData.swift in Sources */,
 				F1CC124C277F4C210007634C /* ESPTimeAxisGenerator.swift in Sources */,
+				F1BDFED927DDD07B005AF812 /* SelectEventViewController.swift in Sources */,
 				0CF69240270A308B0098F515 /* ESPAlexaAPIWorker.swift in Sources */,
 				F17EF2B42652690E002AC7BE /* TimeZoneTableViewCell.swift in Sources */,
 				F1390EFC27D6428D00F80DFB /* CommonDeviceServices+UpdateActions.swift in Sources */,
@@ -1946,6 +2143,7 @@
 				0CF69242270A34140098F515 /* AppDelegate+ESPAlexa.swift in Sources */,
 				F195745325B5AA41005F6601 /* AddMemberTableViewCell.swift in Sources */,
 				F1AC6D7E27A447B20051F6E7 /* TriggerTableViewCell.swift in Sources */,
+				F1A866A527EBC4E200A9858B /* AutomationEventTableViewCell.swift in Sources */,
 				F1C76D66268875A7009E217D /* ESPLocalStorageNodes.swift in Sources */,
 				F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */,
 				F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */,
@@ -1956,8 +2154,11 @@
 				F11DC9D72578D5D100603BF5 /* DeviceControlHelper.swift in Sources */,
 				F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */,
 				0C80AA3226FDBD4B00480C53 /* ESPChangePasswordService.swift in Sources */,
+				F13B821427E77FAB00511BBB /* ESPAutomationTriggerAction+GetPayload.swift in Sources */,
 				F133495125E23C4400CCB308 /* NodeDetailsTableViewCell.swift in Sources */,
 				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
+				F13B820E27E0C75F00511BBB /* ESPListUserDevicesService.swift in Sources */,
+				F1BDFED327DCFC83005AF812 /* ESPAutomationTriggerAction.swift in Sources */,
 				0CF6923A270A308B0098F515 /* ESPAlexaAPIParser.swift in Sources */,
 				F1124F5F268CFDB400FA0B9E /* ESPNotificationKeys+Additional.swift in Sources */,
 				F17EF2B02651661E002AC7BE /* ESPTimezone.swift in Sources */,
@@ -1969,6 +2170,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1C76D842689870C009E217D /* ESPNotificationHandler.swift in Sources */,
+				F1B2D21A27F6D64D00AE143D /* ESPAutomationTriggerEvent.swift in Sources */,
 				F1B1012526A764E6004B5537 /* ESPNodeDisassociatedEvent.swift in Sources */,
 				F1C76D7F2689848B009E217D /* Array<String>+CombinedString.swift in Sources */,
 				F19EF8B22684640100CC7D3E /* Attribute.swift in Sources */,
@@ -2150,7 +2352,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;

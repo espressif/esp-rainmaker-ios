@@ -21,6 +21,7 @@ import Foundation
 enum DeviceServiceType {
     case schedule
     case scene
+    case automation
     case none
 }
 
@@ -48,6 +49,8 @@ extension ScheduleSceneActionAllowedProtocol {
             default:
                 isAllowed = false
             }
+        case .automation:
+            return true
         default:
             break
         }

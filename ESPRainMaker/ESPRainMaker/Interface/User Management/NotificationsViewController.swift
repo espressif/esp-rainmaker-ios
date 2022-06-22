@@ -152,7 +152,11 @@ class NotificationsViewController: UIViewController {
     private func getNotificationTableViewCell(for indexPath:IndexPath) -> NotificationsTableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "notificationsTVC", for: indexPath) as! NotificationsTableViewCell
         let notification = pastNotifications[indexPath.section - pendingRequests.count]
-        cell.bodyLabel.text = notification.body
+        if notification.title.contains("Automation") {
+            cell.bodyLabel.text = notification.title + "\n" + notification.body
+        } else {
+            cell.bodyLabel.text = notification.body
+        }
         
         let timeDetails = notification.timestamp.dateTimeString()
         cell.timeLabel.text = timeDetails.time

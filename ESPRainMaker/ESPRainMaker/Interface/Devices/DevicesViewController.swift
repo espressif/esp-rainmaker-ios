@@ -88,12 +88,7 @@ class DevicesViewController: UIViewController {
             configureSegmentControl()
         }
         
-        if !Configuration.shared.appConfiguration.supportSchedule {
-            tabBarController?.viewControllers?.remove(at: 1)
-        }
-        if !Configuration.shared.appConfiguration.supportScene {
-            tabBarController?.viewControllers?.remove(at: 2)
-        }
+        setTabBarControllerViews()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -453,6 +448,18 @@ class DevicesViewController: UIViewController {
                     self.segmentControl.layoutIfNeeded()
                 }
             }
+        }
+    }
+    
+    private func setTabBarControllerViews() {
+        if !Configuration.shared.appConfiguration.supportDeviceAutomation {
+            tabBarController?.viewControllers?.remove(at: 3)
+        }
+        if !Configuration.shared.appConfiguration.supportScene {
+            tabBarController?.viewControllers?.remove(at: 2)
+        }
+        if !Configuration.shared.appConfiguration.supportSchedule {
+            tabBarController?.viewControllers?.remove(at: 1)
         }
     }
 }

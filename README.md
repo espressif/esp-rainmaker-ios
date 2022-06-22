@@ -150,6 +150,20 @@ Node Grouping is optional but enabled by default. It can be disabled from the `C
 Node Sharing is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Sharing` key from `App Configuration` to `NO`.
 
 
+### Device Automation
+
+Device Automation is a set of actions that will be triggered based on the completion of certain events. For example, the user can set an event as the Temperature sensor equals 35 degrees celsius. Then based on this event user can trigger different actions like Switching on AC or Setting the AC temperature to 20 degrees celsius or a combination of both.
+
+Users will be allowed to perform different automation operations in the app as mentioned below:
+
+1. Adding new automation.
+2. Updating existing automation.
+3. Enabling/disabling automation triggers.
+4. Deleting automation.
+5. Receiving notifications related to triggered automation.
+
+Device automation is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Device Automation` key from `App Configuration` to `NO`.
+
 ### Push Notifications
 
 ESPRainMaker app supports remote notifiations in order to notify app in realtime for any updates. Types of notification enabled in the app :

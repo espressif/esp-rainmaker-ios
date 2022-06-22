@@ -26,6 +26,7 @@ enum ESPNotificationEvents: String {
     case nodeDisconnected = "rmaker.event.node_disconnected"
     case nodeSharingAdd = "rmaker.event.user_node_sharing_add"
     case nodeAlert = "rmaker.event.alert"
+    case automationTrigger = "rmaker.event.node_automation_trigger"
 }
 
 // Struct to handle all type of notification events.
@@ -84,6 +85,8 @@ struct ESPNotificationHandler: ESPNotificationProtocol {
             modifiedNotification = ESPNodeAssociatedEvent(eventData, notification).modifiedContent()
         case .nodeDissassociated:
             modifiedNotification = ESPNodeDisassociatedEvent(eventData, notification).modifiedContent()
+        case .automationTrigger:
+            modifiedNotification = ESPAutomationTriggerEvent(eventData, notification).modifiedContent()
         default:
             return nil
         }
