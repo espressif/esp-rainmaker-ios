@@ -31,7 +31,7 @@ struct ESPXAxisNameFormater {
 
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(identifier: "GMT")
+        formatter.timeZone = TimeZone.current
         
         switch timeInterval {
         case .minute:
