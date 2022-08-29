@@ -78,9 +78,9 @@ class SettingsPageViewController: UIViewController {
     }
 
     @IBAction func signOut(_: Any) {
-        let alertController = UIAlertController(title: "Logout", message: "Do you like to proceed?", preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
-        let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+        let alertController = UIAlertController(title: "Logout", message: "Would you like to proceed?", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "No", style: .default, handler: nil)
+        let confirmAction = UIAlertAction(title: "Yes", style: .destructive) { _ in
             DispatchQueue.main.async {
                 Utility.showLoader(message: "Logging Out", view: self.view)
             }

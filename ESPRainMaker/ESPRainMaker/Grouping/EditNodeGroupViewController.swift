@@ -55,9 +55,9 @@ class EditNodeGroupViewController: UIViewController {
 
     @IBAction func removeGroupButtonPressed(_: Any) {
         // Add confirmation alert before removing node group
-        let alertController = UIAlertController(title: "Remove", message: "Are you sure to remove this group?", preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
-        let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+        let alertController = UIAlertController(title: "Remove", message: "Are you sure you want to remove this group?", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "No", style: .default, handler: nil)
+        let confirmAction = UIAlertAction(title: "Yes", style: .destructive) { _ in
             Utility.showLoader(message: "Removing group...", view: self.view)
             // Perform remove node group operation for selected group
             NodeGroupManager.shared.performNodeGroupOperation(group: self.currentNodeGroup, parameter: nil, method: .delete) { success, error in

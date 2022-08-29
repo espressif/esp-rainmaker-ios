@@ -210,8 +210,8 @@ extension ScheduleListViewController: UITableViewDelegate {
         }
         if editingStyle == .delete {
             let alertController = UIAlertController(title: "Are you sure?", message: "", preferredStyle: .alert)
-            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
-            let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { _ in
+            let cancelAction = UIAlertAction(title: "No", style: .default, handler: nil)
+            let confirmAction = UIAlertAction(title: "Yes", style: .destructive) { _ in
                 DispatchQueue.main.async {
                     Utility.showLoader(message: "", view: self.view)
                     ESPScheduler.shared.deleteScheduleAt(key: self.scheduleList[indexPath.row/2], onView: self.view) { result  in
