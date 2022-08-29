@@ -133,7 +133,7 @@ class SceneListViewController: UIViewController {
     }
     
     private func addScene() {
-        let input = UIAlertController(title: "Add name", message: "Choose name for your scene", preferredStyle: .alert)
+        let input = UIAlertController(title: ESPSceneConstants.addSceneNameTitle, message: ESPSceneConstants.addSceneNameMessage, preferredStyle: .alert)
         input.addTextField { textField in
             textField.delegate = self
         }
@@ -144,7 +144,7 @@ class SceneListViewController: UIViewController {
             textField?.keyboardType = .asciiCapable
             guard let name = textField?.text, name.count > 0 else {
                 //show name error alert
-                self.showErrorAlert(title: "Error", message: "Please enter a name for the scene to proceed.", buttonTitle: "OK", callback: {
+                self.showErrorAlert(title: "Error", message: ESPSceneConstants.nameNotAddedErrorMessage, buttonTitle: "OK", callback: {
                     self.addScene()
                 })
                 return
@@ -289,13 +289,13 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
                         case .success(let nodesFailed):
                             DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
                                 if !nodesFailed {
-                                    Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneDeletedSuccessMessage, duration: 2.0)
+                                    Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneDeletionSuccessMessage, duration: 2.0)
                                 }
                                 self.refreshSceneList(self)
                             })
                         default:
                             Utility.hideLoader(view: self.view)
-                            Utility.showToastMessage(view: self.view, message: ESPSceneConstants.deleteSceneFailureMessage, duration: 1.5)
+                            Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneDeletionFailureMessage, duration: 1.5)
                         }
                     }
                 }
@@ -321,10 +321,10 @@ extension SceneListViewController: SceneListCellDelegate {
                 switch result {
                 case .success(let nodesFailed):
                     if !nodesFailed {
-                        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.activateSceneSuccessMessage, duration: 1.5)
+                        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneActivationSuccessMessage, duration: 1.5)
                     }
                 case .failure:
-                    Utility.showToastMessage(view: self.view, message: ESPSceneConstants.activateSceneFailureMessage, duration: 1.5)
+                    Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneActivationFailureMessage, duration: 1.5)
                     break
                 }
             })
@@ -347,14 +347,14 @@ extension SceneListViewController: UITextFieldDelegate {
 extension SceneListViewController: ServiceUpdateActionsDelegate {
     
     func serviceAdded() {
-        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneAddedSuccessMessage, duration: 2.0)
+        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneCreationSuccessMessage, duration: 2.0)
     }
     
     func serviceUpdated() {
-        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneUpdatedSuccessMessage, duration: 2.0)
+        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneUpdationSuccessMessage, duration: 2.0)
     }
     
     func serviceRemoved() {
-        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneDeletedSuccessMessage, duration: 2.0)
+        Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneDeletionSuccessMessage, duration: 2.0)
     }
 }

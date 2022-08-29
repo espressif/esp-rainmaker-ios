@@ -48,6 +48,7 @@ class ScheduleListTableViewCell: UITableViewCell {
                 case .failure:
                     self.scheduleSwitch.isOn = !sender.isOn
                     ESPScheduler.shared.currentSchedule.enabled = currentState
+                    self.delegate?.failedToUpdateSchedule()
                 case .success(let nodesFailed):
                     self.delegate?.scheduleStateChanged(index: self.index, enabled: ESPScheduler.shared.currentSchedule.enabled, shouldRefresh: nodesFailed)
                 }
@@ -63,4 +64,5 @@ class ScheduleListTableViewCell: UITableViewCell {
 /// Protocol to be invoked when state of schedule table view cell changes
 @objc protocol ScheduleListTableViewCellDelegate {
     func scheduleStateChanged(index: Int, enabled: Bool, shouldRefresh: Bool)
+    func failedToUpdateSchedule()
 }

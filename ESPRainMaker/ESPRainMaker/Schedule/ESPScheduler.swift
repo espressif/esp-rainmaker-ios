@@ -29,9 +29,6 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     // MARK constant strings:
     let nodeIdKey = "node_id"
     let payloadKey = "payload"
-    let saveScheduleFailureMessage: String = "Unable to save schedule for"
-    let editScheduleFailureMessage: String = "Unable to edit schedule for"
-    let deleteScheduleFailureMessage: String = "Unable to delete schedule for"
     
     // MARK: - Schedule Operations
 
@@ -49,7 +46,11 @@ class ESPScheduler: CommonDeviceServicesProtocol {
             jsonString["triggers"] = [["d": currentSchedule.trigger.days!, "m": currentSchedule.trigger.minutes!]]
             let actions = createActionsFromDeviceList()
             if actions.keys.count > 0 {
-                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: saveScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: true, onView: onView) { result in
+                var message = ESPScheduleConstants.scheduleUpdationPartialFailureMessage
+                if let operation = currentSchedule.operation, operation == .add {
+                    message = ESPScheduleConstants.scheduleCreationPartialFailureMessage
+                }
+                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: message, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: true, onView: onView) { result in
                     completionHandler(result)
                 }
             } else {
@@ -73,7 +74,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
             jsonString["operation"] = currentSchedule.enabled == true ? "enable" : "disable"
             let actions = createActionsFromDeviceList()
             if actions.keys.count > 0 {
-                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: editScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
+                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: ESPScheduleConstants.scheduleUpdationPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
                     completionHandler(result)
                 }
             } else {
@@ -98,7 +99,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
                 jsonString["name"] = schedule.name
                 jsonString["id"] = schedule.id
                 jsonString["operation"] = "remove"
-                self.invokeServiceAction(apiManager: apiManager, keys: nodeIDs, jsonString: jsonString, text: deleteScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: schedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
+                self.invokeServiceAction(apiManager: apiManager, keys: nodeIDs, jsonString: jsonString, text: ESPScheduleConstants.scheduleDeletionPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: schedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
                     completionHandler(result)
                 }
             } else {
@@ -122,7 +123,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
             jsonString["name"] = currentSchedule.name
             jsonString["id"] = currentSchedule.id
             jsonString["operation"] = "remove"
-            self.invokeServiceAction(apiManager: apiManager, keys: [String](currentSchedule.actions.keys), jsonString: jsonString, text: deleteScheduleFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: self.currentSchedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
+            self.invokeServiceAction(apiManager: apiManager, keys: [String](currentSchedule.actions.keys), jsonString: jsonString, text: ESPScheduleConstants.scheduleDeletionPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: self.currentSchedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
                 completionHandler(result)
             }
         } else {

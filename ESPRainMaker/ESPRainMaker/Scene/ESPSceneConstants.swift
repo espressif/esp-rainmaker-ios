@@ -23,17 +23,24 @@ class ESPSceneConstants {
     //MARK: constant strings:
     static let nodeIdKey = "node_id"
     static let payloadKey = "payload"
-    static let saveSceneFailureMessage: String = "Failed to save scene for"
-    static let partialDeleteSceneFailureMessage: String = "Failed to delete scene for"
-    static let deleteSceneFailureMessage: String = "Failed to delete scene"
-    static let partialActivateSceneFailureMessage: String = "Failed to activate scene for"
-    static let activateSceneSuccessMessage: String = "Scene activated successfully"
-    static let activateSceneFailureMessage: String = "Failed to activate scene"
-    static let failedToUpdateErrorMessage: String = "Failed to update scene"
-    static let nameNotAddedErrorMessage: String = "Please enter a name for the scene to proceed."
     
-    static let sceneAddedSuccessMessage: String = "Scene added successfully"
-    static let sceneUpdatedSuccessMessage: String = "Scene updated successfully"
-    static let sceneDeletedSuccessMessage: String = "Scene deleted successfully"
+    static let sceneCreationSuccessMessage: String = "Scene created successfully"
+    static let sceneCreationFailureMessage: String = "Failed to create scene"
+    static let sceneCreationPartialFailureMessage: String = "Failed to create scene for"
     
+    static let sceneUpdationSuccessMessage: String = "Scene updated successfully"
+    static let sceneUpdationFailureMessage: String = "Failed to update scene"
+    static let sceneUpdationPartialFailureMessage: String = "Failed to update scene for"
+    
+    static let sceneActivationSuccessMessage: String = "Scene activated successfully"
+    static let sceneActivationFailureMessage: String = "Failed to activate scene"
+    static let sceneActivationPartialFailureMessage: String = "Failed to activate scene for"
+    
+    static let sceneDeletionSuccessMessage: String = "Scene deleted successfully"
+    static let sceneDeletionFailureMessage: String = "Failed to delete scene"
+    static let sceneDeletionPartialFailureMessage: String = "Failed to delete scene for"
+    
+    static let addSceneNameTitle = "Add name"
+    static let addSceneNameMessage = "Choose name for your scene"
+    static let nameNotAddedErrorMessage = "Please enter a name for the scene to proceed."
 }
