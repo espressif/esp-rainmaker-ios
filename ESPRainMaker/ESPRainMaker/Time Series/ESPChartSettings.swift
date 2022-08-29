@@ -64,9 +64,9 @@ struct ESPChartSettings {
     
     static var xAxisLeadingPadding: Double {
         if Utility.isIPhone() {
-            return 10.0
-        } else {
             return 15.0
+        } else {
+            return 20.0
         }
     }
     

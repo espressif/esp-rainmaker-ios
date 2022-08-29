@@ -470,7 +470,11 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         completionHandler(value, nil)
                         return
                     case let .failure(error):
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        if let urlError = error.underlyingError as? URLError, (urlError.code == URLError.Code.notConnectedToInternet || urlError.code == URLError.Code.dataNotAllowed) {
+                            completionHandler(nil, .noNetwork)
+                        } else {
+                            completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        }
                         return
                     }
                 }

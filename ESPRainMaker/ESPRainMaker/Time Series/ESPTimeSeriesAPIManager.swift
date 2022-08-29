@@ -36,14 +36,14 @@ class ESPTimeSeriesAPIManager {
     ///   - startTime: Timestamp for start of duration.
     ///   - endTime: Timestamp for end of duration.
     ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
-    func fetchTSDataFor(nodeID: String, paramName: String, aggregate: String? = nil, timeInterval: String? = nil, startTime: UInt? = nil, endTime: UInt? = nil, completionHandler: @escaping (ESPTSData?) -> Void ) {
+    func fetchTSDataFor(nodeID: String, paramName: String, aggregate: String? = nil, timeInterval: String? = nil, startTime: UInt? = nil, endTime: UInt? = nil, weekStart: String? = nil, completionHandler: @escaping (ESPTSData?, ESPNetworkError?) -> Void ) {
         
         var url = tsDataURL + "?node_id=\(nodeID)&param_name=\(paramName)"
         if let aggregate = aggregate {
             url.append("&aggregate=\(aggregate)")
         }
         if let timeInterval = timeInterval {
-            url.append("&time_interval=\(timeInterval)")
+            url.append("&aggregation_interval=\(timeInterval)")
         }
         if let startTime = startTime {
             url.append("&start_time=\(startTime)")
@@ -51,37 +51,40 @@ class ESPTimeSeriesAPIManager {
         if let endTime = endTime {
             url.append("&end_time=\(endTime)")
         }
+        if let weekStart = weekStart {
+            url.append("&week_start=\(weekStart)")
+        }
         url.append("&timezone=\(TimeZone.current.identifier)")
         
         let urlString = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         
         apiManager.genericAuthorizedDataRequest(url: urlString ?? url, parameter: nil, method: .get) { response, error in
             guard let result = ESPTSData.decoder(data: response) else {
-                completionHandler(nil)
+                completionHandler(nil, error)
                 return
             }
             if let nextID = result.next_id {
                 self.fetchNextRecordSet(url: urlString ?? url, nodeID: nodeID, paramName: paramName, startID: nextID, tsData: result, completionHandler: completionHandler)
             } else {
-                completionHandler(result)
+                completionHandler(result, nil)
             }
         }
     }
     
     
-    private func fetchNextRecordSet(url: String, nodeID: String, paramName: String, startID: String, tsData: ESPTSData, completionHandler: @escaping (ESPTSData?) -> Void) {
+    private func fetchNextRecordSet(url: String, nodeID: String, paramName: String, startID: String, tsData: ESPTSData, completionHandler: @escaping (ESPTSData?, ESPNetworkError?) -> Void) {
         let urlString = url + "&start_id=\(startID)"
         apiManager.genericAuthorizedDataRequest(url: urlString, parameter: nil, method: .get) { response, error in
             guard let result = ESPTSData.decoder(data: response) else {
-                completionHandler(tsData)
+                completionHandler(tsData, nil)
                 return
             }
             var joinedTSData = tsData
-            joinedTSData.params?.append(contentsOf: result.params ?? [])
+            joinedTSData.params?[0].values?.append(contentsOf: result.params?[0].values ?? [])
             if let nextID = result.next_id {
                 self.fetchNextRecordSet(url: url, nodeID: nodeID, paramName: paramName, startID: nextID, tsData: joinedTSData, completionHandler: completionHandler)
             } else {
-                completionHandler(joinedTSData)
+                completionHandler(joinedTSData, nil)
             }
         }
     }

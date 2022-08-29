@@ -24,12 +24,12 @@ enum ESPChartType: String, CaseIterable {
 }
 
 enum ESPAggregate: String, CaseIterable {
+    case raw
     case avg
     case min
     case max
     case count
     case latest
-    case raw
 }
 
 enum ESPTimeInterval: String, CaseIterable {

@@ -60,8 +60,8 @@ struct ESPTimeAxisGenerator {
                 lastModalValue = daytimeStamp.endDateTS
                 chartAxisValueGenerator = ChartAxisGeneratorMultiplier(ESPChartsConstant.hourTimeStamp * 6)
             case .day:
-                chartAxisValueGenerator = ChartAxisGeneratorMultiplier(ESPChartsConstant.dayTimeStamp)
                 lastModalValue = lastModalValue - ESPChartsConstant.dayTimeStamp
+                chartAxisValueGenerator = ChartAxisGeneratorMultiplier(ESPChartsConstant.dayTimeStamp)
             case .week:
                 chartAxisValueGenerator = ChartAxisGeneratorMultiplier(ESPChartsConstant.weekTimestamp)
             case .month:
@@ -85,6 +85,9 @@ struct ESPTimeAxisGenerator {
     // Method to get fromatted string from timestamp.
     private func getxAxisLabel(scalar: Double) -> String {
         let xAxisFormatter = ESPXAxisNameFormater(timeInterval: timeInterval, timezone: timezone)
+        if scalar > endTime {
+            return ""
+        }
         return "\(xAxisFormatter.stringForValue(scalar))"
     }
 }
