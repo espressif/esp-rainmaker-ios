@@ -47,6 +47,7 @@
 		0CBAC3C5278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBAC3C4278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift */; };
 		0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */; };
 		0CDDC34A27E89D50004F9486 /* UILabel+GetViewHeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDDC34927E89D50004F9486 /* UILabel+GetViewHeight.swift */; };
+		0CE10B7D283B6662000BBEE1 /* ESPAutomationAddResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14CAF48283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift */; };
 		0CE3E9F7279017F9002138DA /* String+GetViewHeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE3E9F6279017F9002138DA /* String+GetViewHeight.swift */; };
 		0CE79FF827ABBE8F00972F22 /* CommonDeviceServices+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE79FF727ABBE8F00972F22 /* CommonDeviceServices+Utils.swift */; };
 		0CF69236270A308B0098F515 /* ESPAlexaConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922A270A308B0098F515 /* ESPAlexaConnectViewController.swift */; };
@@ -142,7 +143,6 @@
 		F1402AB8239677B300C989F8 /* StaticControlTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1402AB6239677B300C989F8 /* StaticControlTableViewCell.swift */; };
 		F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1402AB7239677B300C989F8 /* StaticControlTableViewCell.xib */; };
 		F14491D526C52A5A008817C7 /* Configuration.plist in Resources */ = {isa = PBXBuildFile; fileRef = F164A2F82581E73000B879BC /* Configuration.plist */; };
-		F14CAF49283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14CAF48283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift */; };
 		F151FEE0246E874F006F514E /* esp_rmaker_user_mapping.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151FEDF246E874E006F514E /* esp_rmaker_user_mapping.pb.swift */; };
 		F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151FF1D24827343006F514E /* WifiListTableViewCell.swift */; };
 		F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15EABF323E043DA008A766B /* CustomUIElements.swift */; };
@@ -879,6 +879,13 @@
 			path = Interface;
 			sourceTree = "<group>";
 		};
+		0CE10B7C283B6618000BBEE1 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		0CF69228270A308B0098F515 /* Alexa */ = {
 			isa = PBXGroup;
 			children = (
@@ -906,6 +913,7 @@
 				1431462420DE994B0017E119 /* Products */,
 				CAE64040D79003E04BA4A14C /* Frameworks */,
 				8F698F3AF42EA9FEE0BF4C3F /* Pods */,
+				0CE10B7C283B6618000BBEE1 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1936,6 +1944,7 @@
 				F1BDFEDE27DDD6B8005AF812 /* SelectEventTableViewCell.swift in Sources */,
 				0CE79FF827ABBE8F00972F22 /* CommonDeviceServices+Utils.swift in Sources */,
 				F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */,
+				0CE10B7D283B6662000BBEE1 /* ESPAutomationAddResponseParser.swift in Sources */,
 				F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */,
 				F1AC6D8327AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift in Sources */,
 				F1C352D026DBC40900A88893 /* ESPLocalDevice.swift in Sources */,
@@ -2039,7 +2048,6 @@
 				F133495525E24CE200CCB308 /* NodeSharingManager.swift in Sources */,
 				F1A866A327EBC45300A9858B /* AutomationNameTableViewCell.swift in Sources */,
 				0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */,
-				F14CAF49283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift in Sources */,
 				F1AFB2562720320200418969 /* DeleteAccountViewController.swift in Sources */,
 				F1FA24B5276F866300447050 /* ESPLineChartViewProvider.swift in Sources */,
 				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
