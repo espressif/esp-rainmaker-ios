@@ -36,9 +36,9 @@ class ESPSceneConstants {
     static let sceneActivationFailureMessage: String = "Failed to activate scene"
     static let sceneActivationPartialFailureMessage: String = "Failed to activate scene for"
     
-    static let sceneDeletionSuccessMessage: String = "Scene deleted successfully"
-    static let sceneDeletionFailureMessage: String = "Failed to delete scene"
-    static let sceneDeletionPartialFailureMessage: String = "Failed to delete scene for"
+    static let sceneDeletionSuccessMessage: String = "Scene removed successfully"
+    static let sceneDeletionFailureMessage: String = "Failed to remove scene"
+    static let sceneDeletionPartialFailureMessage: String = "Failed to remove scene for"
     
     static let addSceneNameTitle = "Add name"
     static let addSceneNameMessage = "Choose name for your scene"

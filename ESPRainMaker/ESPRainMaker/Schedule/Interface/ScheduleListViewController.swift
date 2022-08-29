@@ -179,6 +179,10 @@ class ScheduleListViewController: UIViewController {
 }
 
 extension ScheduleListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "Remove"
+    }
+    
     func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row % 2 != 0 {
             return 20.0

@@ -150,6 +150,7 @@ class ScheduleViewController: UIViewController {
                             }
                             self.navigationController?.popViewController(animated: true)
                         default:
+                            Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionFailureMessage)
                             break
                         }
                     }
