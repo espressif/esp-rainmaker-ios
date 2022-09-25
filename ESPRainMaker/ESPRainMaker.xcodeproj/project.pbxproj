@@ -312,6 +312,24 @@
 		F1CC125B2784871A0007634C /* ESPTimeLabelGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC125A2784871A0007634C /* ESPTimeLabelGenerator.swift */; };
 		F1CC125D2784E0630007634C /* ESPTSArguments+NextDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC125C2784E0630007634C /* ESPTSArguments+NextDuration.swift */; };
 		F1CC12612787786C0007634C /* Double+Rounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC12602787786B0007634C /* Double+Rounded.swift */; };
+		F1CC3C03295D85C20000D6DC /* FirmwareUpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C02295D85C20000D6DC /* FirmwareUpdateViewController.swift */; };
+		F1CC3C18295D866D0000D6DC /* ESPOTAPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C06295D866D0000D6DC /* ESPOTAPresenter.swift */; };
+		F1CC3C19295D866D0000D6DC /* ESPPushOTAUpdateResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C08295D866D0000D6DC /* ESPPushOTAUpdateResponse.swift */; };
+		F1CC3C1A295D866D0000D6DC /* ESPOTAFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C09295D866D0000D6DC /* ESPOTAFailure.swift */; };
+		F1CC3C1B295D866D0000D6DC /* ESPOTAUpdateStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C0A295D866D0000D6DC /* ESPOTAUpdateStatus.swift */; };
+		F1CC3C1C295D866D0000D6DC /* ESPOTAUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C0B295D866D0000D6DC /* ESPOTAUpdate.swift */; };
+		F1CC3C1D295D866D0000D6DC /* ESPCheckOTAUpdateParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C0D295D866D0000D6DC /* ESPCheckOTAUpdateParser.swift */; };
+		F1CC3C1E295D866D0000D6DC /* ESPOTAUpdateStatusParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C0E295D866D0000D6DC /* ESPOTAUpdateStatusParser.swift */; };
+		F1CC3C1F295D866D0000D6DC /* ESPPushOTAUpdateParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C0F295D866D0000D6DC /* ESPPushOTAUpdateParser.swift */; };
+		F1CC3C20295D866D0000D6DC /* ESPGetOTAUpdateStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C11295D866D0000D6DC /* ESPGetOTAUpdateStatusService.swift */; };
+		F1CC3C21295D866D0000D6DC /* ESPPushOTAUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C12295D866D0000D6DC /* ESPPushOTAUpdateService.swift */; };
+		F1CC3C22295D866D0000D6DC /* ESPCheckOTAUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C13295D866D0000D6DC /* ESPCheckOTAUpdateService.swift */; };
+		F1CC3C23295D866D0000D6DC /* ESPOTAConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C15295D866D0000D6DC /* ESPOTAConstants.swift */; };
+		F1CC3C24295D866E0000D6DC /* ESPOTAAPIWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C16295D866D0000D6DC /* ESPOTAAPIWorker.swift */; };
+		F1CC3C25295D866E0000D6DC /* ESPOTAAPIEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C17295D866D0000D6DC /* ESPOTAAPIEndpoint.swift */; };
+		F1CC3C27295D87C80000D6DC /* UIImage+GIF.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CC3C26295D87C80000D6DC /* UIImage+GIF.swift */; };
+		F1CC3C2B295EFD9C0000D6DC /* checkUpdate.gif in Resources */ = {isa = PBXBuildFile; fileRef = F1CC3C29295EFD9C0000D6DC /* checkUpdate.gif */; };
+		F1CC3C2C295EFD9C0000D6DC /* updateInProgress.gif in Resources */ = {isa = PBXBuildFile; fileRef = F1CC3C2A295EFD9C0000D6DC /* updateInProgress.gif */; };
 		F1CE295C2861D015009EFC8E /* Date+DayOfWeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE295A2861D015009EFC8E /* Date+DayOfWeek.swift */; };
 		F1CE295D2861D015009EFC8E /* Double+TimeString.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE295B2861D015009EFC8E /* Double+TimeString.swift */; };
 		F1CE29602861D030009EFC8E /* ESPChartPointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1CE295E2861D02F009EFC8E /* ESPChartPointView.swift */; };
@@ -700,6 +718,24 @@
 		F1CC125A2784871A0007634C /* ESPTimeLabelGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTimeLabelGenerator.swift; sourceTree = "<group>"; };
 		F1CC125C2784E0630007634C /* ESPTSArguments+NextDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPTSArguments+NextDuration.swift"; sourceTree = "<group>"; };
 		F1CC12602787786B0007634C /* Double+Rounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Rounded.swift"; sourceTree = "<group>"; };
+		F1CC3C02295D85C20000D6DC /* FirmwareUpdateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirmwareUpdateViewController.swift; sourceTree = "<group>"; };
+		F1CC3C06295D866D0000D6DC /* ESPOTAPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAPresenter.swift; sourceTree = "<group>"; };
+		F1CC3C08295D866D0000D6DC /* ESPPushOTAUpdateResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPPushOTAUpdateResponse.swift; sourceTree = "<group>"; };
+		F1CC3C09295D866D0000D6DC /* ESPOTAFailure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAFailure.swift; sourceTree = "<group>"; };
+		F1CC3C0A295D866D0000D6DC /* ESPOTAUpdateStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAUpdateStatus.swift; sourceTree = "<group>"; };
+		F1CC3C0B295D866D0000D6DC /* ESPOTAUpdate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAUpdate.swift; sourceTree = "<group>"; };
+		F1CC3C0D295D866D0000D6DC /* ESPCheckOTAUpdateParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPCheckOTAUpdateParser.swift; sourceTree = "<group>"; };
+		F1CC3C0E295D866D0000D6DC /* ESPOTAUpdateStatusParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAUpdateStatusParser.swift; sourceTree = "<group>"; };
+		F1CC3C0F295D866D0000D6DC /* ESPPushOTAUpdateParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPPushOTAUpdateParser.swift; sourceTree = "<group>"; };
+		F1CC3C11295D866D0000D6DC /* ESPGetOTAUpdateStatusService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPGetOTAUpdateStatusService.swift; sourceTree = "<group>"; };
+		F1CC3C12295D866D0000D6DC /* ESPPushOTAUpdateService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPPushOTAUpdateService.swift; sourceTree = "<group>"; };
+		F1CC3C13295D866D0000D6DC /* ESPCheckOTAUpdateService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPCheckOTAUpdateService.swift; sourceTree = "<group>"; };
+		F1CC3C15295D866D0000D6DC /* ESPOTAConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAConstants.swift; sourceTree = "<group>"; };
+		F1CC3C16295D866D0000D6DC /* ESPOTAAPIWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAAPIWorker.swift; sourceTree = "<group>"; };
+		F1CC3C17295D866D0000D6DC /* ESPOTAAPIEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAAPIEndpoint.swift; sourceTree = "<group>"; };
+		F1CC3C26295D87C80000D6DC /* UIImage+GIF.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+GIF.swift"; sourceTree = "<group>"; };
+		F1CC3C29295EFD9C0000D6DC /* checkUpdate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = checkUpdate.gif; sourceTree = "<group>"; };
+		F1CC3C2A295EFD9C0000D6DC /* updateInProgress.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = updateInProgress.gif; sourceTree = "<group>"; };
 		F1CE295A2861D015009EFC8E /* Date+DayOfWeek.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+DayOfWeek.swift"; sourceTree = "<group>"; };
 		F1CE295B2861D015009EFC8E /* Double+TimeString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Double+TimeString.swift"; sourceTree = "<group>"; };
 		F1CE295E2861D02F009EFC8E /* ESPChartPointView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPChartPointView.swift; sourceTree = "<group>"; };
@@ -948,6 +984,7 @@
 		1431462520DE994B0017E119 /* ESPRainMaker */ = {
 			isa = PBXGroup;
 			children = (
+				F1CC3C04295D866D0000D6DC /* OTA update */,
 				F1C2DE5827439B620037EB3F /* Time Series */,
 				0C80AA0B26FDBD4B00480C53 /* UserManagement */,
 				F1390F1627D86C5D00F80DFB /* Device Automation */,
@@ -1320,6 +1357,7 @@
 		F199216A25B024CE0066BCB0 /* NodeDetails */ = {
 			isa = PBXGroup;
 			children = (
+				F1CC3C02295D85C20000D6DC /* FirmwareUpdateViewController.swift */,
 				F133494F25E23C4400CCB308 /* NodeDetailsTableViewCell.swift */,
 				F133494E25E23C4400CCB308 /* NodeDetailsViewController.swift */,
 				F199217925B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift */,
@@ -1361,6 +1399,7 @@
 		F1B1011A269EC520004B5537 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				F1CC3C26295D87C80000D6DC /* UIImage+GIF.swift */,
 				F168F2CA28E44DC200E39433 /* UITableView+ScrollToBottom.swift */,
 				F1AC6D8C27AD54700051F6E7 /* ESPRMDeviceType+GetImage.swift */,
 				F1B1011B269EC627004B5537 /* Double+DateTimeString.swift */,
@@ -1509,6 +1548,76 @@
 			path = Axis;
 			sourceTree = "<group>";
 		};
+		F1CC3C04295D866D0000D6DC /* OTA update */ = {
+			isa = PBXGroup;
+			children = (
+				F1CC3C05295D866D0000D6DC /* Presenter */,
+				F1CC3C07295D866D0000D6DC /* Model */,
+				F1CC3C0C295D866D0000D6DC /* Worker */,
+				F1CC3C10295D866D0000D6DC /* Interactors */,
+				F1CC3C14295D866D0000D6DC /* Utility */,
+			);
+			path = "OTA update";
+			sourceTree = "<group>";
+		};
+		F1CC3C05295D866D0000D6DC /* Presenter */ = {
+			isa = PBXGroup;
+			children = (
+				F1CC3C06295D866D0000D6DC /* ESPOTAPresenter.swift */,
+			);
+			path = Presenter;
+			sourceTree = "<group>";
+		};
+		F1CC3C07295D866D0000D6DC /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				F1CC3C08295D866D0000D6DC /* ESPPushOTAUpdateResponse.swift */,
+				F1CC3C09295D866D0000D6DC /* ESPOTAFailure.swift */,
+				F1CC3C0A295D866D0000D6DC /* ESPOTAUpdateStatus.swift */,
+				F1CC3C0B295D866D0000D6DC /* ESPOTAUpdate.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		F1CC3C0C295D866D0000D6DC /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				F1CC3C0D295D866D0000D6DC /* ESPCheckOTAUpdateParser.swift */,
+				F1CC3C0E295D866D0000D6DC /* ESPOTAUpdateStatusParser.swift */,
+				F1CC3C0F295D866D0000D6DC /* ESPPushOTAUpdateParser.swift */,
+			);
+			path = Worker;
+			sourceTree = "<group>";
+		};
+		F1CC3C10295D866D0000D6DC /* Interactors */ = {
+			isa = PBXGroup;
+			children = (
+				F1CC3C11295D866D0000D6DC /* ESPGetOTAUpdateStatusService.swift */,
+				F1CC3C12295D866D0000D6DC /* ESPPushOTAUpdateService.swift */,
+				F1CC3C13295D866D0000D6DC /* ESPCheckOTAUpdateService.swift */,
+			);
+			path = Interactors;
+			sourceTree = "<group>";
+		};
+		F1CC3C14295D866D0000D6DC /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				F1CC3C15295D866D0000D6DC /* ESPOTAConstants.swift */,
+				F1CC3C16295D866D0000D6DC /* ESPOTAAPIWorker.swift */,
+				F1CC3C17295D866D0000D6DC /* ESPOTAAPIEndpoint.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		F1CC3C28295EFD9C0000D6DC /* animations */ = {
+			isa = PBXGroup;
+			children = (
+				F1CC3C29295EFD9C0000D6DC /* checkUpdate.gif */,
+				F1CC3C2A295EFD9C0000D6DC /* updateInProgress.gif */,
+			);
+			path = animations;
+			sourceTree = "<group>";
+		};
 		F1D37CF327B4C238002BACEB /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1629,6 +1738,7 @@
 		F1F4513B2328C8F10009DCE0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				F1CC3C28295EFD9C0000D6DC /* animations */,
 				F15EAC0123E05A51008A766B /* Localizable.strings */,
 				F1C77F1124911FD4000CE2FE /* GitVersion.h */,
 				F17EF2AF2651661D002AC7BE /* ESPTimezone.swift */,
@@ -1809,6 +1919,7 @@
 				F133495F25E2B84100CCB308 /* SharingTableViewCell.xib in Resources */,
 				F1012F62251110B300839F06 /* Schedule.storyboard in Resources */,
 				F17581792418DF0B00FF7407 /* amazonRootCA.der in Resources */,
+				F1CC3C2C295EFD9C0000D6DC /* updateInProgress.gif in Resources */,
 				F1A8669F27EBC04B00A9858B /* AutomationActionSummaryView.xib in Resources */,
 				F18C23BF25F1838C009E232D /* CentralSwitchTableViewCell.xib in Resources */,
 				F11DC9A02577772F00603BF5 /* DropDownTableViewCell.xib in Resources */,
@@ -1816,6 +1927,7 @@
 				F1AB5119233216FE002401F9 /* GenericControlTableViewCell.xib in Resources */,
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
 				F10C2B2A25EB82DA00B60696 /* Settings.storyboard in Resources */,
+				F1CC3C2B295EFD9C0000D6DC /* checkUpdate.gif in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
 				F1CE29612861D030009EFC8E /* ESPChartPointView.xib in Resources */,
 				F1AC6D7F27A447B20051F6E7 /* TriggerTableViewCell.xib in Resources */,
@@ -1938,6 +2050,7 @@
 				0CF69236270A308B0098F515 /* ESPAlexaConnectViewController.swift in Sources */,
 				F1FBF05625EED1D200627C07 /* RadialHueColorPaletteDelegate.swift in Sources */,
 				F1390F4727D9E81800F80DFB /* ESPAutomationPresenter.swift in Sources */,
+				F1CC3C1C295D866D0000D6DC /* ESPOTAUpdate.swift in Sources */,
 				F1CE295D2861D015009EFC8E /* Double+TimeString.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
 				F1CE295C2861D015009EFC8E /* Date+DayOfWeek.swift in Sources */,
@@ -1963,6 +2076,7 @@
 				F117CDEF252C75CD00ADB856 /* ESPLocalControl.swift in Sources */,
 				0C80AA3126FDBD4B00480C53 /* ESPForgotPasswordService.swift in Sources */,
 				F1CA0C98257A2E270085E19A /* ParamDropDownTableViewCell.swift in Sources */,
+				F1CC3C03295D85C20000D6DC /* FirmwareUpdateViewController.swift in Sources */,
 				F17B80E927EC68670096035A /* GroupDevicesFlowLayout.swift in Sources */,
 				F1C76D7E2689848A009E217D /* Array<String>+CombinedString.swift in Sources */,
 				F1F45152232B7ECB0009DCE0 /* Attribute.swift in Sources */,
@@ -1999,6 +2113,8 @@
 				0CF69239270A308B0098F515 /* ESPEnableAlexaSkillService.swift in Sources */,
 				0C69D72826E9ED9800AF6985 /* NodeExtension.swift in Sources */,
 				0C80AA2F26FDBD4B00480C53 /* ESPIdProviderLoginService.swift in Sources */,
+				F1CC3C24295D866E0000D6DC /* ESPOTAAPIWorker.swift in Sources */,
+				F1CC3C25295D866E0000D6DC /* ESPOTAAPIEndpoint.swift in Sources */,
 				F10B074825CD7EBC00723254 /* NodeGroupsViewController.swift in Sources */,
 				F16BD3682758FDC20089049C /* ESPTSArguments.swift in Sources */,
 				F1A057B0278EA9C100485C23 /* UIView+AddGradient.swift in Sources */,
@@ -2010,6 +2126,8 @@
 				0C1C7C82276162CC0062867A /* SceneSelectDevicesVC.swift in Sources */,
 				F1FA24B3276F82D400447050 /* ESPChartViewProvider.swift in Sources */,
 				F1EAACAE23E2A74300E9A6A8 /* DefaultValues.swift in Sources */,
+				F1CC3C23295D866D0000D6DC /* ESPOTAConstants.swift in Sources */,
+				F1CC3C1A295D866D0000D6DC /* ESPOTAFailure.swift in Sources */,
 				F1E46CA1253ED6BA007000FB /* ESPAPIManager.swift in Sources */,
 				F1D0F30627A2D3030032DB80 /* ESPRMDeviceType.swift in Sources */,
 				0C80AA2E26FDBD4B00480C53 /* ESPCreateUserService.swift in Sources */,
@@ -2060,12 +2178,14 @@
 				0C80AA2326FDBD4B00480C53 /* ESPProtocol.swift in Sources */,
 				F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */,
 				F1E37E9323D6CF4800A5043F /* PasswordTextField.swift in Sources */,
+				F1CC3C18295D866D0000D6DC /* ESPOTAPresenter.swift in Sources */,
 				F1FFC91125D4A04500DD26C6 /* EditNodeGroupViewController.swift in Sources */,
 				F1EAACA923E2A74300E9A6A8 /* ColorPickerCell.swift in Sources */,
 				0C80AA2626FDBD4B00480C53 /* ESPAPIWorker.swift in Sources */,
 				0C69D72326E9ED4500AF6985 /* Node.swift in Sources */,
 				F1C76D62268871F3009E217D /* ESPLocalStorage.swift in Sources */,
 				F17F1412239F96C3008326A4 /* VersionManager.swift in Sources */,
+				F1CC3C1F295D866D0000D6DC /* ESPPushOTAUpdateParser.swift in Sources */,
 				F1924C36282AB7DC00E13FC8 /* ESPAutomationResponseParser.swift in Sources */,
 				0C80AA2A26FDBD4B00480C53 /* ESPTokenWorker.swift in Sources */,
 				F10D8DF8270EF1A80056E986 /* ESPLocalStorageHandler.swift in Sources */,
@@ -2076,8 +2196,10 @@
 				F13B821227E60E2500511BBB /* ESPParam+GetSliderBounds.swift in Sources */,
 				F190B9BA24BF7775006D136D /* ScheduleViewController.swift in Sources */,
 				0CF69238270A308B0098F515 /* ESPAlexaTokenWorker.swift in Sources */,
+				F1CC3C27295D87C80000D6DC /* UIImage+GIF.swift in Sources */,
 				143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */,
 				F18C23BE25F1838C009E232D /* CentralSwitchTableViewCell.swift in Sources */,
+				F1CC3C20295D866D0000D6DC /* ESPGetOTAUpdateStatusService.swift in Sources */,
 				F133495525E24CE200CCB308 /* NodeSharingManager.swift in Sources */,
 				F1A866A327EBC45300A9858B /* AutomationNameTableViewCell.swift in Sources */,
 				0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */,
@@ -2086,6 +2208,7 @@
 				F1FA24B5276F866300447050 /* ESPLineChartViewProvider.swift in Sources */,
 				F1EAAC8C23E2078300E9A6A8 /* AppSettingsViewController.swift in Sources */,
 				0C80AA3026FDBD4B00480C53 /* ESPExtendSessionService.swift in Sources */,
+				F1CC3C1B295D866D0000D6DC /* ESPOTAUpdateStatus.swift in Sources */,
 				F1124F64268D099300FA0B9E /* ESPNodeSharingAcceptedEvent.swift in Sources */,
 				0C80AA3326FDBD4B00480C53 /* ESPNoRefreshTokenLogic.swift in Sources */,
 				F10B076E25D11CCD00723254 /* NodeGroupTableViewCell.swift in Sources */,
@@ -2116,6 +2239,7 @@
 				F15FFF882402643A00E72D01 /* NoInternetConnection.swift in Sources */,
 				F1B1011E26A06867004B5537 /* ESPNodeDisassociatedEvent.swift in Sources */,
 				F199217A25B025E20066BCB0 /* RemoveNodeTableViewFooterView.swift in Sources */,
+				F1CC3C1D295D866D0000D6DC /* ESPCheckOTAUpdateParser.swift in Sources */,
 				F1390F4427D9E6A100F80DFB /* DeviceAutomationTableViewCell.swift in Sources */,
 				0C8BE957275D2DF10032A8E1 /* ESPScene.swift in Sources */,
 				F160AF1C26B7508C00578F00 /* ESPConfiguration.swift in Sources */,
@@ -2157,6 +2281,7 @@
 				F191CD41251122D300BDCEF1 /* AssistedClaiming.swift in Sources */,
 				F1390F2827D86C5E00F80DFB /* ESPAutomationAPIWorker.swift in Sources */,
 				F1FFC90725D4872C00DD26C6 /* SelectNodeFooterCollectionReusableView.swift in Sources */,
+				F1CC3C22295D866D0000D6DC /* ESPCheckOTAUpdateService.swift in Sources */,
 				F1B1012026A47105004B5537 /* ESPNotificationKeys.swift in Sources */,
 				F17E2F1527F33AE000938A45 /* ESPEnableAutomationService.swift in Sources */,
 				0C65879C27D5FA9100C5E0DB /* ESPScheduleConstants.swift in Sources */,
@@ -2173,6 +2298,7 @@
 				F1FA24A7275F358900447050 /* ESPXAxisNameFormater.swift in Sources */,
 				0C80AA2226FDBD4B00480C53 /* ESPPresenter.swift in Sources */,
 				F1B1012926AEFD52004B5537 /* UserNavigationHandler.swift in Sources */,
+				F1CC3C1E295D866D0000D6DC /* ESPOTAUpdateStatusParser.swift in Sources */,
 				F1A866A127EBC25100A9858B /* EditAutomationViewController.swift in Sources */,
 				F17B313A2844B0F90052D80F /* ESPSystemService.swift in Sources */,
 				0C04745027CFA36E00FCE611 /* ESPSceneConstants.swift in Sources */,
@@ -2190,6 +2316,7 @@
 				F1A866A527EBC4E200A9858B /* AutomationEventTableViewCell.swift in Sources */,
 				F1C76D66268875A7009E217D /* ESPLocalStorageNodes.swift in Sources */,
 				F1084205257103BD009F1AC3 /* GradientSlider.swift in Sources */,
+				F1CC3C21295D866D0000D6DC /* ESPPushOTAUpdateService.swift in Sources */,
 				F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */,
 				0CB234E92705751A000D0663 /* AppDelegate+UserManagement.swift in Sources */,
 				1431462720DE994B0017E119 /* AppDelegate.swift in Sources */,
@@ -2198,6 +2325,7 @@
 				F11DC9D72578D5D100603BF5 /* DeviceControlHelper.swift in Sources */,
 				F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */,
 				0C80AA3226FDBD4B00480C53 /* ESPChangePasswordService.swift in Sources */,
+				F1CC3C19295D866D0000D6DC /* ESPPushOTAUpdateResponse.swift in Sources */,
 				F13B821427E77FAB00511BBB /* ESPAutomationTriggerAction+GetPayload.swift in Sources */,
 				F133495125E23C4400CCB308 /* NodeDetailsTableViewCell.swift in Sources */,
 				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
@@ -2396,7 +2524,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 2.9.0;
+				MARKETING_VERSION = 2.10.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;

@@ -204,6 +204,13 @@ System service allows a primary user of the node to perform node operations like
 
 Note : System service feature requires support in firmware. It will be available for nodes that has "esp.service.system" configured.
 
+### OTA Update
+
+- Checks if firmware update is available for nodes that requires user approval.
+- Push firmware update to nodes remotely when user provide approval using the app.
+
+OTA update is optional and disabled by default. It can be enabled from the `Configuration.plist` by setting `Enable OTA Update` key from `App Configuration` to `YES`.
+
 ## Supports
 
 

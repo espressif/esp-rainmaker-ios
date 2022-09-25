@@ -22,6 +22,8 @@ import UIKit
 class NodeDetailsViewController: UIViewController {
     // Constants
     let systemServices = "System Services"
+    let firmwareUpdate = "firmwareUpdate"
+    
     @IBOutlet var tableView: UITableView!
     @IBOutlet var loadingIndicator: SpinnerView!
     @IBOutlet var loadingLabel: UILabel!
@@ -29,7 +31,7 @@ class NodeDetailsViewController: UIViewController {
     var currentNode: Node!
 
     var dataSource: [[String]] = [[]]
-    var collapsed = [false, false, false, false]
+    var collapsed = [false, false, false, false, false]
     var pendingRequests: [SharingRequest] = []
     var sharingIndex = 0
     var timeZoneParam: Param!
@@ -51,8 +53,6 @@ class NodeDetailsViewController: UIViewController {
         tableView.estimatedRowHeight = 70.0
         tableView.tableFooterView = UIView()
 
-        createDataSource()
-
         if Configuration.shared.appConfiguration.supportSharing {
             getSharingInfo()
         }
@@ -66,6 +66,7 @@ class NodeDetailsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = true
+        createDataSource()
     }
 
     @objc func hideKeyboard() {
@@ -195,6 +196,14 @@ class NodeDetailsViewController: UIViewController {
             }
         }
         
+        // Add option for OTA update if supported
+        if Configuration.shared.appConfiguration.supportOTAUpdate {
+            index += 1
+            dataSource.append([])
+            dataSource[index].append(firmwareUpdate)
+        }
+        
+        tableView.reloadData()
     }
 
     // MARK: - Private Methods
@@ -388,12 +397,20 @@ extension NodeDetailsViewController: UITableViewDelegate {
             headerView.headerLabel.text = headerTitle + " (Offline)"
         }
         
+        if headerTitle == firmwareUpdate {
+            return UIView()
+        }
+        
         return headerView
     }
 
     func tableView(_: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 {
             return 0
+        }
+        let sectionValue = dataSource[section][0]
+        if sectionValue == firmwareUpdate {
+            return 10
         }
         return 50.0
     }
@@ -433,6 +450,9 @@ extension NodeDetailsViewController: UITableViewDataSource {
         let sectionValue = dataSource[section][0]
         if sectionValue == systemServices {
             return dataSource[section].count/2
+        }
+        if sectionValue == firmwareUpdate {
+            return 1
         }
         return dataSource[section].count - 1
     }
@@ -521,6 +541,13 @@ extension NodeDetailsViewController: UITableViewDataSource {
                 cell.resetButton.isEnabled = false
             }
             return cell
+        } else if sectionValue == firmwareUpdate {
+            let cell = tableView.dequeueReusableCell(withIdentifier: firmwareUpdate, for: indexPath)
+            cell.contentView.layer.borderWidth = 0.5
+            cell.contentView.layer.cornerRadius = 10
+            cell.contentView.layer.borderColor = UIColor.lightGray.cgColor
+            cell.contentView.layer.masksToBounds = true
+            return cell
         }
         
         let value = dataSource[indexPath.section][indexPath.row + 1]
@@ -550,6 +577,16 @@ extension NodeDetailsViewController: UITableViewDataSource {
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailsTVC", for: indexPath) as! NodeDetailsTableViewCell
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let sectionValue = dataSource[indexPath.section][0]
+        if sectionValue == firmwareUpdate {
+            let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
+            let firmwareUpdateVC = deviceStoryboard.instantiateViewController(withIdentifier: firmwareUpdate) as! FirmwareUpdateViewController
+            firmwareUpdateVC.currentNode = currentNode
+            navigationController?.pushViewController(firmwareUpdateVC, animated: true)
+        }
     }
 }
 
