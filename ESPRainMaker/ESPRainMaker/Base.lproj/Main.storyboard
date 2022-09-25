@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S6F-ru-bO5">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -320,7 +320,7 @@
                     </tabBarItem>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="e8O-Ax-H59">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="48" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="barTintColor" red="0.94901960780000005" green="0.94509803920000002" blue="0.98823529409999999" alpha="1" colorSpace="calibratedRGB"/>
@@ -568,7 +568,7 @@
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wifiListCell" id="cHM-rp-6Qs" customClass="WifiListTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="44.5" width="350" height="43.5"/>
+                                                <rect key="frame" x="0.0" y="50" width="350" height="43.5"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cHM-rp-6Qs" id="KGP-NE-uxb">
                                                     <rect key="frame" x="0.0" y="0.0" width="350" height="43.5"/>
@@ -750,7 +750,7 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ngp-U3-nxr">
-                                <rect key="frame" x="32" y="454.5" width="350" height="134"/>
+                                <rect key="frame" x="32" y="454" width="350" height="134"/>
                                 <string key="text">To provision your device make sure it is turned ON and follow below steps:
 1. Go to Settings app using the Connect button below.
 2. Navigate to the Wi-Fi section in the iOS Settings app.
@@ -766,13 +766,13 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Connect your device" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UfM-3v-SMK">
-                                <rect key="frame" x="124" y="425" width="166" height="21.5"/>
+                                <rect key="frame" x="124" y="425" width="166" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" alpha="0.5" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5RK-YN-Cai" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                <rect key="frame" x="32" y="623.5" width="350" height="56"/>
+                                <rect key="frame" x="32" y="623" width="350" height="56"/>
                                 <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="350" id="umg-wP-hz2"/>
@@ -1118,6 +1118,27 @@ PROV_XXXX</string>
                                                                                     <constraint firstAttribute="height" constant="40" id="wOA-C1-sLF"/>
                                                                                 </constraints>
                                                                             </imageView>
+                                                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I5e-W2-Ju3">
+                                                                                <rect key="frame" x="185" y="16" width="30" height="30"/>
+                                                                                <color key="backgroundColor" red="0.50980392156862742" green="0.396078431372549" blue="0.8901960784313725" alpha="1" colorSpace="calibratedRGB"/>
+                                                                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                                <state key="normal" title="Button"/>
+                                                                                <buttonConfiguration key="configuration" style="plain"/>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                        <real key="value" value="15"/>
+                                                                                    </userDefinedRuntimeAttribute>
+                                                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                                                        <real key="value" value="2"/>
+                                                                                    </userDefinedRuntimeAttribute>
+                                                                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                                    </userDefinedRuntimeAttribute>
+                                                                                </userDefinedRuntimeAttributes>
+                                                                                <connections>
+                                                                                    <action selector="triggerButtonPressed:" destination="xk3-na-oA1" eventType="touchUpInside" id="ofH-n4-YnB"/>
+                                                                                </connections>
+                                                                            </button>
                                                                             <button hidden="YES" opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l5P-vq-j5D">
                                                                                 <rect key="frame" x="185" y="16" width="30" height="30"/>
                                                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1152,6 +1173,7 @@ PROV_XXXX</string>
                                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         <constraints>
                                                                             <constraint firstItem="unB-Hp-jbL" firstAttribute="leading" secondItem="l61-BQ-GxC" secondAttribute="leading" constant="16" id="2Yq-nc-Skc"/>
+                                                                            <constraint firstItem="l5P-vq-j5D" firstAttribute="bottom" secondItem="I5e-W2-Ju3" secondAttribute="bottom" id="51r-bs-1jM"/>
                                                                             <constraint firstItem="LJ1-l8-F6X" firstAttribute="top" secondItem="l61-BQ-GxC" secondAttribute="top" constant="16" id="90O-BA-gxV"/>
                                                                             <constraint firstItem="l5P-vq-j5D" firstAttribute="top" secondItem="l61-BQ-GxC" secondAttribute="top" constant="16" id="A3m-H7-3Sz"/>
                                                                             <constraint firstItem="mBU-Eh-Tz0" firstAttribute="leading" secondItem="l61-BQ-GxC" secondAttribute="leading" constant="8" id="Ekk-wT-7uZ"/>
@@ -1164,6 +1186,9 @@ PROV_XXXX</string>
                                                                             <constraint firstAttribute="trailing" secondItem="unB-Hp-jbL" secondAttribute="trailing" constant="4" id="lrE-NK-crv"/>
                                                                             <constraint firstItem="mBU-Eh-Tz0" firstAttribute="top" secondItem="l61-BQ-GxC" secondAttribute="top" constant="16" id="p1q-eq-Acz"/>
                                                                             <constraint firstAttribute="trailing" secondItem="l5P-vq-j5D" secondAttribute="trailing" constant="16" id="rBQ-qm-fp1"/>
+                                                                            <constraint firstItem="l5P-vq-j5D" firstAttribute="trailing" secondItem="I5e-W2-Ju3" secondAttribute="trailing" id="rY7-7p-tbU"/>
+                                                                            <constraint firstItem="l5P-vq-j5D" firstAttribute="top" secondItem="I5e-W2-Ju3" secondAttribute="top" id="vfn-NC-7xj"/>
+                                                                            <constraint firstItem="l5P-vq-j5D" firstAttribute="leading" secondItem="I5e-W2-Ju3" secondAttribute="leading" id="yhp-BS-4Di"/>
                                                                         </constraints>
                                                                         <userDefinedRuntimeAttributes>
                                                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
@@ -1199,6 +1224,7 @@ PROV_XXXX</string>
                                                                 <outlet property="primaryValue" destination="LJ1-l8-F6X" id="UE4-Ie-vj0"/>
                                                                 <outlet property="statusView" destination="unB-Hp-jbL" id="Yu6-6o-nHO"/>
                                                                 <outlet property="switchButton" destination="l5P-vq-j5D" id="dWs-nQ-x7Z"/>
+                                                                <outlet property="triggerButton" destination="I5e-W2-Ju3" id="o17-hS-mhh"/>
                                                             </connections>
                                                         </collectionViewCell>
                                                     </cells>
@@ -1996,7 +2022,7 @@ Unable to add device</string>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="bleDeviceCell" rowHeight="70" id="e2b-VG-MGG" customClass="BLEDeviceListViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="44.5" width="414" height="70"/>
+                                        <rect key="frame" x="0.0" y="50" width="414" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e2b-VG-MGG" id="tEp-Iw-EPl">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="70"/>
@@ -2330,7 +2356,7 @@ Unable to add device</string>
         <image name="devices" width="70" height="70"/>
         <image name="devices_selected" width="70" height="70"/>
         <image name="dummy_device_icon" width="48" height="48"/>
-        <image name="info.circle" catalog="system" width="128" height="121"/>
+        <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="info_icon" width="22" height="22"/>
         <image name="internet" width="70" height="70"/>
         <image name="menu_icon" width="32" height="32"/>

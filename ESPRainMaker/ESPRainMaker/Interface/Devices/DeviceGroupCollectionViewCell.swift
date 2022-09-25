@@ -115,6 +115,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         cell.device = device
         cell.switchButton.isHidden = true
         cell.primaryValue.isHidden = true
+        cell.triggerButton.isHidden = true
 
         cell.layer.shadowColor = UIColor.lightGray.cgColor
         cell.layer.shadowOffset = CGSize(width: 0.5, height: 1.0)
@@ -141,7 +142,16 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
                 param.name == primary
             }) {
                 primaryKeyFound = true
-                if primaryParam.dataType?.lowercased() == "bool" {
+                if primaryParam.uiType?.lowercased() == Constants.trigger {
+                    cell.triggerButton.isHidden = false
+                    if device.isReachable(), primaryParam.properties?.contains("write") ?? false {
+                        cell.triggerButton.isEnabled = true
+                        cell.triggerButton.alpha = 1.0
+                    } else {
+                        cell.triggerButton.isEnabled = false
+                        cell.triggerButton.alpha = 0.4
+                    }
+                } else if primaryParam.dataType?.lowercased() == "bool" {
                     if device.isReachable(), primaryParam.properties?.contains("write") ?? false {
                         cell.switchButton.alpha = 1.0
                         cell.switchButton.backgroundColor = UIColor.white

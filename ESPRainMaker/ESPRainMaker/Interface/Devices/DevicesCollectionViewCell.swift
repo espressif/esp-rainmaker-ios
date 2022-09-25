@@ -27,6 +27,7 @@ class DevicesCollectionViewCell: UICollectionViewCell {
     @IBOutlet var deviceImageView: UIImageView!
     @IBOutlet var deviceName: UILabel!
     @IBOutlet var switchButton: UIButton!
+    @IBOutlet var triggerButton: UIButton!
     @IBOutlet var statusView: UIView!
     @IBOutlet var offlineLabel: UILabel!
     @IBAction func switchButtonPressed(_: Any) {
@@ -45,6 +46,30 @@ class DevicesCollectionViewCell: UICollectionViewCell {
             switchButton.setBackgroundImage(UIImage(named: "switch_on"), for: .normal)
         } else {
             switchButton.setBackgroundImage(UIImage(named: "switch_off"), for: .normal)
+        }
+    }
+    
+    @IBAction func triggerButtonPressed(_: Any) {
+        // Animate button to show trigger effect
+        triggerButton.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+
+        UIView.animate(withDuration: 0.5,
+          delay: 0,
+                       usingSpringWithDamping: CGFloat(0.39),
+                       initialSpringVelocity: CGFloat(0),
+          options: .allowUserInteraction,
+          animations: {
+            self.triggerButton.transform = .identity
+          }, completion: {_ in }
+        )
+        NetworkManager.shared.setDeviceParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [device.primary ?? "": true]]) { result in
+            switch result {
+            case .failure:
+                let view = self.parentViewController?.view ?? self.contentView
+                Utility.showToastMessage(view: view, message: "Fail to update parameter. Please check you network connection!!")
+            default:
+                break
+            }
         }
     }
 
