@@ -170,18 +170,26 @@ class ProvisionViewController: UIViewController {
     }
 
     @IBAction func provisionButtonClicked(_: Any) {
-        guard let passphrase = passphraseTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-              passphrase.count > 0
-        else {
-            return
-        }
-        if shouldSavePassword {
-            savedPasswords[currentSSID] = passphrase
+        if !passphraseView.isHidden {
+            guard let passphrase = passphraseTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  passphrase.count > 0
+            else {
+                let alertController = UIAlertController(title: "Error", message: "Password cannot be empty.", preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .default)
+                alertController.addAction(action)
+                self.present(alertController, animated: true, completion: nil)
+                return
+            }
+            if shouldSavePassword {
+                savedPasswords[currentSSID] = passphrase
+            } else {
+                savedPasswords.removeValue(forKey: currentSSID)
+            }
+            UserDefaults.standard.setValue(savedPasswords, forKey: Constants.wifiPassword)
+            provisionDevice(ssid: currentSSID, passphrase: passphrase)
         } else {
-            savedPasswords.removeValue(forKey: currentSSID)
+            provisionDevice(ssid: currentSSID, passphrase: "")
         }
-        UserDefaults.standard.setValue(savedPasswords, forKey: Constants.wifiPassword)
-        provisionDevice(ssid: currentSSID, passphrase: passphrase)
     }
 
     // Scanned ESP device to get list of available Wi-Fi

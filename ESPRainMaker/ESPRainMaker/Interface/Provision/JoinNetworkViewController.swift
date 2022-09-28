@@ -81,14 +81,22 @@ class JoinNetworkViewController: UIViewController {
         device.disconnect()
         navigationController?.popToRootViewController(animated: false)
     }
+    
+    @IBAction func backButtonPressed(_: Any) {
+        navigationController?.popViewController(animated: false)
+    }
 
     @IBAction func provisionButtonClicked(_: Any) {
-        guard let passphrase = passphraseTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-              passphrase.count > 0
+        guard let ssid = ssidTextfield.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+              ssid.count > 0
         else {
+            let alertController = UIAlertController(title: "Error", message: "Network name cannot be empty.", preferredStyle: .alert)
+            let action = UIAlertAction(title: "Ok", style: .default)
+            alertController.addAction(action)
+            self.present(alertController, animated: true, completion: nil)
             return
         }
-        provisionDevice(ssid: ssidTextfield.text ?? "", passphrase: passphrase)
+        provisionDevice(ssid: ssid, passphrase: passphrase)
     }
 
     func showStatusScreen(step1Failed: Bool = false) {
