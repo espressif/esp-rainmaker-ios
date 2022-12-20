@@ -123,6 +123,7 @@ struct Constants {
     // Service types
     static let timezoneServiceName = "esp.service.time"
     static let timezoneServiceParam = "esp.param.tz"
+    static let systemService = "esp.service.system"
 
     // Theme Color
     static let backgroundColor = Configuration.shared.appThemeColor
@@ -174,6 +175,16 @@ struct Constants {
     static let scenesKey = "Scenes"
     
     static let edit = "Edit"
+    
+    // Data types
+    static let boolType = "bool"
+    static let intType = "int"
+    static let stringType = "string"
+    static let floatType = "float"
+    
+    // Property types
+    static let readType = "read"
+    static let writeType = "write"
     
     // Image names
     static let dummyDeviceImage = "dummy_device_icon"

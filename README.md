@@ -195,6 +195,15 @@ ESPRainMaker app supports remote notifiations in order to notify app in realtime
 
 Note : Time series feature requires support in firmware. It will be available only for the parameters that have "time_series" property.
 
+### System service
+
+System service allows a primary user of the node to perform node operations like:
+- Reboot
+- Wi-Fi reset
+- Factory reset
+
+Note : System service feature requires support in firmware. It will be available for nodes that has "esp.service.system" configured.
+
 ## Supports
 
 

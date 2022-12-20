@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -222,14 +222,14 @@
                                     <constraint firstItem="4ss-rj-wh7" firstAttribute="centerY" secondItem="sUH-9C-huB" secondAttribute="centerY" id="tfS-Z2-OvZ"/>
                                 </constraints>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" directionalLockEnabled="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="rIn-Rw-ujo">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" directionalLockEnabled="YES" indicatorStyle="black" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="rIn-Rw-ujo">
                                 <rect key="frame" x="32" y="236" width="350" height="626"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="nodeDetailsTVC" rowHeight="55" id="ycd-Qe-XKO" customClass="NodeDetailsTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="44.5" width="350" height="55"/>
+                                        <rect key="frame" x="0.0" y="50" width="350" height="55"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ycd-Qe-XKO" id="joj-Um-8YI">
                                             <rect key="frame" x="0.0" y="0.0" width="350" height="55"/>
@@ -290,6 +290,38 @@
                                         <connections>
                                             <outlet property="detailLabel" destination="NP1-FK-O9j" id="Kcv-Kf-kWi"/>
                                             <outlet property="titleLabel" destination="kAx-6A-Qi4" id="Lf3-rY-qgp"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="SystemServicesTableViewCell" id="SLT-JL-WTl" customClass="SystemServicesTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="105" width="350" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SLT-JL-WTl" id="svS-wm-Eeu">
+                                            <rect key="frame" x="0.0" y="0.0" width="350" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GvO-5k-MRM">
+                                                    <rect key="frame" x="20" y="7" width="315" height="30"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <color key="tintColor" systemColor="tintColor"/>
+                                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                    <state key="normal">
+                                                        <color key="titleColor" systemColor="systemBlueColor"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="buttonTapped:" destination="SLT-JL-WTl" eventType="touchUpInside" id="DOu-nA-jsk"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstItem="GvO-5k-MRM" firstAttribute="centerY" secondItem="svS-wm-Eeu" secondAttribute="centerY" id="8Nz-g4-hmN"/>
+                                                <constraint firstAttribute="trailing" secondItem="GvO-5k-MRM" secondAttribute="trailing" constant="15" id="ohH-q6-2z4"/>
+                                                <constraint firstItem="GvO-5k-MRM" firstAttribute="leading" secondItem="svS-wm-Eeu" secondAttribute="leading" constant="20" symbolic="YES" id="pfM-9P-i9c"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <outlet property="resetButton" destination="GvO-5k-MRM" id="BOt-Ai-hDA"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -816,13 +848,13 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" style="compact" translatesAutoresizingMaskIntoConstraints="NO" id="3vY-se-U1u">
-                                        <rect key="frame" x="8.5" y="73" width="193" height="31"/>
+                                        <rect key="frame" x="8.5" y="73" width="193" height="34.5"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="193" id="KiV-mM-JHu"/>
                                         </constraints>
                                     </datePicker>
                                     <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" style="compact" translatesAutoresizingMaskIntoConstraints="NO" id="fVQ-bs-YZH">
-                                        <rect key="frame" x="208.5" y="73" width="193" height="31"/>
+                                        <rect key="frame" x="208.5" y="73" width="193" height="34.5"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="193" id="pYj-UR-bwN"/>
                                         </constraints>
@@ -908,17 +940,23 @@
         </scene>
     </scenes>
     <resources>
-        <image name="info.circle" catalog="system" width="128" height="121"/>
+        <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="info_tab_icon" width="32" height="32"/>
-        <image name="next_button" width="16" height="16"/>
+        <image name="next_button" width="32" height="32"/>
         <image name="node_icon" width="100" height="90"/>
         <image name="prev_button" width="32" height="32"/>
         <image name="right_arrow" width="6.5" height="12"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemGray2Color">
             <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="tintColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
