@@ -507,7 +507,7 @@
                                                     <constraint firstAttribute="width" constant="25" id="ejl-hy-OOb"/>
                                                 </constraints>
                                             </imageView>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ij6-Td-237">
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ij6-Td-237">
                                                 <rect key="frame" x="41" y="10" width="247" height="20"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
@@ -2150,9 +2150,25 @@ Unable to add device</string>
                                             <action selector="cancelClicked:" destination="zSA-RH-jsX" eventType="touchUpInside" id="SI0-SR-qh9"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U76-hb-H0s">
+                                        <rect key="frame" x="16" y="47" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="S2F-ZA-1Fy"/>
+                                            <constraint firstAttribute="width" constant="50" id="dBZ-lB-iNu"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="Back">
+                                            <color key="titleColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="backButtonPressed:" destination="xks-hY-Ir4" eventType="touchUpInside" id="ZYm-yg-OOo"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
+                                    <constraint firstItem="U76-hb-H0s" firstAttribute="leading" secondItem="wUZ-ok-Hd1" secondAttribute="leading" constant="16" id="09A-TO-ALN"/>
+                                    <constraint firstItem="47v-Q7-y1t" firstAttribute="centerY" secondItem="U76-hb-H0s" secondAttribute="centerY" id="Ei5-t6-V4o"/>
                                     <constraint firstAttribute="trailing" secondItem="AEV-hV-RMv" secondAttribute="trailing" constant="16" id="L5w-df-Zyo"/>
                                     <constraint firstItem="47v-Q7-y1t" firstAttribute="centerX" secondItem="wUZ-ok-Hd1" secondAttribute="centerX" id="Q93-rN-2i5"/>
                                     <constraint firstAttribute="bottom" secondItem="47v-Q7-y1t" secondAttribute="bottom" constant="14" id="nqH-oU-Er6"/>
@@ -2200,7 +2216,7 @@ Unable to add device</string>
                                                     <constraint firstAttribute="width" constant="25" id="ivD-IC-Nrk"/>
                                                 </constraints>
                                             </imageView>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="J5V-gc-vF0">
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Network Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="J5V-gc-vF0">
                                                 <rect key="frame" x="41" y="9.5" width="289" height="21"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <textInputTraits key="textInputTraits"/>
@@ -2237,7 +2253,7 @@ Unable to add device</string>
                                                     <constraint firstAttribute="height" constant="25" id="ZPW-c0-v5w"/>
                                                 </constraints>
                                             </imageView>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="JFZ-5t-kS9">
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="JFZ-5t-kS9">
                                                 <rect key="frame" x="41" y="10" width="247" height="20"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
