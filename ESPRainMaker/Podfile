@@ -13,7 +13,7 @@ target 'ESPRainMaker' do
   pod 'ReachabilitySwift'
   pod 'JWTDecode', '~> 2.4'
   pod 'M13Checkbox'
-  pod 'ESPProvision', '2.0.14'
+  pod 'ESPProvision', '2.0.16'
   pod 'DropDown'
   pod 'FlexColorPicker'
   pod 'SwiftCharts', '~> 0.6.5'
