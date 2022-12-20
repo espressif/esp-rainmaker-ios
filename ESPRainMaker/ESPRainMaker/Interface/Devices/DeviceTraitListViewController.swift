@@ -157,14 +157,17 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func refreshDeviceAttributes() {
-        if device?.isReachable() ?? false {
-            NetworkManager.shared.getDeviceParam(device: device) { error in
-                if error != nil {
-                    return
-                }
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                    self.tableView.reloadData()
+        // Check if alert view is presented before trying to refetch the param values.
+        if self.presentedViewController == nil {
+            if device?.isReachable() ?? false {
+                NetworkManager.shared.getDeviceParam(device: device) { error in
+                    if error != nil {
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        Utility.hideLoader(view: self.view)
+                        self.tableView.reloadData()
+                    }
                 }
             }
         }
