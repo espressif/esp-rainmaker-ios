@@ -51,7 +51,7 @@ class ESPForgotPasswordService: ESPForgotPasswordLogic {
     /// Request forgot password
     /// - Parameter name: user name
     func requestForgotPassword(name: String) {
-        apiWorker.callAPI(endPoint: .requestForgotPassword(url: self.url, name: name), encoding: JSONEncoding.default) { data, error in
+        apiWorker.callAPI(endPoint: .requestForgotPassword(url: self.url, name: name, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
             self.apiParser.parseResponse(data, withError: error) { umError in
                 self.presenter?.requestedForgotPassword(withError: umError)
             }
@@ -64,7 +64,7 @@ class ESPForgotPasswordService: ESPForgotPasswordLogic {
     ///   - password: new password
     ///   - verificationCode: verification code
     func confirmForgotPassword(name: String, password: String, verificationCode: String) {
-        apiWorker.callAPI(endPoint: .confirmForgotPassword(url: self.url, name: name, password: password, verificationCode: verificationCode), encoding: JSONEncoding.default) { data, error in
+        apiWorker.callAPI(endPoint: .confirmForgotPassword(url: self.url, name: name, password: password, verificationCode: verificationCode, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
             self.apiParser.parseResponse(data, withError: error) { umError in
                 self.presenter?.confirmForgotPassword(withError: umError)
             }

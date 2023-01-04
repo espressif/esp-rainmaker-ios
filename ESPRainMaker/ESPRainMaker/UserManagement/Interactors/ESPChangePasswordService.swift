@@ -59,7 +59,7 @@ class ESPChangePasswordService: ESPChangePasswordLogic, ESPNoRefreshTokenLogic {
     func changePassword(oldPassword: String, newPassword: String) {
         sessionWorker.checkUserSession() { accessToken, sessionError in
             if let token = accessToken {
-                self.apiWorker.callAPI(endPoint: .changePassword(url: self.url, old: oldPassword, new: newPassword, accessToken: token), encoding: JSONEncoding.default) { data, error in
+                self.apiWorker.callAPI(endPoint: .changePassword(url: self.url, old: oldPassword, new: newPassword, accessToken: token, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
                     self.apiParser.parseResponse(data, withError: error) { umError in
                         self.presenter?.passwordChanged(withError: umError)
                     }

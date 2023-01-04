@@ -50,7 +50,7 @@ class ESPLogoutService: ESPLogoutLogic {
     
     /// Logout user
     func logoutUser() {
-        apiWorker.callAPI(endPoint: .logoutUser(url: self.url), encoding: JSONEncoding.default) { data, error in
+        apiWorker.callAPI(endPoint: .logoutUser(url: self.url, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
             self.apiParser.parseResponse(data, withError: error) { umError in
                 self.presenter?.userLoggedOut(withError: umError)
             }

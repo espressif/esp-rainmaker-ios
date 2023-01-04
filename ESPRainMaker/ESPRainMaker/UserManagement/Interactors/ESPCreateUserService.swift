@@ -54,7 +54,7 @@ class ESPCreateUserService: ESPCreateUserLogic {
     ///   - name: user name
     ///   - password: password
     func createNewUser(name: String, password: String) {
-        apiWorker.callAPI(endPoint: .createNewUser(url: self.url, name: name, password: password), encoding: JSONEncoding.default) { data, error in
+        apiWorker.callAPI(endPoint: .createNewUser(url: self.url, name: name, password: password, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
             self.apiParser.parseResponse(data, withError: error) { umError in
                 self.presenter?.verifyUser(withName: name, andPassword: password, withError: umError)
             }
@@ -66,7 +66,7 @@ class ESPCreateUserService: ESPCreateUserLogic {
     ///   - name: user name
     ///   - verificationCode: verification code
     func confirmUser(name: String, verificationCode: String) {
-        apiWorker.callAPI(endPoint: .confirmUser(url: self.url, name: name, verificationCode: verificationCode), encoding: JSONEncoding.default) { data, error in
+        apiWorker.callAPI(endPoint: .confirmUser(url: self.url, name: name, verificationCode: verificationCode, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
             self.apiParser.parseResponse(data, withError: error) { umError in
                 self.presenter?.userVerified(withError: umError)
             }

@@ -32,7 +32,8 @@ extension AppDelegate: ESPServerTokenProtocol {
         ESPURLParams.shared.setURLs(baseURL: Configuration.shared.getAWSBaseURL(),
             authURL: Configuration.shared.awsConfiguration.authURL,
             redirectURL: Configuration.shared.awsConfiguration.redirectURL,
-            appClientID: Configuration.shared.awsConfiguration.appClientId)
+            appClientID: Configuration.shared.awsConfiguration.appClientId,
+            userPool: Configuration.shared.appConfiguration.userPool)
     }
     
     /// Set keys for id, access and refresh token keys

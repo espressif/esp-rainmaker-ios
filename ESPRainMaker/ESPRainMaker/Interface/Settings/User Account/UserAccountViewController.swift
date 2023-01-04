@@ -19,7 +19,7 @@
 import Foundation
 import UIKit
 
-class UserAccountViewController: UIViewController {
+class UserAccountViewController: UIViewController, ESPNoRefreshTokenLogic {
     @IBOutlet var emailLabel: UILabel!
     @IBOutlet var userIDLabel: UILabel!
     @IBOutlet var changePasswordView: UIView!

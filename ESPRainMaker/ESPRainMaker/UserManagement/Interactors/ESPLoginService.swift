@@ -53,7 +53,7 @@ class ESPLoginService: ESPLoginLogic {
     ///   - name: user name
     ///   - password: password
     func loginUser(name: String, password: String) {
-        apiWorker.callAPI(endPoint: .loginUser(url: self.url, name: name, password: password), encoding: JSONEncoding.default) { data, error in
+        apiWorker.callAPI(endPoint: .loginUser(url: self.url, name: name, password: password, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
             self.apiParser.parseExtendSessionResponse(data, error: error) { _, umError in
                 self.presenter?.loginCompleted(withError: umError)
             }
