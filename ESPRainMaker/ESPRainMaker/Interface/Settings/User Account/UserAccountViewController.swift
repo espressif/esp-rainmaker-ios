@@ -51,4 +51,39 @@ class UserAccountViewController: UIViewController, ESPNoRefreshTokenLogic {
     @IBAction func backClicked(_: Any) {
         navigationController?.popViewController(animated: true)
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //If change password segue is selected user pool update
+        if segue.identifier == Constants.changePasswordSegueId {
+            let vc = segue.destination as! ChangePasswordViewController
+            vc.userPasswordUpdatedDelegate = self
+        }
+    }
+}
+
+extension UserAccountViewController: UserPasswordUpdatedProtocol {
+    
+    func logoutUser() {
+        let service = ESPLogoutService(presenter: self)
+        service.logoutUser()
+    }
+}
+
+extension UserAccountViewController: ESPLogoutUserPresentationLogic {
+    
+    func userLoggedOut(withError error: ESPAPIError?) {
+        self.clearUserData()
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            self.navigationController?.popToRootViewController(animated: false)
+            self.tabBarController?.selectedIndex = 0
+            let storyboard = UIStoryboard(name: "Login", bundle: nil)
+            if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {
+                if let _ = nav.viewControllers.first as? SignInViewController, let tab = self.tabBarController {
+                    nav.modalPresentationStyle = .fullScreen
+                    tab.present(nav, animated: true, completion: nil)
+                }
+            }
+        }
+    }
 }

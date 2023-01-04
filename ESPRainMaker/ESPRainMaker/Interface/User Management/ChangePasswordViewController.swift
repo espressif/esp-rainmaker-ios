@@ -18,10 +18,15 @@
 
 import UIKit
 
+protocol UserPasswordUpdatedProtocol: NSObject {
+    func logoutUser()
+}
+
 class ChangePasswordViewController: UIViewController {
     @IBOutlet var oldPasswordTextField: PasswordTextField!
     @IBOutlet var newPasswordTextField: PasswordTextField!
     @IBOutlet var confirmNewPasswordTextField: PasswordTextField!
+    weak var userPasswordUpdatedDelegate: UserPasswordUpdatedProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,7 +119,11 @@ extension ChangePasswordViewController: ESPChangePasswordPresentationLogic {
                                                         message: "Password changed successfully",
                                                         preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                    self.navigationController?.popToRootViewController(animated: false)
+                    if let delegate = self.userPasswordUpdatedDelegate {
+                        delegate.logoutUser()
+                    } else {
+                        self.navigationController?.popToRootViewController(animated: false)
+                    }
                 }
                 alertController.addAction(okAction)
                 self.present(alertController, animated: true, completion: nil)
