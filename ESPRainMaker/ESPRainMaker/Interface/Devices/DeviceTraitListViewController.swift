@@ -113,7 +113,7 @@ class DeviceTraitListViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        tableView.reloadData()
+        self.reloadTableView()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -123,7 +123,7 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     @objc func reloadParamTableView() {
-        tableView.reloadData()
+        self.reloadTableView()
     }
 
     @objc func appEnterForeground() {
@@ -157,19 +157,23 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func refreshDeviceAttributes() {
-        // Check if alert view is presented before trying to refetch the param values.
-        if self.presentedViewController == nil {
-            if device?.isReachable() ?? false {
-                NetworkManager.shared.getDeviceParam(device: device) { error in
-                    if error != nil {
-                        return
-                    }
-                    DispatchQueue.main.async {
-                        Utility.hideLoader(view: self.view)
-                        self.tableView.reloadData()
-                    }
+        if device?.isReachable() ?? false {
+            NetworkManager.shared.getDeviceParam(device: device) { error in
+                if error != nil {
+                    return
+                }
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    self.reloadTableView()
                 }
             }
+        }
+    }
+    
+    func reloadTableView() {
+        // Check if alert view is presented before trying to reload the param values.
+        if self.presentedViewController == nil {
+            self.tableView.reloadData()
         }
     }
 
@@ -203,7 +207,7 @@ class DeviceTraitListViewController: UIViewController {
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
                 self.checkForCentralParam()
-                self.tableView.reloadData()
+                self.reloadTableView()
             }
         }
     }
