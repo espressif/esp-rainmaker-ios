@@ -94,6 +94,7 @@ struct AppConfiguration {
     var supportSharing = true
     var supportScene = true
     var supportDeviceAutomation = true
+    var supportOTAUpdate = false
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -103,6 +104,7 @@ struct AppConfiguration {
             supportGrouping = configDict["Enable Grouping"] as? Bool ?? true
             supportSharing = configDict["Enable Sharing"] as? Bool ?? true
             supportDeviceAutomation = configDict["Enable Device Automation"] as? Bool ?? true
+            supportOTAUpdate = configDict["Enable OTA Update"] as? Bool ?? false
         }
     }
 }

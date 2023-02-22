@@ -38,6 +38,8 @@
 		<true/>
 		<key>Enable Device Automation</key>
 		<true/>
+		<key>Enable OTA Update</key>
+		<false/>
 	</dict>
 	<key>Provision Settings</key>
 	<dict>
