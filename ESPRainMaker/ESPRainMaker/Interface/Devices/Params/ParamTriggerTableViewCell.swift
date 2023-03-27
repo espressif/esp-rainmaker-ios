@@ -43,6 +43,6 @@ class ParamTriggerTableViewCell: TriggerTableViewCell {
     
     @IBAction override func triggerPressed(_ triggerButton : Any) {
         super.triggerPressed(_: triggerButton)
-        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: true]], delegate: paramDelegate)
+        DeviceControlHelper.shared.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [paramName: true]], delegate: paramDelegate)
     }
 }

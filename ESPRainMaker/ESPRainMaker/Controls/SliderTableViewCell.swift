@@ -53,9 +53,20 @@ class SliderTableViewCell: UITableViewCell {
     var dataType: String!
     var sliderValue = ""
     var paramDelegate: ParamUpdateProtocol?
+    var timer = Timer()
     
     var sliderInitialValue: Float?
     var sliderStepValue: Float?
+    
+    // Properties for handling continuous updates
+    let group = DispatchGroup()
+    var finalValue:Float = 0.0
+    var currentFinalValue:Float = 0.0
+    var hueFinalValue: CGFloat = 0.0
+    var hueCurrentFinalValue:CGFloat = 0.0
+    var currentTimeStamp = Date()
+    var hueTimeStamp = Date()
+    
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -63,12 +74,15 @@ class SliderTableViewCell: UITableViewCell {
 
     // IB Actions
     @IBAction func sliderValueChanged(_: UISlider) {}
+    
+    @IBAction func sliderValueDragged(_ sender: UISlider) {}
 
     @IBAction func hueSliderValueDragged(_: GradientSlider) {}
 
     @IBAction func hueSliderValueChanged(_: GradientSlider) {}
 
     @IBAction func checkBoxPressed(_: Any) {}
+
 }
 
 extension SliderTableViewCell: StepSliderProtocol {

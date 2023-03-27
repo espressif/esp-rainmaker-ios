@@ -211,6 +211,13 @@ Note : System service feature requires support in firmware. It will be available
 
 OTA update is optional and disabled by default. It can be enabled from the `Configuration.plist` by setting `Enable OTA Update` key from `App Configuration` to `YES`.
 
+### Continuous Parameter Update
+
+- App now supports continuous update feature that allows users to move a slider continuously and see the changes reflect on the device in real-time as the slider is moved.
+- Continuous update are supported only for sliders and hue circle type of UI.
+- This feautre is configurable but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Continuous Updates` key from `App Configuration` to `NO`.
+- Minimum gap between two updates can be managed by setting `Continuous Update Interval` under `App Configuration` in `Configuration.plist`. This value is considered in milliseconds and acceptable value is in range 400 - 1000.
+
 ## Supports
 
 

@@ -48,7 +48,7 @@ class SystemServicesTableViewCell: UITableViewCell {
             let alertController = UIAlertController(title: "Warning!", message: systemServiceCase.alertDescription, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "No", style: .default, handler: nil))
             alertController.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { _ in
-                DeviceControlHelper.updateParam(nodeID: self.node.node_id, parameter: [serviceName : [self.paramName: true]], delegate: nil)
+                DeviceControlHelper.shared.updateParam(nodeID: self.node.node_id, parameter: [serviceName : [self.paramName: true]], delegate: nil)
                 self.delegate?.systemServiceOperationPerformed()
                 if systemServiceCase == .factoryReset {
                     self.delegate?.factoryResetPerformed()

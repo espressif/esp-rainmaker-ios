@@ -171,9 +171,12 @@ class DeviceTraitListViewController: UIViewController {
     }
     
     func reloadTableView() {
-        // Check if alert view is presented before trying to reload the param values.
-        if self.presentedViewController == nil {
-            self.tableView.reloadData()
+        // Reload view if last param update was more than 5 seconds ago.
+        if Date().seconds(from: DeviceControlHelper.shared.latestRequestTimestamp) > 5 {
+            // Check if alert view is presented before trying to reload the param values.
+            if self.presentedViewController == nil {
+                self.tableView.reloadData()
+            }
         }
     }
 
@@ -300,7 +303,7 @@ class DeviceTraitListViewController: UIViewController {
             cell.paramDelegate = self
             let currentColor = HSBColor(hue: CGFloat(dynamicAttribute.value as! Int) / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
 
-            cell.hueSlider.setSelectedHSBColor(currentColor, isInteractive: true)
+            cell.hueSlider.setInitialHSBColor(currentColor, isInteractive: true)
             cell.selectedColor.setSelectedHSBColor(currentColor, isInteractive: true)
             return cell
         }
@@ -354,6 +357,9 @@ class DeviceTraitListViewController: UIViewController {
                         }
                         cell.title.text = dynamicAttribute.name ?? ""
                         setIconsForSliderCell(cell: cell, param: dynamicAttribute)
+                        
+                        // Check for continuos update setting from app configuration
+                        cell.slider.isContinuous = Configuration.shared.appConfiguration.supportContinuousUpdate
                         return cell
                     }
                 }

@@ -32,7 +32,8 @@ import UIKit
 let radialHuePaletteStripWidth: CGFloat = 28
 
 protocol RadialHueControlDelegate {
-    func colorSelected(hue: CGFloat)
+    func finalSelectedColor(value: CGFloat)
+    func selectedColor(value: CGFloat)
 }
 
 @IBDesignable
@@ -44,7 +45,6 @@ class RadialHueControl: ColorPaletteControl {
         thumbView.autoDarken = false
         super.commonInit()
     }
-
     override func updatePaletteImagesAndThumb(isInteractive interactive: Bool) {
         super.updatePaletteImagesAndThumb(isInteractive: interactive)
         thumbView.setColor(selectedHSBColor.withSaturation(1, andBrightness: 1).toUIColor(), animateBorderColor: false)
@@ -53,9 +53,21 @@ class RadialHueControl: ColorPaletteControl {
     override func setSelectedHSBColor(_ hsbColor: HSBColor, isInteractive interactive: Bool) {
         super.setSelectedHSBColor(hsbColor, isInteractive: interactive)
         thumbView.setColor(hsbColor.withSaturation(1, andBrightness: 1).toUIColor(), animateBorderColor: false)
+        delegate?.selectedColor(value: selectedHSBColor.hue * 360.0)
+    }
+    
+    func setInitialHSBColor(_ hsbColor: HSBColor, isInteractive interactive: Bool) {
+        super.setSelectedHSBColor(hsbColor, isInteractive: interactive)
+        thumbView.setColor(hsbColor.withSaturation(1, andBrightness: 1).toUIColor(), animateBorderColor: false)
     }
 
     override func touchesEnded(_: Set<UITouch>, with _: UIEvent?) {
-        delegate?.colorSelected(hue: selectedHSBColor.hue * 360.0)
+        delegate?.finalSelectedColor(value: selectedHSBColor.hue * 360.0)
+    }
+}
+
+extension ColorControl {
+    static var canConfirmColor: Bool {
+        return false
     }
 }

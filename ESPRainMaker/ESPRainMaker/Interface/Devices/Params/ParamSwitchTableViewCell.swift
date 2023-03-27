@@ -51,7 +51,7 @@ class ParamSwitchTableViewCell: SwitchTableViewCell {
         } else {
             controlStateLabel.text = "Off"
         }
-        DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]], delegate: paramDelegate)
+        DeviceControlHelper.shared.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: sender.isOn]], delegate: paramDelegate)
         param.value = sender.isOn
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.reloadCollectionView)))
     }

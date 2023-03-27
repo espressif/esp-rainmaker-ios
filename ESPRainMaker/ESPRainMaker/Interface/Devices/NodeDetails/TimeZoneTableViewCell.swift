@@ -61,7 +61,7 @@ class TimeZoneTableViewCell: DropDownTableViewCell {
 
         // Assigning action for dropdown item selection
         dropDown.selectionAction = { [unowned self] (_: Int, item: String) in
-            DeviceControlHelper.updateParam(nodeID: self.node?.node_id, parameter: [self.service?.name ?? "": [self.param.name ?? "": item]], delegate: paramDelegate)
+            DeviceControlHelper.shared.updateParam(nodeID: self.node?.node_id, parameter: [self.service?.name ?? "": [self.param.name ?? "": item]], delegate: paramDelegate)
             param.value = item
             currentValue = item
             DispatchQueue.main.async {

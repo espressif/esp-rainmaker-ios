@@ -21,17 +21,28 @@ import Foundation
 ///  Protocol to update listeners about failure in updating params
 protocol ParamUpdateProtocol {
     func failureInUpdatingParam()
+    
 }
 
-enum DeviceControlHelper {
-    static func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?, completionHandler: ((ESPCloudResponseStatus) -> Void)? = nil) {
+class DeviceControlHelper {
+    static let shared = DeviceControlHelper()
+    // Keep tracks of the timestamp for last request made.
+    var latestRequestTimestamp = Date()
+    
+    func updateParam(nodeID: String?, parameter: [String: Any], delegate: ParamUpdateProtocol?, completionHandler: ((ESPCloudResponseStatus) -> Void)? = nil) {
+        
+        // Update timestamp with latest request.
+        self.latestRequestTimestamp = Date()
+        
         NetworkManager.shared.setDeviceParam(nodeID: nodeID, parameter: parameter) { result in
             switch result {
             case .failure:
                 delegate?.failureInUpdatingParam()
+                completionHandler?(.unknown)
             case .success:
                 completionHandler?(result)
             default:
+                completionHandler?(.unknown)
                 break
             }
         }

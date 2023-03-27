@@ -159,6 +159,7 @@
 		F1676F88269626F9005C22CB /* ESPNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18744222695F52E00971591 /* ESPNotifications.swift */; };
 		F1676F89269735B4005C22CB /* ESPNotificationsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18744242696087900971591 /* ESPNotificationsStore.swift */; };
 		F168F2CB28E44DC200E39433 /* UITableView+ScrollToBottom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F168F2CA28E44DC200E39433 /* UITableView+ScrollToBottom.swift */; };
+		F16A9F5329CC66D30009F839 /* Date+Seconds.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16A9F5229CC66D20009F839 /* Date+Seconds.swift */; };
 		F16BD3682758FDC20089049C /* ESPTSArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16BD3672758FDC20089049C /* ESPTSArguments.swift */; };
 		F16BD370275DF1840089049C /* UInt+DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16BD36F275DF1840089049C /* UInt+DateFormatter.swift */; };
 		F172F96927B1344A00E62017 /* Calendar+GMT.swift in Sources */ = {isa = PBXBuildFile; fileRef = F172F96827B1344A00E62017 /* Calendar+GMT.swift */; };
@@ -579,6 +580,7 @@
 		F164A2F82581E73000B879BC /* Configuration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Configuration.plist; sourceTree = "<group>"; };
 		F164A30725824EC500B879BC /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		F168F2CA28E44DC200E39433 /* UITableView+ScrollToBottom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableView+ScrollToBottom.swift"; sourceTree = "<group>"; };
+		F16A9F5229CC66D20009F839 /* Date+Seconds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Seconds.swift"; sourceTree = "<group>"; };
 		F16BD3672758FDC20089049C /* ESPTSArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPTSArguments.swift; sourceTree = "<group>"; };
 		F16BD36F275DF1840089049C /* UInt+DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt+DateFormatter.swift"; sourceTree = "<group>"; };
 		F172F96827B1344A00E62017 /* Calendar+GMT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+GMT.swift"; sourceTree = "<group>"; };
@@ -1412,6 +1414,7 @@
 				F172F96827B1344A00E62017 /* Calendar+GMT.swift */,
 				F13B821127E60E2500511BBB /* ESPParam+GetSliderBounds.swift */,
 				F17B80EC27EF690C0096035A /* UISegmentControl+SetAppearance.swift */,
+				F16A9F5229CC66D20009F839 /* Date+Seconds.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2092,6 +2095,7 @@
 				F1B13AD823D85125006DD949 /* ChangePasswordViewController.swift in Sources */,
 				F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */,
 				F1AC6D8327AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift in Sources */,
+				F16A9F5329CC66D30009F839 /* Date+Seconds.swift in Sources */,
 				F1C352D026DBC40900A88893 /* ESPLocalDevice.swift in Sources */,
 				F1CC12542780FC640007634C /* ESPYAxisGenerator.swift in Sources */,
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
