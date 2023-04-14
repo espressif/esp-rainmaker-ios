@@ -188,4 +188,7 @@ struct Constants {
     
     // Image names
     static let dummyDeviceImage = "dummy_device_icon"
+    
+    // Change user password segue id
+    static let changePasswordSegueId = "ChangePassword"
 }
