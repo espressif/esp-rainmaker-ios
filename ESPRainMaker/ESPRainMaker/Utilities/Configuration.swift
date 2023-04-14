@@ -95,6 +95,7 @@ struct AppConfiguration {
     var supportScene = true
     var supportDeviceAutomation = true
     var supportOTAUpdate = false
+    var userPool: Int = 2
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -105,6 +106,9 @@ struct AppConfiguration {
             supportSharing = configDict["Enable Sharing"] as? Bool ?? true
             supportDeviceAutomation = configDict["Enable Device Automation"] as? Bool ?? true
             supportOTAUpdate = configDict["Enable OTA Update"] as? Bool ?? false
+            if let pool = configDict["User Pool"] as? Int {
+                userPool = pool
+            }
         }
     }
 }

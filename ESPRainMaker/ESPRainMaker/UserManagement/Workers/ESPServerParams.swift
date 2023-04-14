@@ -46,14 +46,17 @@ class ESPURLParams {
     var authURL: String = ""
     var redirectURL: String = ""
     var appClientID: String?
+    var userPool: Int = 2
     
     func setURLs(baseURL: String,
                  authURL: String,
                  redirectURL: String,
-                 appClientID: String?) {
+                 appClientID: String?,
+                 userPool: Int) {
         self.baseURL = baseURL
         self.authURL = authURL
         self.redirectURL = redirectURL
         self.appClientID = appClientID
+        self.userPool = userPool
     }
 }

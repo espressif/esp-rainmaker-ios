@@ -40,6 +40,8 @@
 		<true/>
 		<key>Enable OTA Update</key>
 		<false/>
+		<key>User Pool</key>
+		<integer>2</integer>
 	</dict>
 	<key>Provision Settings</key>
 	<dict>

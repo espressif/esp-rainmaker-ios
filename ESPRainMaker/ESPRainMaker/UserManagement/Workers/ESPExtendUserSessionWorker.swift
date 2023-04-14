@@ -58,7 +58,7 @@ class ESPExtendUserSessionWorker {
                 mail = email
             }
             if mail.count > 0 {
-                apiWorker.callAPI(endPoint: .extendSession(url: self.url, name: mail, refreshToken: refreshToken), encoding: JSONEncoding.default) { data, error in
+                apiWorker.callAPI(endPoint: .extendSession(url: self.url, name: mail, refreshToken: refreshToken, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
                     self.apiParser.parseExtendSessionResponse(data, error: error, completion: completion)
                 }
             } else {

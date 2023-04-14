@@ -60,7 +60,7 @@ class ESPUserService: ESPUserLogic {
     func updateUserName(name: String) {
         sessionWorker.checkUserSession { accessToken, error in
             if let token = accessToken, token.count > 0 {
-                self.apiWorker.callAPI(endPoint: .updateUsername(url: self.url, name: name, accessToken: token), encoding: JSONEncoding.default) {
+                self.apiWorker.callAPI(endPoint: .updateUsername(url: self.url, name: name, accessToken: token, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) {
                     data, error in
                     
                 }
@@ -73,7 +73,7 @@ class ESPUserService: ESPUserLogic {
     func fetchUserDetails() {
         sessionWorker.checkUserSession { accessToken, error in
             if let token = accessToken, token.count > 0 {
-                self.apiWorker.callAPI(endPoint: .fetchUserDetails(url: self.url, accessToken: token), encoding: JSONEncoding.default) {
+                self.apiWorker.callAPI(endPoint: .fetchUserDetails(url: self.url, accessToken: token, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) {
                     data, error in
                     self.apiParser.parseUserDetailsResponse(data, withError: error) { umError in
                         self.presenter?.userDetailsFetched(error: umError)
