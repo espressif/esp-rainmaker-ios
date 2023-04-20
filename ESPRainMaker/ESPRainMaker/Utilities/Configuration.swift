@@ -146,6 +146,7 @@ struct ESPProvSettings {
     var allowPrefixSearch = true
     var scanEnabled = true
     var bleDevicePrefix = ""
+    var sec2Username = ""
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -165,6 +166,7 @@ struct ESPProvSettings {
                 }
             }
             bleDevicePrefix = configDict["BLE Device Prefix"] as? String ?? ""
+            sec2Username = configDict["Security 2 Username"] as? String ?? ""
         }
     }
 }

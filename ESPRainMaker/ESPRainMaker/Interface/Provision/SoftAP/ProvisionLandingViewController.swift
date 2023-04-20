@@ -249,6 +249,11 @@ private func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: 
 }
 
 extension ProvisionLandingViewController: ESPDeviceConnectionDelegate {
+    
+    func getUsername(forDevice: ESPDevice, completionHandler: @escaping (String?) -> Void) {
+        completionHandler(Configuration.shared.espProvSetting.sec2Username)
+    }
+    
     func getProofOfPossesion(forDevice _: ESPDevice, completionHandler: @escaping (String) -> Void) {
         completionHandler("")
     }

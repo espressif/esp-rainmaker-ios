@@ -236,6 +236,11 @@ extension BLELandingViewController: UITextFieldDelegate {
 }
 
 extension BLELandingViewController: ESPDeviceConnectionDelegate {
+    
+    func getUsername(forDevice: ESPDevice, completionHandler: @escaping (String?) -> Void) {
+        completionHandler(Configuration.shared.espProvSetting.sec2Username)
+    }
+    
     func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (String) -> Void) {
         let connectVC = storyboard?.instantiateViewController(withIdentifier: Constants.connectVCIdentifier) as! ConnectViewController
         connectVC.espDevice = forDevice
