@@ -58,7 +58,7 @@ struct ESPChartViewProvider {
             let date = Date(timeIntervalSince1970: TimeInterval(tsArguments.duration.startTime))
             weekStart = date.dayOfWeek()
         }
-        tsManager.fetchTSDataFor(nodeID: device.node?.node_id ?? "", paramName: (device.name ?? "") + "." + (param.name ?? ""), aggregate: tsArguments.aggregate.rawValue, timeInterval:tsArguments.timeInterval.rawValue, startTime: tsArguments.duration.startTime, endTime: tsArguments.duration.endTime, weekStart: weekStart) { tsData, error in
+        tsManager.fetchTSDataFor(nodeID: device.node?.node_id ?? "", paramName: (device.name ?? "") + "." + (param.name ?? ""), dataType:param.dataType, aggregate: tsArguments.aggregate.rawValue, timeInterval:tsArguments.timeInterval.rawValue, startTime: tsArguments.duration.startTime, endTime: tsArguments.duration.endTime, weekStart: weekStart) { tsData, error in
             completionHandler(tsData, error)
         }
     }

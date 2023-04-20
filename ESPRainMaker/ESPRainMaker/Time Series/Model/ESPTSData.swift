@@ -33,8 +33,8 @@ struct ESPTSData:Codable {
             return nil
         }
         let jsonDecoder = JSONDecoder()
-        let responseModel = try! jsonDecoder.decode(ESPTSDataList.self, from: response)
-        if let tsData = responseModel.ts_data?[0] {
+        let responseModel = try? jsonDecoder.decode(ESPTSDataList.self, from: response)
+        if let tsData = responseModel?.ts_data?[0] {
             return tsData
         }
         return nil
