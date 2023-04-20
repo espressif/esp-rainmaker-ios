@@ -27,4 +27,6 @@ enum ESPRMDeviceType: String {
     case lock = "esp.device.lock"
     case sensor = "esp.device.sensor"
     case outlet = "esp.device.outlet"
+    case gateway = "esp.device.gateway"
+    case zigbeeGateway = "esp.device.zigbee_gateway"
 }

@@ -42,6 +42,7 @@ class DeviceTraitListViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         tableView.tableFooterView = UIView()
+        tableView.register(UINib(nibName: "ActionTableViewCell", bundle: nil), forCellReuseIdentifier: "ActionTableViewCell")
         tableView.register(UINib(nibName: "SwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "SwitchTableViewCell")
         tableView.register(UINib(nibName: "SliderTableViewCell", bundle: nil), forCellReuseIdentifier: "SliderTableViewCell")
         tableView.register(UINib(nibName: "StaticControlTableViewCell", bundle: nil), forCellReuseIdentifier: "staticControlTableViewCell")
@@ -321,7 +322,21 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func getTableViewCellBasedOn(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
-        if dynamicAttribute.uiType == Constants.slider {
+        if dynamicAttribute.uiType == Constants.scanQRCode {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: ActionTableViewCell.reuseIdentifier) as? ActionTableViewCell {
+                cell.controlValueLabel.text = "Scanner"
+                if let name = dynamicAttribute.name {
+                    cell.controlValueLabel.text = name
+                }
+                cell.delegate = self
+                cell.device = device
+                cell.param = dynamicAttribute
+                if let attributeName = dynamicAttribute.name {
+                    cell.paramName = attributeName
+                }
+                return cell
+            }
+        } else if dynamicAttribute.uiType == Constants.slider {
             if let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "int" || dataType == "float" {
                 if let bounds = dynamicAttribute.bounds {
                     let maxValue = bounds["max"] as? Float ?? 100
@@ -526,7 +541,7 @@ class DeviceTraitListViewController: UIViewController {
 
 extension DeviceTraitListViewController: UITableViewDelegate {
     func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
-        return 40.0
+        return 10.0
     }
 
     func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -600,5 +615,18 @@ extension String {
     func deletingPrefix(_ prefix: String) -> String {
         guard hasPrefix(prefix) else { return self }
         return String(dropFirst(prefix.count + 1))
+    }
+}
+
+
+extension DeviceTraitListViewController: ActionTableViewCellDelegate {
+    func actionInvoked(device: Device?, param: Param?, paramName: String) {
+        let storyboard = UIStoryboard(name: "Scanner", bundle: nil)
+        if let svc = storyboard.instantiateViewController(withIdentifier: String(describing: ESPScannerViewController.self)) as? ESPScannerViewController {
+            svc.device = device
+            svc.param = param
+            svc.paramName = paramName
+            self.navigationController?.pushViewController(svc, animated: true)
+        }
     }
 }

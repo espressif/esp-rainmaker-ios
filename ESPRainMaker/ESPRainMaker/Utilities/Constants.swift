@@ -111,6 +111,7 @@ struct Constants {
     static let github = "Github"
 
     // UI types
+    static let scanQRCode = "esp.ui.qr-scan"
     static let slider = "esp.ui.slider"
     static let hue = "esp.ui.hue-slider"
     static let toggle = "esp.ui.toggle"
@@ -119,7 +120,7 @@ struct Constants {
     static let dropdown = "esp.ui.dropdown"
     static let trigger = "esp.ui.trigger"
     static let hidden = "esp.ui.hidden"
-
+    
     // Service types
     static let timezoneServiceName = "esp.service.time"
     static let timezoneServiceParam = "esp.param.tz"
