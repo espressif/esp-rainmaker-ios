@@ -31,12 +31,14 @@ class ESPTimeSeriesAPIManager {
     /// - Parameters:
     ///   - nodeID: Node ID of device whose params data need to be fetched.
     ///   - paramName: Name of device parameter.
+    ///   - dataType: Type of data (Integer & Float are currently supported.)
     ///   - aggregate: Aggregate for a certain time duration like avgerage, minimum, maximum , etc.
     ///   - timeInterval: Time interval aggregate like hour, day, week , etc.
     ///   - startTime: Timestamp for start of duration.
     ///   - endTime: Timestamp for end of duration.
+    ///   - weekStart: Day of week that will be considered as start of the week.
     ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
-    func fetchTSDataFor(nodeID: String, paramName: String, aggregate: String? = nil, timeInterval: String? = nil, startTime: UInt? = nil, endTime: UInt? = nil, weekStart: String? = nil, completionHandler: @escaping (ESPTSData?, ESPNetworkError?) -> Void ) {
+    func fetchTSDataFor(nodeID: String, paramName: String, dataType:String? = nil, aggregate: String? = nil, timeInterval: String? = nil, startTime: UInt? = nil, endTime: UInt? = nil, weekStart: String? = nil, completionHandler: @escaping (ESPTSData?, ESPNetworkError?) -> Void ) {
         
         var url = tsDataURL + "?node_id=\(nodeID)&param_name=\(paramName)"
         if let aggregate = aggregate {
@@ -53,6 +55,15 @@ class ESPTimeSeriesAPIManager {
         }
         if let weekStart = weekStart {
             url.append("&week_start=\(weekStart)")
+        }
+        if let dataType = dataType {
+            switch dataType {
+            case "float","int":
+                url.append("&type=\(dataType)")
+            default:
+                completionHandler(nil,.serverError("Data type not supported."))
+                return
+            }
         }
         url.append("&timezone=\(TimeZone.current.identifier)")
         

@@ -115,6 +115,13 @@ class ESPChartsViewController: UIViewController {
     private func loadChart() {
         self.chart?.clearView()
         clearLabels()
+        switch param.dataType {
+        case "string","bool":
+            self.noChartDataLabel.text = "Data type not supported."
+            return
+        default:
+            break
+        }
         switch espTSArguments.aggregate {
         case .latest, .raw:
             switch self.espTSArguments.timeInterval {
