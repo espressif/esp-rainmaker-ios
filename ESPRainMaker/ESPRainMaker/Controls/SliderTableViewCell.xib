@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -20,13 +20,14 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xz9-78-Glk">
                         <rect key="frame" x="15" y="2" width="290" height="115"/>
                         <subviews>
-                            <slider hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gau-RP-e10" customClass="ThumbTextSlider" customModule="ESP_RainMaker" customModuleProvider="target">
+                            <slider hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="gau-RP-e10" customClass="ThumbTextSlider" customModule="ESP_RainMaker" customModuleProvider="target">
                                 <rect key="frame" x="38" y="50" width="214" height="31"/>
                                 <color key="minimumTrackTintColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="maximumTrackTintColor" red="0.50588235294117645" green="0.50588235294117645" blue="0.6588235294117647" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="thumbTintColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
-                                    <action selector="sliderValueChanged:" destination="KGk-i7-Jjw" eventType="valueChanged" id="qIx-IS-CWi"/>
+                                    <action selector="sliderValueChanged:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="1ig-VX-AVd"/>
+                                    <action selector="sliderValueDragged:" destination="KGk-i7-Jjw" eventType="valueChanged" id="e8Y-eb-0Hb"/>
                                 </connections>
                             </slider>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fv6-kj-hye">

@@ -45,11 +45,11 @@ class CentralSwitchTableViewCell: UITableViewCell {
     @IBAction func powerButtonPressed(_: Any) {
         let currentValue = param.value as! Bool
         if currentValue {
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [param.name ?? "": false]], delegate: paramDelegate)
+            DeviceControlHelper.shared.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [param.name ?? "": false]], delegate: paramDelegate)
             powerButton.setBackgroundImage(UIImage(named: "central_switch_off"), for: .normal)
             param.value = false
         } else {
-            DeviceControlHelper.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [param.name ?? "": true]], delegate: paramDelegate)
+            DeviceControlHelper.shared.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [param.name ?? "": true]], delegate: paramDelegate)
             powerButton.setBackgroundImage(UIImage(named: "central_switch_on"), for: .normal)
             param.value = true
         }

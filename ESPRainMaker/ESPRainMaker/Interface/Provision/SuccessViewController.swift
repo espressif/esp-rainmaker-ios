@@ -194,7 +194,7 @@ class SuccessViewController: UIViewController {
                             if let param = service.params?.first(where: { $0.type?.lowercased() == Constants.timezoneServiceParam }) {
                                 let timezone = param.value as? String
                                 if timezone == nil || timezone!.isEmpty {
-                                    DeviceControlHelper.updateParam(nodeID: nodeID, parameter: [service.name ?? "Time": [param.name ?? "": TimeZone.current.identifier]], delegate: nil)
+                                    DeviceControlHelper.shared.updateParam(nodeID: nodeID, parameter: [service.name ?? "Time": [param.name ?? "": TimeZone.current.identifier]], delegate: nil)
                                 }
                             }
                         }

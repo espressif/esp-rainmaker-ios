@@ -57,10 +57,10 @@ class ParamDropDownTableViewCell: DropDownTableViewCell {
         // Assigning action for dropdown item selection
         dropDown.selectionAction = { [unowned self] (_: Int, item: String) in
             if self.param.dataType?.lowercased() == "string" {
-                DeviceControlHelper.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": item]], delegate: paramDelegate)
+                DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": item]], delegate: paramDelegate)
                 param.value = item
             } else {
-                DeviceControlHelper.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": Int(item)]], delegate: paramDelegate)
+                DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": Int(item)]], delegate: paramDelegate)
                 param.value = Int(item)
             }
             currentValue = item

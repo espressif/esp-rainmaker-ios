@@ -96,6 +96,9 @@ struct AppConfiguration {
     var supportDeviceAutomation = true
     var supportOTAUpdate = false
     var userPool: Int = 2
+    var supportContinuousUpdate = true
+    // In milliseconds
+    var continuousUpdateInterval:Int64 = 400
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -108,6 +111,16 @@ struct AppConfiguration {
             supportOTAUpdate = configDict["Enable OTA Update"] as? Bool ?? false
             if let pool = configDict["User Pool"] as? Int {
                 userPool = pool
+            }
+            supportContinuousUpdate = configDict["Enable Continuous Updates"] as? Bool ?? true
+            let interval = configDict["Continuous Update Interval"] as? Int64 ?? 400
+            switch interval {
+            case 0..<400:
+                continuousUpdateInterval = 400
+            case 400...1000:
+                continuousUpdateInterval = interval
+            default:
+                continuousUpdateInterval = 1000
             }
         }
     }
