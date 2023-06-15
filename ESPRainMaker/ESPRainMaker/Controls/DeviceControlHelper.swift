@@ -38,7 +38,7 @@ class DeviceControlHelper {
             switch result {
             case .failure:
                 delegate?.failureInUpdatingParam()
-                completionHandler?(.unknown)
+                completionHandler?(.failure)
             case .success:
                 completionHandler?(result)
             default:

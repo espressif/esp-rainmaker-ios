@@ -89,8 +89,7 @@ class DeviceAutomationsListVC: UIViewController {
             textField?.keyboardType = .asciiCapable
             guard let name = textField?.text, name.count > 0 else {
                 //Show name error alert
-                self.showErrorAlert(title: "Error", message: "Please enter a name for the automation to proceed.", buttonTitle: "OK", callback: {
-                })
+                self.alertUser(title: "Error", message: "Please enter a name for the automation to proceed.", buttonTitle: "OK", callback: {})
                 return
             }
             self.addNewAutomation(name: name)

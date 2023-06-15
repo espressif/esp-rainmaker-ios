@@ -175,6 +175,8 @@ class NetworkManager {
                     availableService.setProperty(json: parameter) { success, _ in
                         if !success {
                             self.setDeviceParamPrivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+                        } else {
+                            completionHandler(.success)
                         }
                     }
                 } else {

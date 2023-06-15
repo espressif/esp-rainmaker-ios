@@ -459,7 +459,7 @@ extension String {
 
 extension UIViewController {
     
-    func showErrorAlert(title: String, message: String, buttonTitle: String, callback: @escaping () -> Void) {
+    func alertUser(title: String, message: String, buttonTitle: String, callback: @escaping () -> Void) {
         let alertController = UIAlertController(title: title,
                                                 message: message,
                                                 preferredStyle: .alert)

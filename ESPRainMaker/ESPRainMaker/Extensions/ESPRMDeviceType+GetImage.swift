@@ -38,6 +38,8 @@ extension ESPRMDeviceType {
             return UIImage(named: "sensor_icon")
         case .outlet:
             return UIImage(named: "outlet")
+        case .gateway, .zigbeeGateway:
+            return UIImage(named: "gateway")
         }
     }
 }

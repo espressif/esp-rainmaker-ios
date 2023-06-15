@@ -143,7 +143,7 @@ class SceneListViewController: UIViewController {
             textField?.keyboardType = .asciiCapable
             guard let name = textField?.text, name.count > 0 else {
                 //show name error alert
-                self.showErrorAlert(title: "Error", message: ESPSceneConstants.nameNotAddedErrorMessage, buttonTitle: "OK", callback: {
+                self.alertUser(title: "Error", message: ESPSceneConstants.nameNotAddedErrorMessage, buttonTitle: "OK", callback: {
                     self.addScene()
                 })
                 return
