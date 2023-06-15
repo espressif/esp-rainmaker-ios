@@ -60,7 +60,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     }
 
     func scanQrCode() {
-        ESPProvisionManager.shared.scanQRCode(scanView: scannerView) { espDevice, scanError in
+        ESPProvisionManager.shared.scanQRCode(scanView: self.scannerView) { espDevice, scanError in
             if let device = espDevice {
                 if self.isDeviceSupported(device: device) {
                     Utility.showLoader(message: "Connecting to device", view: self.view)
@@ -262,6 +262,11 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
 }
 
 extension ScannerViewController: ESPDeviceConnectionDelegate {
+    
+    func getUsername(forDevice: ESPDevice, completionHandler: @escaping (String?) -> Void) {
+        completionHandler(Configuration.shared.espProvSetting.sec2Username)
+    }
+    
     func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (String) -> Void) {
         completionHandler("")
     }

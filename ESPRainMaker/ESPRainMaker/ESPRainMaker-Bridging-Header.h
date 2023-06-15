@@ -16,5 +16,4 @@
 //
 
 #import <CommonCrypto/CommonDigest.h>
-#import "AESDecryptor.h"
 #import "GitVersion.h"

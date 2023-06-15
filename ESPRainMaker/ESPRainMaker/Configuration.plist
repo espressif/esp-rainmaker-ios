@@ -5,9 +5,9 @@
 	<key>AWS Configuration</key>
 	<dict>
 		<key>App Client ID</key>
-		<string>60i6kac5f9rjuetqnq5mnmaqv6</string>
+		<string>1h7ujqjs8140n17v0ahb4n51m2</string>
 		<key>Authentication URL</key>
-		<string>https://auth.rainmaker.espressif.com/oauth2</string>
+		<string>https://3pauth.rainmaker.espressif.com</string>
 		<key>Base URL</key>
 		<string>https://api.rainmaker.espressif.com</string>
 		<key>Redirect URL</key>
@@ -59,6 +59,8 @@
 		<string>Secure</string>
 		<key>ESP Scan Enabled</key>
 		<true/>
+		<key>Security 2 Username</key>
+		<string>wifiprov</string>
 	</dict>
 	<key>App Group</key>
 	<string>group.com.espressif.rainmaker.softap</string>

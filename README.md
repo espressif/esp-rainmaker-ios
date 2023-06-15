@@ -221,7 +221,7 @@ OTA update is optional and disabled by default. It can be enabled from the `Conf
 ## Supports
 
 
-- iOS 12.0 or greater.
+- iOS 13.0 or greater.
 
 - Xcode 13.0
 

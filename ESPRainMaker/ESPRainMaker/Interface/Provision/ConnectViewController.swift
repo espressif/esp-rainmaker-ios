@@ -132,6 +132,11 @@ class ConnectViewController: UIViewController {
 }
 
 extension ConnectViewController: ESPDeviceConnectionDelegate {
+    
+    func getUsername(forDevice: ESPDevice, completionHandler: @escaping (String?) -> Void) {
+        completionHandler(Configuration.shared.espProvSetting.sec2Username)
+    }
+    
     func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (String) -> Void) {
         completionHandler(pop)
     }
