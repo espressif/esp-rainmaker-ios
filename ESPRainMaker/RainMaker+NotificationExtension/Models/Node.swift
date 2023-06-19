@@ -64,6 +64,8 @@ class Node: Codable {
         case currentSchedulesCount
         case supportsEncryption
         case pop
+        case timestamp
+        case isConnected
     }
 
     func encode(to encoder: Encoder) throws {
@@ -78,9 +80,13 @@ class Node: Codable {
         try container.encode(currentSchedulesCount, forKey: .currentSchedulesCount)
         try container.encode(supportsEncryption, forKey: .supportsEncryption)
         try container.encode(pop, forKey: .pop)
+        try container.encode(timestamp, forKey: .timestamp)
+        try container.encode(isConnected, forKey: .isConnected)
 
         var configContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
         try configContainer.encode(info, forKey: .info)
+        try configContainer.encode(config_version, forKey: .config_version)
+        try configContainer.encode(config_version, forKey: .config_version)
         try configContainer.encode(config_version, forKey: .config_version)
     }
 
@@ -107,7 +113,8 @@ class Node: Codable {
         currentSchedulesCount = try container.decodeIfPresent(Int.self, forKey: .currentSchedulesCount) ?? 0
         supportsEncryption = try container.decodeIfPresent(Bool.self, forKey: .supportsEncryption) ?? false
         pop = try container.decodeIfPresent(String.self, forKey: .pop) ?? ""
-        isConnected = false
+        isConnected = try container.decodeIfPresent(Bool.self, forKey: .isConnected) ?? false
+        timestamp = try container.decodeIfPresent(Int.self, forKey: .timestamp) ?? 0
         fromLocalStorage = true
     }
 

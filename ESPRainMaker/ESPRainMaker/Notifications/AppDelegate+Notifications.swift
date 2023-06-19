@@ -18,6 +18,7 @@
 
 import Foundation
 import UIKit
+import WidgetKit
 
 extension AppDelegate {
     
@@ -87,6 +88,9 @@ extension AppDelegate {
         let notificationHandler = ESPNotificationHandler(userInfo)
         // Update data if event is related with node connection.
         notificationHandler.updateData()
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
         completionHandler([.alert, .badge, .sound])
     }
 

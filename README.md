@@ -218,6 +218,12 @@ OTA update is optional and disabled by default. It can be enabled from the `Conf
 - This feautre is configurable but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Continuous Updates` key from `App Configuration` to `NO`.
 - Minimum gap between two updates can be managed by setting `Continuous Update Interval` under `App Configuration` in `Configuration.plist`. This value is considered in milliseconds and acceptable value is in range 400 - 1000.
 
+### App Widget
+
+- App will support Widget from iOS version greater than 15.0.
+- Users have the option to add Widgets of both medium and small sizes to their Widget screen.
+- Widget will provide essential information regarding device connectivity status and primary parameter values.
+- Users can easily configure which device information is displayed within the Widget, offering a customizable experience.
 
 ## Custom Matter Fabric
 

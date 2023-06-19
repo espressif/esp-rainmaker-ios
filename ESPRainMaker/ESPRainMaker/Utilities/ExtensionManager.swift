@@ -22,6 +22,7 @@
 import Foundation
 import UIKit
 import Alamofire
+import WidgetKit
 
 extension UISegmentedControl {
     func removeBorder() {
@@ -585,6 +586,15 @@ extension ESPNoRefreshTokenLogic {
         User.shared.accessToken = nil
         User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
         User.shared.associatedNodeList = nil
+        // Refresh Widget after user logout.
+        if #available(iOS 14.0, *) {
+            if #available(iOS 16.0, *) {
+                WidgetCenter.shared.invalidateConfigurationRecommendations()
+            }
+            WidgetCenter.shared.reloadAllTimelines()
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     /// Is sign in view controller presented currently
