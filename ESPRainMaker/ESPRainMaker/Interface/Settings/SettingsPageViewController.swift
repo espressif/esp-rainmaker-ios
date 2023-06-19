@@ -26,13 +26,25 @@ class SettingsPageViewController: UIViewController {
     @IBOutlet var notificationCount: UILabel!
     @IBOutlet var notificationView: UIView!
     @IBOutlet var pendingActionView: UIView!
-
+    
+    @IBOutlet weak var groupSharingView: UIView!
+    @IBOutlet weak var groupSharingHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var groupSharingText: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateUIView), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
         navigationController?.navigationBar.isHidden = true
 
+        #if ESPRainMakerMatter
+        if !Configuration.shared.appConfiguration.supportGrouping {
+            self.hideGroupSharing()
+        }
+        #else
+        self.hideGroupSharing()
+        #endif
+        
         if !Configuration.shared.appConfiguration.supportSharing {
             pendingActionView.isHidden = true
             pendingActionView.heightAnchor.constraint(equalToConstant: 0.0).isActive = true
@@ -54,7 +66,8 @@ class SettingsPageViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
         tabBarController?.tabBar.isHidden = false
         emailLabel.text = User.shared.userInfo.email
 
@@ -104,6 +117,14 @@ class SettingsPageViewController: UIViewController {
         let userAccountVC = storyboard.instantiateViewController(withIdentifier: "userAccountVC") as! UserAccountViewController
         navigationController?.pushViewController(userAccountVC, animated: true)
     }
+    
+    @IBAction func showGroupSharingRequests(_: Any) {
+        let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
+        let sharingVC = storyboard.instantiateViewController(withIdentifier: NodeGroupSharingRequestsViewController.storyboardId) as! NodeGroupSharingRequestsViewController
+        tabBarController?.tabBar.isHidden = false
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.pushViewController(sharingVC, animated: true)
+    }
 
     func imageWith(name: String?) -> UIImage? {
         let frame = CGRect(x: 0, y: 0, width: 100, height: 100)
@@ -120,6 +141,12 @@ class SettingsPageViewController: UIViewController {
             return nameImage
         }
         return nil
+    }
+    
+    private func hideGroupSharing() {
+        self.groupSharingText.text = ""
+        self.groupSharingHeightConstraint.constant = 0
+        self.groupSharingView.isHidden = true
     }
 
     private func getSharingRequests() {

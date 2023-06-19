@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="RequestSentCell" rowHeight="101" id="WoN-ev-H8Z" customClass="RequestSentCell" customModule="ESP_RainMaker" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="101"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="WoN-ev-H8Z" id="0WB-RT-PoZ">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="101"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nYH-eS-1ro">
+                        <rect key="frame" x="20" y="10" width="335" height="81"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Shared group with user." textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="On5-uV-dtK">
+                                <rect key="frame" x="15" y="31" width="205" height="19.333333333333329"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2ha-ps-JNZ">
+                                <rect key="frame" x="235" y="23" width="85" height="35"/>
+                                <color key="backgroundColor" red="0.0" green="0.3294117647" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="LUK-Yr-P8R"/>
+                                    <constraint firstAttribute="width" constant="85" id="i6k-Qa-2CS"/>
+                                </constraints>
+                                <color key="tintColor" red="0.0" green="0.3294117647" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Cancel">
+                                    <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="14"/>
+                                </buttonConfiguration>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="cancelRequest:" destination="WoN-ev-H8Z" eventType="touchUpInside" id="n4Q-iB-PXX"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.96470588235294119" green="0.96470588235294119" blue="0.98431372549019602" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="On5-uV-dtK" firstAttribute="centerY" secondItem="nYH-eS-1ro" secondAttribute="centerY" id="5rc-0P-gFJ"/>
+                            <constraint firstItem="2ha-ps-JNZ" firstAttribute="leading" secondItem="On5-uV-dtK" secondAttribute="trailing" constant="15" id="P2q-mt-ze9"/>
+                            <constraint firstItem="On5-uV-dtK" firstAttribute="leading" secondItem="nYH-eS-1ro" secondAttribute="leading" constant="15" id="Rs2-Ts-WfD"/>
+                            <constraint firstItem="2ha-ps-JNZ" firstAttribute="centerY" secondItem="nYH-eS-1ro" secondAttribute="centerY" id="n2V-hV-NAQ"/>
+                            <constraint firstAttribute="trailing" secondItem="2ha-ps-JNZ" secondAttribute="trailing" constant="15" id="wbt-Xv-MsZ"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstItem="nYH-eS-1ro" firstAttribute="leading" secondItem="0WB-RT-PoZ" secondAttribute="leading" constant="20" id="QNo-t0-sAq"/>
+                    <constraint firstAttribute="trailing" secondItem="nYH-eS-1ro" secondAttribute="trailing" constant="20" id="kyA-dT-RPI"/>
+                    <constraint firstItem="nYH-eS-1ro" firstAttribute="top" secondItem="0WB-RT-PoZ" secondAttribute="top" constant="10" id="q1i-Tn-XTI"/>
+                    <constraint firstAttribute="bottom" secondItem="nYH-eS-1ro" secondAttribute="bottom" constant="10" id="zZw-WT-cDL"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="cancelRequestButton" destination="2ha-ps-JNZ" id="Wfa-FM-mO7"/>
+                <outlet property="container" destination="nYH-eS-1ro" id="jHy-Ya-eJD"/>
+                <outlet property="sharedWithText" destination="On5-uV-dtK" id="iDj-kY-E3n"/>
+            </connections>
+            <point key="canvasLocation" x="21" y="21"/>
+        </tableViewCell>
+    </objects>
+</document>

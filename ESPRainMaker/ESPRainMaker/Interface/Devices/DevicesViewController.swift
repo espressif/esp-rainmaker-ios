@@ -22,6 +22,23 @@ import JWTDecode
 import MBProgressHUD
 import UIKit
 
+enum NodeConnectionStatus {
+    case local
+    case remote
+    case offline
+    
+    var description: String {
+        switch self {
+        case .local:
+            return "Local"
+        case .remote:
+            return "Remote"
+        case .offline:
+            return "Offline"
+        }
+    }
+}
+
 class DevicesViewController: UIViewController {
     // IB outlets
     @IBOutlet var collectionView: UICollectionView!
@@ -41,6 +58,8 @@ class DevicesViewController: UIViewController {
     var checkDeviceAssociation = false
     private var currentPage = 0
     private var absoluteSegmentPosition: [CGFloat] = []
+    var groups: [ESPNodeGroup]?
+    var nodeGroups: [NodeGroup]?
     
     // MARK: - Overriden Methods
 
@@ -93,7 +112,7 @@ class DevicesViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        self.navigationController?.isNavigationBarHidden = true
         checkNetworkUpdate()
         if User.shared.updateUserInfo {
             User.shared.updateUserInfo = false
@@ -158,12 +177,61 @@ class DevicesViewController: UIViewController {
             subview.setNeedsDisplay()
         }
     }
-
+    
     @objc func refreshDeviceList() {
         showLoader()
         collectionView.isUserInteractionEnabled = false
         User.shared.updateDeviceList = false
-
+        if Configuration.shared.appConfiguration.supportGrouping {
+            self.setupGroupsUI()
+        } else {
+            self.getNodes {
+                self.searchForDevicesOnWLAN()
+                self.prepareView()
+            }
+        }
+    }
+    
+    private func setupGroupsUI() {
+        //get node groups data
+        NodeGroupManager.shared.getNodeGroups { groups, error in
+            if let groups = groups {
+                self.nodeGroups = groups
+                #if ESPRainMakerMatter
+                if #available(iOS 16.4, *) {
+                    self.getMatterNodeDetails(groups: groups) {
+                        //fetch user nocs for groups
+                        DispatchQueue.main.async {
+                            Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
+                        }
+                        self.fetchUserNOCs(groups: groups) {
+                            //fetch node configs
+                            self.fetchNodesAndUpdateUI(groups: groups, error: error)
+                        }
+                    }
+                } else {
+                    self.fetchNodesAndUpdateUI(groups: groups, error: error)
+                }
+                #else
+                self.fetchNodesAndUpdateUI(groups: groups, error: error)
+                #endif
+            } else {
+                self.fetchNodesAndUpdateUI(groups: groups, error: error)
+            }
+        }
+    }
+    
+    private func fetchNodesAndUpdateUI(groups: [NodeGroup]?, error: ESPNetworkError?) {
+        self.getNodes {
+            DispatchQueue.main.async {
+                NodeGroupManager.shared.updateNodeListInNodeGroup(nodeGroup: groups)
+                Utility.hideLoader(view: self.view)
+                self.discoverDevicesAndFormatUI(error: error)
+            }
+        }
+    }
+    
+    private func getNodes(_ completion: @escaping () -> Void) {
         NetworkManager.shared.getNodes { nodes, error in
             DispatchQueue.main.async {
                 self.loadingIndicator.isHidden = true
@@ -172,29 +240,48 @@ class DevicesViewController: UIViewController {
                     self.searchForDevicesOnWLAN()
                     self.unhideInitialView(error: error)
                     self.collectionView.isUserInteractionEnabled = true
+                    completion()
                     return
                 }
                 User.shared.associatedNodeList = nodes
-
-                if Configuration.shared.appConfiguration.supportGrouping {
-                    NodeGroupManager.shared.getNodeGroups { _, error in
-                        self.searchForDevicesOnWLAN()
-                        if error != nil {
-                            Utility.showToastMessage(view: self.view, message: error!.description, duration: 5.0)
-                        }
-                        self.setupSegmentControl()
-                        self.prepareView()
-                    }
-                } else {
-                    self.searchForDevicesOnWLAN()
-                    self.prepareView()
-                }
+                completion()
             }
         }
     }
+    
+    private func discoverDevicesAndFormatUI(error: ESPNetworkError?) {
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *) {
+            if let nodes = User.shared.associatedNodeList, nodes.count > 0 {
+                self.searchForMatterDevices { _ in
+                    DispatchQueue.main.async {
+                        Utility.showLoader(message: "Searching for matter devices...", view: self.view)
+                        self.formatUI(error: error)
+                        self.getNodeGroupMatterFabricDetails()
+                    }
+                }
+            } else {
+                self.formatUI(error: error)
+                self.getNodeGroupMatterFabricDetails()
+            }
+        } else {
+            self.formatUI(error: error)
+        }
+        #else
+        self.formatUI(error: error)
+        #endif
+    }
+    
+    func formatUI(error: ESPNetworkError?) {
+        self.searchForDevicesOnWLAN()
+        if error != nil {
+            Utility.showToastMessage(view: self.view, message: error!.description, duration: 5.0)
+        }
+        self.setupSegmentControl()
+        self.prepareView()
+    }
 
     // MARK: - IB Actions
-
     @IBAction func clickedSegment(segment: UISegmentedControl) {
         print(segment.selectedSegmentIndex)
         if segment.selectedSegmentIndex > currentPage {
@@ -261,7 +348,6 @@ class DevicesViewController: UIViewController {
     }
 
     // MARK: - Private Methods
-    
     private func searchForDevicesOnWLAN() {
         DispatchQueue.main.async {
             // Start local discovery if its enabled
@@ -509,6 +595,11 @@ extension DevicesViewController: UICollectionViewDataSource {
             }
         }
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "deviceGroupCollectionViewCell", for: indexPath) as! DeviceGroupCollectionViewCell
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *) {
+            cell.collectionView.register(UINib(nibName: DeviceCollectionViewCell.reuseIdentifier, bundle: nil), forCellWithReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier)
+        }
+        #endif
         cell.delegate = self
         if indexPath.item == 0 {
             cell.singleDeviceNodeCount = getSingleDeviceNodeCount(forNodeList: User.shared.associatedNodeList)
@@ -559,23 +650,6 @@ extension DevicesViewController: UIPopoverPresentationControllerDelegate {
 
     func popoverPresentationControllerShouldDismissPopover(_: UIPopoverPresentationController) -> Bool {
         return false
-    }
-}
-
-extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
-    func didSelectDevice(device: Device) {
-        let deviceTraitsVC = controlStoryBoard.instantiateViewController(withIdentifier: Constants.deviceTraitListVCIdentifier) as! DeviceTraitListViewController
-        deviceTraitsVC.device = device
-
-        Utility.hideLoader(view: view)
-        navigationController?.pushViewController(deviceTraitsVC, animated: true)
-    }
-
-    func didSelectNode(node: Node) {
-        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
-        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
-        destination.currentNode = node
-        navigationController?.pushViewController(destination, animated: true)
     }
 }
 

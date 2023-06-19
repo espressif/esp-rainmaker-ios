@@ -21,6 +21,10 @@ import UIKit
 protocol DeviceGroupCollectionViewCellDelegate {
     func didSelectDevice(device: Device)
     func didSelectNode(node: Node)
+    func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath)
+    func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?)
+    func showDeviceTraitListVC(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath)
+    func showDeleteDeviceVC(node: ESPNodeDetails?, group: ESPNodeGroup, rainmakerNode: Node?, indexPath: IndexPath)
 }
 
 class DeviceGroupCollectionViewCell: UICollectionViewCell {
@@ -34,11 +38,11 @@ class DeviceGroupCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
-
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-
+    
     @objc func refreshDeviceList() {
         refreshAction()
     }
@@ -58,7 +62,7 @@ class DeviceGroupCollectionViewCell: UICollectionViewCell {
         var index = indexPath.section
         if singleDeviceNodeCount > 0 {
             if index == 0 {
-                return datasource[indexPath.section]
+                return datasource[indexPath.item]
             }
             index = index + singleDeviceNodeCount - 1
         }
@@ -68,6 +72,42 @@ class DeviceGroupCollectionViewCell: UICollectionViewCell {
 
 extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
     func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        #if ESPRainMakerMatter
+        let node = getNodeAt(indexPath: indexPath)
+        if #available(iOS 16.4, *), node.isMatter {
+            var status: NodeConnectionStatus = .offline
+            if let id = node.node_id, let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: id), let group = ESPMatterFabricDetails.shared.getGroupData(groupId: groupId), let nodeDetails = ESPMatterFabricDetails.shared.getNodeDetails(nodeId: id) {
+                if let matterNodeId = ESPMatterFabricDetails.shared.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
+                    if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+                        status = .local
+                    } else if node.isRainmaker, node.isConnected {
+                        status = .remote
+                    }
+                    if status == .local {
+                        if let devices = node.devices {
+                            if devices.count > 1 {
+                                delegate?.launchDeviceScreen(isSingleDeviceNode: false, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath)
+                            } else {
+                                delegate?.launchDeviceScreen(isSingleDeviceNode: true, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath)
+                            }
+                        }
+                    } else if status  == .remote {
+                        delegate?.showDeviceTraitListVC(node: nodeDetails, group: group, endpointClusterId: nil, indexPath: indexPath)
+                    } else {
+                        delegate?.showDeleteDeviceVC(node: nodeDetails, group: group, rainmakerNode: node, indexPath: indexPath)
+                    }
+                } else {
+                    if #available(iOS 16.4, *), let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
+                        let status = cell.connectionStatus
+                        if status == .offline {
+                            delegate?.showDeleteDeviceVC(node: nodeDetails, group: group, rainmakerNode: node, indexPath: indexPath)
+                        }
+                    }
+                }
+            }
+            return
+        }
+        #endif
         let currentDevice = getDeviceAt(indexPath: indexPath)
         delegate?.didSelectDevice(device: currentDevice)
     }
@@ -108,6 +148,33 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        #if ESPRainMakerMatter
+        let node = getNodeAt(indexPath: indexPath)
+        if #available(iOS 16.4, *), node.isMatter, var cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
+            var status: NodeConnectionStatus = .offline
+            if let id = node.node_id, let matterNodeId = ESPMatterFabricDetails.shared.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
+                if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+                    status = .local
+                } else if node.isRainmaker, node.isConnected {
+                    status = .remote
+                }
+                if let matterDeviceName = node.matterDeviceName {
+                    cell.deviceName.text = matterDeviceName
+                }
+                if let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: id), let nodeDetails = ESPMatterFabricDetails.shared.getNodeDetails(nodeId: id) {
+                    if let devices = node.devices {
+                        if devices.count > 1 {
+                            self.configureNodeCell(cell: &cell, rainmakerNode: node, node: nodeDetails, groupId: groupId, matterNodeId: matterNodeId, deviceId: deviceId, isSingleDeviceNode: false, indexPath: indexPath)
+                        } else {
+                            self.configureNodeCell(cell: &cell, rainmakerNode: node, node: nodeDetails, groupId: groupId, matterNodeId: matterNodeId, deviceId: deviceId, isSingleDeviceNode: true, indexPath: indexPath)
+                        }
+                    }
+                }
+            }
+            cell.setConnectionStatusUI(status: status)
+            return cell
+        }
+        #endif
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "deviceCollectionViewCell", for: indexPath) as! DevicesCollectionViewCell
         cell.refresh()
         let device = getDeviceAt(indexPath: indexPath)
@@ -227,6 +294,52 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         }
         return headerView
     }
+    
+    #if ESPRainMakerMatter
+    /// Configure device cell
+    /// - Parameters:
+    ///   - cell: cell
+    ///   - node: node
+    ///   - groupId: group id
+    ///   - matterNodeId: matter node id
+    ///   - deviceId: node id
+    ///   - isSingleDeviceNode: is single device node
+    ///   - indexPath: index path
+    @available(iOS 16.4, *)
+    func configureNodeCell(cell: inout DeviceCollectionViewCell, rainmakerNode: Node, node: ESPNodeDetails, groupId: String, matterNodeId: String, deviceId: UInt64, isSingleDeviceNode: Bool, indexPath: IndexPath) {
+        let endPointClusterId = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
+        cell.node = node
+        if let group = ESPMatterFabricDetails.shared.getGroupData(groupId: groupId) {
+            cell.group = group
+        }
+        if let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
+            cell.deviceName.text = isSingleDeviceNode ? deviceName : deviceName+".\(indexPath.item)"
+        } else {
+            cell.deviceName.text = isSingleDeviceNode ? matterNodeId : matterNodeId+".\(indexPath.item)"
+        }
+        let (result, _) = ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId)
+        if result {
+            cell.deviceImage.image = UIImage(named: ESPMatterConstants.lightDevice)
+            cell.onOffButton.isHidden = false
+        } else if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId) {
+            if isSingleDeviceNode {
+                cell.endpointClusterId = endPointClusterId
+            } else {
+                let sortedKeys = endPointClusterId.keys.sorted { $0 < $1 }
+                if indexPath.item < sortedKeys.count {
+                    let key = sortedKeys[indexPath.item]
+                    cell.endpointClusterId = [key: [endPointClusterId[key]]]
+                }
+            }
+            cell.deviceImage.image = UIImage(named: ESPMatterConstants.switchDevice)
+            cell.onOffButton.isHidden = true
+        } else {
+            cell.deviceImage.image = UIImage(named: ESPMatterConstants.defaultDevice)
+            cell.onOffButton.isHidden = true
+        }
+        cell.rainmakerNode = rainmakerNode
+    }
+    #endif
 }
 
 extension DeviceGroupCollectionViewCell: UICollectionViewDelegateFlowLayout {

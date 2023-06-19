@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -161,7 +162,7 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="nodeGroupsTVC" rowHeight="60" id="zaQ-RE-IK2" customClass="NodeGroupTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="44.5" width="374" height="60"/>
+                                        <rect key="frame" x="0.0" y="50" width="374" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zaQ-RE-IK2" id="4YL-Ao-UFu">
                                             <rect key="frame" x="0.0" y="0.0" width="374" height="60"/>
@@ -366,6 +367,23 @@
                                             <action selector="removeGroupButtonPressed:" destination="E95-5n-8Co" eventType="touchUpInside" id="4vH-G3-hmd"/>
                                         </connections>
                                     </button>
+                                    <button contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oTp-KT-VNk" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="288" y="58" width="25" height="25"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="oTp-KT-VNk" secondAttribute="height" id="Hwu-xe-g86"/>
+                                            <constraint firstAttribute="width" constant="25" id="R8D-R1-SkJ"/>
+                                        </constraints>
+                                        <color key="tintColor" systemColor="systemBlueColor"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="share">
+                                            <backgroundConfiguration key="background"/>
+                                            <color key="baseForegroundColor" systemColor="systemBlueColor"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="shareButtonPressed:" destination="E95-5n-8Co" eventType="touchUpInside" id="ZJF-cj-rVl"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -377,6 +395,8 @@
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="96" id="UjO-hV-Z24"/>
                                     <constraint firstAttribute="bottom" secondItem="QdR-Yr-rOM" secondAttribute="bottom" constant="14" id="iby-gc-Geu"/>
                                     <constraint firstItem="QdR-Yr-rOM" firstAttribute="centerX" secondItem="mTx-hW-Xz9" secondAttribute="centerX" id="kzP-5b-j4U"/>
+                                    <constraint firstItem="RYK-hR-a8L" firstAttribute="leading" secondItem="oTp-KT-VNk" secondAttribute="trailing" constant="15" id="q8A-Ly-u2c"/>
+                                    <constraint firstItem="oTp-KT-VNk" firstAttribute="centerY" secondItem="RYK-hR-a8L" secondAttribute="centerY" id="sJo-rr-Pkm"/>
                                     <constraint firstItem="7ig-gZ-afK" firstAttribute="leading" secondItem="mTx-hW-Xz9" secondAttribute="leading" constant="16" id="xKP-xO-yQV"/>
                                     <constraint firstItem="4Jf-WX-XkK" firstAttribute="top" secondItem="7ig-gZ-afK" secondAttribute="bottom" id="zc9-TP-teP"/>
                                 </constraints>
@@ -608,6 +628,7 @@
                         <outlet property="addButtonHeightConstraint" destination="jJC-Za-Iki" id="kEQ-Vg-VBs"/>
                         <outlet property="collectionView" destination="6sR-LH-RwD" id="smZ-H5-YuE"/>
                         <outlet property="nameLabel" destination="gbD-1P-K14" id="EUi-FI-fkA"/>
+                        <outlet property="shareButton" destination="oTp-KT-VNk" id="MWm-fQ-ZJh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pbz-i6-PFD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1329,6 +1350,10 @@
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="refresh_icon" width="128" height="128"/>
         <image name="right_arrow" width="6.5" height="12"/>
+        <image name="share" width="17.5" height="23.5"/>
         <image name="unselected_empty" width="10" height="10"/>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>

@@ -202,7 +202,7 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
     ///   - code: rainmaker auth code
     ///   - completionHandler: callback to be invoked with AlexaAPIStatus
     func espEnableSkill(code: String, completionHandler: @escaping (ESPAlexaAPIStatus) -> Void) {
-        
+        self.apiWorker = ESPAlexaAPIWorker()
         if let accessToken = ESPAlexaTokenWorker.shared.getAccessToken, let urlEndPoints = ESPAlexaTokenWorker.shared.getAlexaURLEndPoints, urlEndPoints.count > 0 {
             self.enableSkillForMultipleEndpoints(apiEndPoints: urlEndPoints, index: 0, code: code, accessToken: accessToken, completionHandler: completionHandler)
         } else {
@@ -249,7 +249,7 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
             urlEndPoint: endPoint,
             stage: Configuration.shared.espAlexaConfiguration.skillStage)
         
-        apiWorker.callAPI(endPoint: apiEndPoint, encoding: JSONEncoding.default) { response in
+        self.apiWorker.callAPI(endPoint: apiEndPoint, encoding: JSONEncoding.default) { response in
             let (data, error) = self.parseResponse(response: response)
             if !self.checkEnablementStatusCode(response: response, enablementStatus: .enable, completionHandler: completionHandler) {
                 return

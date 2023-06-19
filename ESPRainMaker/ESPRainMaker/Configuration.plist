@@ -1,87 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>AWS Configuration</key>
-	<dict>
-		<key>App Client ID</key>
-		<string>1h7ujqjs8140n17v0ahb4n51m2</string>
-		<key>Authentication URL</key>
-		<string>https://3pauth.rainmaker.espressif.com</string>
-		<key>Base URL</key>
-		<string>https://api.rainmaker.espressif.com</string>
-		<key>Redirect URL</key>
-		<string>com.espressif.rainmaker.softap://success</string>
-		<key>Claim URL</key>
-		<string>https://esp-claiming.rainmaker.espressif.com</string>
-	</dict>
-	<key>External Links</key>
-	<dict>
-		<key>Terms of Use</key>
-		<string>https://rainmaker.espressif.com/docs/terms-of-use.html</string>
-		<key>Privacy Policy</key>
-		<string>https://rainmaker.espressif.com/docs/privacy-policy.html</string>
-		<key>Documentation</key>
-		<string>https://rainmaker.espressif.com</string>
-	</dict>
-	<key>App Configuration</key>
-	<dict>
-		<key>Enable Grouping</key>
-		<true/>
-		<key>Enable Schedule</key>
-		<true/>
-		<key>Enable Local Control</key>
-		<true/>
-		<key>Enable Sharing</key>
-		<true/>
-		<key>Enable Scene</key>
-		<true/>
-		<key>Enable Device Automation</key>
-		<true/>
-		<key>Enable OTA Update</key>
-		<false/>
-		<key>User Pool</key>
-		<integer>2</integer>
-		<key>Enable Continuous Updates</key>
-		<true/>
-		<key>Continuous Update Interval</key>
-		<integer>400</integer>
-	</dict>
-	<key>Provision Settings</key>
-	<dict>
-		<key>ESP Transport</key>
-		<string>Both</string>
-		<key>BLE Device Prefix</key>
-		<string>PROV_</string>
-		<key>ESP Allow Prefix Search</key>
-		<true/>
-		<key>ESP Securtiy Mode</key>
-		<string>Secure</string>
-		<key>ESP Scan Enabled</key>
-		<true/>
-		<key>Security 2 Username</key>
-		<string>wifiprov</string>
-	</dict>
-	<key>App Group</key>
-	<string>group.com.espressif.rainmaker.softap</string>
-	<key>App Theme Color</key>
-	<string>#FFFFFF</string>
-	<key>ESP Alexa Configuration</key>
-	<dict>
-		<key>Alexa Client Id</key>
-		<string></string>
-		<key>Alexa Client Secret</key>
-		<string></string>
-		<key>Alexa RM Client Id</key>
-		<string></string>
-		<key>Skill Id</key>
-		<string></string>
-		<key>Skill Stage</key>
-		<string></string>
-		<key>Redirect URL</key>
-		<string></string>
-		<key>Alexa Access Token URL</key>
-		<string></string>
-	</dict>
-</dict>
+    <dict>
+        <key>AWS Configuration</key>
+        <dict>
+            <key>App Client ID</key>
+            <string>1h7ujqjs8140n17v0ahb4n51m2</string>
+            <key>Authentication URL</key>
+            <string>https://3pauth.rainmaker.espressif.com</string>
+            <key>Base URL</key>
+            <string>https://api.rainmaker.espressif.com</string>
+            <key>Redirect URL</key>
+            <string>com.espressif.rainmaker.softap://success</string>
+            <key>Claim URL</key>
+            <string>https://esp-claiming.rainmaker.espressif.com</string>
+        </dict>
+        <key>External Links</key>
+        <dict>
+            <key>Terms of Use</key>
+            <string>https://rainmaker.espressif.com/docs/terms-of-use.html</string>
+            <key>Privacy Policy</key>
+            <string>https://rainmaker.espressif.com/docs/privacy-policy.html</string>
+            <key>Documentation</key>
+            <string>https://rainmaker.espressif.com</string>
+        </dict>
+        <key>App Configuration</key>
+        <dict>
+            <key>Enable Grouping</key>
+            <true/>
+            <key>Enable Schedule</key>
+            <true/>
+            <key>Enable Local Control</key>
+            <true/>
+            <key>Enable Sharing</key>
+            <true/>
+            <key>Enable Scene</key>
+            <true/>
+            <key>Enable Device Automation</key>
+            <true/>
+            <key>Enable OTA Update</key>
+            <false/>
+            <key>User Pool</key>
+            <integer>2</integer>
+            <key>Enable Continuous Updates</key>
+            <true/>
+            <key>Continuous Update Interval</key>
+            <integer>400</integer>
+            <key>Matter Ecosystem</key>
+            <string>Espressif</string>
+        </dict>
+        <key>Provision Settings</key>
+        <dict>
+            <key>ESP Transport</key>
+            <string>Both</string>
+            <key>BLE Device Prefix</key>
+            <string>PROV_</string>
+            <key>ESP Allow Prefix Search</key>
+            <true/>
+            <key>ESP Securtiy Mode</key>
+            <string>Secure</string>
+            <key>ESP Scan Enabled</key>
+            <true/>
+            <key>Security 2 Username</key>
+            <string>wifiprov</string>
+        </dict>
+        <key>App Group</key>
+        <string>group.com.espressif.rainmaker.softap</string>
+        <key>App Theme Color</key>
+        <string>#FFFFFF</string>
+        <key>ESP Alexa Configuration</key>
+        <dict>
+            <key>Alexa Client Id</key>
+            <string></string>
+            <key>Alexa Client Secret</key>
+            <string></string>
+            <key>Alexa RM Client Id</key>
+            <string></string>
+            <key>Skill Id</key>
+            <string></string>
+            <key>Skill Stage</key>
+            <string></string>
+            <key>Redirect URL</key>
+            <string></string>
+            <key>Alexa Access Token URL</key>
+            <string></string>
+        </dict>
+    </dict>
 </plist>

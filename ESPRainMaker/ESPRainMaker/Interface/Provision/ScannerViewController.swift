@@ -83,8 +83,28 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                         switch error {
                         case .cameraAccessDenied:
                             self.noCameraView.isHidden = false
-                        case .espDeviceNotFound, .softApSearchNotSupported, .invalidQRCode:
+                        case .espDeviceNotFound, .softApSearchNotSupported:
                             self.retry(message: error.description)
+                        case .invalidQRCode(let code):
+                            Utility.hideLoader(view: self.view)
+                            if code.hasPrefix(ESPMatterConstants.matterPrefix) {
+                                #if ESPRainMakerMatter
+                                if #available(iOS 16.4, *) {
+                                    self.goToFabricSelection(onboardingPayload: code)
+                                } else {
+                                    self.alertUser(title: ESPMatterConstants.warning, message: ESPMatterConstants.upgradeOSVersionMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {
+                                        self.navigationController?.popToRootViewController(animated: false)
+                                    })
+                                }
+                                #else
+                                self.alertUser(title: ESPMatterConstants.warning, message: ESPMatterConstants.matterNotSupportedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {
+                                    self.navigationController?.popToRootViewController(animated: false)
+                                })
+                                #endif
+                            } else {
+                                self.retry(message: error.description)
+                            }
+                            break
                         case .videoInputError, .videoOutputError, .cameraNotAvailable, .avCaptureDeviceInputError:
                             self.showAlertWith(message: "Unable to scan QR code. Something went wrong while processing camera input.")
                         }
@@ -209,6 +229,17 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         let bleLandingVC = storyboard?.instantiateViewController(withIdentifier: "provisionLanding") as! ProvisionLandingViewController
         navigationController?.pushViewController(bleLandingVC, animated: true)
     }
+    
+    #if ESPRainMakerMatter
+    @available(iOS 16.4, *)
+    func goToFabricSelection(onboardingPayload: String) {
+        let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
+        let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as! ESPFabricSelectionVC
+        fabricSelectionVC.onboardingPayload = onboardingPayload
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationController?.pushViewController(fabricSelectionVC, animated: true)
+    }
+    #endif
 
     // Helper method to check whether app supports the scanned device.
     private func isDeviceSupported(device: ESPDevice) -> Bool {

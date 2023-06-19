@@ -163,7 +163,9 @@ struct Constants {
     static let schedulesKey = "Schedules"
 
     static let serviceType = "_esp_local_ctrl._tcp."
+    static let matterCommissionedServiceType = "_matter._tcp"
     static let serviceDomain = "local"
+    
     
     // APIs JSON keys
     static let successKey = "success"

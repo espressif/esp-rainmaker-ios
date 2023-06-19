@@ -110,7 +110,7 @@ class SelectGroupNodesViewController: UIViewController {
         }
         return User.shared.associatedNodeList![index].devices![indexPath.row]
     }
-
+    
     // Helper method to fetch node at given index
     private func getNodeAt(indexPath: IndexPath) -> Node {
         var index = indexPath.section
@@ -166,7 +166,7 @@ extension SelectGroupNodesViewController: UICollectionViewDataSource {
         // Configure cell for device in the current index
         let device = getDeviceAt(indexPath: indexPath)
         cell.deviceName.text = device.getDeviceName()
-        if device.node?.devices?.count ?? 0 > 1 {
+        if device.node?.devices?.count ?? 0 > 1, device.isMatter ?? false {
             cell.selectButton.isHidden = true
             cell.selectedImage.isHidden = true
         } else {
@@ -192,6 +192,10 @@ extension SelectGroupNodesViewController: UICollectionViewDataSource {
         cell.layer.masksToBounds = false
 
         cell.deviceImageView.image = ESPRMDeviceType(rawValue: device.type ?? "")?.getImageFromDeviceType() ?? UIImage(named: Constants.dummyDeviceImage)
+        if device.isMatter ?? false {
+            cell.selectButton.isHidden = true
+            cell.selectedImage.isHidden = true
+        }
         return cell
     }
 

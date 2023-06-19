@@ -16,4 +16,6 @@
 //
 
 #import <CommonCrypto/CommonDigest.h>
+#import "FabricKeys.h"
+#import "MTRCSRKeys.h"
 #import "GitVersion.h"

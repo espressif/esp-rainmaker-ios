@@ -39,6 +39,21 @@ class ESPAPIWorker {
         }
     }
     
+    public func callDataAPI(endPoint: ESPMatterAPIEndpoint,
+                 encoding: ParameterEncoding = JSONEncoding.default,
+                 completionHandler: @escaping (Data?, Error?) -> Void) {
+        
+        debugMatterLog(endPoint: endPoint)
+        
+        callDataAPI(url: endPoint.url,
+                    method: endPoint.method,
+                    parameters: endPoint.parameters,
+                    encoding: encoding,
+                    headers: endPoint.headers,
+                    apiDescription: endPoint.description,
+                    completionHandler: completionHandler)
+    }
+    
     public func callAPI(endPoint: ESPAPIEndPoint,
                  encoding: ParameterEncoding = URLEncoding.default,
                  completionHandler: @escaping (Data?, Error?) -> Void) {
@@ -96,6 +111,32 @@ class ESPAPIWorker {
             }
     }
     
+    func callDataAPI(url: URLConvertible,
+                             method: HTTPMethod,
+                             parameters: Parameters? = nil,
+                             encoding: ParameterEncoding = JSONEncoding.default,
+                             headers: HTTPHeaders? = nil,
+                             apiDescription: String,
+                             completionHandler: @escaping (Data?, Error?) -> Void) {
+        
+        session.request(url,
+                        method: method,
+                        parameters: parameters,
+                        encoding: encoding,
+                        headers: headers)
+            .responseData { response in
+                switch response.result {
+                case .success(let data):
+                    #if DEBUG
+                    self.logJSONResponse(apiDescription: apiDescription, data: data)
+                    #endif
+                    completionHandler(data, nil)
+                case .failure(let error):
+                    completionHandler(nil, error)
+                }
+            }
+    }
+    
     /// Method is to print data in string format
     /// - Parameters:
     ///   - api: api name
@@ -110,6 +151,20 @@ class ESPAPIWorker {
     /// - Parameter endPoint: endpoint to be logged
     private func debugLog(endPoint: ESPAPIEndPoint) {
         print("\n************************||************************")
+        print("ENDPOINT: \(endPoint.description)")
+        print("URL: \(endPoint.url)")
+        print("METHOD: \(endPoint.method)")
+        if let params = endPoint.parameters {
+            print("PARAMS: \(params.description)")
+        }
+        print("HEADERS: \(endPoint.headers.description)")
+        print("************************||************************\n")
+    }
+    
+    /// Log API details
+    /// - Parameter endPoint: endpoint to be logged
+    private func debugMatterLog(endPoint: ESPMatterAPIEndpoint) {
+        print("\n************************| Matter API Endpoint |************************")
         print("ENDPOINT: \(endPoint.description)")
         print("URL: \(endPoint.url)")
         print("METHOD: \(endPoint.method)")

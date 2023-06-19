@@ -34,13 +34,26 @@ class DeviceTraitListViewController: UIViewController {
     @IBOutlet var tableView: UITableView!
     @IBOutlet var offlineLabel: UILabel!
     @IBOutlet var networkIndicator: UIView!
-
+    @IBOutlet weak var linkingButton: UIButton!
+    var deviceName: String?
+    var group: ESPNodeGroup?
+    var node: ESPNodeDetails?
+    var allNodes: [ESPNodeDetails]?
+    var indePath: IndexPath?
     var dataSource: [Param] = []
     var foundCentralParam = false
+    var isSwitch: Bool = false
+    var endpointClusterId: [String: UInt]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        #if ESPRainMakerMatter
+        if let node = self.device.node, node.isMatter, node.isOnOffClientSupported, node.bindingServers.count > 0 {
+            self.linkingButton.isHidden = false
+            self.linkingButton.isUserInteractionEnabled = true
+        }
+        #endif
         tableView.tableFooterView = UIView()
         tableView.register(UINib(nibName: "ActionTableViewCell", bundle: nil), forCellReuseIdentifier: "ActionTableViewCell")
         tableView.register(UINib(nibName: "SwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "SwitchTableViewCell")
@@ -69,7 +82,23 @@ class DeviceTraitListViewController: UIViewController {
         }
         checkOfflineStatus()
     }
-
+    
+    #if ESPRainMakerMatter
+    /// Open binding window
+    @available(iOS 16.4, *)
+    @IBAction func openBindingWindow(_ sender: Any) {
+        if let node = self.node {
+            let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
+            let devicesBindingVC = storyboard.instantiateViewController(withIdentifier: DevicesBindingViewController.storyboardId) as! DevicesBindingViewController
+            devicesBindingVC.group = self.group
+            devicesBindingVC.nodes = self.allNodes
+            devicesBindingVC.sourceNode = node
+            devicesBindingVC.endpointClusterId = self.endpointClusterId
+            self.navigationController?.pushViewController(devicesBindingVC, animated: true)
+        }
+    }
+    #endif
+    
     // Method to show central param based on UI type
     private func checkForCentralParam() {
         dataSource.removeAll()
@@ -618,7 +647,6 @@ extension String {
     }
 }
 
-
 extension DeviceTraitListViewController: ActionTableViewCellDelegate {
     func actionInvoked(device: Device?, param: Param?, paramName: String) {
         let storyboard = UIStoryboard(name: "Scanner", bundle: nil)
@@ -628,5 +656,25 @@ extension DeviceTraitListViewController: ActionTableViewCellDelegate {
             svc.paramName = paramName
             self.navigationController?.pushViewController(svc, animated: true)
         }
+    }
+}
+
+extension DeviceTraitListViewController: ESPAddNodeToMatterFabricPresentationLogic {
+    
+    /// Node NOC received callback
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - response: response
+    ///   - error: error
+    func nodeNOCReceived(groupId: String, response: ESPAddNodeToFabricResponse?, error: Error?) {}
+    
+    /// Node removed callback
+    /// - Parameters:
+    ///   - status: status
+    ///   - error: error
+    func nodeRemoved(status: Bool, error: Error?) {
+        User.shared.updateDeviceList = true
+        Utility.hideLoader(view: self.view)
+        self.navigationController?.popViewController(animated: true)
     }
 }

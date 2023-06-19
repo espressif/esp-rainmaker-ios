@@ -39,7 +39,25 @@ struct JSONParser {
             // Saving node related information
             let node = Node()
             node.node_id = node_details["id"] as? String
-
+            #if ESPRainMakerMatter
+            if let isMatter = node_details["is_matter"] as? Bool, isMatter {
+                node.isMatter = true
+            }
+            if node.isMatter {
+                if let nodeId = node.node_id, let matterNodeId = ESPMatterFabricDetails.shared.getMatterNodeId(nodeId: nodeId) {
+                    node.matter_node_id = matterNodeId
+                } else {
+                    continue
+                }
+                if let metadata = node_details["metadata"] as? [String: Any] {
+                    node.metadata = metadata
+                    if let id = node.node_id, let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: id), let matternodeId = node.matterNodeId {
+                        ESPMatterFabricDetails.shared.saveMetadata(details: metadata, groupId: groupId, matterNodeId: matternodeId)
+                    }
+                }
+            }
+            #endif
+            
             if let config = node_details["config"] as? [String: Any] {
                 if let services = config["services"] as? [[String: Any]] {
                     var nodeServices: [Service] = []
@@ -122,13 +140,14 @@ struct JSONParser {
                 }
 
                 if let devices = config["devices"] as? [[String: Any]] {
-                    for item in devices {
+                    for index in 0..<devices.count {
+                        let item = devices[index]
                         let newDevice = Device()
                         newDevice.name = item["name"] as? String
                         newDevice.type = item["type"] as? String
                         newDevice.primary = item["primary"] as? String
                         newDevice.node = node
-
+                        newDevice.isMatter = node.isMatter
                         if let dynamicParams = item["params"] as? [[String: Any]] {
                             newDevice.params = []
                             for attr in dynamicParams {
@@ -164,11 +183,55 @@ struct JSONParser {
                                 newDevice.attributes?.append(staticAttr)
                             }
                         }
+                        #if ESPRainMakerMatter
+                        if node.isMatter, node.isRainmaker {
+                            newDevice.isMatter = true
+                            if node.isOnOffClientSupported {
+                                let clients = node.bindingServers
+                                if clients.count > 0 {
+                                    let sortedKeys = clients.keys.sorted { $0 < $1 }
+                                    for i in 0..<sortedKeys.count {
+                                        if i == index {
+                                            let key = sortedKeys[i]
+                                            if let value = clients[key] {
+                                                newDevice.endpointClusterId = [key: value]
+                                            }
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        #endif
                         result.append(newDevice)
                     }
                 }
                 node.devices = result.sorted { $0.name! < $1.name! }
             }
+            #if ESPRainMakerMatter
+            if node.isMatter, !node.isRainmaker {
+                if node.isOnOffServerSupported.0 {
+                    let device = Device(name: node.matterDeviceName ?? "", type: nil, node: node, deviceName: node.matterDeviceName ?? "")
+                    device.isMatter = true
+                    result.append(device)
+                } else if node.isOnOffClientSupported {
+                    let clients = node.bindingServers
+                    if clients.count > 0 {
+                        let sortedKeys = clients.keys.sorted { $0 < $1 }
+                        for i in 0..<sortedKeys.count {
+                            let key = sortedKeys[i]
+                            let device = Device(name: node.matterDeviceName ?? "", type: nil, node: node, deviceName: node.matterDeviceName ?? "")
+                            if let value = clients[key] {
+                                device.endpointClusterId = [key: value]
+                            }
+                            device.isMatter = true
+                            result.append(device)
+                        }
+                    }
+                }
+                node.devices = result.sorted { $0.name! < $1.name! }
+            }
+            #endif
 
             // Get value for service params
             for service in node.services ?? [] {

@@ -33,9 +33,16 @@ class User {
     var currentAssociationInfo: AssociationConfig?
     var updateUserInfo = false
     var localServices: [String: ESPLocalService] = [:]
+    var discoveredNodes: [String] = []
+    var discoveredNodesCompletion: (([String]) -> Void)?
+    var matterLightOnStatus: [String: Bool] = [String: Bool]()
 
     lazy var localControl: ESPLocalControl = {
         ESPLocalControl()
+    }()
+    
+    lazy var matterConnectionManager: ESPMatterConnectionManager = {
+        ESPMatterConnectionManager()
     }()
 
     private init() {
@@ -144,6 +151,17 @@ class User {
         }
     }
     
+    /// Start search for matter devices on local network
+    ///
+    func startCommissionedMatterServiceDiscovery(discoveredNodesCompletion: @escaping ([String]) -> Void) {
+        DispatchQueue.main.async {
+            self.discoveredNodes.removeAll()
+            self.discoveredNodesCompletion = discoveredNodesCompletion
+            self.matterConnectionManager.delegate = self
+            self.matterConnectionManager.searchForServicesOfType(type: Constants.matterCommissionedServiceType, domain: Constants.serviceDomain)
+        }
+    }
+    
     /// Returns node from associated node list
     /// - Parameter id: node id
     /// - Returns: node for given node id or nil if it doesn't exist
@@ -153,6 +171,18 @@ class User {
             predicate.evaluate(with: ($0.node_id))
         })
         return node ?? nil
+    }
+    
+    /// Is node connected over local netowkr
+    /// - Parameter matterNodeId: matter node id
+    /// - Returns: is connected
+    func isMatterNodeConnected(matterNodeId: String) -> Bool {
+        for id in User.shared.discoveredNodes {
+            if id.contains(matterNodeId) {
+                return true
+            }
+        }
+        return false
     }
 }
 
@@ -168,5 +198,13 @@ extension User: ESPLocalControlDelegate {
             localServices[hostname] = service
         }
         updateNodeLocalNetworkInfo()
+    }
+}
+
+extension User: ESPMatterNodesDiscoveredDelegate {
+    func matterDevicesDiscovered(matterNodes: [String]) {
+        self.matterConnectionManager.delegate = nil
+        self.discoveredNodes = matterNodes
+        self.discoveredNodesCompletion?(matterNodes)
     }
 }

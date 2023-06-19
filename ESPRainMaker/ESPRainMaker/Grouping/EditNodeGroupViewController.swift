@@ -24,25 +24,31 @@ class EditNodeGroupViewController: UIViewController {
     @IBOutlet var collectionView: UICollectionView!
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var addButton: UIButton!
-
+    @IBOutlet weak var shareButton: BarButton!
+    
     // List of nodes in the group
     var groupNodes: [Node] = []
     // List of other nodes available but not included in the group
     var remainingNodes: [Node] = []
     var singleDeviceNodeCount = 0
     var currentNodeGroup: NodeGroup!
+    var emailField: UITextField?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBarController?.tabBar.isHidden = true
-
+        #if ESPRainMakerMatter
+        self.shareButton.setTitle("", for: .normal)
+        self.shareButton.imageView?.image = UIImage(named: ESPMatterConstants.share)
+        #else
+        self.shareButton.isHidden = true
+        #endif
         // Show option to Add Device if there are available nodes not already added in the current group
         getRemainingNodes()
         if remainingNodes.count < 1 {
             addButtonHeightConstraint.constant = 0
             addButton.isHidden = true
         }
-
         // Configure collection view for display of group nodes
         getSingleDeviceNodeCount()
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
@@ -65,6 +71,9 @@ class EditNodeGroupViewController: UIViewController {
                     Utility.hideLoader(view: self.view)
                     // Check if remove node group operation is successful
                     if success {
+                        if let nodeGroup = self.currentNodeGroup, let groupId = nodeGroup.group_id {
+                            ESPMatterFabricDetails.shared.removeGroupMetadata(groupId: groupId)
+                        }
                         if let index = NodeGroupManager.shared.nodeGroups.firstIndex(where: { $0.group_id == self.currentNodeGroup.group_id }) {
                             NodeGroupManager.shared.nodeGroups.remove(at: index)
                         }
@@ -90,7 +99,7 @@ class EditNodeGroupViewController: UIViewController {
         input.addTextField { textField in
             textField.text = self.currentNodeGroup.group_name ?? ""
         }
-        input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
+        input.addAction(UIAlertAction(title: ESPMatterConstants.cancelTxt, style: .destructive, handler: { _ in
 
         }))
         input.addAction(UIAlertAction(title: "Rename", style: .default, handler: { [weak input] _ in
@@ -128,6 +137,42 @@ class EditNodeGroupViewController: UIViewController {
 
     @IBAction func backButtonPressed(_: Any) {
         navigationController?.popViewController(animated: true)
+    }
+    
+    #if ESPRainMakerMatter
+    @IBAction func shareButtonPressed(_ sender: Any) {
+        let alert = UIAlertController(title: ESPMatterConstants.shareGroupTxt, message: ESPMatterConstants.shareGroupMsg, preferredStyle: .alert)
+        alert.addTextField { emailIdField in
+            self.emailField = emailIdField
+            self.emailField?.keyboardType = .emailAddress
+            emailIdField.placeholder = ESPMatterConstants.email
+        }
+        alert.addAction(UIAlertAction(title: ESPMatterConstants.cancelTxt, style: .destructive, handler: nil))
+        alert.addAction(UIAlertAction(title: ESPMatterConstants.sendRequestTxt, style: .default) { _ in
+            if let email = self.emailField?.text, email.count > 0, let group = self.currentNodeGroup, let groupId = group.group_id, let groupName = group.group_name {
+                Utility.showLoader(message: ESPMatterConstants.sharingGroupMsg, view: self.view)
+                NodeGroupSharingManager.shared.shareNodeGroup(groupId: groupId, groupName: groupName, userName: email, isPrimary: false) { data in
+                    Utility.hideLoader(view: self.view)
+                    if let data = data, let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = response[ESPMatterConstants.status] as? String {
+                        if status.lowercased() == ESPMatterConstants.success {
+                            self.alertUser(title: "", message: ESPMatterConstants.groupShareSuccessMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+                        } else if let errorDescription = response[ESPMatterConstants.description] as? String {
+                            self.showGroupSharingFailedDialog(message: errorDescription)
+                        } else {
+                            self.showGroupSharingFailedDialog(message: ESPMatterConstants.groupShareFailedMsg)
+                        }
+                    } else {
+                        self.showGroupSharingFailedDialog(message: ESPMatterConstants.groupShareFailedMsg)
+                    }
+                }
+            }
+        })
+        self.present(alert, animated: true)
+    }
+    #endif
+    
+    private func showGroupSharingFailedDialog(message: String) {
+        self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: message, buttonTitle: ESPMatterConstants.okTxt, callback: {})
     }
 
     private func getSingleDeviceNodeCount() {
@@ -219,6 +264,14 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "selectGroupNodeCVC", for: indexPath) as! SelectGroupNodeCollectionViewCell
         let device = getDeviceAt(indexPath: indexPath)
+        if let isMatter = device.isMatter, isMatter, let node = device.node {
+            if let deviceName = node.matterDeviceName {
+                cell.selectButton.isHidden = true
+                cell.selectedImage.isHidden = true
+                cell.deviceName.text = deviceName
+            }
+            return cell
+        }
         cell.deviceName.text = device.getDeviceName()
         if device.node?.devices?.count ?? 0 > 1 {
             cell.selectButton.isHidden = true
@@ -230,7 +283,7 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
 
         cell.selectButtonAction = {
             Utility.showLoader(message: "Removing device..", view: self.view)
-            let parameter: [String: Any] = ["operation": "remove", "nodes": [device.node?.node_id ?? ""]]
+            let parameter: [String: Any] = [ESPMatterConstants.operation: ESPMatterConstants.remove, ESPMatterConstants.nodes: [device.node?.node_id ?? ""]]
             NodeGroupManager.shared.performNodeGroupOperation(group: self.currentNodeGroup, parameter: parameter, method: .put) { success, error in
                 Utility.hideLoader(view: self.view)
                 if success {
@@ -291,7 +344,7 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
             headerView.headerLabel.text = node.info?.name ?? "Node"
             headerView.selectButtonAction = {
                 Utility.showLoader(message: "Removing device..", view: self.view)
-                let parameter: [String: Any] = ["operation": "remove", "nodes": [node.node_id ?? ""]]
+                let parameter: [String: Any] = [ESPMatterConstants.operation: ESPMatterConstants.remove, ESPMatterConstants.nodes: [node.node_id ?? ""]]
                 NodeGroupManager.shared.performNodeGroupOperation(group: self.currentNodeGroup, parameter: parameter, method: .put) { success, error in
                     Utility.hideLoader(view: self.view)
                     if success {

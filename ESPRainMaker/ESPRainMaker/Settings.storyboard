@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="OxW-ag-4I0">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="OxW-ag-4I0">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,7 +18,7 @@
                     </tabBarItem>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="v3F-Ao-GbY">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -194,8 +194,37 @@
                                     <constraint firstItem="AQ2-YT-W3M" firstAttribute="top" secondItem="g55-TH-gDp" secondAttribute="top" id="tWY-fn-P6Z"/>
                                 </constraints>
                             </view>
-                            <view alpha="0.60000002384185791" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZlH-SR-fGb">
+                            <view alpha="0.60000002384185791" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bf9-xw-tUM" userLabel="Group Sharing Requests">
                                 <rect key="frame" x="0.0" y="280" width="414" height="50"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Group Sharing" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FjU-CS-Yhw">
+                                        <rect key="frame" x="30.000000000000007" y="16" width="98.666666666666686" height="18"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hYJ-Ow-JKb">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="20" maxY="0.0"/>
+                                        <state key="normal" image="right_arrow"/>
+                                        <connections>
+                                            <action selector="showGroupSharingRequests:" destination="KmU-8M-UuW" eventType="touchUpInside" id="oNo-HE-BUQ"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="hYJ-Ow-JKb" secondAttribute="trailing" id="GfS-NP-G37"/>
+                                    <constraint firstAttribute="bottom" secondItem="hYJ-Ow-JKb" secondAttribute="bottom" id="Hrc-kB-yis"/>
+                                    <constraint firstItem="hYJ-Ow-JKb" firstAttribute="top" secondItem="bf9-xw-tUM" secondAttribute="top" id="Jvm-Ra-uLy"/>
+                                    <constraint firstItem="hYJ-Ow-JKb" firstAttribute="leading" secondItem="bf9-xw-tUM" secondAttribute="leading" id="Upw-2E-nbV"/>
+                                    <constraint firstItem="FjU-CS-Yhw" firstAttribute="centerY" secondItem="bf9-xw-tUM" secondAttribute="centerY" id="bAw-G7-sTq"/>
+                                    <constraint firstItem="FjU-CS-Yhw" firstAttribute="leading" secondItem="bf9-xw-tUM" secondAttribute="leading" constant="30" id="eb0-qA-c5x"/>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="50" id="ijI-a6-Pty"/>
+                                </constraints>
+                            </view>
+                            <view alpha="0.60000002384185791" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZlH-SR-fGb">
+                                <rect key="frame" x="0.0" y="332" width="414" height="50"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hcS-uA-Srj" customClass="SecondaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
@@ -227,7 +256,7 @@
                                 </constraints>
                             </view>
                             <view alpha="0.59999999999999998" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GEt-eG-AgC">
-                                <rect key="frame" x="0.0" y="332" width="414" height="50"/>
+                                <rect key="frame" x="0.0" y="384" width="414" height="50"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eGN-5v-3dG" customClass="SecondaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
@@ -259,7 +288,7 @@
                                 </constraints>
                             </view>
                             <view alpha="0.59999999999999998" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HXC-NX-j3Z">
-                                <rect key="frame" x="0.0" y="407" width="414" height="50"/>
+                                <rect key="frame" x="0.0" y="459" width="414" height="50"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="swh-dL-t8K">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
@@ -296,13 +325,15 @@
                             <constraint firstItem="akG-X3-qrm" firstAttribute="top" secondItem="7dH-ck-Fp1" secondAttribute="bottom" constant="20" id="5Ba-G3-3bd"/>
                             <constraint firstItem="ZlH-SR-fGb" firstAttribute="leading" secondItem="8lv-Ht-sBa" secondAttribute="leading" id="5c1-Q4-cYt"/>
                             <constraint firstItem="HXC-NX-j3Z" firstAttribute="top" secondItem="GEt-eG-AgC" secondAttribute="bottom" constant="25" id="7aX-oQ-JUa"/>
+                            <constraint firstItem="ZlH-SR-fGb" firstAttribute="top" secondItem="bf9-xw-tUM" secondAttribute="bottom" constant="2" id="9yj-p7-oBS"/>
+                            <constraint firstItem="bf9-xw-tUM" firstAttribute="leading" secondItem="g55-TH-gDp" secondAttribute="leading" id="AlQ-wA-JhB"/>
                             <constraint firstItem="HXC-NX-j3Z" firstAttribute="height" secondItem="9Ig-et-rtx" secondAttribute="height" multiplier="0.0701" priority="999" id="B5i-a4-uT9"/>
-                            <constraint firstItem="ZlH-SR-fGb" firstAttribute="top" secondItem="g55-TH-gDp" secondAttribute="bottom" constant="2" id="BeB-G7-O57"/>
                             <constraint firstItem="8lv-Ht-sBa" firstAttribute="trailing" secondItem="HXC-NX-j3Z" secondAttribute="trailing" id="CZO-0S-LGT"/>
                             <constraint firstItem="GEt-eG-AgC" firstAttribute="top" secondItem="ZlH-SR-fGb" secondAttribute="bottom" constant="2" id="Dki-IR-Qtj"/>
                             <constraint firstItem="akG-X3-qrm" firstAttribute="leading" secondItem="8lv-Ht-sBa" secondAttribute="leading" id="E4y-GL-Ynh"/>
                             <constraint firstItem="ZlH-SR-fGb" firstAttribute="trailing" secondItem="8lv-Ht-sBa" secondAttribute="trailing" id="Fea-a8-Wa9"/>
                             <constraint firstItem="8lv-Ht-sBa" firstAttribute="trailing" secondItem="VMh-c2-tMc" secondAttribute="trailing" id="JW0-jH-myc"/>
+                            <constraint firstItem="bf9-xw-tUM" firstAttribute="height" secondItem="9Ig-et-rtx" secondAttribute="height" multiplier="0.071" priority="998" id="JrK-0M-2tn"/>
                             <constraint firstItem="g55-TH-gDp" firstAttribute="height" secondItem="9Ig-et-rtx" secondAttribute="height" multiplier="0.071" priority="999" id="Pe6-Oh-BVE"/>
                             <constraint firstItem="ZlH-SR-fGb" firstAttribute="height" secondItem="9Ig-et-rtx" secondAttribute="height" multiplier="0.0701" priority="999" id="QPf-8c-dsA"/>
                             <constraint firstItem="g55-TH-gDp" firstAttribute="top" secondItem="VMh-c2-tMc" secondAttribute="bottom" constant="2" id="QSv-qq-n1B"/>
@@ -320,8 +351,10 @@
                             <constraint firstItem="7dH-ck-Fp1" firstAttribute="leading" secondItem="8lv-Ht-sBa" secondAttribute="leading" id="p4b-eY-sIS"/>
                             <constraint firstItem="VMh-c2-tMc" firstAttribute="leading" secondItem="8lv-Ht-sBa" secondAttribute="leading" id="pWB-WT-Fdn"/>
                             <constraint firstItem="7dH-ck-Fp1" firstAttribute="trailing" secondItem="8lv-Ht-sBa" secondAttribute="trailing" id="qIp-Cc-c24"/>
+                            <constraint firstItem="bf9-xw-tUM" firstAttribute="top" secondItem="g55-TH-gDp" secondAttribute="bottom" constant="2" id="sWG-0a-zgY"/>
                             <constraint firstItem="SJo-FY-Tvp" firstAttribute="centerY" secondItem="9Ig-et-rtx" secondAttribute="centerY" id="tdB-ZH-Cef"/>
                             <constraint firstItem="VMh-c2-tMc" firstAttribute="top" secondItem="akG-X3-qrm" secondAttribute="bottom" constant="20" id="v6U-ZW-Coc"/>
+                            <constraint firstItem="bf9-xw-tUM" firstAttribute="trailing" secondItem="g55-TH-gDp" secondAttribute="trailing" id="vq6-wM-tOe"/>
                             <constraint firstItem="g55-TH-gDp" firstAttribute="leading" secondItem="8lv-Ht-sBa" secondAttribute="leading" id="xJT-bp-IhO"/>
                             <constraint firstItem="VMh-c2-tMc" firstAttribute="trailing" secondItem="akG-X3-qrm" secondAttribute="trailing" id="zD4-yZ-mTX"/>
                         </constraints>
@@ -340,6 +373,9 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
                         <outlet property="emailLabel" destination="4dA-Lf-QAl" id="w7W-jt-hhg"/>
+                        <outlet property="groupSharingHeightConstraint" destination="ijI-a6-Pty" id="baX-wJ-isc"/>
+                        <outlet property="groupSharingText" destination="FjU-CS-Yhw" id="1BZ-KE-7Kh"/>
+                        <outlet property="groupSharingView" destination="bf9-xw-tUM" id="24O-kS-enp"/>
                         <outlet property="notificationCount" destination="0VV-1r-pfg" id="Axm-um-AJz"/>
                         <outlet property="notificationView" destination="fO1-f9-7Dg" id="0zT-bs-Hcm"/>
                         <outlet property="pendingActionView" destination="g55-TH-gDp" id="Gpk-zz-6EJ"/>
@@ -808,6 +844,7 @@
                                             <constraint firstAttribute="width" constant="50" id="WGo-va-c8a"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="tintColor" red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <state key="normal" title="Back">
                                             <color key="titleColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                         </state>
@@ -844,7 +881,7 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="addSharingNotificationsTVC" rowHeight="200" id="0IQ-5t-ssQ" customClass="AddSharingNotificationTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="44.666666030883789" width="374" height="200"/>
+                                        <rect key="frame" x="0.0" y="50" width="374" height="200"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0IQ-5t-ssQ" id="zQp-YB-6zL">
                                             <rect key="frame" x="0.0" y="0.0" width="374" height="200"/>
@@ -928,7 +965,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="notificationsTVC" rowHeight="80" id="4n6-pF-wut" customClass="NotificationsTableViewCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="244.66666603088379" width="374" height="80"/>
+                                        <rect key="frame" x="0.0" y="250" width="374" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="4n6-pF-wut" id="Wzc-cp-yeZ">
                                             <rect key="frame" x="0.0" y="0.0" width="374" height="80"/>

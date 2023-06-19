@@ -99,6 +99,7 @@ struct AppConfiguration {
     var supportContinuousUpdate = true
     // In milliseconds
     var continuousUpdateInterval:Int64 = 400
+    var matterEcosystemName: String = ESPMatterConstants.espressif
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -122,6 +123,7 @@ struct AppConfiguration {
             default:
                 continuousUpdateInterval = 1000
             }
+            matterEcosystemName = configDict["Matter Ecosystem"] as? String ?? ESPMatterConstants.espressif
         }
     }
 }

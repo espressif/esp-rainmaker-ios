@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -43,6 +43,33 @@
                                             <action selector="backButtonPressed:" destination="nFQ-wA-GhO" eventType="touchUpInside" id="1Qp-sG-B8t"/>
                                         </connections>
                                     </button>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YOD-7y-gMR">
+                                        <rect key="frame" x="306" y="52" width="36" height="36"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="36" id="76Y-dA-iXV"/>
+                                            <constraint firstAttribute="width" constant="36" id="9xe-LX-esd"/>
+                                        </constraints>
+                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <state key="normal" image="share_dark"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="18"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="0.5"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="18"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="openBindingWindow:" destination="nFQ-wA-GhO" eventType="touchUpInside" id="cdB-RX-Mc5"/>
+                                        </connections>
+                                    </button>
                                     <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4St-yp-dzE">
                                         <rect key="frame" x="362" y="52" width="36" height="36"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -79,6 +106,8 @@
                                     <constraint firstAttribute="bottom" secondItem="4St-yp-dzE" secondAttribute="bottom" constant="8" id="j1L-Rj-uTy"/>
                                     <constraint firstAttribute="bottom" secondItem="cde-Gf-DWb" secondAttribute="bottom" constant="14" id="j4e-b9-FvR"/>
                                     <constraint firstItem="4St-yp-dzE" firstAttribute="leading" secondItem="cde-Gf-DWb" secondAttribute="trailing" constant="40" id="qSU-U9-KZT"/>
+                                    <constraint firstItem="YOD-7y-gMR" firstAttribute="centerY" secondItem="4St-yp-dzE" secondAttribute="centerY" id="uLM-lI-WH3"/>
+                                    <constraint firstItem="4St-yp-dzE" firstAttribute="leading" secondItem="YOD-7y-gMR" secondAttribute="trailing" constant="20" id="yqx-7n-HcL"/>
                                     <constraint firstAttribute="trailing" secondItem="4St-yp-dzE" secondAttribute="trailing" constant="16" id="zT9-eA-TLv"/>
                                 </constraints>
                             </view>
@@ -152,6 +181,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="linkingButton" destination="YOD-7y-gMR" id="UKE-KT-1qD"/>
                         <outlet property="networkIndicator" destination="K0y-Y2-7LR" id="CNz-SD-psE"/>
                         <outlet property="offlineLabel" destination="vgD-RA-Ypi" id="8SE-kW-lqZ"/>
                         <outlet property="tableView" destination="EuC-HO-Qx5" id="4FM-vb-v36"/>
@@ -899,6 +929,7 @@
         <image name="next_button" width="32" height="32"/>
         <image name="node_icon" width="100" height="90"/>
         <image name="prev_button" width="32" height="32"/>
+        <image name="share_dark" width="20" height="20.5"/>
         <image name="updated_icon" width="32" height="32"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

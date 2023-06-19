@@ -31,6 +31,7 @@ protocol StepSliderProtocol {
 }
 
 class SliderTableViewCell: UITableViewCell {
+    static let reuseIdentifier: String = "SliderTableViewCell"
     // IB outlets
     @IBOutlet var slider: UISlider!
     @IBOutlet var minLabel: UILabel!
@@ -57,6 +58,7 @@ class SliderTableViewCell: UITableViewCell {
     
     var sliderInitialValue: Float?
     var sliderStepValue: Float?
+    var currentHueValue: CGFloat = 0
     
     // Properties for handling continuous updates
     let group = DispatchGroup()
@@ -66,6 +68,19 @@ class SliderTableViewCell: UITableViewCell {
     var hueCurrentFinalValue:CGFloat = 0.0
     var currentTimeStamp = Date()
     var hueTimeStamp = Date()
+    
+    // Matter properties
+    var deviceId: UInt64?
+    weak var nodeGroup: ESPNodeGroup?
+    var isRainmaker: Bool = true
+    //Matter Level Control
+    var minLevel: Int = 0
+    var maxLevel: Int = 100
+    var currentLevel: Int = 0
+    //Matter Hue Control
+    var minHue: Int = 0
+    var maxHue: Int = 100
+    weak var paramChipDelegate: ParamCHIPDelegate?
     
 
     override func awakeFromNib() {

@@ -19,6 +19,7 @@
 import Foundation
 
 class Node: Codable {
+    
     var node_id: String?
     var config_version: String?
     var info: Info?
@@ -38,12 +39,15 @@ class Node: Codable {
     var currentSchedulesCount = 0
     var scheduleName = "Schedule"
     var schedulesName = "Schedules"
-    
     var isSceneSupported = false
     var maxScenesCount = -1
     var currentScenesCount = 0
     var sceneName = "Scene"
     var scenesName = "Scenes"
+    var isMatter = false
+    var matter_node_id: String?
+    var metadata: [String: Any]?
+    var tags: [String]?
 
     enum CodingKeys: String, CodingKey {
         case node_id = "id"

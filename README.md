@@ -218,6 +218,53 @@ OTA update is optional and disabled by default. It can be enabled from the `Conf
 - This feautre is configurable but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Continuous Updates` key from `App Configuration` to `NO`.
 - Minimum gap between two updates can be managed by setting `Continuous Update Interval` under `App Configuration` in `Configuration.plist`. This value is considered in milliseconds and acceptable value is in range 400 - 1000.
 
+
+## Custom Matter Fabric
+
+### What is Matter?
+Matter is a unifying standard that provides reliable, secure connectivity across smart home devices. It is being developed by Matter Working Group within the Connectivity Standards Alliance (CSA) as a new, royalty-free connectivity standard to increase compatibility among smart home products, with security as a fundamental design tenet.
+The project is built around a shared belief that smart home devices should be secure, reliable, and seamless to use. By building upon Internet Protocol (IP), the project aims to enable communication across smart home devices, mobile apps, and cloud services and to define a specific set of IP-based networking technologies for device certification.
+
+### Capabilities
+- Commission matter only and matter+rainmaker devices to custom fabric.
+- Control matter & matter+rainmaker devices locally using Matter clusters.
+- Control matter+rainmaker devices remotely using the Rainmaker cloud.
+- Bind switch to light device.
+
+### Build app for Matter fabric
+To support Custom Matter Fabric on the app do the following:
+- Open Xcode go to Scheme selection dropdown.
+- Select ESPRainmakerMatter scheme.
+- Build/Run/Archive the app and it will be built with Matter support.
+```
+Note: This app with ESPRainmakerMatter configuration cannot be run on iOS simulators.
+```
+
+To build app for Rainmaker only devcies:
+- Open Xcode go to Scheme selection dropdown.
+- Select ESPRainmaker scheme.
+- Build/Run/Archive the app and it will be built without Matter support.
+
+```
+In order to build the Rainmaker only app for simulator user needs to do the following:
+- On Xcode select ESPRainmaker project from navigator.
+- Select General tab.
+- Scroll down to Frameworks, Libraries and Embedded Content
+- Delete Matter.farmework from the list.
+- User will be able to run the app on simulator.
+
+If user wants to rerun the app for Matter: 
+- On Xcode go to Scheme selection dropdown.
+- Select ESPRainmakerMatter scheme.
+- Go to General tab under main project.
+- Go to Frameworks section.
+- Select + button at the bottom.
+- Go to ESPRainMaker/Matter/ESPMTRCommissioner/Framework and select Matter.framework and click Open.
+- Under embed section select Embed and Sign from dropdown for the Matter framework.
+- Run the app.
+```
+
+
 ## Supports
 
 

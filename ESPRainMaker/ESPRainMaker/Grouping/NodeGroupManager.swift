@@ -29,6 +29,18 @@ class NodeGroupManager {
     var listUpdated = false
 
     private init() {}
+    
+    /// Get node group for group id
+    /// - Parameter id: group id
+    /// - Returns: node group
+    func getGroupForId(id: String) -> NodeGroup? {
+        return nodeGroups.first(where: {
+            if let gId = $0.group_id, gId == id {
+                return true
+            }
+            return false
+        })
+    }
 
     /// Method to get node groups for the current user
     ///
@@ -52,6 +64,22 @@ class NodeGroupManager {
                     return
                 } else {
                     // Initializing Group objects from response data
+                    
+                    #if ESPRainMakerMatter
+                    // Save group metadata
+                    if let groupsData = try? JSONSerialization.jsonObject(with: response) as? [String: Any], let groups = groupsData[ESPMatterConstants.groups] as? [[String: Any]] {
+                        for group in groups {
+                            if let groupId = group[ESPMatterConstants.groupId] as? String {
+                                if let groupMetadata = group[ESPMatterConstants.groupMetadata] as? [String: Any] {
+                                    ESPMatterFabricDetails.shared.saveGroupMetadata(groupId: groupId, groupMetadata: groupMetadata)
+                                } else {
+                                    ESPMatterFabricDetails.shared.removeGroupMetadata(groupId: groupId)
+                                }
+                            }
+                        }
+                    }
+                    #endif
+                    
                     let groups = try decoder.decode(Group.self, from: response)
                     
                     // Check if additional node group is present
@@ -144,7 +172,7 @@ class NodeGroupManager {
     /// Method to add reference of node object in groups
     ///
     ///
-    private func updateNodeListInNodeGroup(nodeGroup: [NodeGroup]?) {
+    func updateNodeListInNodeGroup(nodeGroup: [NodeGroup]?) {
         if let groups = nodeGroup {
             // Iterate through groups and find associated node by node ID
             for group in groups {

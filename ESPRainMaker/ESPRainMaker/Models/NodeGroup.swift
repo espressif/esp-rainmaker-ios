@@ -34,6 +34,7 @@ class NodeGroup: Codable {
     var type: String?
     var nodes: [String]?
     var sub_groups: [NodeGroup]?
+    var is_matter: Bool?
     // Additional parameter for referencing node object
     var nodeList: [Node]?
 }

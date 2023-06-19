@@ -166,7 +166,7 @@ extension AddNodeGroupsViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "selectGroupNodeCVC", for: indexPath) as! SelectGroupNodeCollectionViewCell
         let device = getDeviceAt(indexPath: indexPath)
         cell.deviceName.text = device.getDeviceName()
-        if device.node?.devices?.count ?? 0 > 1 {
+        if device.node?.devices?.count ?? 0 > 1, device.isMatter ?? false {
             cell.selectButton.isHidden = true
             cell.selectedImage.isHidden = true
         } else {

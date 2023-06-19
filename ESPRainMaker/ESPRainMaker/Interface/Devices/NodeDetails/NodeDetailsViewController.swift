@@ -37,6 +37,10 @@ class NodeDetailsViewController: UIViewController {
     var timeZoneParam: Param!
     var timeZoneService: Service!
     var shareAction: UIAlertAction?
+    
+    var vendorId: String?
+    var productId: String?
+    var softwareVersion: String?
 
     // MARK: - Overriden Methods
 
@@ -133,8 +137,25 @@ class NodeDetailsViewController: UIViewController {
         index += 1
         dataSource.append([])
         dataSource[index].append("Node Information")
-        dataSource[index].append("Type:\(currentNode.info?.type ?? "")")
-        dataSource[index].append("Firmware version:\(currentNode.info?.fw_version ?? "")")
+        if let type = currentNode.info?.type {
+            dataSource[index].append("Type:\(type)")
+        }
+        if let fw_version = currentNode.info?.fw_version {
+            dataSource[index].append("Firmware version:\(fw_version)")
+        }
+        
+        #if ESPRainMakerMatter
+        if let vid = currentNode.vendorId {
+            dataSource[index].append("Vendor Id:\(vid)")
+        }
+        if let pid = currentNode.productId {
+            dataSource[index].append("Product Id:\(pid)")
+        }
+        if let softwareVersion = currentNode.swVersion {
+            dataSource[index].append("Software version:\(softwareVersion)")
+        }
+        #endif
+        
         if let tzService = currentNode.services?.first(where: { $0.type == Constants.timezoneServiceName }) {
             if let tzParam = tzService.params?.first(where: { $0.type == Constants.timezoneServiceParam }) {
                 let timezone = tzParam.value as? String
@@ -235,7 +256,6 @@ class NodeDetailsViewController: UIViewController {
             }
             // Navigate to node details view controller
             self.createDataSource()
-            self.tableView.reloadData()
         }
     }
 

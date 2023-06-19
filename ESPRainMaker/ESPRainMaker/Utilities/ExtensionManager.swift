@@ -115,6 +115,12 @@ extension UIColor {
 }
 
 extension UIView {
+    /// Get view from nib
+    /// - Returns: instance of UIView
+    class func fromNib<T: UIView>() -> T {
+        return Bundle(for: T.self).loadNibNamed(String(describing: T.self), owner: nil, options: nil)![0] as! T
+    }
+    
     @IBInspectable var cornerRadius: CGFloat {
         get {
             return layer.cornerRadius
@@ -457,9 +463,73 @@ extension String {
     }
 }
 
+extension UINavigationController {
+    
+    func addCustomBottomLine(color:UIColor,height:Double) {
+        //Hiding Default Line and Shadow
+        navigationBar.setValue(true, forKey: "hidesShadow")
+        //Creating New line
+        let lineView = UIView(frame: CGRect(x: 0, y: 0, width:0, height: height))
+        lineView.backgroundColor = color
+        navigationBar.addSubview(lineView)
+
+        lineView.translatesAutoresizingMaskIntoConstraints = false
+        lineView.widthAnchor.constraint(equalTo: navigationBar.widthAnchor).isActive = true
+        lineView.heightAnchor.constraint(equalToConstant: CGFloat(height)).isActive = true
+        lineView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor).isActive = true
+        lineView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor).isActive = true
+    }
+}
+
 extension UIViewController {
     
+    /// Set autoresizing mask
+    /// - Parameter cell: table view cell
+    func setAutoresizingMask(_ cell: UITableViewCell) {
+        cell.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth, .flexibleHeight]
+        cell.contentView.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth, .flexibleHeight]
+    }
+    
+    /// Go Back
+    @objc func goBack() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    /// Show alert
+    /// - Parameters:
+    ///   - title: title
+    ///   - message: message
+    ///   - buttonTitle: button title
+    ///   - callback: callback
+    func showAlertWithOptions(title: String, message: String, actions: [UIAlertAction]) {
+        let alertController = UIAlertController(title: title,
+                                                message: message,
+                                                preferredStyle: .alert)
+        for action in actions {
+            alertController.addAction(action)
+        }
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    /// Set navigation text attributes
+    /// - Parameter color: color
+    func setNavigationTextAttributes(color: UIColor) {
+        let textAttributes = [NSAttributedString.Key.foregroundColor: color]
+        self.navigationController?.navigationBar.titleTextAttributes = textAttributes
+    }
+    
     func alertUser(title: String, message: String, buttonTitle: String, callback: @escaping () -> Void) {
+        let alertController = UIAlertController(title: title,
+                                                message: message,
+                                                preferredStyle: .alert)
+        let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: {_ in
+            callback()
+        })
+        alertController.addAction(dismissAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func showErrorAlert(title: String, message: String, buttonTitle: String, callback: @escaping () -> Void) {
         let alertController = UIAlertController(title: title,
                                                 message: message,
                                                 preferredStyle: .alert)
@@ -503,6 +573,7 @@ extension ESPNoRefreshTokenLogic {
     func clearUserData() {
         UIApplication.shared.unregisterForRemoteNotifications()
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        ESPMatterFabricDetails.shared.clearGroupSharingData()
         ESPTokenWorker.shared.deleteAll()
         ESPAlexaTokenWorker.shared.clearAllClientTokens()
         UserDefaults.standard.removeObject(forKey: Constants.wifiPassword)

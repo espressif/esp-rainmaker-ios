@@ -47,6 +47,42 @@ extension Node: MaxScheduleProtocol, MaxSceneProtocol {
         }
         return false
     }
+    
+    /// Find value of light
+    func isPowerOn() -> Bool {
+        if let devices = self.devices, let device = devices.first {
+            for param in device.params ?? [] {
+                if param.uiType == "esp.ui.toggle", param.name == "Power", let dataType = param.dataType, dataType.lowercased() == "bool", let value = param.value as? Bool {
+                    return value
+                }
+            }
+        }
+        return false
+    }
+    
+    /// Update light param
+    func updateLightParam() {
+        let val = self.isPowerOn()
+        if let devices = self.devices, let device = devices.first {
+            for param in device.params ?? [] {
+                if param.uiType == "esp.ui.toggle", param.name == "Power", let dataType = param.dataType, dataType.lowercased() == "bool" {
+                    param.value = !val
+                }
+            }
+        }
+    }
+    
+    /// Is light supported on the device
+    func isLightSupported() -> Bool {
+        if let devices = self.devices, let device = devices.first {
+            for param in device.params ?? [] {
+                if param.uiType == "esp.ui.toggle", param.name == "Power", let dataType = param.dataType, dataType.lowercased() == "bool" {
+                    return true
+                }
+            }
+        }
+        return false
+    }
 }
 
 

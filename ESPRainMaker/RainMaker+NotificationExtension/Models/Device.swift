@@ -31,6 +31,8 @@ class Device: Codable {
     var deviceNameParam = ""
     var scheduleActionStatus: ScheduleActionStatus?
     var sceneActionStatus: SceneActionStatus?
+    var endpointClusterId: [String: UInt]?
+    var isMatter: Bool? = false
 
     enum CodingKeys: String, CodingKey {
         case name
