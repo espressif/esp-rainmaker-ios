@@ -21,6 +21,7 @@ import Foundation
 struct ESPMatterConstants {
     
     /// Utils
+    static let controller = "controller"
     static let acceptedSharings = "acceptedSharings"
     static let pendingNodeGroupRequests = "pendingNodeGroupRequests"
     static let requestsSent = "requestsSent"
@@ -35,6 +36,7 @@ struct ESPMatterConstants {
     static let lightDevice = "light"
     static let switchDevice = "switch"
     static let defaultDevice = "default"
+    static let controllerNodeId = "controllerNodeId"
     
     /// UI keys
     static let bindings = "bindings"
@@ -81,6 +83,7 @@ struct ESPMatterConstants {
     static let colorControl = "colorControl"
     static let binding = "binding"
     static let openCW = "openCW"
+    static let rainmakerController = "rainmakerController"
     static let delete = "delete"
     static let share = "share"
     static let add = "add"
@@ -163,6 +166,7 @@ struct ESPMatterConstants {
     
     
     /// Messages
+    static let operationFailedMsg = "Operation failed"
     static let mtrPairingFailedMsg = "Failed to pair device."
     static let sharingGroupMsg = "Sharing group..."
     static let groupShareSuccessMsg = "Group sharing request sent successfully."
@@ -210,6 +214,8 @@ struct ESPMatterConstants {
     static let chipDeviceId: String = "ChipDeviceId"
     static let fetchingDeviceDetailsMsg: String = "Fetching device details..."
     static let updatingDeviceDetailsMsg: String = "Updating device details..."
+    static let updatingDeviceListMsg: String = "Updating device list..."
+    static let controllerNeedsAccessMsg: String = "Matter Controller needs access to your RainMaker account to fetch all nodes under the account. Proceed?"
     /// Matter data keys
     static let groupIdKey = "group.com.espressif.rainmaker.softap"
     static let homesDataKey: String = "com.espressif.hmmatterdemo.homes"
@@ -236,6 +242,7 @@ struct ESPMatterConstants {
     static let colorControlClusterId: UInt = 768
     static let commissioningWindowClusterId: UInt = 60
     static let bindingClusterId: UInt = 30
+    static let controllerClusterId: UInt = 320601089
     
     static let csrHeader = "-----BEGIN CERTIFICATE REQUEST-----"
     static let csrFooter = "-----END CERTIFICATE REQUEST-----"

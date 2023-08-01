@@ -81,6 +81,11 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
         }
     }
     
+    /// Setup Offline UI
+    func setupOfflineUI() {
+        self.setupInitialLevelValues()
+    }
+    
     /// Get level controller
     /// - Parameters:
     ///   - timeout: time out

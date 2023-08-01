@@ -253,9 +253,17 @@ class DevicesViewController: UIViewController {
         #if ESPRainMakerMatter
         if #available(iOS 16.4, *) {
             if let nodes = User.shared.associatedNodeList, nodes.count > 0 {
-                self.searchForMatterDevices { _ in
+                if let data = ESPMatterFabricDetails.shared.getGroupsData(), let groups = data.groups, groups.count > 0 {
+                    self.searchForMatterDevices { _ in
+                        DispatchQueue.main.async {
+                            Utility.showLoader(message: "Searching for matter devices...", view: self.view)
+                            self.formatUI(error: error)
+                            self.getNodeGroupMatterFabricDetails()
+                        }
+                    }
+                } else {
                     DispatchQueue.main.async {
-                        Utility.showLoader(message: "Searching for matter devices...", view: self.view)
+                        Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
                         self.formatUI(error: error)
                         self.getNodeGroupMatterFabricDetails()
                     }

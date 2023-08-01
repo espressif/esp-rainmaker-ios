@@ -178,7 +178,7 @@ class User {
     /// - Returns: is connected
     func isMatterNodeConnected(matterNodeId: String) -> Bool {
         for id in User.shared.discoveredNodes {
-            if id.contains(matterNodeId) {
+            if id.uppercased().contains(matterNodeId.uppercased()) {
                 return true
             }
         }

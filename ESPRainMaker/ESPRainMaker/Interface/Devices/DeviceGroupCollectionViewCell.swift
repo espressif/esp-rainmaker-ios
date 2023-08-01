@@ -337,6 +337,9 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.defaultDevice)
             cell.onOffButton.isHidden = true
         }
+        if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+            cell.deviceImage.image = UIImage(named: ESPMatterConstants.controller)
+        }
         cell.rainmakerNode = rainmakerNode
     }
     #endif

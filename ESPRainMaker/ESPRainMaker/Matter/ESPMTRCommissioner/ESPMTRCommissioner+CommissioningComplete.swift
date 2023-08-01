@@ -103,7 +103,7 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
             self.addDeviceDetailsCatId(writeCatIdOperate: true, groupId: groupId, deviceId: id) {
                 DispatchQueue.main.async {
                     self.uidelegate?.hideLoaderFromView()
-                    self.uidelegate?.reloadData()
+                    self.uidelegate?.reloadData(groupId: groupId, matterNodeId: matterNodeId)
                 }
             }
         }
@@ -115,7 +115,7 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
         self.uidelegate?.hideLoaderFromView()
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         if let _ = status {
-            if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].matterNodeId {
+            if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].getMatterNodeId() {
                 self.exportMatterNodeData(isRainmaker: true, groupId: grpId, matterNodeId: matterNodeId, temporaryDeviceId: temporaryDeviceId)
             }
         } else {

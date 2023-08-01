@@ -186,7 +186,7 @@ extension ESPMatterFabricDetails {
     /// - Parameter nodeId: node id
     /// - Returns: matter node id
     func getMatterNodeId(nodeId: String) -> String? {
-        if let details = self.getNodeDetails(nodeId: nodeId), let matterNodeId = details.matterNodeID {
+        if let details = self.getNodeDetails(nodeId: nodeId), let matterNodeId = details.getMatterNodeId() {
             return matterNodeId
         }
         return nil

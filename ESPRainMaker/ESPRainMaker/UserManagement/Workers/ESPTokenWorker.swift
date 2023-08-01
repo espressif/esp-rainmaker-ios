@@ -323,6 +323,13 @@ struct ESPSessionResponse: Codable {
         return false
     }
     
+    var isValid: Bool {
+        if let status = status, status.lowercased() == "success" {
+            return true
+        }
+        return false
+    }
+    
     enum CodingKeys: String, CodingKey {
         case status, description
         case errorCode = "error_code"

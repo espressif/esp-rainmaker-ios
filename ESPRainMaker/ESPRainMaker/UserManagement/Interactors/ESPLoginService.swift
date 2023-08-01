@@ -28,23 +28,28 @@ class ESPLoginService: ESPLoginLogic {
     var url: String
     var apiWorker: ESPAPIWorker
     var apiParser: ESPAPIParser
+    var isRainmakerControllerFlow: Bool
     
     var presenter: ESPLoginPresentationLogic?
     
-    convenience init(presenter: ESPLoginPresentationLogic? = nil) {
+    convenience init(isRainmakerControllerFlow: Bool = false,
+                     presenter: ESPLoginPresentationLogic? = nil) {
         self.init(url: ESPURLParams.shared.baseURL,
                   apiWorker: ESPAPIWorker(),
                   apiParser: ESPAPIParser(),
+                  isRainmakerControllerFlow: isRainmakerControllerFlow,
                   presenter: presenter)
     }
     
     private init(url: String,
                  apiWorker: ESPAPIWorker,
                  apiParser: ESPAPIParser,
+                 isRainmakerControllerFlow: Bool,
                  presenter: ESPLoginPresentationLogic? = nil) {
         self.url = url
         self.apiWorker = apiWorker
         self.apiParser = apiParser
+        self.isRainmakerControllerFlow = isRainmakerControllerFlow
         self.presenter = presenter
     }
     
@@ -54,8 +59,12 @@ class ESPLoginService: ESPLoginLogic {
     ///   - password: password
     func loginUser(name: String, password: String) {
         apiWorker.callAPI(endPoint: .loginUser(url: self.url, name: name, password: password, userPool: ESPURLParams.shared.userPool), encoding: JSONEncoding.default) { data, error in
-            self.apiParser.parseExtendSessionResponse(data, error: error) { _, umError in
-                self.presenter?.loginCompleted(withError: umError)
+            if self.isRainmakerControllerFlow {
+                self.presenter?.rainmakerControllerLoginCompleted(data: data)
+            } else {
+                self.apiParser.parseExtendSessionResponse(data, error: error) { _, umError in
+                    self.presenter?.loginCompleted(withError: umError)
+                }
             }
         }
     }

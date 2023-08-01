@@ -26,7 +26,7 @@ protocol ESPMTRUIDelegate: AnyObject {
     func hideToastMessage()
     func showLoaderInView(message: String)
     func hideLoaderFromView()
-    func reloadData()
+    func reloadData(groupId: String?, matterNodeId: String?)
     func showError(title: String, message: String, buttonTitle: String)
 }
 
@@ -226,7 +226,7 @@ extension ESPMTRCommissioner: MTRDevicePairingDelegate {
     func onCommissioningComplete(_ error: Error?) {
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         guard let _ = error else {
-            if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].matterNodeId {
+            if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].getMatterNodeId() {
                 self.performPostCommissioningAction(groupId: grpId, requestId: requestId, matterNodeId: matterNodeId)
             }
             return

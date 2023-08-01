@@ -59,6 +59,18 @@ extension Node {
     }
     
     /// Is on off server supported
+    var isControllerServerSupported: (Bool, String?) {
+        if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+            for key in val.keys {
+                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.controllerClusterId) {
+                    return (true, key)
+                }
+            }
+        }
+        return (false, nil)
+    }
+    
+    /// Is on off server supported
     var isOnOffServerSupported: (Bool, String?) {
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
@@ -124,6 +136,16 @@ extension Node {
     
     /// Matter node id
     var matterNodeId: String? {
+        if let id = controllerNodeId {
+            if User.shared.isMatterNodeConnected(matterNodeId: id) {
+                return id
+            }
+        }
+        return originalMatterNodeId
+    }
+    
+    /// Original matter node id
+    var originalMatterNodeId: String? {
         if let matterNodeId = self.matter_node_id {
             return matterNodeId
         }
@@ -165,6 +187,26 @@ extension Node {
     /// group Id
     var groupId: String? {
         if let metadata = metadata, let id = metadata[ESPMatterConstants.groupId] as? String {
+            return id
+        }
+        return nil
+    }
+    
+    /// Is on off client supported
+    var isRainmakerControllerSupported: (Bool, String?) {
+        if let metadata = metadata, let serversData = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+            for key in serversData.keys {
+                if let list = serversData[key], list.count > 0, list.contains(ESPMatterConstants.controllerClusterId) {
+                    return (true, key)
+                }
+            }
+        }
+        return (true, nil)
+    }
+    
+    /// Controller node id
+    var controllerNodeId: String? {
+        if let metadata = metadata, let id = metadata[ESPMatterConstants.controllerNodeId] as? String {
             return id
         }
         return nil

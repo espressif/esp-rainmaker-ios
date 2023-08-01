@@ -81,21 +81,68 @@ class NodeDetailsViewController: UIViewController {
 
     @IBAction func deleteNode(_: Any) {
         // Display message based on number of devices in the nodes.
-        var title = "Are you sure?"
+        let title = "Are you sure?"
         var message = ""
-        if currentNode.devices!.count > 1 {
-            title = "Are you sure?"
+        if let devices = currentNode.devices, devices.count > 1 {
             message = "By removing a node, all the associated devices will also be removed"
         }
-
         // Display a confirmation pop up on action of delete node.
         let confirmAction = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let yesAction = UIAlertAction(title: "Yes", style: .destructive) { _ in
             Utility.showLoader(message: "Deleting node", view: self.view)
-            let parameters = ["user_id": User.shared.userInfo.userID, "node_id": self.currentNode.node_id!, "secret_key": "", "operation": "remove"]
+            #if ESPRainMakerMatter
+            self.removeFabric { _ in
+                self.removeDeviceFromRainmaker()
+            }
+            #else
+            self.removeDeviceFromRainmaker()
+            #endif
+        }
+        let noAction = UIAlertAction(title: "No", style: .default, handler: nil)
+        confirmAction.addAction(noAction)
+        confirmAction.addAction(yesAction)
+        present(confirmAction, animated: true, completion: nil)
+    }
+    
+    /// Remove fabric
+    /// - Parameter completion: completion handler
+    func removeFabric(completion: @escaping (Bool) -> Void) {
+        if let node = currentNode, let matterNodeId = node.matterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+            #if ESPRainMakerMatter
+            if #available(iOS 16.4, *) {
+                ESPMTRCommissioner.shared.readCurrentFabricIndex(deviceId: deviceId) { index in
+                    if let index = index {
+                        ESPMTRCommissioner.shared.removeFabricAtIndex(deviceId: deviceId, atIndex: index) { result in
+                            completion(result)
+                        }
+                    } else {
+                        completion(false)
+                    }
+                }
+            } else {
+                completion(false)
+            }
+            #else
+            completion(false)
+            #endif
+        } else {
+            completion(false)
+        }
+    }
+    
+    /// Remove device from rainmaker
+    func removeDeviceFromRainmaker() {
+        if let nodeId = self.currentNode.node_id {
+            let parameters = ["user_id": User.shared.userInfo.userID,
+                              "node_id": nodeId,
+                              "secret_key": "",
+                              "operation": "remove"]
             // Call method to dissociate node from user
             NetworkManager.shared.addDeviceToUser(parameter: parameters) { _, error in
                 if error == nil {
+                    if let oMNId = self.currentNode?.originalMatterNodeId {
+                        ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
+                    }
                     User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
                         node.node_id == self.currentNode.node_id
                     })
@@ -114,11 +161,9 @@ class NodeDetailsViewController: UIViewController {
                     }
                 }
             }
+        } else {
+            self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.operationFailedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
         }
-        let noAction = UIAlertAction(title: "No", style: .default, handler: nil)
-        confirmAction.addAction(noAction)
-        confirmAction.addAction(yesAction)
-        present(confirmAction, animated: true, completion: nil)
     }
 
     @IBAction func backButtonPressed(_: Any) {

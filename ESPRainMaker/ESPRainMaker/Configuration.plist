@@ -47,7 +47,7 @@
             <key>Continuous Update Interval</key>
             <integer>400</integer>
             <key>Matter Ecosystem</key>
-            <string>Espressif</string>
+            <string>ESP Rainmaker</string>
         </dict>
         <key>Provision Settings</key>
         <dict>

@@ -20,6 +20,7 @@
 import UIKit
 import MatterSupport
 import Matter
+import Foundation
 
 @available(iOS 16.4, *)
 class ESPMatterCommissioningVC: UIViewController {
@@ -94,11 +95,6 @@ class ESPMatterCommissioningVC: UIViewController {
             await self.setup()
         }
     }
-}
-
-//MARK: commissioning methods
-@available(iOS 16.4, *)
-extension ESPMatterCommissioningVC {
     
     /// Setup commissioning session
     func setup() async {
@@ -106,7 +102,183 @@ extension ESPMatterCommissioningVC {
         ESPMatterEcosystemInfo.shared.removeDeviceName()
         ESPMatterEcosystemInfo.shared.removeCertDeclaration()
         ESPMatterEcosystemInfo.shared.removeAttestationInfo()
-        if let group = self.group, let groupName = group.groupName, let _ = self.onboardingPayload {
+        if let group = self.group, let groupName = group.groupName, let onboardingPayload = self.onboardingPayload, let setupPayload = try? MTRSetupPayload(onboardingPayload: onboardingPayload) {
+            Task {
+                let topology = MatterAddDeviceRequest.Topology(ecosystemName: Configuration.shared.appConfiguration.matterEcosystemName, homes: [MatterAddDeviceRequest.Home(displayName: groupName)])
+                let setupRequest = MatterAddDeviceRequest(topology: topology, setupPayload: setupPayload)
+                do {
+                    try await setupRequest.perform()
+                    self.validatePayloadAndStartCommissioning(groupName: groupName)
+                } catch {
+                    self.validatePayloadAndStartCommissioning(groupName: groupName)
+                }
+            }
+        }
+    }
+    
+    /// Start controller update process
+    /// - Parameter deviceId: device id
+    func startControllerUpdate(deviceId: UInt64, matterNodeId: String, refreshToken: String) {
+        ESPMTRCommissioner.shared.resetRefreshToken(deviceId: deviceId) { result in
+            if result {
+                self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
+                    if result {
+                        self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL)
+                    } else {
+                        DispatchQueue.main.async {
+                            self.hideLoaderAndAlertUser()
+                        }
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.hideLoaderAndAlertUser()
+                }
+            }
+        }
+    }
+    
+    /// Hide loader and alert user
+    func hideLoaderAndAlertUser() {
+        Utility.hideLoader(view: self.view)
+        self.alertUser(title: "", message: ESPMatterConstants.operationFailedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {
+            User.shared.updateDeviceList = true
+            self.navigationController?.popToRootViewController(animated: true)
+        })
+    }
+    
+    /// Show Rainmaker Login Screen
+    func showRainmakerLoginScreen(groupId: String, matterNodeId: String) {
+        let storyboard = UIStoryboard(name: "Login", bundle: nil)
+        if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {
+            if let signInVC = nav.viewControllers.first as? SignInViewController, let tab = self.tabBarController {
+                signInVC.setRainmakerControllerProperties(isRainmakerControllerFlow: true,
+                                                          groupId: groupId,
+                                                          matterNodeId: matterNodeId,
+                                                          rainmakerControllerDelegate: self)
+                nav.modalPresentationStyle = .fullScreen
+                tab.present(nav, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    /// Go to Home screen
+    func goToHomeScreen() {
+        User.shared.updateDeviceList = true
+        self.navigationController?.popToRootViewController(animated: true)
+    }
+}
+
+//MARK: rainmaker controller methods
+@available(iOS 16.4, *)
+extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
+    
+    /// Controller flow cancelled
+    func controllerFlowCancelled() {
+        DispatchQueue.main.async {
+            self.navigationController?.popToRootViewController(animated: true)
+        }
+    }
+    
+    /// Append refresh token
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - refreshToken: refresh token
+    ///   - completion: completion
+    func appendRefreshToken(deviceId: UInt64, refreshToken: String, completion: @escaping (Bool) -> Void) {
+        let index = refreshToken.index(refreshToken.startIndex, offsetBy: 960)
+        let firstPayload = refreshToken[..<index]
+        let secondPayload = refreshToken.replacingOccurrences(of: firstPayload, with: "")
+        ESPMTRCommissioner.shared.appendRefreshToken(deviceId: deviceId, token: String(firstPayload)) { result in
+            if result {
+                ESPMTRCommissioner.shared.appendRefreshToken(deviceId: deviceId, token: secondPayload) { result in
+                    completion(result)
+                }
+                return
+            }
+            completion(false)
+        }
+    }
+
+    /// Authorize
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - endpointURL: endpoint URL
+    ///   - completion: completion
+    func authorize(matterNodeId: String, deviceId: UInt64, endpointURL: String) {
+        ESPMTRCommissioner.shared.authorize(deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
+            if result {
+                ESPMTRCommissioner.shared.updateUserNOC(deviceId: deviceId) { result in
+                    if result, let controller = ESPMTRCommissioner.shared.sController, let id = controller.controllerNodeID?.uint64Value {
+                        ESPMTRCommissioner.shared.updateDeviceList(deviceId: id) { result in
+                            if result {
+                                let str = String(id, radix:16)
+                                ESPMatterFabricDetails.shared.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
+                                DispatchQueue.main.async {
+                                    self.goToHomeScreen()
+                                }
+                            } else {
+                                DispatchQueue.main.async {
+                                    self.hideLoaderAndAlertUser()
+                                }
+                            }
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.hideLoaderAndAlertUser()
+                        }
+                    }
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                self.hideLoaderAndAlertUser()
+            }
+        }
+    }
+
+    /// Cloud login completed
+    /// - Parameters:
+    ///   - cloudResponse: cloud response
+    ///   - groupId: group id
+    ///   - matterNodeId: matter node id
+    func cloudLoginConcluded(cloudResponse: ESPSessionResponse?, groupId: String, matterNodeId: String) {
+        if let cloudResponse = cloudResponse, var refreshToken = cloudResponse.refreshToken, let deviceId = matterNodeId.hexToDecimal {
+            ESPMatterFabricDetails.shared.saveAWSTokens(cloudResponse: cloudResponse, groupId: groupId, matterNodeId: matterNodeId)
+            DispatchQueue.main.async {
+                Utility.showLoader(message: ESPMatterConstants.updatingDeviceListMsg, view: self.view)
+            }
+            ESPMTRCommissioner.shared.resetRefreshToken(deviceId: deviceId) { result in
+                if result {
+                    self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
+                        if result {
+                            self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL)
+                        } else {
+                            DispatchQueue.main.async {
+                                self.hideLoaderAndAlertUser()
+                            }
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.hideLoaderAndAlertUser()
+                    }
+                }
+            }
+        }
+    }
+}
+
+//MARK: commissioning methods
+@available(iOS 16.4, *)
+extension ESPMatterCommissioningVC {
+    
+    /// Validate onboarding payload and start commissioning
+    /// - Parameter groupName: group name
+    func validatePayloadAndStartCommissioning(groupName: String) {
+        if let _ = ESPMatterEcosystemInfo.shared.getOnboardingPayload() {
+            self.startCommissioning()
+        } else {
             self.launchCommissioningDialog(groupName: groupName)
         }
     }
@@ -192,12 +364,51 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
         }
     }
     
-    func reloadData() {
-        DispatchQueue.main.async {
-            User.shared.updateDeviceList = true
-            self.navigationController?.popToRootViewController(animated: true)
+    func reloadData(groupId: String? = nil, matterNodeId: String? = nil) {
+        if let groupId = groupId, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
+            if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+                //Show login screen
+                self.alertUser(title: "", message: ESPMatterConstants.controllerNeedsAccessMsg, buttonTitle: ESPMatterConstants.okTxt) {
+                    DispatchQueue.main.async {
+                        self.showRainmakerLoginScreen(groupId: groupId, matterNodeId: matterNodeId)
+                    }
+                }
+            } else {
+                //Go to home screen
+                if let nodes = User.shared.associatedNodeList, nodes.count > 0 {
+                    var shouldUpdateDeviceList = false
+                    var id: UInt64?
+                    for node in  nodes {
+                        if let grpId = node.groupId, let matterNodeId = node.matterNodeId, let deviceId = matterNodeId.hexToDecimal, grpId == groupId, node.isRainmakerControllerSupported.0 {
+                            shouldUpdateDeviceList = true
+                            id = deviceId
+                            break
+                        }
+                    }
+                    if shouldUpdateDeviceList, let id = id {
+                        DispatchQueue.main.async {
+                            Utility.showLoader(message: "", view: self.view)
+                        }
+                        ESPMTRCommissioner.shared.updateDeviceList(deviceId: id) { result in
+                            DispatchQueue.main.async {
+                                Utility.hideLoader(view: self.view)
+                                self.goToHomeScreen()
+                            }
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.goToHomeScreen()
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.goToHomeScreen()
+                    }
+                }
+            }
         }
     }
+
     
     func showError(title: String, message: String, buttonTitle: String) {
         DispatchQueue.main.async {
@@ -210,7 +421,7 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
         var index = 0
         if let group = self.group, group.shouldUpdate, let fabricDetails = group.fabricDetails, let catIdAdminHex = fabricDetails.catIdAdmin, let catIdAdmin = "FFFFFFFD\(catIdAdminHex)".hexToDecimal, let catIdOperateHex = fabricDetails.catIdOperate, let catIdOperate = "FFFFFFFD\(catIdOperateHex)".hexToDecimal, let nodes = self.nodes, nodes.count > 0 {
             for node in nodes {
-                if let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal {
+                if let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal {
                     ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { accessControlEntries in
                         if var accessControlEntries = accessControlEntries, accessControlEntries.count > 0 {
                             var entries = [MTRAccessControlClusterAccessControlEntryStruct]()
