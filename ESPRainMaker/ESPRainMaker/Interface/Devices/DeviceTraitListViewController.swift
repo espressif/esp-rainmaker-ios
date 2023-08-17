@@ -35,6 +35,9 @@ class DeviceTraitListViewController: UIViewController {
     @IBOutlet var offlineLabel: UILabel!
     @IBOutlet var networkIndicator: UIView!
     @IBOutlet weak var linkingButton: UIButton!
+    @IBOutlet weak var betaLabel: UILabel!
+    @IBOutlet weak var betaLabelHeightConstraint: NSLayoutConstraint!
+    
     var deviceName: String?
     var group: ESPNodeGroup?
     var node: ESPNodeDetails?
@@ -49,10 +52,8 @@ class DeviceTraitListViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         #if ESPRainMakerMatter
-        if let node = self.device.node, node.isMatter, node.isOnOffClientSupported, node.bindingServers.count > 0 {
-            self.linkingButton.isHidden = false
-            self.linkingButton.isUserInteractionEnabled = true
-        }
+        self.setupLinkingButton()
+        self.setupBetaView()
         #endif
         tableView.tableFooterView = UIView()
         tableView.register(UINib(nibName: "ActionTableViewCell", bundle: nil), forCellReuseIdentifier: "ActionTableViewCell")
@@ -81,6 +82,29 @@ class DeviceTraitListViewController: UIViewController {
             checkForCentralParam()
         }
         checkOfflineStatus()
+    }
+    
+    /// Setup linking button
+    func setupLinkingButton() {
+        if let node = self.device.node, node.isMatter, node.isOnOffClientSupported, node.bindingServers.count > 0 {
+            self.linkingButton.isHidden = false
+            self.linkingButton.isUserInteractionEnabled = true
+        }
+    }
+    
+    /// Setup beta view
+    func setupBetaView() {
+        if let node = self.device.node, node.isMatter, node.isRainmakerControllerSupported.0 {
+            DispatchQueue.main.async {
+                self.betaLabel.text = "Beta"
+                self.betaLabelHeightConstraint.constant = 16.0
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.betaLabel.text = ""
+                self.betaLabelHeightConstraint.constant = 0.0
+            }
+        }
     }
     
     #if ESPRainMakerMatter
@@ -569,7 +593,10 @@ class DeviceTraitListViewController: UIViewController {
 }
 
 extension DeviceTraitListViewController: UITableViewDelegate {
-    func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
+    func tableView(_: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return 0.0
+        }
         return 10.0
     }
 
@@ -673,6 +700,9 @@ extension DeviceTraitListViewController: ESPAddNodeToMatterFabricPresentationLog
     ///   - status: status
     ///   - error: error
     func nodeRemoved(status: Bool, error: Error?) {
+        if status, let matterNodeId = self.node?.getMatterNodeId() {
+            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: matterNodeId)
+        }
         User.shared.updateDeviceList = true
         Utility.hideLoader(view: self.view)
         self.navigationController?.popViewController(animated: true)

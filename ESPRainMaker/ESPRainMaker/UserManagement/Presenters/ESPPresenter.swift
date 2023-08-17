@@ -25,6 +25,7 @@ protocol ESPUserPresentationLogic {
 
 protocol ESPLoginPresentationLogic {
     func loginCompleted(withError error: ESPAPIError?)
+    func rainmakerControllerLoginCompleted(data: Data?)
 }
 
 protocol ESPExtendSessionPresentationLogic {

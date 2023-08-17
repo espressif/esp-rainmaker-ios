@@ -29,6 +29,8 @@ class DeviceViewController: UIViewController {
     @IBOutlet weak var offlineView: UIView!
     @IBOutlet weak var offlineViewHeight: NSLayoutConstraint!
     @IBOutlet weak var deviceTableView: UITableView!
+    @IBOutlet weak var betaLabel: UILabel!
+    @IBOutlet weak var betaLabelHeightConstraint: NSLayoutConstraint!
     var group: ESPNodeGroup?
     var node: ESPNodeDetails?
     var allNodes: [ESPNodeDetails]?
@@ -59,7 +61,7 @@ class DeviceViewController: UIViewController {
         tapGestureRecognizer.cancelsTouchesInView = false
         self.setNavigationTextAttributes(color: .darkGray)
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: ESPMatterConstants.backTxt, style: .plain, target: self, action: #selector(goBack))
-        self.navigationItem.leftBarButtonItem?.tintColor = .darkGray
+        self.navigationItem.leftBarButtonItem?.tintColor = .systemBlue
         self.view.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin]
         self.deviceTableView.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin]
         self.deviceTableView.delegate = self
@@ -73,6 +75,7 @@ class DeviceViewController: UIViewController {
             }
         }
         self.showRightBarButtons(showInfo: true)
+        self.showBetaLabel()
         self.registerCells()
     }
     
@@ -84,6 +87,21 @@ class DeviceViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
+    /// Show beta label
+    func showBetaLabel() {
+        if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal, ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+            DispatchQueue.main.async {
+                self.betaLabel.text = "Beta"
+                self.betaLabelHeightConstraint.constant = 16.0
+            }
+            return
+        }
+        DispatchQueue.main.async {
+            self.betaLabel.text = ""
+            self.betaLabelHeightConstraint.constant = 0.0
+        }
     }
 
     /// Restart matter controller
@@ -154,7 +172,7 @@ class DeviceViewController: UIViewController {
     /// Generate cells
     func generateCells() {
         cellInfo.removeAll()
-        if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal, !self.isDelete {
+        if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
             if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
                 cellInfo.append(ESPMatterConstants.onOff)
             }
@@ -167,12 +185,31 @@ class DeviceViewController: UIViewController {
             if ESPMatterClusterUtil.shared.isOpenCommissioningWindowSupported(groupId: groupId, deviceId: deviceId).0 {
                 cellInfo.append(ESPMatterConstants.openCW)
             }
-            ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { _ in }
+            if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+                cellInfo.append(ESPMatterConstants.rainmakerController)
+            }
+            if !self.isDelete {
+                ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { _ in }
+            }
         }
-        cellInfo.append(ESPMatterConstants.delete)
+        /*
+         cellInfo.append(ESPMatterConstants.delete)
+         */
+        self.deviceTableView.isUserInteractionEnabled = !self.isDelete
+        self.setupOfflineUI()
         self.deviceTableView.reloadData()
     }
     
+    /// Setup offline UI
+    func setupOfflineUI() {
+        if self.isDelete {
+            self.offlineView.isHidden = false
+            self.offlineViewHeight.constant = 17.0
+        } else {
+            self.offlineView.isHidden = true
+            self.offlineViewHeight.constant = 0.0
+        }
+    }
     
     
     /// Check matter connection

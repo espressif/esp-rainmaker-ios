@@ -120,6 +120,21 @@ public class ESPMatterClusterUtil {
         return (false, nil)
     }
     
+    /// Is color control server supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: (result, endpoint id)
+    public func isRainmakerControllerServerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        let val = ESPMatterFabricDetails.shared.fetchServersData(groupId: groupId, deviceId: deviceId)
+        for key in val.keys {
+            if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.controllerClusterId) {
+                return (true, key)
+            }
+        }
+        return (false, nil)
+    }
+    
     /// Is open commissioning window supported
     /// - Parameters:
     ///   - groupId: group id

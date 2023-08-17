@@ -29,10 +29,10 @@ extension DeviceViewController: RemoveDeviceDelegate {
             let worker = ESPExtendUserSessionWorker()
             worker.checkUserSession { token, _ in
                 if let token = token, let node = self.node, let nodeId = node.nodeID, let rainmakerNode = User.shared.getNode(id: nodeId), let groupId = rainmakerNode.groupId {
-                    self.checkConnectionAndRemoveFabric(node: node) { _ in
-                        DispatchQueue.main.async {
-                            Utility.showLoader(message: ESPMatterConstants.removingDeviceMsg, view: self.view)
-                        }
+                    DispatchQueue.main.async {
+                        Utility.showLoader(message: ESPMatterConstants.removingDeviceMsg, view: self.view)
+                    }
+                    self.checkConnectionAndRemoveFabric(node: node) { _ in   
                         let userId = User.shared.userInfo.userID
                         let params = [ESPMatterConstants.nodes: [nodeId],
                                       ESPMatterConstants.operation: ESPMatterConstants.remove]
@@ -52,14 +52,14 @@ extension DeviceViewController: RemoveDeviceDelegate {
     ///   - node: node
     ///   - completion: completion
     func checkConnectionAndRemoveFabric(node: ESPNodeDetails, completion: @escaping (Bool) -> Void) {
-        if let nodeId = node.nodeID, let matterNodeId = node.matterNodeID, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+        if let nodeId = node.nodeID, let matterNodeId = node.getMatterNodeId(), User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
             ESPMTRCommissioner.shared.readCurrentFabricIndex(deviceId: deviceId) { index in
-                guard let index = index else {
+                if let index = index {
+                    ESPMTRCommissioner.shared.removeFabricAtIndex(deviceId: deviceId, atIndex: index) { result in
+                        completion(result)
+                    }
+                } else {
                     completion(false)
-                    return
-                }
-                ESPMTRCommissioner.shared.removeFabricAtIndex(deviceId: deviceId, atIndex: index) { result in
-                    completion(result)
                 }
             }
         } else {

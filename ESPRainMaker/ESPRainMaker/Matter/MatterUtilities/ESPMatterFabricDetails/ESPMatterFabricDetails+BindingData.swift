@@ -138,7 +138,7 @@ extension ESPMatterFabricDetails {
         }
         if let nodeDetails = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId), let groups = nodeDetails.groups, groups.count > 0, let nodes = groups[0].nodeDetails, nodes.count > 0 {
             for node in nodes {
-                if let nodeId = node.matterNodeID?.hexToDecimal, nodeId != deviceId {
+                if let nodeId = node.getMatterNodeId()?.hexToDecimal, nodeId != deviceId {
                     self.removeDeviceFromLinkedDevices(groupId: groupId, sourceDeviceId: nodeId, deviceId: deviceId, endpointClusterId: endpointClusterId)
                     self.removeDeviceFromUnlinkedDevices(groupId: groupId, sourceDeviceId: nodeId, deviceId: deviceId, endpointClusterId: endpointClusterId)
                 }
@@ -160,7 +160,7 @@ extension ESPMatterFabricDetails {
         var devices = [ESPNodeDetails]()
         if let data = UserDefaults.standard.value(forKey: linkedDevicesKey) as? Data, let linkedDevices = try? decoder.decode([ESPNodeDetails].self, from: data), linkedDevices.count > 0 {
             for device in linkedDevices {
-                if let matterNodeID = device.matterNodeID, let id = matterNodeID.hexToDecimal, id == deviceId {
+                if let matterNodeID = device.getMatterNodeId(), let id = matterNodeID.hexToDecimal, id == deviceId {
                     continue
                 }
                 devices.append(device)
@@ -186,7 +186,7 @@ extension ESPMatterFabricDetails {
         var devices = [ESPNodeDetails]()
         if let data = UserDefaults.standard.value(forKey: unlinkedDevicesKey) as? Data, let unlinkedDevices = try? decoder.decode([ESPNodeDetails].self, from: data), unlinkedDevices.count > 0 {
             for device in unlinkedDevices {
-                if let matterNodeID = device.matterNodeID, let id = matterNodeID.hexToDecimal, id == deviceId {
+                if let matterNodeID = device.getMatterNodeId(), let id = matterNodeID.hexToDecimal, id == deviceId {
                     continue
                 }
                 devices.append(device)

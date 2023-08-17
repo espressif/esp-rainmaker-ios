@@ -47,7 +47,7 @@ class DevicesBindingViewController: UIViewController {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: ESPMatterConstants.backTxt, style: .done, target: self, action: #selector(goBack))
         self.navigationItem.leftBarButtonItem?.tintColor = .darkGray
         self.navigationController?.addCustomBottomLine(color: .lightGray, height: 0.5)
-        if let group = group, let groupId = group.groupID, let sourceNode = sourceNode, let matterNodeId = sourceNode.matterNodeID, let sourceDeviceid = matterNodeId.hexToDecimal {
+        if let group = group, let groupId = group.groupID, let sourceNode = sourceNode, let matterNodeId = sourceNode.getMatterNodeId(), let sourceDeviceid = matterNodeId.hexToDecimal {
             if let linkedNodes = ESPMatterFabricDetails.shared.getLinkedDevices(groupId: groupId, deviceId: sourceDeviceid, endpointClusterId: self.endpointClusterId) {
                 self.linkedNodes = linkedNodes
             }
@@ -96,7 +96,7 @@ class DevicesBindingViewController: UIViewController {
         Utility.showLoader(message: ESPMatterConstants.fetchBindingMsg, view: self.view)
         self.checkNodesLinkingStatus() {
             Utility.hideLoader(view: self.view)
-            if let group = self.group, let groupId = group.groupID, let node = self.sourceNode, let matterNodeId = node.matterNodeID, let sourceDeviceId = matterNodeId.hexToDecimal {
+            if let group = self.group, let groupId = group.groupID, let node = self.sourceNode, let matterNodeId = node.getMatterNodeId(), let sourceDeviceId = matterNodeId.hexToDecimal {
                 ESPMatterFabricDetails.shared.saveBindingData(groupId: groupId, deviceId: sourceDeviceId, linkedNodes: self.linkedNodes, unlinkedNodes: self.unlinkedNodes, endpointClusterId: self.endpointClusterId)
                 self.setupUI()
                 self.editDevices()
@@ -125,7 +125,7 @@ class DevicesBindingViewController: UIViewController {
     func areDevicesLinked(sourceNode: ESPNodeDetails, nodes: [ESPNodeDetails], index: Int, completionHandler: @escaping () -> Void) {
         if index < nodes.count {
             let destinationNode = nodes[index]
-            if let destinationNodeId = destinationNode.matterNodeID, let sourceNodeId = sourceNode.matterNodeID, destinationNodeId != sourceNodeId, let destinationDeviceId = destinationNodeId.hexToDecimal {
+            if let destinationNodeId = destinationNode.getMatterNodeId(), let sourceNodeId = sourceNode.getMatterNodeId(), destinationNodeId != sourceNodeId, let destinationDeviceId = destinationNodeId.hexToDecimal {
                 if let group = self.group, let groupId = group.groupID {
                     if !ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: destinationDeviceId).0 {
                         self.areDevicesLinked(sourceNode: sourceNode, nodes: nodes, index: index+1, completionHandler: completionHandler)
@@ -190,7 +190,7 @@ class DevicesBindingViewController: UIViewController {
     
     /// Reload linked and unlinked data sources
     func reloadDataSource() {
-        if let group = self.group, let groupId = group.groupID, let sourceNode = self.sourceNode, let matterId = sourceNode.matterNodeID, let deviceId = matterId.hexToDecimal {
+        if let group = self.group, let groupId = group.groupID, let sourceNode = self.sourceNode, let matterId = sourceNode.getMatterNodeId(), let deviceId = matterId.hexToDecimal {
             ESPMatterFabricDetails.shared.saveBindingData(groupId: groupId, deviceId: deviceId, linkedNodes: self.linkedNodes, unlinkedNodes: self.unlinkedNodes, endpointClusterId: self.endpointClusterId)
             self.bindingTable.reloadData()
         }
@@ -202,7 +202,7 @@ class DevicesBindingViewController: UIViewController {
     ///   - action: action
     ///   - destinationNode: destination node
     func configureCell(cell: inout BindingTableViewCell, action: Action, destinationNode: ESPNodeDetails) {
-        if let destinationDeviceMatterNodeID = destinationNode.matterNodeID {
+        if let destinationDeviceMatterNodeID = destinationNode.getMatterNodeId() {
             if let group = self.group, let groupId = group.groupID {
                 if let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: destinationDeviceMatterNodeID) {
                     cell.deviceName.text = deviceName
@@ -303,7 +303,7 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
     ///   - node: node to be linked
     ///   - action: action
     func executeLinkingAction(node: ESPNodeDetails?, action: Action) {
-        if let sourceNode = self.sourceNode, let sourceNodeId = sourceNode.nodeID, let destinationNode = node, let destinationNodeId = destinationNode.nodeID, let sourceDeviceId = sourceNode.matterNodeID?.hexToDecimal, let destinationDeviveId = node?.matterNodeID?.hexToDecimal {
+        if let sourceNode = self.sourceNode, let sourceNodeId = sourceNode.nodeID, let destinationNode = node, let destinationNodeId = destinationNode.nodeID, let sourceDeviceId = sourceNode.getMatterNodeId()?.hexToDecimal, let destinationDeviveId = node?.getMatterNodeId()?.hexToDecimal {
             if action == .add {
                 Utility.showLoader(message: ESPMatterConstants.linkingDevicesMeg, view: self.view)
                 ESPMTRCommissioner.shared.linkDevice(endpointClusterId: self.endpointClusterId, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
@@ -324,7 +324,7 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
                                 self.service?.bindDevice(node: node, destinationNodeId: destinationNodeId) { result in
                                     for index in 0..<self.unlinkedNodes.count {
                                         let dest = self.unlinkedNodes[index]
-                                        if let id = destinationNode.matterNodeID, dest.matterNodeID == id {
+                                        if let id = destinationNode.getMatterNodeId(), dest.getMatterNodeId() == id {
                                             self.linkedNodes.append(dest)
                                             self.unlinkedNodes.remove(at: index)
                                             break
@@ -359,7 +359,7 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
                                 self.service?.unbindDevice(node: node, destinationNodeId: destinationNodeId) { result in
                                     for index in 0..<self.linkedNodes.count {
                                         let dest = self.linkedNodes[index]
-                                        if let id = destinationNode.matterNodeID, dest.matterNodeID == id {
+                                        if let id = destinationNode.getMatterNodeId(), dest.getMatterNodeId() == id {
                                             self.unlinkedNodes.append(dest)
                                             self.linkedNodes.remove(at: index)
                                             break

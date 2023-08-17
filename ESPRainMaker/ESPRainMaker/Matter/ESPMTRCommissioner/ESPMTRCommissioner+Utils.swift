@@ -154,6 +154,11 @@ extension ESPMTRCommissioner {
         let serversData = ESPMatterFabricDetails.shared.fetchServersData(groupId: groupId, deviceId: deviceId)
         let clientsData = ESPMatterFabricDetails.shared.fetchClientsData(groupId: groupId, deviceId: deviceId)
         let endpointsData = ESPMatterFabricDetails.shared.fetchEndpointsData(groupId: groupId, deviceId: deviceId)
+        if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0, let controllerNodeId = self.sController?.controllerNodeID {
+            let id = controllerNodeId.uint64Value
+            let str = String(id, radix: 16)
+            metaData[ESPMatterConstants.controllerNodeId] = str
+        }
         if serverData.count > 0 {
             metaData[ESPMatterConstants.serversData] = serversData
         }

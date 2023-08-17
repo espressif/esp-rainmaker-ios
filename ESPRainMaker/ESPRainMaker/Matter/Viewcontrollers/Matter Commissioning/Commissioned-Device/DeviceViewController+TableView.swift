@@ -34,6 +34,8 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 return 75.0
             } else if value == ESPMatterConstants.levelControl || value == ESPMatterConstants.colorControl {
                 return 126.0
+            } else if value == ESPMatterConstants.rainmakerController {
+                return 100.0
             }
         }
         return 0.0
@@ -66,7 +68,11 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.delegate = self
                     cell.group = self.group
                     self.setAutoresizingMask(cell)
-                    cell.setupInitialUI()
+                    if self.isDelete {
+                        cell.setupOfflineUI(deviceId: deviceId)
+                    } else {
+                        cell.setupInitialUI()
+                    }
                     return cell
                 }
             } else if value == ESPMatterConstants.levelControl {
@@ -81,7 +87,11 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.slider.isHidden = false
                 cell.paramChipDelegate = self
                 self.setAutoresizingMask(cell)
-                cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
+                if self.isDelete {
+                    cell.setupOfflineUI()
+                } else {
+                    cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
+                }
                 return cell
             } else if value == ESPMatterConstants.colorControl {
                 
@@ -108,6 +118,12 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
             } else if value == ESPMatterConstants.openCW {
                 
                 if let cell = tableView.dequeueReusableCell(withIdentifier: OpenCommissioningWindowCell.reuseIdentifier, for: indexPath) as? OpenCommissioningWindowCell {
+                    cell.delegate = self
+                    self.setAutoresizingMask(cell)
+                    return cell
+                }
+            } else if value == ESPMatterConstants.rainmakerController {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: LaunchControllerCell.reuseIdentifier, for: indexPath) as? LaunchControllerCell {
                     cell.delegate = self
                     self.setAutoresizingMask(cell)
                     return cell

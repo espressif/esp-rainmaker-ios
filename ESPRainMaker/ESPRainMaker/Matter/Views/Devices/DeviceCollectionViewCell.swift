@@ -116,12 +116,15 @@ class DeviceCollectionViewCell: UICollectionViewCell {
             if status == .local {
                 self.overlay.isHidden = true
                 self.isUserInteractionEnabled = true
+                self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
             } else if status == .remote {
                 self.overlay.isHidden = true
                 self.isUserInteractionEnabled = true
+                self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
             } else {
                 self.overlay.isHidden = false
                 self.isUserInteractionEnabled = true
+                self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
             }
         }
     }

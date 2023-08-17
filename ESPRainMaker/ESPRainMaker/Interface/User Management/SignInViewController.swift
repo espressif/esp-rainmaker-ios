@@ -21,12 +21,22 @@ import Foundation
 import JWTDecode
 import SafariServices
 
+#if ESPRainMakerMatter
+protocol RainmakerControllerFlowDelegate: AnyObject {
+    func cloudLoginConcluded(cloudResponse: ESPSessionResponse?, groupId: String, matterNodeId: String)
+    func controllerFlowCancelled()
+}
+#endif
+
 protocol FlowCancelledDelegate: AnyObject {
     func flowCancelled()
 }
 
 class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextViewDelegate {
     
+    
+    @IBOutlet weak var controllerSigninButton: PrimaryButton!
+    @IBOutlet weak var closeButton: PrimaryButton!
     @IBOutlet var checkBox: UIButton!
     @IBOutlet var signInTopSpace: NSLayoutConstraint!
     @IBOutlet var signUpTopView: NSLayoutConstraint!
@@ -63,11 +73,26 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     let appDelegate = UIApplication.shared.delegate as? AppDelegate
     
     var showAgreementView: Bool = true
+    
+    var service: ESPLoginService?
+    
+    #if ESPRainMakerMatter
+    var isRainmakerControllerFlow = false
+    var groupId: String = ""
+    var matterNodeId: String = ""
+    weak var rainmakerControllerDelegate: RainmakerControllerFlowDelegate?
+    #endif
+
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.presentationController?.delegate = self
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        #if ESPRainMakerMatter
+        setCloseButtonUI()
+        #else
+        setSigninButtonUI()
+        #endif
         segmentControl.selectedSegmentIndex = 0
         changeSegment()
         password.text = ""
@@ -115,13 +140,24 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .normal)
         segmentControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: currentBGColor as Any], for: .selected)
         segmentControl.changeUnderlineColor(color: currentBGColor)
-        agreementView.isHidden = !showAgreementView
-        showAgreementView = true
+        #if ESPRainMakerMatter
+        if self.isRainmakerControllerFlow {
+            self.showAgreementScreen(showAgreementView: false)
+        } else {
+            self.showAgreementScreen(showAgreementView: true)
+        }
+        #else
+        self.showAgreementScreen(showAgreementView: true)
+        #endif
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        #if ESPRainMakerMatter
+        setCloseButtonUI()
+        #else
+        setSigninButtonUI()
+        #endif
         if User.shared.automaticLogin {
             User.shared.automaticLogin = false
             password.text = User.shared.password
@@ -191,6 +227,13 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         }
     }
     
+    /// Show agreement screen
+    /// - Parameter showAgreementView: show/hide
+    func showAgreementScreen(showAgreementView: Bool) {
+        self.agreementView.isHidden = !showAgreementView
+        self.showAgreementView = showAgreementView
+    }
+    
     // UITextViewDelegate method to handle callbacks for clickable text.
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         if URL.absoluteString == privacyLink {
@@ -201,6 +244,14 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
             return false
         }
         return true
+    }
+    
+    @IBAction func closeSigninVC(_ sender: Any) {
+        #if ESPRainMakerMatter
+        User.shared.updateDeviceList = true
+        self.rainmakerControllerDelegate?.controllerFlowCancelled()
+        self.dismiss(animated: true, completion: nil)
+        #endif
     }
     
     @IBAction func segmentChange(sender _: UISegmentedControl) {
@@ -277,7 +328,16 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         return self
     }
 
+    @IBAction func controllerSignInPressed(_: AnyObject) {
+        self.signIn()
+    }
+    
     @IBAction func signInPressed(_: AnyObject) {
+        self.signIn()
+    }
+    
+    /// Sign in pressed
+    func signIn() {
         dismissKeyboard()
         signInButton.isEnabled = false
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
@@ -298,8 +358,15 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     func signIn(username: String, password: String) {
         Utility.showLoader(message: "Signing in", view: view)
         User.shared.username = username
-        let service = ESPLoginService(presenter: self)
-        service.loginUser(name: username, password: password)
+        #if ESPRainMakerMatter
+        if self.isRainmakerControllerFlow {
+            self.service = ESPLoginService(isRainmakerControllerFlow: true, presenter: self)
+            self.service?.loginUser(name: username, password: password)
+            return
+        }
+        #endif
+        self.service = ESPLoginService(presenter: self)
+        self.service?.loginUser(name: username, password: password)
     }
 
     func showAlert() {
@@ -459,6 +526,39 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
             }
         }
     }
+    
+    #if ESPRainMakerMatter
+    /// Set rainmaker properties
+    /// - Parameters:
+    ///   - isRainmakerControllerFlow: is rainmaker controller flow
+    ///   - groupId: group id
+    ///   - matterNodeId: matter node id
+    ///   - rainmakerControllerDelegate: rainmaker controller delegate
+    func setRainmakerControllerProperties(isRainmakerControllerFlow: Bool,
+                                      groupId: String,
+                                      matterNodeId: String,
+                                      rainmakerControllerDelegate: RainmakerControllerFlowDelegate?) {
+        self.isRainmakerControllerFlow = isRainmakerControllerFlow
+        self.groupId = groupId
+        self.matterNodeId = matterNodeId
+        self.rainmakerControllerDelegate = rainmakerControllerDelegate
+    }
+    
+    /// Set close button UI
+    func setCloseButtonUI() {
+        self.closeButton.isHidden = !self.isRainmakerControllerFlow
+        self.controllerSigninButton.isHidden = !self.isRainmakerControllerFlow
+        self.signInButton.isHidden = self.isRainmakerControllerFlow
+        self.segmentControl.isHidden = self.isRainmakerControllerFlow
+    }
+    #endif
+    
+    /// Set sign in button UI
+    func setSigninButtonUI() {
+        self.closeButton.isHidden = true
+        self.controllerSigninButton.isHidden = true
+        self.signInButton.isHidden = false
+    }
 }
 
 extension SignInViewController: UIAdaptivePresentationControllerDelegate {
@@ -497,6 +597,26 @@ extension SignInViewController: UITextFieldDelegate {
 }
 
 extension SignInViewController: ESPLoginPresentationLogic {
+    func rainmakerControllerLoginCompleted(data: Data?) {
+        #if ESPRainMakerMatter
+        Utility.hideLoader(view: self.view)
+        let decoder = JSONDecoder()
+        if let data = data, let cloudResponse = try? decoder.decode(ESPSessionResponse.self, from: data) {
+            if cloudResponse.isValid {
+                self.rainmakerControllerDelegate?.cloudLoginConcluded(cloudResponse: cloudResponse, groupId: self.groupId, matterNodeId: self.matterNodeId)
+                self.dismiss(animated: true)
+            } else if let desc = cloudResponse.description {
+                self.alertUser(title: "Failure", message: desc, buttonTitle: "OK") {
+                    self.signInButton.isEnabled = true
+                }
+            }
+        } else {
+            self.rainmakerControllerDelegate?.cloudLoginConcluded(cloudResponse: nil, groupId: self.groupId, matterNodeId: self.matterNodeId)
+            self.dismiss(animated: true)
+        }
+        #endif
+    }
+
     func loginCompleted(withError error: ESPAPIError?) {
         DispatchQueue.main.async {
             Utility.hideLoader(view: self.view)
@@ -572,6 +692,17 @@ extension SignInViewController: ESPIdProviderLoginPresenter {
     }
     
     func loginSuccess(requestToken: RequestToken) {
+        #if ESPRainMakerMatter
+        if self.isRainmakerControllerFlow {
+            var cloudResponse = ESPSessionResponse()
+            cloudResponse.accessToken = requestToken.accessToken
+            cloudResponse.idToken = requestToken.idToken
+            cloudResponse.refreshToken = requestToken.refreshToken
+            self.rainmakerControllerDelegate?.cloudLoginConcluded(cloudResponse: cloudResponse, groupId: self.groupId, matterNodeId: self.matterNodeId)
+            self.dismiss(animated: true)
+            return
+        }
+        #endif
         let umTokenWorker = ESPTokenWorker.shared
         if let refreshToken = requestToken.refreshToken {
             umTokenWorker.save(value: refreshToken, key: Constants.refreshTokenKey)

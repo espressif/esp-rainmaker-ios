@@ -231,4 +231,32 @@ class ESPMatterFabricDetails {
         let key = "group.metadata.\(groupId)"
         UserDefaults.standard.removeObject(forKey: key)
     }
+    
+    /// Save AWS tokens
+    /// - Parameters:
+    ///   - cloudResponse: cloud response
+    ///   - groupId: group id
+    ///   - matterNodeId: matter node id
+    func saveAWSTokens(cloudResponse: ESPSessionResponse, groupId: String, matterNodeId: String) {
+        let key = "matter.aws.tokens.\(groupId).\(matterNodeId)"
+        let encoder = JSONEncoder()
+        if let data = try? encoder.encode(cloudResponse) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+    
+    /// Get AWS tokens
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - matterNodeId: matter node id
+    /// - Returns: response
+    func getAWSTokens(groupId: String, matterNodeId: String) -> ESPSessionResponse? {
+        let decoder = JSONDecoder()
+        let key = "matter.aws.tokens.\(groupId).\(matterNodeId)"
+        if let data = UserDefaults.standard.value(forKey: key) as? Data, let response = try? decoder.decode(ESPSessionResponse.self, from: data) {
+            return response
+        }
+        return nil
+    }
+
 }

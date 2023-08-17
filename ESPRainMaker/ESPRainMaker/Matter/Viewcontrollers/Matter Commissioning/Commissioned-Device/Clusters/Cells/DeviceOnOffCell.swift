@@ -101,5 +101,18 @@ class DeviceOnOffCell: UITableViewCell {
             }
         }
     }
+    
+    /// Setup offline UI
+    func setupOfflineUI(deviceId: UInt64) {
+        DispatchQueue.main.async {
+            if let node = self.node, let status = node.isMatterLightOn(deviceId: deviceId) {
+                self.toggleSwitch.setOn(status, animated: true)
+                self.onOffStatus.text = status ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+            } else {
+                self.toggleSwitch.setOn(false, animated: true)
+                self.onOffStatus.text = ESPMatterConstants.offTxt
+            }
+        }
+    }
 }
 #endif

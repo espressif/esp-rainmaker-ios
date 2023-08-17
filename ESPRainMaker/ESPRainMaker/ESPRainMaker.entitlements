@@ -8,6 +8,8 @@
 	<array>
 		<string>applinks:app-link-esp-rainmaker.s3.amazonaws.com</string>
 	</array>
+	<key>com.apple.developer.matter.allow-setup-payload</key>
+	<true/>
 	<key>com.apple.developer.networking.HotspotConfiguration</key>
 	<true/>
 	<key>com.apple.developer.networking.wifi-info</key>

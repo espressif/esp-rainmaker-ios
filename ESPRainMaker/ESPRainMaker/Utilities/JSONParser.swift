@@ -53,6 +53,9 @@ struct JSONParser {
                     node.metadata = metadata
                     if let id = node.node_id, let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: id), let matternodeId = node.matterNodeId {
                         ESPMatterFabricDetails.shared.saveMetadata(details: metadata, groupId: groupId, matterNodeId: matternodeId)
+                        if let controllerNodeId = metadata[ESPMatterConstants.controllerNodeId] as? String {
+                            ESPMatterFabricDetails.shared.saveControllerNodeId(controllerNodeId: controllerNodeId, matterNodeId: matternodeId)
+                        }
                     }
                 }
             }
