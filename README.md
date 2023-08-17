@@ -231,7 +231,16 @@ The project is built around a shared belief that smart home devices should be se
 - Control matter+rainmaker devices remotely using the Rainmaker cloud.
 - Bind switch to light device.
 
+### Matter API Reference
+Please refer to this file [Matter.md](ESPRainMaker/ESPRainMaker/Matter/Matter.md) for the following:
+- Matter API details.
+- MatterSupport integration.
+- Custom fabric commissioning workflow.
+
 ### Build app for Matter fabric
+
+**[Note: app supports Matter for iOS 16.4+]**
+
 To support Custom Matter Fabric on the app do the following:
 - Open Xcode go to Scheme selection dropdown.
 - Select ESPRainmakerMatter scheme.
@@ -264,9 +273,7 @@ If user wants to rerun the app for Matter:
 - Run the app.
 ```
 
-
 ## Supports
-
 
 - iOS 13.0 or greater.
 
