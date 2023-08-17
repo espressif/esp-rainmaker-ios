@@ -55,11 +55,6 @@ Some of the important classes used in the app:
 	- Is device connected via local network 
 	- Get device metadata 
 
-	ESPMTRCommissioner+Rainmaker.swift: 
-	- Fetch rainmaker node id 
-	- Send matter node id 
-	- Read attribute challenge 
-
 	ESPMTRCommissioner+BasicInformation.swift: 
 	- Get basic information cluster 
 	- Get vendor id 
@@ -85,8 +80,10 @@ Some of the important classes used in the app:
 	- Bind devices 
 	- Unbind devices 
 
-	ESPMATRCommissioner+RainmakerController.swift: 
-	- Get rainmaker controller cluster 
+	ESPMTRCommissioner+CustomCluster.swift: 
+	- Fetch rainmaker node id 
+	- Send matter node id 
+	- Read attribute challenge
 	- Read attribute refresh token 
 	- Read attribute accesstoken 
 	- Read attribute authorized 
@@ -202,3 +199,177 @@ file: **esp-rainmaker- ios/ESPRainMaker/ESPRainMaker/Matter/ESPMTRCommissioner/E
 
 **func controller(_ controller: MTRDeviceController, commissioningComplete error: Error?)**
 file: **esp-rainmaker- ios/ESPRainMaker/ESPRainMaker/Matter/ESPMTRCommissioner/ESPMTRCommissioner+Setup.swift**
+
+
+### How to work with custom clusters?
+
+*Files included:* 
+- **esp-rainmaker-ios/ESPRainMaker/ESPRainMaker/Matter/ESPMTRCommissioner/Custom\ Clusters/ESPCustomClusterInfo.swift**: This file is where we can define the custom clusters.
+- **esp-rainmaker-ios/ESPRainMaker/ESPRainMaker/Matter/ESPMTRCommissioner/Custom\ Clusters/ESPMTRCommissioner+CustomCluster.swift**: This file contains the methods that are used to call matter custom cluster APIs.
+
+
+*Defining custom cluster:*
+- Go to file ESPCustomClusterInfo.swift
+- The subsequent enum outlines the definition of the rainmaker cluster data:
+```
+enum rainmaker {
+    
+	enum attributes {
+		case rainmakerNodeId
+        case challenge
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .rainmakerNodeId:
+                return NSNumber(value: 1)
+            case .challenge:
+                return NSNumber(value: 2)
+            }
+        }
+    }
+    
+    enum commands {
+        case sendNodeId
+        
+        var commandId: NSNumber {
+            switch self {
+            case .sendNodeId:
+                return NSNumber(value: 1)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 320601088)
+}
+```
+- enum rainmaker will have the following:
+	- **static let clusterId: NSNumber**: this is the cluster id of the custom cluster
+	- **enum attributes**: this enum contains info on the attributes supported by the cluster
+		- **var attributeId: NSNumber**: attribute id for each attribute on the cluster
+	- **enum commands**: this enum contains info on the commands supported by the cluster
+		- **var commandId: NSNumber**: command id for each command supported by the cluster
+
+*Calling custom cluster APIs:*
+- Go to file ESPMTRCommissioner+CustomCluster.swift
+- Before calling an API, we need to get an instance of MTRBaseDevice using the following method:
+```
+func getMatterDevice(deviceId: UInt64, completion: @escaping (MTRBaseDevice?) -> Void) {
+	if let controller = sController {
+		if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
+			completion(device)
+			return
+		}
+		let device = MTRBaseDevice(nodeID: NSNumber(value: deviceId), controller: controller)
+		completion(device)
+		return
+	}
+	completion(nil)
+}
+```
+- Sample method for reading attribute on a custom cluster:
+	- Following is the method used for reading rainmaker node id from the device:
+```
+/// Read rainmaker node id
+/// - Parameters:
+///   - deviceId: device id
+///   - completion: completion
+func readAttributeRainmakerNodeIdFromDevice(deviceId: UInt64, _ completion: @escaping (String?) -> Void) {
+	getMatterDevice(deviceId: deviceId) { device in
+		if let device = device {
+			device.readAttributes(withEndpointID: NSNumber(value: 0),
+                                      clusterID: rainmaker.clusterId,
+                                      attributeID: rainmaker.attributes.rainmakerNodeId.attributeId,
+                                      params: nil,
+                                      queue: self.matterQueue) { value, _  in
+				if let value = value, let data = value.first?[ESPMatterConstants.data] as? [String: Any], let nodeId = data[ESPMatterConstants.value] as? String {
+					completion(nodeId)
+					return
+				}
+				completion(nil)
+			}
+		} else {
+			completion(nil)
+		}
+	}
+}
+```
+	- Read attribute method: This is the method of MTRBaseDevice class that can be used to read attribute for a given endpoint id, cluster id & attribute id.
+```
+/**
+ * Reads attributes from the device.
+ *
+ * Nil values for endpointID, clusterID, attributeID indicate wildcards
+ * (e.g. nil attributeID means "read all the attributes from the endpoint(s) and
+ * cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, attributeID are non-nil, a single
+ * attribute will be read.
+ *
+ * If all of endpointID, clusterID, attributeID are nil, all attributes on the
+ * device will be read.
+ *
+ * A non-nil attributeID along with a nil clusterID will only succeed if the
+ * attribute ID is for a global attribute that applies to all clusters.
+ */
+- (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                           clusterID:(NSNumber * _Nullable)clusterID
+                         attributeID:(NSNumber * _Nullable)attributeID
+                              params:(MTRReadParams * _Nullable)params
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+```
+	- Sample method for sending command on a custom cluster:
+		- Following is the method used for sending matter node id:
+```
+/// Send matter node id
+/// - Parameters:
+///   - deviceId: device id
+///   - matterNodeId: matter node id
+///   - completion: completion
+func sendMatterNodeIdToDevice(deviceId: UInt64, matterNodeId: String, _ completion: @escaping (Bool) -> Void) {
+	getMatterDevice(deviceId: deviceId) { device in
+		if let device = device {
+			let data = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
+                            ESPMatterConstants.value: matterNodeId]
+			device.invokeCommand(withEndpointID: NSNumber(value: 0),
+                                     clusterID: rainmaker.clusterId,
+                                     commandID: rainmaker.commands.sendNodeId.commandId,
+                                     commandFields: data,
+                                     timedInvokeTimeout: nil,
+                                     queue: self.matterQueue) { value, error in
+				guard let _ = error else {
+					completion(true)
+					return
+				}
+				completion(false)
+			}
+		} else {
+			completion(false)
+		}
+	}
+}
+```
+	- Send matter command method: This is the method of MTRBaseDevice class that can be used to send command for a given endpoint id, cluster id & command id.
+```
+/**
+ * Invoke a command with a designated command path
+ *
+ * @param commandFields   command fields object. The object must be a data-value NSDictionary object
+ *                      as described in the MTRDeviceResponseHandler.
+ *                      The attribute must be a Structure, i.e.,
+ *                      the NSDictionary MTRTypeKey key must have the value MTRStructureValueType.
+ *
+ * @param timeoutMs   timeout in milliseconds for timed invoke, or nil.
+ *
+ * @param completion  response handler will receive either values or error.
+ */
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+```

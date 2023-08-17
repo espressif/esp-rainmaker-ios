@@ -48,4 +48,8 @@ extension Data {
     var hexString: String {
         return self.base64EncodedString()
     }
+    
+    var bytes: [UInt8] {
+        return [UInt8](self)
+    }
 }

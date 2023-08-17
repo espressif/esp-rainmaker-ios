@@ -35,11 +35,10 @@ protocol ESPMTRUIDelegate: AnyObject {
 class ESPMTRCommissioner: NSObject {
     
     var discoveryStarted: Bool = false
-    let kTestVendorId: UInt16 = 0x1349
+    let kEspressifVendorId: UInt16 = 0x131B
     var group: ESPNodeGroup?
     var fabricIndex: UInt8?
     var keys: MTRCSRKeys?
-//    let matterQueue = DispatchQueue.main
     let matterQueue = DispatchQueue(label: "com.zigbee.chip.qrcodevc.callback", qos: .userInteractive)
     public static let shared = ESPMTRCommissioner()
     public var sController: MTRDeviceController?
@@ -48,7 +47,6 @@ class ESPMTRCommissioner: NSObject {
     var clientData: [String: [UInt]] = [String: [UInt]]()
     var completion: ((MTROperationalCertificateChain?, Error?) -> Void)?
     weak var uidelegate: ESPMTRUIDelegate?
-    
     var matterDeviceNotFoundCompletion: ((Bool) -> Void)?
     var isMaterTaskCompleted: Bool = false
     var lightQueue: DispatchQueue = DispatchQueue(label: "com.matter.light.queue")
@@ -139,8 +137,9 @@ extension ESPMTRCommissioner: MTROperationalCertificateIssuer {
     ///   - completion: completion
     func issueOperationalCertificate(forRequest csrInfo: MTROperationalCSRInfo, attestationInfo: MTRDeviceAttestationInfo, controller: MTRDeviceController, completion: @escaping (MTROperationalCertificateChain?, Error?) -> Void) {
         self.completion = completion
-        let csrData = csrInfo.csrElementsTLV
-        if let group = group, let groupId = group.groupID, let csrString = MTRCertificates.deconstructNOCSRElements(csrData) {
+        let csrData = csrInfo.csr
+        if let group = group, let groupId = group.groupID {
+            let csrString = csrData.base64EncodedString()
             self.getDeviceMetaData { metadata in
                 let nodeGroupURL = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion
                 let service = ESPAddNodeToMatterFabricService(presenter: self)
@@ -176,7 +175,7 @@ extension ESPMTRCommissioner: ESPAddNodeToMatterFabricPresentationLogic {
             let deviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
             if let completion = completion, let response = response {
                 ESPMatterFabricDetails.shared.saveAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId, data: response)
-                if let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId), let certs = data.certificates, certs.count > 0, let noc = certs[0].nodeNOC, let nocData = MTRCertificates.convertPEMString(toDER: noc), let fabricData = group?.fabricDetails, let rootCACert = fabricData.rootCACertificate, let rootCertData = MTRCertificates.convertPEMString(toDER: rootCACert) {
+                if let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId), let certs = data.certificates, certs.count > 0, let noc = certs[0].nodeNOC, let nocData = ESPDefaultData.convertPEMString(toDER: noc), let fabricData = group?.fabricDetails, let rootCACert = fabricData.rootCACertificate, let rootCertData = ESPDefaultData.convertPEMString(toDER: rootCACert) {
                     
                     if let fabData = group?.fabricDetails, let catIdAdmin = fabData.catIdAdmin, let id = "FFFFFFFD\(catIdAdmin)".hexToDecimal {
                         let params = MTROperationalCertificateChain(operationalCertificate: nocData, intermediateCertificate: nil, rootCertificate: rootCertData, adminSubject: NSNumber(value: id))

@@ -28,12 +28,12 @@ extension ESPMTRCommissioner {
     ///   - requestId: request id
     func performPostCommissioningAction(groupId: String, requestId: String, matterNodeId: String) {
         if let deviceId = matterNodeId.hexToDecimal {
-            self.fetchRainmakerNodeId(deviceId: deviceId) { rainmakerNodeId in
+            self.readAttributeRainmakerNodeIdFromDevice(deviceId: deviceId) { rainmakerNodeId in
                 if let rainmakerNodeId = rainmakerNodeId {
                     ESPMatterFabricDetails.shared.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.trueFlag)
-                    self.sendMatterNodeId(deviceId: deviceId, matterNodeId: matterNodeId) { result in
+                    self.sendMatterNodeIdToDevice(deviceId: deviceId, matterNodeId: matterNodeId) { result in
                         if result {
-                            self.readAttributeChallenge(deviceId: deviceId) { challenge in
+                            self.readAttributeChallengeFromDevice(deviceId: deviceId) { challenge in
                                 if let challenge = challenge {
                                     self.confirmMatterRainmakerCommissioning(requestId: requestId, groupId: groupId, rainmakerNodeId: rainmakerNodeId, challenge: challenge)
                                 } else {

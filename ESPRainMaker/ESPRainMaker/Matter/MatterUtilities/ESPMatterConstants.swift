@@ -131,6 +131,8 @@ struct ESPMatterConstants {
     static let clientId = "client_id"
     static let groupName = "group_name"
     static let type = "type"
+    static let structure = "Structure"
+    static let contextTag = "contextTag"
     static let mutuallyExclusive = "mutually_exclusive"
     static let description = "description"
     static let isMatter = "is_matter"
@@ -246,4 +248,8 @@ struct ESPMatterConstants {
     
     static let csrHeader = "-----BEGIN CERTIFICATE REQUEST-----"
     static let csrFooter = "-----END CERTIFICATE REQUEST-----"
+    
+    static let UTF8String = "UTF8String"
+    static let data = "data"
+    static let value = "value"
 }
