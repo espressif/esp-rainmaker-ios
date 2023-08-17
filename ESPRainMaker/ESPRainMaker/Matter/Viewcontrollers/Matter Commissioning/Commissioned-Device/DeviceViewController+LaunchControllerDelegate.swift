@@ -28,9 +28,9 @@ extension DeviceViewController: LaunchControllerDelegate {
             DispatchQueue.main.async {
                 Utility.showLoader(message: "", view: self.view)
             }
-            ESPMTRCommissioner.shared.readAttributeUserNOCInstalled(deviceId: deviceId) { result in
+            ESPMTRCommissioner.shared.readAttributeUserNOCInstalledOnDevice(deviceId: deviceId) { result in
                 if result {
-                    ESPMTRCommissioner.shared.updateDeviceList(deviceId: deviceId) { result in
+                    ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId) { result in
                         DispatchQueue.main.async {
                             Utility.hideLoader(view: self.view)
                             if !result {
@@ -71,9 +71,9 @@ extension DeviceViewController: LaunchControllerDelegate {
         let index = refreshToken.index(refreshToken.startIndex, offsetBy: 960)
         let firstPayload = refreshToken[..<index]
         let secondPayload = refreshToken.replacingOccurrences(of: firstPayload, with: "")
-        ESPMTRCommissioner.shared.appendRefreshToken(deviceId: deviceId, token: String(firstPayload)) { result in
+        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: String(firstPayload)) { result in
             if result {
-                ESPMTRCommissioner.shared.appendRefreshToken(deviceId: deviceId, token: secondPayload) { result in
+                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: secondPayload) { result in
                     completion(result)
                 }
                 return
@@ -88,11 +88,11 @@ extension DeviceViewController: LaunchControllerDelegate {
     ///   - endpointURL: endpoint URL
     ///   - completion: completion
     func authorize(matterNodeId: String, deviceId: UInt64, endpointURL: String) {
-        ESPMTRCommissioner.shared.authorize(deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
+        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
             if result {
-                ESPMTRCommissioner.shared.updateUserNOC(deviceId: deviceId) { result in
+                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId) { result in
                     if result, let controller = ESPMTRCommissioner.shared.sController, let id = controller.controllerNodeID?.uint64Value {
-                        ESPMTRCommissioner.shared.updateDeviceList(deviceId: id) { result in
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id) { result in
                             if result {
                                 DispatchQueue.main.async {
                                     Utility.hideLoader(view: self.view)
@@ -134,7 +134,7 @@ extension DeviceViewController: RainmakerControllerFlowDelegate {
                 DispatchQueue.main.async {
                     Utility.showLoader(message: "", view: self.view)
                 }
-                ESPMTRCommissioner.shared.resetRefreshToken(deviceId: deviceId) { result in
+                ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId) { result in
                     if result {
                         self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
                             if result {

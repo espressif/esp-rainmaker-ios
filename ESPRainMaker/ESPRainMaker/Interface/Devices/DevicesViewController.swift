@@ -256,7 +256,7 @@ class DevicesViewController: UIViewController {
                 if let data = ESPMatterFabricDetails.shared.getGroupsData(), let groups = data.groups, groups.count > 0 {
                     self.searchForMatterDevices { _ in
                         DispatchQueue.main.async {
-                            Utility.showLoader(message: "Searching for matter devices...", view: self.view)
+                            Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
                             self.formatUI(error: error)
                             self.getNodeGroupMatterFabricDetails()
                         }

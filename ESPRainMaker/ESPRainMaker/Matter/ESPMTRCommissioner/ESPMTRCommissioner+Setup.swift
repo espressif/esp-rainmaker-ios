@@ -48,7 +48,7 @@ extension ESPMTRCommissioner {
             }
             if let grpId = group?.groupID {
                 let keys = MTRCSRKeys(groupId: grpId)
-                if let details = matterFabricData.fabricDetails, let rootCA = details.rootCACertificate, let rootCADerBytes = MTRCertificates.convertPEMString(toDER: rootCA), let certs = userNOCData.certificates, certs.count > 0, let noc = certs[0].userNOC, let nocDerBytes = MTRCertificates.convertPEMString(toDER: noc) {
+                if let details = matterFabricData.fabricDetails, let rootCA = details.rootCACertificate, let rootCADerBytes = ESPDefaultData.convertPEMString(toDER: rootCA), let certs = userNOCData.certificates, certs.count > 0, let noc = certs[0].userNOC, let nocDerBytes = ESPDefaultData.convertPEMString(toDER: noc) {
                     var finalIPK = keys.ipk
                     if let ipkString = ESPMatterFabricDetails.shared.getIPK(groupId: grpId), ipkString.replacingOccurrences(of: " ", with: "").lowercased() != "", let savedIpk = ipkString.hexadecimal {
                         finalIPK = savedIpk
@@ -58,17 +58,7 @@ extension ESPMTRCommissioner {
                                                                   operationalCertificate: nocDerBytes,
                                                                   intermediateCertificate: nil,
                                                                   rootCertificate: rootCADerBytes)
-                    if let attestationCertificate = ESPMatterEcosystemInfo.shared.getAttestationInfo() {
-                        let vendorId = MTRCertificates.getVendorId(fromCert: attestationCertificate)
-                        ESPDefaultData.shared.saveVendorId(groupId: grpId, vendorId: vendorId)
-                        params.vendorID = NSNumber(value: vendorId)
-                        ESPMatterEcosystemInfo.shared.removeAttestationInfo()
-                        ESPMatterEcosystemInfo.shared.removeCertDeclaration()
-                    } else if let vendorId = ESPDefaultData.shared.getVendorId(groupId: grpId) {
-                        params.vendorID = NSNumber(value: vendorId)
-                    } else {
-                        params.vendorID = NSNumber(value: kTestVendorId)
-                    }
+                    params.vendorID = NSNumber(value: kEspressifVendorId)
                     params.operationalCertificateIssuer = self
                     params.operationalCertificateIssuerQueue = self.matterQueue
                     if let controller = try? factory.createController(onNewFabric: params) {

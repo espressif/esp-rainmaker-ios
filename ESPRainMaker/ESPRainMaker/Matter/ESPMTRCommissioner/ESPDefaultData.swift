@@ -59,6 +59,16 @@ class ESPDefaultData {
             return nil
         }
     }
+    
+    static func convertPEMString(toDER pem: String) -> Data? {
+        var result = pem.replacingOccurrences(of: "-----BEGIN CERTIFICATE-----", with: "")
+        result = result.replacingOccurrences(of: "-----END CERTIFICATE-----", with: "")
+        result = result.replacingOccurrences(of: "\n", with: "")
+        if let data = Data(base64Encoded: result, options: []) {
+            return data
+        }
+        return nil
+    }
 }
 
 

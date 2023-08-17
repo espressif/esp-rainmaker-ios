@@ -119,7 +119,7 @@ class ESPMatterCommissioningVC: UIViewController {
     /// Start controller update process
     /// - Parameter deviceId: device id
     func startControllerUpdate(deviceId: UInt64, matterNodeId: String, refreshToken: String) {
-        ESPMTRCommissioner.shared.resetRefreshToken(deviceId: deviceId) { result in
+        ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId) { result in
             if result {
                 self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
                     if result {
@@ -189,9 +189,9 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
         let index = refreshToken.index(refreshToken.startIndex, offsetBy: 960)
         let firstPayload = refreshToken[..<index]
         let secondPayload = refreshToken.replacingOccurrences(of: firstPayload, with: "")
-        ESPMTRCommissioner.shared.appendRefreshToken(deviceId: deviceId, token: String(firstPayload)) { result in
+        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: String(firstPayload)) { result in
             if result {
-                ESPMTRCommissioner.shared.appendRefreshToken(deviceId: deviceId, token: secondPayload) { result in
+                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: secondPayload) { result in
                     completion(result)
                 }
                 return
@@ -206,11 +206,11 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
     ///   - endpointURL: endpoint URL
     ///   - completion: completion
     func authorize(matterNodeId: String, deviceId: UInt64, endpointURL: String) {
-        ESPMTRCommissioner.shared.authorize(deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
+        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
             if result {
-                ESPMTRCommissioner.shared.updateUserNOC(deviceId: deviceId) { result in
+                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId) { result in
                     if result, let controller = ESPMTRCommissioner.shared.sController, let id = controller.controllerNodeID?.uint64Value {
-                        ESPMTRCommissioner.shared.updateDeviceList(deviceId: id) { result in
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id) { result in
                             if result {
                                 let str = String(id, radix:16)
                                 ESPMatterFabricDetails.shared.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
@@ -248,7 +248,7 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
             DispatchQueue.main.async {
                 Utility.showLoader(message: ESPMatterConstants.updatingDeviceListMsg, view: self.view)
             }
-            ESPMTRCommissioner.shared.resetRefreshToken(deviceId: deviceId) { result in
+            ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId) { result in
                 if result {
                     self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
                         if result {
@@ -389,7 +389,7 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                         DispatchQueue.main.async {
                             Utility.showLoader(message: "", view: self.view)
                         }
-                        ESPMTRCommissioner.shared.updateDeviceList(deviceId: id) { result in
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id) { result in
                             DispatchQueue.main.async {
                                 Utility.hideLoader(view: self.view)
                                 self.goToHomeScreen()

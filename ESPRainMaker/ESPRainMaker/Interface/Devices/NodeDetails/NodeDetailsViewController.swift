@@ -139,17 +139,15 @@ class NodeDetailsViewController: UIViewController {
                               "operation": "remove"]
             // Call method to dissociate node from user
             NetworkManager.shared.addDeviceToUser(parameter: parameters) { _, error in
-                if error == nil {
-                    if let oMNId = self.currentNode?.originalMatterNodeId {
-                        ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
-                    }
-                    User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
-                        node.node_id == self.currentNode.node_id
-                    })
-                }
                 DispatchQueue.main.async {
                     Utility.hideLoader(view: self.view)
                     guard let removeNodeError = error else {
+                        if let oMNId = self.currentNode?.originalMatterNodeId {
+                            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
+                        }
+                        User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
+                            node.node_id == self.currentNode.node_id
+                        })
                         User.shared.updateDeviceList = true
                         self.navigationController?.popToRootViewController(animated: false)
                         return

@@ -232,6 +232,7 @@ The project is built around a shared belief that smart home devices should be se
 - Bind switch to light device.
 
 ### Matter API Reference
+
 Please refer to this file [Matter.md](ESPRainMaker/ESPRainMaker/Matter/Matter.md) for the following:
 - Matter API details.
 - MatterSupport integration.

@@ -130,7 +130,7 @@ extension ESPMTRCommissioner {
                 if let deviceName = ESPMatterEcosystemInfo.shared.getDeviceName() {
                     metaData[ESPMatterConstants.deviceName] = deviceName
                 }
-                self.fetchRainmakerNodeId(deviceId: deviceId) { rainmakerNodeId in
+                self.readAttributeRainmakerNodeIdFromDevice(deviceId: deviceId) { rainmakerNodeId in
                     if let _ = rainmakerNodeId {
                         metaData[ESPMatterConstants.isRainmaker] = true
                     } else {
