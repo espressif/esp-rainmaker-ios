@@ -211,15 +211,17 @@ class ESPMatterFabricDetails {
     ///   - groupMetadata: group metadata
     func saveGroupMetadata(groupId: String, groupMetadata: [String: Any]) {
         let key = "group.metadata.\(groupId)"
-        UserDefaults.standard.set(groupMetadata, forKey: key)
+        if let data = try? JSONSerialization.data(withJSONObject: groupMetadata) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
     }
-    
+
     /// Get group metadata
     /// - Parameter groupId: group id
     /// - Returns: group metadata
     func getGroupMetadata(groupId: String) -> [String: Any]? {
         let key = "group.metadata.\(groupId)"
-        if let groupMetadata = UserDefaults.standard.value(forKey: key) as? [String: Any] {
+        if let data = UserDefaults.standard.object(forKey: key) as? Data, let groupMetadata = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
             return groupMetadata
         }
         return nil

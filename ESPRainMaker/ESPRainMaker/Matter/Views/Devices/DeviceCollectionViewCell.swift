@@ -91,11 +91,13 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     /// Set UI according to connection status
     /// - Parameter status: status
     func setConnectionStatusUI(status: NodeConnectionStatus) {
+        var showLight = false
         self.connectionStatus = status
         self.accessibilityButton.text = status.description + "  "
         if let group = self.group, let groupId = group.groupID, let node = self.node, let deviceId = node.deviceId {
             if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
                 DispatchQueue.main.async {
+                    showLight = true
                     self.onOffButton.isHidden = false
                     if let status = node.isMatterLightOn(deviceId: deviceId) {
                         if status {
@@ -122,7 +124,9 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                 self.isUserInteractionEnabled = true
                 self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
             } else {
-                self.overlay.isHidden = false
+                if showLight {
+                    self.onOffButton.image = UIImage(named: "switch_disabled")
+                }
                 self.isUserInteractionEnabled = true
                 self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
             }
