@@ -89,7 +89,7 @@
 		0CB34FEE283E31D300DD1813 /* ESPQRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34FED283E31D300DD1813 /* ESPQRScannerView.swift */; };
 		0CB34FF0283E325A00DD1813 /* Scanner.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CB34FEF283E325900DD1813 /* Scanner.storyboard */; };
 		0CB34FF2283E35D800DD1813 /* ESPScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34FF1283E35D800DD1813 /* ESPScannerViewController.swift */; };
-		0CB4A0652A86548B00908AE0 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB4A0642A86548B00908AE0 /* Matter.framework */; };
+		0CB4A0652A86548B00908AE0 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB4A0642A86548B00908AE0 /* Matter.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		0CBAC3C5278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBAC3C4278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift */; };
 		0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */; };
 		0CCD2FB22A121C7B00ABB680 /* RequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCD2FB12A121C7B00ABB680 /* RequestHandler.swift */; };
@@ -3361,7 +3361,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.0.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D ESPRainMakerMatter";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
@@ -3698,7 +3698,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.0.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
