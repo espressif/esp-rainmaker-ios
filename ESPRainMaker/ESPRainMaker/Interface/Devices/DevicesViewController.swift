@@ -437,6 +437,8 @@ class DevicesViewController: UIViewController {
             initialView.isHidden = false
             collectionView.isHidden = true
             addButton.isHidden = true
+        } else {
+            self.collectionView.reloadData()
         }
     }
 
