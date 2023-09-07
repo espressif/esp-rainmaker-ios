@@ -62,6 +62,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     @IBOutlet var registerPassword: UITextField!
     @IBOutlet var confirmPassword: UITextField!
     @IBOutlet var email: UITextField!
+    @IBOutlet weak var brandLogo: UIImageView!
 
     var usernameText: String?
     var session: SFAuthenticationSession!
@@ -213,6 +214,11 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         regularText.addAttributes([NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)], range: NSMakeRange(0, regularText.length))
         signupTextView.attributedText = regularText
         signupTextView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor(hexString: "#8265E3")]
+        if Configuration.shared.appConfiguration.supportConfigOverride {
+            self.configureBrandLogo()
+        } else {
+            self.resetConfig()
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -253,6 +259,58 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         self.rainmakerControllerDelegate?.controllerFlowCancelled()
         self.dismiss(animated: true, completion: nil)
         #endif
+    }
+    
+    func resetConfig() {
+        UserDefaults.standard.removeObject(forKey: Constants.overriddenBaseURLKey)
+        Configuration.shared.awsConfiguration.resetBaseURLFromConfig()
+        self.resetParamURL()
+    }
+        
+    func resetParamURL() {
+        ESPServerTrustParams.shared.setParams(fileName: "amazonRootCA",
+                                              baseURLDomain: Configuration.shared.awsConfiguration.baseURL.getDomain(),
+                                              authURLDomain: Configuration.shared.awsConfiguration.authURL.getDomain(),
+                                              claimURLDomain: Configuration.shared.awsConfiguration.claimURL.getDomain())
+        ESPURLParams.shared.setURLs(baseURL: Configuration.shared.getAWSBaseURL(),
+                                    authURL: Configuration.shared.awsConfiguration.authURL,
+                                    redirectURL: Configuration.shared.awsConfiguration.redirectURL,
+                                    appClientID: Configuration.shared.awsConfiguration.appClientId,
+                                    userPool: Configuration.shared.appConfiguration.userPool)
+    }
+    
+    func configureBrandLogo() {
+        self.brandLogo.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(logoTapped))
+        tap.numberOfTapsRequired = 5
+        self.brandLogo.addGestureRecognizer(tap)
+    }
+        
+    @objc func logoTapped() {
+        let alert = UIAlertController(title: "Config", message: "Enter new base URL", preferredStyle: .alert)
+        alert.addTextField { textField in
+            if let text = UserDefaults.standard.value(forKey: Constants.overriddenBaseURLKey) as? String {
+                textField.text = text
+            } else {
+                textField.text = Configuration.shared.awsConfiguration.baseURL
+            }
+        }
+        alert.addAction(UIAlertAction(title: "Update value", style: .default, handler: { [weak alert] (_) in
+            let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
+            let text = textField!.text
+            if let text = text, text.count > 0 {
+                UserDefaults.standard.setValue(text, forKey: Constants.overriddenBaseURLKey)
+                Configuration.shared.awsConfiguration.baseURL = text
+                self.resetParamURL()
+            }
+        }))
+        if let text = UserDefaults.standard.value(forKey: Constants.overriddenBaseURLKey) as? String, text.count > 0 {
+            alert.addAction(UIAlertAction(title: "Reset to defaults", style: .default) { _ in
+                self.resetConfig()
+            })
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func segmentChange(sender _: UISegmentedControl) {
@@ -304,7 +362,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     func requestToken(code: String) {
         let url = Configuration.shared.awsConfiguration.authURL + "/token"
         let parameters = ["grant_type": "authorization_code", "client_id": Configuration.shared.awsConfiguration.appClientId!, "code": code, "redirect_uri": Configuration.shared.awsConfiguration.redirectURL]
-        let headers: HTTPHeaders = ["Content-Type": "application/x-www-form-urlencoded"]
+        let headers: HTTPHeaders = [Constants.contentType: Constants.applicationFormURLEncoded]
         NetworkManager.shared.genericRequest(url: url, method: .post, parameters: parameters, encoding: URLEncoding.default,
                                              headers: headers) { response in
             if let json = response {
@@ -574,20 +632,21 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
 }
 
 extension SignInViewController: UIAdaptivePresentationControllerDelegate {
+    
     func adaptivePresentationStyle(for _: UIPresentationController) -> UIModalPresentationStyle {
         return UIModalPresentationStyle.fullScreen
     }
 }
 
 extension SignInViewController: ASWebAuthenticationPresentationContextProviding {
-    @available(iOS 12.0, *)
-
+    
     func presentationAnchor(for _: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return view.window ?? ASPresentationAnchor()
     }
 }
 
 extension SignInViewController: UITextFieldDelegate {
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         switch textField {
         case username:
@@ -609,6 +668,7 @@ extension SignInViewController: UITextFieldDelegate {
 }
 
 extension SignInViewController: ESPLoginPresentationLogic {
+    
     func rainmakerControllerLoginCompleted(data: Data?) {
         #if ESPRainMakerMatter
         Utility.hideLoader(view: self.view)
@@ -618,7 +678,9 @@ extension SignInViewController: ESPLoginPresentationLogic {
                 self.rainmakerControllerDelegate?.cloudLoginConcluded(cloudResponse: cloudResponse, groupId: self.groupId, matterNodeId: self.matterNodeId)
                 self.dismiss(animated: true)
             } else if let desc = cloudResponse.description {
-                self.alertUser(title: "Failure", message: desc, buttonTitle: "OK") {
+                self.alertUser(title: ESPMatterConstants.failureTxt,
+                               message: desc,
+                               buttonTitle: ESPMatterConstants.okTxt) {
                     self.signInButton.isEnabled = true
                 }
             }

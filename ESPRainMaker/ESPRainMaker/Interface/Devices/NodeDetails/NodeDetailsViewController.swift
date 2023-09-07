@@ -18,11 +18,14 @@
 
 import Toast_Swift
 import UIKit
+import Matter
 
 class NodeDetailsViewController: UIViewController {
     // Constants
     let systemServices = "System Services"
     let firmwareUpdate = "firmwareUpdate"
+    let enablePairingMode = "enablePairingMode"
+    let bindingAction = "bindingAction"
     
     @IBOutlet var tableView: UITableView!
     @IBOutlet var loadingIndicator: SpinnerView!
@@ -31,7 +34,7 @@ class NodeDetailsViewController: UIViewController {
     var currentNode: Node!
 
     var dataSource: [[String]] = [[]]
-    var collapsed = [false, false, false, false, false]
+    var collapsed: [Bool] = [true, true, true, true, true]
     var pendingRequests: [SharingRequest] = []
     var sharingIndex = 0
     var timeZoneParam: Param!
@@ -41,6 +44,16 @@ class NodeDetailsViewController: UIViewController {
     var vendorId: String?
     var productId: String?
     var softwareVersion: String?
+    
+    let nodeRemovalFailedMsg = "Unable to remove node. Please check your internet connection."
+    
+    //Binding requirements
+    var group: ESPNodeGroup?
+    var node: ESPNodeDetails?
+    var allNodes: [ESPNodeDetails]?
+    var switchIndex: Int?
+    var endpointClusterId: [String: UInt]?
+    var sourceNode: ESPNodeDetails?
 
     // MARK: - Overriden Methods
 
@@ -48,7 +61,7 @@ class NodeDetailsViewController: UIViewController {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "NodeDetailsHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "nodeDetailsHV")
-        tableView.register(UINib(nibName: "AddMemberTableViewCell", bundle: nil), forCellReuseIdentifier: "addMemberTVC")
+        tableView.register(UINib(nibName: "NodeDetailActionTableViewCell", bundle: nil), forCellReuseIdentifier: "nodeDetailActionTVC")
         tableView.register(UINib(nibName: "MembersInfoTableViewCell", bundle: nil), forCellReuseIdentifier: "membersInfoTVC")
         tableView.register(UINib(nibName: "NewMemberTableViewCell", bundle: nil), forCellReuseIdentifier: "newMemberTVC")
         tableView.register(UINib(nibName: "SharingTableViewCell", bundle: nil), forCellReuseIdentifier: "sharingTVC")
@@ -104,6 +117,82 @@ class NodeDetailsViewController: UIViewController {
         present(confirmAction, animated: true, completion: nil)
     }
     
+    #if ESPRainMakerMatter
+    @available(iOS 16.4, *)
+    private func getTableViewCellForEnablePairingMode(forIndexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailActionTVC", for: forIndexPath) as! NodeDetailActionTableViewCell
+        view.endEditing(true)
+        cell.nodeDetailActionLabel.text = "Turn On Pairing Mode"
+        cell.addMemberButtonAction = {
+            if let node = self.currentNode, let matterNodeId = node.matterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+                self.openCommissioningWindow()
+            } else {
+                Utility.showToastMessage(view: self.view, message: ESPMatterConstants.deviceNotReachableMsg)
+            }
+        }
+        return cell
+    }
+    
+    /// Open commissioning Window
+    @available(iOS 16.4, *)
+    func openCommissioningWindow() {
+        if let node = currentNode, let matterNodeId = node.matterNodeId, let id = matterNodeId.hexToDecimal {
+            ESPMTRCommissioner.shared.openCommissioningWindow(deviceId: id) { setupPasscode in
+                DispatchQueue.main.async {
+                    if let setupPasscode = setupPasscode {
+                        self.showManualPairingCode(setupPasscode: setupPasscode)
+                    } else {
+                        self.alertUser(title: ESPMatterConstants.failureTxt,
+                                       message: ESPMatterConstants.commissioningWindowOpenFailedMsg,
+                                       buttonTitle: ESPMatterConstants.okTxt,
+                                       callback: {})
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Show manual pairing code
+    func showManualPairingCode(setupPasscode: String) {
+        let dismissAction = UIAlertAction(title: ESPMatterConstants.dismissTxt, style: .default) { _ in}
+        let copyMsgAction = UIAlertAction(title: ESPMatterConstants.copyCodeMsg, style: .default) { _ in
+            let pasteboard = UIPasteboard.general
+            pasteboard.string = setupPasscode
+        }
+        self.showAlertWithOptions(title: ESPMatterConstants.pairingModeTitle, message: ESPMatterConstants.pairingModeMessage, actions: [copyMsgAction, dismissAction])
+    }
+    
+    private func getTableViewCellForBinding(forIndexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailActionTVC", for: forIndexPath) as! NodeDetailActionTableViewCell
+        view.endEditing(true)
+        cell.nodeDetailActionLabel.text = "Device Bindings"
+        cell.addMemberButtonAction = {
+            if #available(iOS 16.4, *) {
+                self.openBindingWindow()
+            } else {
+                self.alertUser(title: ESPMatterConstants.emptyString,
+                               message: ESPMatterConstants.upgradeOSVersionMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+            }
+        }
+        return cell
+    }
+    
+    /// Open Binding Window
+    @available(iOS 16.4, *)
+    func openBindingWindow() {
+        if let node = self.currentNode {
+            let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
+            let devicesBindingVC = storyboard.instantiateViewController(withIdentifier: DevicesBindingViewController.storyboardId) as! DevicesBindingViewController
+            devicesBindingVC.group = self.group
+            devicesBindingVC.nodes = self.allNodes
+            devicesBindingVC.sourceNode = self.sourceNode
+            devicesBindingVC.endpointClusterId = self.endpointClusterId
+            devicesBindingVC.switchIndex = self.switchIndex
+            self.navigationController?.pushViewController(devicesBindingVC, animated: true)
+        }
+    }
+    #endif
+    
     /// Remove fabric
     /// - Parameter completion: completion handler
     func removeFabric(completion: @escaping (Bool) -> Void) {
@@ -138,30 +227,37 @@ class NodeDetailsViewController: UIViewController {
                               "secret_key": "",
                               "operation": "remove"]
             // Call method to dissociate node from user
-            NetworkManager.shared.addDeviceToUser(parameter: parameters) { _, error in
+            NetworkManager.shared.addDeviceToUser(parameter: parameters) { requestId, error in
                 DispatchQueue.main.async {
                     Utility.hideLoader(view: self.view)
                     guard let removeNodeError = error else {
-                        if let oMNId = self.currentNode?.originalMatterNodeId {
-                            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
-                        }
-                        User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
-                            node.node_id == self.currentNode.node_id
-                        })
-                        User.shared.updateDeviceList = true
-                        self.navigationController?.popToRootViewController(animated: false)
+                        self.nodeDeletionSuccessful()
                         return
                     }
                     if !ESPNetworkMonitor.shared.isConnectedToNetwork {
-                        Utility.showToastMessage(view: self.view, message: "Unable to remove node. Please check your internet connection.")
+                        Utility.showToastMessage(view: self.view, message: self.nodeRemovalFailedMsg)
                     } else {
                         Utility.showToastMessage(view: self.view, message: removeNodeError.description)
                     }
                 }
             }
         } else {
-            self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.operationFailedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+            self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                message: ESPMatterConstants.operationFailedMsg,
+                                buttonTitle: ESPMatterConstants.okTxt,
+                                callback: {})
         }
+    }
+    
+    /// Node deletion success action
+    func nodeDeletionSuccessful() {
+        if let oMNId = self.currentNode?.originalMatterNodeId {
+            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
+        }
+        User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
+            node.node_id == self.currentNode.node_id
+        })
+        self.updateDeviceListAndNavigateToHomeScreen()
     }
 
     @IBAction func backButtonPressed(_: Any) {
@@ -170,11 +266,14 @@ class NodeDetailsViewController: UIViewController {
 
     // Method to create data source for table view based on user role, sharing details and node information.
     func createDataSource() {
+        collapsed = []
+        
         // First section will contain node id
         var index = 0
         dataSource = [[]]
         dataSource[index].append("Node ID")
         dataSource[index].append("Node ID:\(currentNode.node_id ?? "")")
+        collapsed.append(false)
 
         // Second section will contain node information
         index += 1
@@ -186,7 +285,6 @@ class NodeDetailsViewController: UIViewController {
         if let fw_version = currentNode.info?.fw_version {
             dataSource[index].append("Firmware version:\(fw_version)")
         }
-        
         #if ESPRainMakerMatter
         if let vid = currentNode.vendorId {
             dataSource[index].append("Vendor Id:\(vid)")
@@ -197,8 +295,16 @@ class NodeDetailsViewController: UIViewController {
         if let softwareVersion = currentNode.swVersion {
             dataSource[index].append("Software version:\(softwareVersion)")
         }
+        if let sn = currentNode.serialNumber {
+            dataSource[index].append("Serial Number:\(sn)")
+        }
+        if let manufacturerName = currentNode.manufacturerName {
+            dataSource[index].append("Manufacturer:\(manufacturerName)")
+        }
+        if let productName = currentNode.productName {
+            dataSource[index].append("Product Name:\(productName)")
+        }
         #endif
-        
         if let tzService = currentNode.services?.first(where: { $0.type == Constants.timezoneServiceName }) {
             if let tzParam = tzService.params?.first(where: { $0.type == Constants.timezoneServiceParam }) {
                 let timezone = tzParam.value as? String
@@ -212,6 +318,7 @@ class NodeDetailsViewController: UIViewController {
                 dataSource[index].append("\(attribute.name ?? ""):\(attribute.value ?? "")")
             }
         }
+        collapsed.append(true)
 
         // If sharing is supported third section will contain related information.
         if Configuration.shared.appConfiguration.supportSharing {
@@ -241,6 +348,7 @@ class NodeDetailsViewController: UIViewController {
                 // No sharing information is available
                 dataSource[index].append("Not Available")
             }
+            collapsed.append(true)
         }
         
         // Check for system services support
@@ -257,15 +365,44 @@ class NodeDetailsViewController: UIViewController {
                 dataSource.append([])
                 dataSource[index].append(systemServices)
                 dataSource[index].append(contentsOf: serviceParam)
+                collapsed.append(true)
             }
         }
         
         // Add option for OTA update if supported
         if Configuration.shared.appConfiguration.supportOTAUpdate {
-            index += 1
-            dataSource.append([])
-            dataSource[index].append(firmwareUpdate)
+            var showFirmwareUpdateButton = false
+            if #available(iOS 16.4, *), let node = currentNode, node.isMatter, node.isRainmaker {
+                showFirmwareUpdateButton = true
+            } else if let node = currentNode, !node.isMatter {
+                showFirmwareUpdateButton = true
+            }
+            if showFirmwareUpdateButton {
+                index += 1
+                dataSource.append([])
+                dataSource[index].append(firmwareUpdate)
+                collapsed.append(false)
+            }
         }
+        
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *), let node = currentNode, let matterNodeId = node.matterNodeId {
+            if node.isOpenCommissioningWindowSupported.0 {
+                index += 1
+                dataSource.append([])
+                dataSource[index].append(enablePairingMode)
+                collapsed.append(false)
+            }
+            if node.isOnOffClientSupported {
+                if node.bindingServers.count > 0 {
+                    index += 1
+                    dataSource.append([])
+                    dataSource[index].append(bindingAction)
+                    collapsed.append(false)
+                }
+            }
+        }
+        #endif
         
         tableView.reloadData()
     }
@@ -339,7 +476,7 @@ class NodeDetailsViewController: UIViewController {
 
     // Method to get table view cell with Add Member option
     private func getTableViewCellForAddMember(forIndexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "addMemberTVC", for: forIndexPath) as! AddMemberTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailActionTVC", for: forIndexPath) as! NodeDetailActionTableViewCell
         view.endEditing(true)
         cell.addMemberButtonAction = {
             // Open dialog box for entering email of the secondary user
@@ -460,7 +597,7 @@ extension NodeDetailsViewController: UITableViewDelegate {
             headerView.headerLabel.text = headerTitle + " (Offline)"
         }
         
-        if headerTitle == firmwareUpdate {
+        if headerTitle == firmwareUpdate || headerTitle == enablePairingMode || headerTitle == bindingAction {
             return UIView()
         }
         
@@ -472,7 +609,7 @@ extension NodeDetailsViewController: UITableViewDelegate {
             return 0
         }
         let sectionValue = dataSource[section][0]
-        if sectionValue == firmwareUpdate {
+        if sectionValue == firmwareUpdate || sectionValue == enablePairingMode || sectionValue == bindingAction {
             return 10
         }
         return 50.0
@@ -514,7 +651,7 @@ extension NodeDetailsViewController: UITableViewDataSource {
         if sectionValue == systemServices {
             return dataSource[section].count/2
         }
-        if sectionValue == firmwareUpdate {
+        if sectionValue == firmwareUpdate || sectionValue == enablePairingMode || sectionValue == bindingAction {
             return 1
         }
         return dataSource[section].count - 1
@@ -585,6 +722,15 @@ extension NodeDetailsViewController: UITableViewDataSource {
         }
         
         let sectionValue = dataSource[indexPath.section][0]
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *) {
+            if sectionValue == enablePairingMode {
+                return getTableViewCellForEnablePairingMode(forIndexPath: indexPath)
+            } else if sectionValue == bindingAction {
+                return getTableViewCellForBinding(forIndexPath: indexPath)
+            }
+        }
+        #endif
         if sectionValue == systemServices {
             let cell = tableView.dequeueReusableCell(withIdentifier: SystemServicesTableViewCell.reuseIdentifier, for: indexPath) as! SystemServicesTableViewCell
             cell.paramName = dataSource[indexPath.section][indexPath.row*2 + 1]

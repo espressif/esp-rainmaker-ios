@@ -125,19 +125,11 @@ extension ESPMTRCommissioner {
         let deviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         if let group = self.group, let groupId = group.groupID {
             self.addDeviceDetails(groupId: groupId, deviceId: deviceId) {
-                var metaData = [String: Any]()
-                metaData[ESPMatterConstants.groupId] = groupId
-                if let deviceName = ESPMatterEcosystemInfo.shared.getDeviceName() {
-                    metaData[ESPMatterConstants.deviceName] = deviceName
-                }
-                self.readAttributeRainmakerNodeIdFromDevice(deviceId: deviceId) { rainmakerNodeId in
-                    if let _ = rainmakerNodeId {
-                        metaData[ESPMatterConstants.isRainmaker] = true
-                    } else {
-                        metaData[ESPMatterConstants.isRainmaker] = false
-                    }
-                    self.extractDeviceMetaData(groupId: groupId, deviceId: deviceId, metaData: &metaData)
+                let metaData = self.extractDeviceMetaData(groupId: groupId, deviceId: deviceId)
+                if metaData.count > 0 {
                     completion(metaData)
+                } else {
+                    completion(nil)
                 }
             }
         } else {
@@ -150,36 +142,52 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - metaData: meta data
-    func extractDeviceMetaData(groupId: String, deviceId: UInt64, metaData: inout [String: Any]) {
-        let serversData = ESPMatterFabricDetails.shared.fetchServersData(groupId: groupId, deviceId: deviceId)
-        let clientsData = ESPMatterFabricDetails.shared.fetchClientsData(groupId: groupId, deviceId: deviceId)
-        let endpointsData = ESPMatterFabricDetails.shared.fetchEndpointsData(groupId: groupId, deviceId: deviceId)
+    func extractDeviceMetaData(groupId: String, deviceId: UInt64) -> [String: Any] {
+        var metaData = [String: Any]()
+        let serversData = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
+        if serverData.count > 0 {
+            metaData[ESPMatterConstants.serversData] = serversData
+        }
+        let clientsData = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
+        if clientsData.count > 0 {
+            metaData[ESPMatterConstants.clientsData] = clientsData
+        }
+        let endpointsData = self.fabricDetails.fetchEndpointsData(groupId: groupId, deviceId: deviceId)
+        if endpointsData.count > 0 {
+            metaData[ESPMatterConstants.endpointsData] = endpointsData
+        }
+        metaData[ESPMatterConstants.groupId] = groupId
+        if let deviceName = ESPMatterEcosystemInfo.shared.getDeviceName() {
+            metaData[ESPMatterConstants.deviceName] = deviceName
+        }
+        metaData[ESPMatterConstants.isRainmaker] = ESPMatterClusterUtil.shared.isRainmakerServerSupported(groupId: groupId, deviceId: deviceId).0
         if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0, let controllerNodeId = self.sController?.controllerNodeID {
             let id = controllerNodeId.uint64Value
             let str = String(id, radix: 16)
             metaData[ESPMatterConstants.controllerNodeId] = str
         }
-        if serverData.count > 0 {
-            metaData[ESPMatterConstants.serversData] = serversData
-        }
-        if clientsData.count > 0 {
-            metaData[ESPMatterConstants.clientsData] = clientsData
-        }
-        if endpointsData.count > 0 {
-            metaData[ESPMatterConstants.endpointsData] = endpointsData
-        }
-        if let deviceType = ESPMatterFabricDetails.shared.getDeviceType(groupId: groupId, deviceId: deviceId) {
+        if let deviceType = self.fabricDetails.getDeviceType(groupId: groupId, deviceId: deviceId) {
             metaData[ESPMatterConstants.deviceType] = deviceType
         }
-        if let vendorId = ESPMatterFabricDetails.shared.getVendorId(groupId: groupId, deviceId: deviceId) {
+        if let vendorId = self.fabricDetails.getVendorId(groupId: groupId, deviceId: deviceId) {
             metaData[ESPMatterConstants.vendorId] = vendorId
         }
-        if let productId = ESPMatterFabricDetails.shared.getProductId(groupId: groupId, deviceId: deviceId) {
+        if let productId = self.fabricDetails.getProductId(groupId: groupId, deviceId: deviceId) {
             metaData[ESPMatterConstants.productId] = productId
         }
-        if let softwareVersion = ESPMatterFabricDetails.shared.getSoftwareVersion(groupId: groupId, deviceId: deviceId) {
+        if let softwareVersion = self.fabricDetails.getSoftwareVersion(groupId: groupId, deviceId: deviceId) {
             metaData[ESPMatterConstants.softwareVersion] = softwareVersion
         }
+        if let serialNumber = self.fabricDetails.getSerialNumber(groupId: groupId, deviceId: deviceId) {
+            metaData[ESPMatterConstants.serialNumber] = serialNumber
+        }
+        if let manufacturerName = self.fabricDetails.getManufacturerName(groupId: groupId, deviceId: deviceId) {
+            metaData[ESPMatterConstants.manufacturerName] = manufacturerName
+        }
+        if let productName = self.fabricDetails.getProductName(groupId: groupId, deviceId: deviceId) {
+            metaData[ESPMatterConstants.productName] = productName
+        }
+        return metaData
     }
 }
 #endif

@@ -81,9 +81,26 @@ struct AWSConfiguration {
         }
         appClientId = clientID
         authURL = authenticationURL
-        baseURL = endpointBaseURL
+        if let value = UserDefaults.standard.value(forKey: Constants.overriddenBaseURLKey) as? String {
+            baseURL = value
+        } else {
+            baseURL = endpointBaseURL
+        }
         claimURL = config["Claim URL"] as? String ?? ""
         redirectURL = config["Redirect URL"] as? String ?? ""
+    }
+    
+    mutating func resetBaseURLFromConfig() {
+        guard let configDictionary = Configuration.shared.getCustomPlist() else {
+            fatalError("Configuration.plist file is not present. Please check the documents for more information.")
+        }
+        guard let awsConfig = configDictionary["AWS Configuration"] as? [String: Any] else {
+            fatalError("AWS Configuration key is not present. Please check the documents for more information.")
+        }
+        guard let endpointBaseURL = awsConfig["Base URL"] as? String, !endpointBaseURL.isEmpty else {
+            fatalError("Base URL is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"Base URL\" as key.")
+        }
+        self.baseURL = endpointBaseURL
     }
 }
 
@@ -95,11 +112,13 @@ struct AppConfiguration {
     var supportScene = true
     var supportDeviceAutomation = true
     var supportOTAUpdate = false
+    var supportConfigOverride = false
     var userPool: Int = 2
     var supportContinuousUpdate = true
     // In milliseconds
     var continuousUpdateInterval:Int64 = 400
     var matterEcosystemName: String = ESPMatterConstants.espressif
+    var matterVendorId: UInt16 = ESPMatterConstants.matterVendorId
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -110,6 +129,7 @@ struct AppConfiguration {
             supportSharing = configDict["Enable Sharing"] as? Bool ?? true
             supportDeviceAutomation = configDict["Enable Device Automation"] as? Bool ?? true
             supportOTAUpdate = configDict["Enable OTA Update"] as? Bool ?? false
+            supportConfigOverride = configDict["Enable Config Override"] as? Bool ?? false
             if let pool = configDict["User Pool"] as? Int {
                 userPool = pool
             }
@@ -124,6 +144,7 @@ struct AppConfiguration {
                 continuousUpdateInterval = 1000
             }
             matterEcosystemName = configDict["Matter Ecosystem"] as? String ?? ESPMatterConstants.espressif
+            matterVendorId = configDict["Matter Vendor Id"] as? UInt16 ?? ESPMatterConstants.matterVendorId
         }
     }
 }

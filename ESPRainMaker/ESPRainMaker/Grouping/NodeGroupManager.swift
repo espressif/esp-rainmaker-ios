@@ -27,6 +27,7 @@ class NodeGroupManager {
     var nodeGroups: [NodeGroup] = []
     static let shared = NodeGroupManager()
     var listUpdated = false
+    let fabricDetails = ESPMatterFabricDetails.shared
 
     private init() {}
     
@@ -71,9 +72,9 @@ class NodeGroupManager {
                         for group in groups {
                             if let groupId = group[ESPMatterConstants.groupId] as? String {
                                 if let groupMetadata = group[ESPMatterConstants.groupMetadata] as? [String: Any] {
-                                    ESPMatterFabricDetails.shared.saveGroupMetadata(groupId: groupId, groupMetadata: groupMetadata)
+                                    self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: groupMetadata)
                                 } else {
-                                    ESPMatterFabricDetails.shared.removeGroupMetadata(groupId: groupId)
+                                    self.fabricDetails.removeGroupMetadata(groupId: groupId)
                                 }
                             }
                         }

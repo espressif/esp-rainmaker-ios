@@ -42,17 +42,17 @@ class DeviceTraitListViewController: UIViewController {
     var group: ESPNodeGroup?
     var node: ESPNodeDetails?
     var allNodes: [ESPNodeDetails]?
-    var indePath: IndexPath?
     var dataSource: [Param] = []
     var foundCentralParam = false
     var isSwitch: Bool = false
     var endpointClusterId: [String: UInt]?
+    var switchIndex: Int?
+    var matterNodeId: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         #if ESPRainMakerMatter
-        self.setupLinkingButton()
         self.setupBetaView()
         #endif
         tableView.tableFooterView = UIView()
@@ -82,14 +82,6 @@ class DeviceTraitListViewController: UIViewController {
             checkForCentralParam()
         }
         checkOfflineStatus()
-    }
-    
-    /// Setup linking button
-    func setupLinkingButton() {
-        if let node = self.device.node, node.isMatter, node.isOnOffClientSupported, node.bindingServers.count > 0 {
-            self.linkingButton.isHidden = false
-            self.linkingButton.isUserInteractionEnabled = true
-        }
     }
     
     /// Setup beta view
@@ -313,6 +305,11 @@ class DeviceTraitListViewController: UIViewController {
         let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
         let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
         destination.currentNode = node
+        destination.group = self.group
+        destination.allNodes = self.allNodes
+        destination.endpointClusterId = endpointClusterId
+        destination.switchIndex = self.switchIndex
+        destination.sourceNode = self.node
         navigationController?.pushViewController(destination, animated: true)
     }
 

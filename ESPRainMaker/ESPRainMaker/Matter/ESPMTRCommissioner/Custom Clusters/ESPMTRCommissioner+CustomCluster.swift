@@ -44,10 +44,10 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - completion: completion
-    func readAttributeRainmakerNodeIdFromDevice(deviceId: UInt64, _ completion: @escaping (String?) -> Void) {
+    func readAttributeRainmakerNodeIdFromDevice(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (String?) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
-                device.readAttributes(withEndpointID: NSNumber(value: 0),
+                device.readAttributes(withEndpointID: NSNumber(value: endpoint),
                                       clusterID: rainmaker.clusterId,
                                       attributeID: rainmaker.attributes.rainmakerNodeId.attributeId,
                                       params: nil,
@@ -70,12 +70,12 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - matterNodeId: matter node id
     ///   - completion: completion
-    func sendMatterNodeIdToDevice(deviceId: UInt64, matterNodeId: String, _ completion: @escaping (Bool) -> Void) {
+    func sendMatterNodeIdToDevice(deviceId: UInt64, endpoint: UInt16, matterNodeId: String, _ completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
                 let data = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
                             ESPMatterConstants.value: matterNodeId]
-                device.invokeCommand(withEndpointID: NSNumber(value: 0),
+                device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmaker.clusterId,
                                      commandID: rainmaker.commands.sendNodeId.commandId,
                                      commandFields: data,
@@ -97,10 +97,10 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - completion: completion
-    func readAttributeChallengeFromDevice(deviceId: UInt64, _ completion: @escaping(String?) -> Void) {
+    func readAttributeChallengeFromDevice(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping(String?) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
-                device.readAttributes(withEndpointID: NSNumber(value: 0),
+                device.readAttributes(withEndpointID: NSNumber(value: endpoint),
                                       clusterID: rainmaker.clusterId,
                                       attributeID: rainmaker.attributes.challenge.attributeId,
                                       params: nil,
@@ -122,12 +122,12 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - completion: completion
-    func resetRefreshTokenInDevice(deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+    func resetRefreshTokenInDevice(deviceId: UInt64, endpoint: UInt16, completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
                 let commandFields: [String: Any] = [ESPMatterConstants.type: ESPMatterConstants.structure,
                                                      ESPMatterConstants.value: []]
-                device.invokeCommand(withEndpointID: NSNumber(value: 0),
+                device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmakerController.clusterId,
                                      commandID: rainmakerController.commands.resetRefreshToken.commandId,
                                      commandFields: commandFields as Any,
@@ -149,12 +149,12 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - token: refresh token
     ///   - completion: completion
-    func appendRefreshTokenToDevice(deviceId: UInt64, token: String, completion: @escaping (Bool) -> Void) {
+    func appendRefreshTokenToDevice(deviceId: UInt64, endpoint: UInt16, token: String, completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
                 let commandFields = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
                               ESPMatterConstants.value: token]
-                device.invokeCommand(withEndpointID: NSNumber(value: 0),
+                device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmakerController.clusterId,
                                      commandID: rainmakerController.commands.appendRefreshToken.commandId,
                                      commandFields: commandFields as Any,
@@ -177,12 +177,12 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - endpointURL: endpoint URL
     ///   - completion: completion
-    func authorizeDevice(deviceId: UInt64, endpointURL: String, completion: @escaping (Bool) -> Void) {
+    func authorizeDevice(deviceId: UInt64, endpoint: UInt16, endpointURL: String, completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
                 let commandFields = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
                                      ESPMatterConstants.value: endpointURL]
-                device.invokeCommand(withEndpointID: NSNumber(value: 0),
+                device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmakerController.clusterId,
                                      commandID: rainmakerController.commands.authorize.commandId,
                                      commandFields: commandFields,
@@ -204,12 +204,12 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - completion: completion
-    func updateUserNOCOnDevice(deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+    func updateUserNOCOnDevice(deviceId: UInt64, endpoint: UInt16, completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
                 let commandFields: [String: Any] = [ESPMatterConstants.type: ESPMatterConstants.structure,
                                                      ESPMatterConstants.value: []]
-                device.invokeCommand(withEndpointID: NSNumber(value: 0),
+                device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmakerController.clusterId,
                                      commandID: rainmakerController.commands.updateUserNOC.commandId,
                                      commandFields: commandFields as Any,
@@ -231,12 +231,12 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - completion: completion
-    func updateDeviceListOnDevice(deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+    func updateDeviceListOnDevice(deviceId: UInt64, endpoint: UInt16, completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
                 let commandFields: [String: Any] = [ESPMatterConstants.type: ESPMatterConstants.structure,
                                                     ESPMatterConstants.value: []]
-                device.invokeCommand(withEndpointID: NSNumber(value: 0),
+                device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmakerController.clusterId,
                                      commandID: rainmakerController.commands.updateDeviceList.commandId,
                                      commandFields: commandFields as Any,
@@ -258,10 +258,10 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - completion: completion
-    func readAttributeUserNOCInstalledOnDevice(deviceId: UInt64, _ completion: @escaping (Bool) -> Void) {
+    func readAttributeUserNOCInstalledOnDevice(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
-                device.readAttributes(withEndpointID: NSNumber(value: 0),
+                device.readAttributes(withEndpointID: NSNumber(value: endpoint),
                                       clusterID: rainmakerController.clusterId,
                                       attributeID: rainmakerController.attributes.userNOCInstalled.attributeId,
                                       params: nil,
@@ -280,7 +280,7 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - completion: completion
-    func readAttributeAuthorizedOnDevice(deviceId: UInt64, _ completion: @escaping (Bool) -> Void) {
+    func readAttributeAuthorizedOnDevice(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
                 device.readAttributes(withEndpointID: NSNumber(value: 0),

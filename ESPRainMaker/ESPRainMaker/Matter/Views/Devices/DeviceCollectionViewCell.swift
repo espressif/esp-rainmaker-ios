@@ -75,8 +75,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                 }
             } else if self.connectionStatus == .remote {
                 if let rainmakerNode = self.rainmakerNode, let devices = rainmakerNode.devices, let device = devices.first {
-                    let deviceName = device.deviceName
-                    DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: [deviceName: ["Power": !rainmakerNode.isPowerOn()]], delegate: self) { status in
+                    DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: [device.name ?? "": ["Power": !rainmakerNode.isPowerOn()]], delegate: self) { status in
                         if status == .success {
                             node.setMatterLightOnStatus(status: !rainmakerNode.isPowerOn(), deviceId: deviceId)
                             self.setToggleButtonUI(isLightOn: !rainmakerNode.isPowerOn())
@@ -140,10 +139,14 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     
     /// Restart matter controller
     func restartController() {
-        ESPMTRCommissioner.shared.shutDownController()
-        ESPMTRCommissioner.shared.group = self.group
         if let group = self.group, let groupId = group.groupID, let userNOC = ESPMatterFabricDetails.shared.getUserNOCDetails(groupId: groupId) {
-            ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOC)
+            if let grp = ESPMTRCommissioner.shared.group, let grpId = grp.groupID, grpId != groupId {
+                ESPMTRCommissioner.shared.shutDownController()
+            }
+            if ESPMTRCommissioner.shared.sController == nil {
+                ESPMTRCommissioner.shared.group = self.group
+                ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOC)
+            }
         }
     }
     

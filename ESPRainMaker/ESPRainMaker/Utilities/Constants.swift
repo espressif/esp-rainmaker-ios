@@ -51,6 +51,7 @@ struct Constants {
     static let addNewScheduleSegue = "addNewScheduleSegue"
 
     // JSON keys
+    static let failure = "failure"
     static let userID = "user_id"
     static let requestID = "request_id"
 
@@ -168,6 +169,10 @@ struct Constants {
     
     
     // APIs JSON keys
+    static let contentType = "Content-Type"
+    static let applicationJSON = "application/json"
+    static let applicationFormURLEncoded = "application/x-www-form-urlencoded"
+    static let authorization = "Authorization"
     static let successKey = "success"
     static let descriptionKey = "description"
     static let statusKey = "status"
@@ -194,4 +199,7 @@ struct Constants {
     
     // Change user password segue id
     static let changePasswordSegueId = "ChangePassword"
+    
+    // Override base URL
+    static let overriddenBaseURLKey = "overriddenBaseURLKey"
 }

@@ -34,6 +34,7 @@ class DeviceGroupCollectionViewCell: UICollectionViewCell {
     var singleDeviceNodeCount = 0
     var datasource: [Node] = []
     var delegate: DeviceGroupCollectionViewCellDelegate?
+    let fabricDetails = ESPMatterFabricDetails.shared
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -76,8 +77,8 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
         let node = getNodeAt(indexPath: indexPath)
         if #available(iOS 16.4, *), node.isMatter {
             var status: NodeConnectionStatus = .offline
-            if let id = node.node_id, let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: id), let group = ESPMatterFabricDetails.shared.getGroupData(groupId: groupId), let nodeDetails = ESPMatterFabricDetails.shared.getNodeDetails(nodeId: id) {
-                if let matterNodeId = ESPMatterFabricDetails.shared.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
+            if let id = node.node_id, let groupId = self.fabricDetails.getGroupId(nodeId: id), let group = self.fabricDetails.getGroupData(groupId: groupId), let nodeDetails = self.fabricDetails.getNodeDetails(nodeId: id) {
+                if let matterNodeId = self.fabricDetails.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
                     if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                         status = .local
                     } else if node.isRainmaker, node.isConnected {
@@ -152,16 +153,18 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         let node = getNodeAt(indexPath: indexPath)
         if #available(iOS 16.4, *), node.isMatter, var cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
             var status: NodeConnectionStatus = .offline
-            if let id = node.node_id, let matterNodeId = ESPMatterFabricDetails.shared.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
+            if let id = node.node_id, let matterNodeId = self.fabricDetails.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
                 if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                     status = .local
                 } else if node.isRainmaker, node.isConnected {
                     status = .remote
                 }
-                if let matterDeviceName = node.matterDeviceName {
+                if let rainmakerDeviceName = node.rainmakerDeviceName {
+                    cell.deviceName.text = rainmakerDeviceName
+                } else if let matterDeviceName = node.matterDeviceName {
                     cell.deviceName.text = matterDeviceName
                 }
-                if let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: id), let nodeDetails = ESPMatterFabricDetails.shared.getNodeDetails(nodeId: id) {
+                if let groupId = self.fabricDetails.getGroupId(nodeId: id), let nodeDetails = self.fabricDetails.getNodeDetails(nodeId: id) {
                     if let devices = node.devices {
                         if devices.count > 1 {
                             self.configureNodeCell(cell: &cell, rainmakerNode: node, node: nodeDetails, groupId: groupId, matterNodeId: matterNodeId, deviceId: deviceId, isSingleDeviceNode: false, indexPath: indexPath)
@@ -309,13 +312,21 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
     func configureNodeCell(cell: inout DeviceCollectionViewCell, rainmakerNode: Node, node: ESPNodeDetails, groupId: String, matterNodeId: String, deviceId: UInt64, isSingleDeviceNode: Bool, indexPath: IndexPath) {
         let endPointClusterId = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
         cell.node = node
-        if let group = ESPMatterFabricDetails.shared.getGroupData(groupId: groupId) {
+        if let group = self.fabricDetails.getGroupData(groupId: groupId) {
             cell.group = group
         }
-        if let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
-            cell.deviceName.text = isSingleDeviceNode ? deviceName : deviceName+".\(indexPath.item)"
+        if let deviceName = self.fabricDetails.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
+            if let rMakerDeviceName = rainmakerNode.rainmakerDeviceName {
+                cell.deviceName.text = isSingleDeviceNode ? rMakerDeviceName : rMakerDeviceName+".\(indexPath.item)"
+            } else {
+                cell.deviceName.text = isSingleDeviceNode ? deviceName : deviceName+".\(indexPath.item)"
+            }
         } else {
-            cell.deviceName.text = isSingleDeviceNode ? matterNodeId : matterNodeId+".\(indexPath.item)"
+            if let rMakerDeviceName = rainmakerNode.rainmakerDeviceName {
+                cell.deviceName.text = isSingleDeviceNode ? rMakerDeviceName : rMakerDeviceName+".\(indexPath.item)"
+            } else {
+                cell.deviceName.text = isSingleDeviceNode ? matterNodeId : matterNodeId+".\(indexPath.item)"
+            }
         }
         let (result, _) = ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId)
         if result {
@@ -337,7 +348,9 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.defaultDevice)
             cell.onOffButton.isHidden = true
         }
-        if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+        if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0, let type = rainmakerNode.deviceType, type == 266 {
+            cell.deviceImage.image = UIImage(named: ESPMatterConstants.outletDevice)
+        } else if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.controller)
         }
         cell.rainmakerNode = rainmakerNode

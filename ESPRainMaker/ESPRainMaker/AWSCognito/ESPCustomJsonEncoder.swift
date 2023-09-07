@@ -58,8 +58,8 @@ public struct ESPCustomJsonEncoder: ParameterEncoding {
             }
             if let data = data {
                 let string = String(data: data, encoding: .utf8)?.replacingOccurrences(of: "\\/", with: "/")
-                if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
-                    urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                if urlRequest.value(forHTTPHeaderField: Constants.contentType) == nil {
+                    urlRequest.setValue(Constants.applicationJSON, forHTTPHeaderField: Constants.contentType)
                 }
                 urlRequest.httpBody = string?.data(using: .utf8)
             }
@@ -87,8 +87,8 @@ public struct ESPCustomJsonEncoder: ParameterEncoding {
             let data = try JSONSerialization.data(withJSONObject: jsonObject, options: options)
             let string = String(data: data, encoding: .utf8)?.replacingOccurrences(of: "\\/", with: "/")
 
-            if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
-                urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            if urlRequest.value(forHTTPHeaderField: Constants.contentType) == nil {
+                urlRequest.setValue(Constants.applicationJSON, forHTTPHeaderField: Constants.contentType)
             }
 
             urlRequest.httpBody = string?.data(using: .utf8)

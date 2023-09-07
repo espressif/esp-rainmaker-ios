@@ -23,35 +23,60 @@ import UIKit
 class NodeGroupSharingRequestsViewController: UIViewController {
     
     static let storyboardId: String = "NodeGroupSharingRequestsViewController"
+    
+    // Pull to refresh control
+    private let refreshControl = UIRefreshControl()
+    @IBOutlet weak var topBarview: TopBarView!
+    @IBOutlet weak var topBarTitle: BarTitle!
     @IBOutlet weak var requestsTable: UITableView!
     @IBOutlet weak var initialView: UIView!
     var acceptedSharings: [ESPNodeGroupSharingStruct] = []
     var pendingNodeGroupRequests: [ESPNodeGroupSharingRequest] = []
     var requestsSent: [ESPNodeGroupSharingRequest] = []
     var sharingsAcceptedBy: [ESPNodeGroupSharingStruct] = []
+    let fabricDetails = ESPMatterFabricDetails.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBarController?.tabBar.isHidden = true
         title = "Group Sharing"
+        self.topBarTitle.text = "Group Sharing"
         self.navigationController?.addCustomBottomLine(color: .black, height: 0.5)
-        self.navigationController?.view.backgroundColor = .clear
-        self.setNavigationTextAttributes(color: .darkGray)
-        let goBackButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(goBack))
-        goBackButton.tintColor = .systemBlue
-        self.navigationItem.leftBarButtonItem = goBackButton
         requestsTable.register(UINib(nibName: RequestSentCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: RequestSentCell.reuseIdentifier)
         requestsTable.register(UINib(nibName: RequestsReceivedCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: RequestsReceivedCell.reuseIdentifier)
         requestsTable.register(UINib(nibName: RequestAcceptedCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: RequestAcceptedCell.reuseIdentifier)
         self.setDefaultData()
         self.refreshSharingData()
+        self.addPullToRefresh()
+        self.view.bringSubviewToFront(self.topBarview)
     }
     
+    /// Add pull to refresh on table view
+    func addPullToRefresh() {
+        // Add pull to refresh on current table view
+        self.refreshControl.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
+        self.requestsTable.refreshControl = self.refreshControl
+        self.refreshControl.tintColor = .clear
+    }
+    
+    /// Refresh table view
+    @objc func refreshTableView() {
+        self.refreshControl.endRefreshing()
+        self.refreshSharingData()
+    }
+    
+    /// Back button pressed
+    /// - Parameter sender: back button
+    @IBAction func backButtonPressed(_ sender: Any) {
+        self.goBack()
+    }
+    
+    /// Set default data
     func setDefaultData() {
-        self.acceptedSharings = ESPMatterFabricDetails.shared.fetchAcceptedSharings()
-        self.pendingNodeGroupRequests = ESPMatterFabricDetails.shared.fetchPendingNodeGroupRequests()
-        self.requestsSent = ESPMatterFabricDetails.shared.fetchRequestsSent()
-        self.sharingsAcceptedBy = ESPMatterFabricDetails.shared.fetchSharingsAcceptedBy()
+        self.acceptedSharings = self.fabricDetails.fetchAcceptedSharings()
+        self.pendingNodeGroupRequests = self.fabricDetails.fetchPendingNodeGroupRequests()
+        self.requestsSent = self.fabricDetails.fetchRequestsSent()
+        self.sharingsAcceptedBy = self.fabricDetails.fetchSharingsAcceptedBy()
         self.updateTableView()
     }
     
@@ -108,9 +133,9 @@ extension NodeGroupSharingRequestsViewController {
                     completion()
                     return
                 }
-                ESPMatterFabricDetails.shared.saveNodeGroupSharingRequestsSent(data: data)
+                self.fabricDetails.saveNodeGroupSharingRequestsSent(data: data)
                 self.requestsSent = self.fetchRequests()
-                ESPMatterFabricDetails.shared.saveRequestsSent(requestsSent: self.requestsSent)
+                self.fabricDetails.saveRequestsSent(requestsSent: self.requestsSent)
                 completion()
             } else {
                 completion()
@@ -121,7 +146,7 @@ extension NodeGroupSharingRequestsViewController {
     /// Fetch requests
     private func fetchRequests() -> [ESPNodeGroupSharingRequest] {
         var sRequets = [ESPNodeGroupSharingRequest]()
-        if let sharingRequests = ESPMatterFabricDetails.shared.getNodeGroupSharingRequestsSent(), let requests = sharingRequests.sharingRequests {
+        if let sharingRequests = self.fabricDetails.getNodeGroupSharingRequestsSent(), let requests = sharingRequests.sharingRequests {
             for sharingRequest in requests {
                 if let primaryUser = sharingRequest.sharedBy, primaryUser == User.shared.userInfo.email, let groupIds = sharingRequest.groupIds, let sharedWith = sharingRequest.sharedWith, let requestStatus = sharingRequest.requestStatus, requestStatus.lowercased() == ESPMatterConstants.pending.lowercased() {
                     var groupName: String? = nil
@@ -149,10 +174,10 @@ extension NodeGroupSharingRequestsViewController {
                 return
             }
             if let sharedData = sharedData {
-                ESPMatterFabricDetails.shared.saveNodeGroupSharing(data: sharedData)
+                self.fabricDetails.saveNodeGroupSharing(data: sharedData)
             }
             self.sharingsAcceptedBy = self.fetchNodeGroupSharings()
-            ESPMatterFabricDetails.shared.saveSharingsAcceptedBy(sharingsAcceptedBy: self.sharingsAcceptedBy)
+            self.fabricDetails.saveSharingsAcceptedBy(sharingsAcceptedBy: self.sharingsAcceptedBy)
             completion()
         }
     }
@@ -160,7 +185,7 @@ extension NodeGroupSharingRequestsViewController {
     /// setup node group sharings
     private func fetchNodeGroupSharings() -> [ESPNodeGroupSharingStruct] {
         var sharings = [ESPNodeGroupSharingStruct]()
-        if let value = ESPMatterFabricDetails.shared.getNodeGroupSharing(), let groupSharing = value.groupSharing {
+        if let value = self.fabricDetails.getNodeGroupSharing(), let groupSharing = value.groupSharing {
             for sharing in groupSharing {
                 if let grpId = sharing.groupID, let users = sharing.users, let sharedByUsers = users.primary, let sharedWithUsers = users.secondary, sharedByUsers.contains(User.shared.userInfo.email), sharedWithUsers.count > 0 {
                     for secondary in sharedWithUsers {
@@ -185,9 +210,9 @@ extension NodeGroupSharingRequestsViewController {
                     completion()
                     return
                 }
-                ESPMatterFabricDetails.shared.saveNodeGroupSharingRequestsReceived(data: data)
+                self.fabricDetails.saveNodeGroupSharingRequestsReceived(data: data)
                 self.pendingNodeGroupRequests = self.setupPendingRequests()
-                ESPMatterFabricDetails.shared.savePendingNodeGroupRequests(pendingNodeGroupRequests: self.pendingNodeGroupRequests)
+                self.fabricDetails.savePendingNodeGroupRequests(pendingNodeGroupRequests: self.pendingNodeGroupRequests)
                 completion()
             } else {
                 completion()
@@ -198,7 +223,7 @@ extension NodeGroupSharingRequestsViewController {
     /// Setup pending requests
     private func setupPendingRequests() -> [ESPNodeGroupSharingRequest] {
         var sRequests = [ESPNodeGroupSharingRequest]()
-        if let sharingRequests = ESPMatterFabricDetails.shared.getNodeGroupSharingRequestsReceived() {
+        if let sharingRequests = self.fabricDetails.getNodeGroupSharingRequestsReceived() {
             if let requests = sharingRequests.sharingRequests, requests.count > 0 {
                 for request in requests {
                     if let sharedWith = request.sharedWith, sharedWith == User.shared.userInfo.email, let sharedBy = request.sharedBy, let requestId = request.requestId, let status = request.requestStatus, status.lowercased() == ESPMatterConstants.pending {
@@ -226,9 +251,9 @@ extension NodeGroupSharingRequestsViewController {
                     completion()
                     return
                 }
-                ESPMatterFabricDetails.shared.saveNodeGroupSharing(data: sharedData)
+                self.fabricDetails.saveNodeGroupSharing(data: sharedData)
                 self.acceptedSharings = self.setupNodeGroupSharings()
-                ESPMatterFabricDetails.shared.saveAcceptedSharings(acceptedSharings: self.acceptedSharings)
+                self.fabricDetails.saveAcceptedSharings(acceptedSharings: self.acceptedSharings)
                 completion()
             } else {
                 completion()
@@ -239,7 +264,7 @@ extension NodeGroupSharingRequestsViewController {
     /// Setup node group sharings
     private func setupNodeGroupSharings() -> [ESPNodeGroupSharingStruct] {
         var sharings = [ESPNodeGroupSharingStruct]()
-        if let value = ESPMatterFabricDetails.shared.getNodeGroupSharing(), let groupSharing = value.groupSharing {
+        if let value = self.fabricDetails.getNodeGroupSharing(), let groupSharing = value.groupSharing {
             for sharing in groupSharing {
                 if let groupId = sharing.groupID, let users = sharing.users, let sharedByUsers = users.primary, let sharedWithUsers = users.secondary, sharedWithUsers.contains(User.shared.userInfo.email), let primary = sharedByUsers.first {
                     let shar = ESPNodeGroupSharingStruct(groupId: groupId, sharedWith: User.shared.userInfo.email, sharedBy: primary)
@@ -265,7 +290,7 @@ extension NodeGroupSharingRequestsViewController: UITableViewDelegate, UITableVi
                     if let groupName = request.groupName {
                         text = "Group \(groupName) was shared by \(sharedBy)."
                     }
-                    let height = text.getViewHeight(labelWidth: tableView.frame.width-80.0, font: UIFont.systemFont(ofSize: 15.0))
+                    let height = text.getViewHeight(labelWidth: tableView.frame.width-80.0, font: UIFont.systemFont(ofSize: 16.0, weight: .semibold))
                     return height+86.0
                 }
             } else if indexPath.row >= self.pendingNodeGroupRequests.count, indexPath.row < self.pendingNodeGroupRequests.count + self.requestsSent.count {
@@ -280,7 +305,7 @@ extension NodeGroupSharingRequestsViewController: UITableViewDelegate, UITableVi
                         text = "Group \(groupName) shared with \(sharedWith) is pending for approval."
                     }
                     let height = text.getViewHeight(labelWidth: constrainedWidth, font: UIFont.systemFont(ofSize: 16.0, weight: .semibold))
-                    return height + 45.0
+                    return height + 80.0
                 }
             } else if indexPath.row >= self.pendingNodeGroupRequests.count + self.requestsSent.count, indexPath.row < self.pendingNodeGroupRequests.count + self.requestsSent.count + self.sharingsAcceptedBy.count {
                 //requests accepted by secondary user
@@ -291,13 +316,13 @@ extension NodeGroupSharingRequestsViewController: UITableViewDelegate, UITableVi
                 if let sharedWith = sharing.sharedWith {
                     let text = "Group shared with \(sharedWith)."
                     let height = text.getViewHeight(labelWidth: constrainedWidth, font: UIFont.systemFont(ofSize: 16.0, weight: .semibold))
-                    return height + 45.0
+                    return height + 80.0
                 }
             } else if indexPath.row >= self.pendingNodeGroupRequests.count + self.requestsSent.count + self.sharingsAcceptedBy.count, indexPath.row < self.pendingNodeGroupRequests.count + self.requestsSent.count + self.sharingsAcceptedBy.count + acceptedSharings.count {
                 //requests accepted by user
                 let count = indexPath.row - (self.pendingNodeGroupRequests.count + self.requestsSent.count + self.sharingsAcceptedBy.count)
                 let sharing = acceptedSharings[count]
-                if let grpId = sharing.groupId, let nodeDetails = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: grpId), let groups = nodeDetails.groups, let sharedBy = sharing.sharedBy {
+                if let grpId = sharing.groupId, let nodeDetails = self.fabricDetails.getNodeGroupDetails(groupId: grpId), let groups = nodeDetails.groups, let sharedBy = sharing.sharedBy {
                     var groupName: String?
                     for group in groups {
                         if let id = group.groupID, id == grpId, let name = group.groupName {
@@ -309,7 +334,7 @@ extension NodeGroupSharingRequestsViewController: UITableViewDelegate, UITableVi
                     if let groupName = groupName {
                         text = "Group \(groupName) was shared by \(sharedBy)."
                     }
-                    let height = text.getViewHeight(labelWidth: tableView.frame.width-185.0, font: UIFont.systemFont(ofSize: 15.0))
+                    let height = text.getViewHeight(labelWidth: tableView.frame.width-180.0, font: UIFont.systemFont(ofSize: 16.0, weight: .semibold))
                     return height+80.0
                 }
             } else {
@@ -394,7 +419,10 @@ extension NodeGroupSharingRequestsViewController: RequestReceivedAction {
                                               nodeGroupSharingRequests: true,
                                               acceptedSharingRequests: true)
                 } else {
-                    self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: "Failed to accept request.", buttonTitle: ESPMatterConstants.okTxt, callback: {})
+                    self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                        message: ESPMatterConstants.requestAcceptFailedMsg,
+                                        buttonTitle: ESPMatterConstants.okTxt,
+                                        callback: {})
                 }
             }
         }
@@ -409,14 +437,20 @@ extension NodeGroupSharingRequestsViewController: RequestReceivedAction {
                 Utility.hideLoader(view: self.view)
                 if result {
                     User.shared.updateDeviceList = true
-                    self.showErrorAlert(title: ESPMatterConstants.successTxt, message: "Request declined successfully.", buttonTitle: ESPMatterConstants.okTxt, callback: {
+                    self.showErrorAlert(title: ESPMatterConstants.successTxt,
+                                        message: ESPMatterConstants.requestDeclinedMsg,
+                                        buttonTitle: ESPMatterConstants.okTxt,
+                                        callback: {
                         self.refreshSharingData(fetchNodeGroupSharingRequests: false,
                                                   acceptedByUserRequests: false,
                                                   nodeGroupSharingRequests: true,
                                                   acceptedSharingRequests: false)
                     })
                 } else {
-                    self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: "Failed to decline request.", buttonTitle: ESPMatterConstants.okTxt, callback: {})
+                    self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                        message: ESPMatterConstants.requestDeclinedMsg,
+                                        buttonTitle: ESPMatterConstants.okTxt,
+                                        callback: {})
                 }
             }
         }
@@ -488,10 +522,14 @@ extension NodeGroupSharingRequestsViewController: RequestAccpetedActionDelegate 
                                               nodeGroupSharingRequests: false,
                                               acceptedSharingRequests: true)
                 } else {
-                    self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.revokeRequestFailedMsg, buttonTitle: ESPMatterConstants.okTxt) {}
+                    self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                        message: ESPMatterConstants.revokeRequestFailedMsg,
+                                        buttonTitle: ESPMatterConstants.okTxt) {}
                 }
             }
         })
-        self.showAlertWithOptions(title: ESPMatterConstants.revokeRequestTxt, message: ESPMatterConstants.revokeRequestMsg, actions: [noAction, yesAction])
+        self.showAlertWithOptions(title: ESPMatterConstants.revokeRequestTxt,
+                                  message: ESPMatterConstants.revokeRequestMsg,
+                                  actions: [noAction, yesAction])
     }
 }

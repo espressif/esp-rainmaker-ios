@@ -28,9 +28,9 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion
     func addCatIdOperate(deviceId: UInt64, completion: @escaping () -> Void) {
-        if let group = self.group, let fabricDetails = group.fabricDetails, let catIdoperate = fabricDetails.catIdOperate, let id = "FFFFFFFD\(catIdoperate)".hexToDecimal {
+        if let group = self.group, let fabricDetails = group.fabricDetails, let catIdoperate = fabricDetails.catIdOperateDecimal {
             self.readAllACLAttributes(deviceId: deviceId) { accessControlEntries in
-                if var accessControlEntries = accessControlEntries {
+                if let accessControlEntries = accessControlEntries {
                     var entries = [MTRAccessControlClusterAccessControlEntryStruct]()
                     var fabricIndex = 0
                     var authMode = 0
@@ -46,7 +46,7 @@ extension ESPMTRCommissioner {
                     entry.fabricIndex = NSNumber(value: fabricIndex)
                     entry.authMode = NSNumber(value: authMode)
                     entry.privilege = NSNumber(value: 3)
-                    entry.subjects = [id]
+                    entry.subjects = [NSNumber(value: catIdoperate)]
                     entries.append(entry)
                     self.writeAllACLAttributes(deviceId: deviceId, accessControlEntry: entries) { result in
                         completion()

@@ -33,6 +33,10 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     @IBOutlet var scannerView: UIView!
     @IBOutlet var noCameraView: UIView!
     @IBOutlet var manualActionButton: UIButton!
+    var onboardingPayload: String?
+    var group: ESPNodeGroup?
+    var groupId: String?
+    let fabricDetails = ESPMatterFabricDetails.shared
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,14 +94,27 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                             if code.hasPrefix(ESPMatterConstants.matterPrefix) {
                                 #if ESPRainMakerMatter
                                 if #available(iOS 16.4, *) {
-                                    self.goToFabricSelection(onboardingPayload: code)
+                                    NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
+                                        if let groups = nodeGroups, groups.count > 0 {
+                                            self.goToFabricSelection(onboardingPayload: code)
+                                        } else {
+                                            self.onboardingPayload = code
+                                            self.createMatterFabric(groupName: "Home")
+                                        }
+                                    }
                                 } else {
-                                    self.alertUser(title: ESPMatterConstants.warning, message: ESPMatterConstants.upgradeOSVersionMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {
+                                    self.alertUser(title: ESPMatterConstants.warning,
+                                                   message: ESPMatterConstants.upgradeOSVersionMsg,
+                                                   buttonTitle: ESPMatterConstants.okTxt,
+                                                   callback: {
                                         self.navigationController?.popToRootViewController(animated: false)
                                     })
                                 }
                                 #else
-                                self.alertUser(title: ESPMatterConstants.warning, message: ESPMatterConstants.matterNotSupportedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {
+                                self.alertUser(title: ESPMatterConstants.warning,
+                                               message: ESPMatterConstants.matterNotSupportedMsg,
+                                               buttonTitle: ESPMatterConstants.okTxt,
+                                               callback: {
                                     self.navigationController?.popToRootViewController(animated: false)
                                 })
                                 #endif
@@ -191,6 +208,28 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             }
             actionSheet.addAction(bleAction)
             actionSheet.addAction(softapAction)
+            #if ESPRainMakerMatter
+            let mtrCommAction = UIAlertAction(title: "Matter", style: .default) { _ in
+                if #available(iOS 16.4, *) {
+                    NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
+                        if let groups = nodeGroups, groups.count > 0 {
+                            self.goToFabricSelection(onboardingPayload: nil)
+                        } else {
+                            self.onboardingPayload = nil
+                            self.createMatterFabric(groupName: "Home")
+                        }
+                    }
+                } else {
+                    self.alertUser(title: ESPMatterConstants.warning,
+                                   message: ESPMatterConstants.upgradeOSVersionMsg,
+                                   buttonTitle: ESPMatterConstants.okTxt,
+                                   callback: {
+                        self.navigationController?.popToRootViewController(animated: false)
+                    })
+                }
+            }
+            actionSheet.addAction(mtrCommAction)
+            #endif
             actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             actionSheet.popoverPresentationController?.sourceView = manualActionButton
             present(actionSheet, animated: true, completion: nil)
@@ -232,11 +271,11 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     
     #if ESPRainMakerMatter
     @available(iOS 16.4, *)
-    func goToFabricSelection(onboardingPayload: String) {
+    func goToFabricSelection(onboardingPayload: String? =  nil) {
         let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
         let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as! ESPFabricSelectionVC
         fabricSelectionVC.onboardingPayload = onboardingPayload
-        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: false)
         navigationController?.pushViewController(fabricSelectionVC, animated: true)
     }
     #endif
@@ -302,3 +341,99 @@ extension ScannerViewController: ESPDeviceConnectionDelegate {
         completionHandler("")
     }
 }
+
+#if ESPRainMakerMatter
+@available(iOS 16.4, *)
+extension ScannerViewController: ESPCreateMatterFabricPresentationLogic {
+    
+    /// Matter fabric created
+    /// - Parameter groupName: group name
+    func createMatterFabric(groupName: String) {
+        let createMatterFabricService = ESPCreateMatterFabricService(presenter: self)
+        let nodeGroupURL = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion
+        createMatterFabricService.createMatterFabric(url: nodeGroupURL, groupName: groupName, type: ESPMatterConstants.matter, mutuallyExclusive: true, description: ESPMatterConstants.matter, isMatter: true)
+    }
+    
+    /// Matter fabric created
+    /// - Parameters:
+    ///   - data: data
+    ///   - error: error
+    func matterFabricCreated(data: ESPCreateMatterFabricResponse?, error: Error?) {
+        guard let _ = error else {
+            User.shared.updateDeviceList = true
+            if let data = data, let grpid = data.groupId {
+                self.groupId = grpid
+                self.getMatterFabrics()
+            }
+            return
+        }
+    }
+    
+    /// Get matter groups
+    func getMatterFabrics() {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
+        }
+        let extendSessionWorker = ESPExtendUserSessionWorker()
+        extendSessionWorker.checkUserSession { token, _ in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+            }
+            if let token = token {
+                let url = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion
+                let service = ESPGetNodeGroupsService(presenter: self)
+                service.getNodeGroupsMatterFabricDetails(url: url, token: token)
+                DispatchQueue.main.async {
+                    Utility.showLoader(message: ESPMatterConstants.fetchingGroupsDataMsg, view: self.view)
+                }
+            }
+        }
+    }
+}
+
+//MARK: Received node groups data
+@available(iOS 16.4, *)
+extension ScannerViewController: ESPGetNodeGroupsPresentationLogic {
+    
+    /// Received node groups data
+    /// - Parameters:
+    ///   - data: groups data
+    ///   - error: error
+    func receivedNodeGroupsData(data: ESPNodeGroups?, error: Error?) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+        }
+        if let data = data, let groups = data.groups, groups.count > 0 {
+            self.fabricDetails.saveGroupsData(groups: data)
+            DispatchQueue.main.async {
+                self.goToMatterCommissioning()
+            }
+        } else {
+            self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.scannErrorMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+        }
+    }
+    
+    /// Received node groups details
+    /// - Parameters:
+    ///   - data: node group details
+    ///   - error: error
+    func receivedNodeGroupDetailsData(data: ESPNodeGroupDetails?, error: Error?) {}
+    
+    /// Go to matter commissioning
+    func goToMatterCommissioning() {
+        let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
+        let matterCommissioningVC = storyBrd.instantiateViewController(withIdentifier: ESPMatterCommissioningVC.storyboardId) as! ESPMatterCommissioningVC
+        matterCommissioningVC.groupId = self.groupId
+        matterCommissioningVC.onboardingPayload = self.onboardingPayload
+        if let data = self.fabricDetails.getGroupsData(), let groups = data.groups, groups.count > 0 {
+            for grp in groups {
+                if let id = grp.groupID, let groupId = self.groupId, id == groupId {
+                    matterCommissioningVC.group = grp
+                    navigationController?.pushViewController(matterCommissioningVC, animated: true)
+                    break
+                }
+            }
+        }
+    }
+}
+#endif

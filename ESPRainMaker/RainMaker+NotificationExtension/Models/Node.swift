@@ -47,7 +47,7 @@ class Node: Codable {
     var isMatter = false
     var matter_node_id: String?
     var metadata: [String: Any]?
-    var tags: [String]?
+    var node_type: String?
 
     enum CodingKeys: String, CodingKey {
         case node_id = "id"
@@ -66,55 +66,118 @@ class Node: Codable {
         case pop
         case timestamp
         case isConnected
+        case isMatter
+        case matter_node_id
+        case metadata
+        case node_type
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(node_id, forKey: .node_id)
+        if let node_id = node_id {
+            try container.encode(node_id, forKey: .node_id)
+        }
         try container.encode(isSchedulingSupported, forKey: .isSchedulingSupported)
-        try container.encode(devices, forKey: .devices)
-        try container.encode(primary, forKey: .primary)
-        try container.encode(secondary, forKey: .secondary)
-        try container.encode(services, forKey: .services)
+        if let devices = devices {
+            try container.encode(devices, forKey: .devices)
+        }
+        if let primary = primary {
+            try container.encode(primary, forKey: .primary)
+        }
+        if let secondary = secondary {
+            try container.encode(secondary, forKey: .primary)
+        }
+        if let services = services {
+            try container.encode(services, forKey: .primary)
+        }
         try container.encode(maxSchedulesCount, forKey: .maxSchedulesCount)
         try container.encode(currentSchedulesCount, forKey: .currentSchedulesCount)
         try container.encode(supportsEncryption, forKey: .supportsEncryption)
         try container.encode(pop, forKey: .pop)
         try container.encode(timestamp, forKey: .timestamp)
         try container.encode(isConnected, forKey: .isConnected)
-
+        try container.encode(isMatter, forKey: .isMatter)
+        if let matter_node_id = matter_node_id {
+            try container.encode(matter_node_id, forKey: .matter_node_id)
+        }
+        if let metadata = metadata, let data = try? JSONSerialization.data(withJSONObject: metadata, options: []) {
+            try container.encode(data, forKey: .metadata)
+        }
         var configContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
-        try configContainer.encode(info, forKey: .info)
-        try configContainer.encode(config_version, forKey: .config_version)
-        try configContainer.encode(config_version, forKey: .config_version)
-        try configContainer.encode(config_version, forKey: .config_version)
+        if let info = info {
+            try configContainer.encodeIfPresent(info, forKey: .info)
+        }
+        if let config_version = config_version {
+            try configContainer.encodeIfPresent(config_version, forKey: .config_version)
+        }
+        if let node_type = node_type {
+            try container.encode(node_type, forKey: .node_type)
+        }
     }
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        node_id = try container.decode(String?.self, forKey: .node_id)
-        devices = try container.decode([Device]?.self, forKey: .devices)
-        primary = try container.decode([String]?.self, forKey: .primary)
-        secondary = try container.decode([String]?.self, forKey: .secondary)
-        services = try container.decode([Service]?.self, forKey: .services)
-
+        if let node_id = try? container.decodeIfPresent(String?.self, forKey: .node_id) {
+            self.node_id = node_id
+        }
+        if let devices = try? container.decodeIfPresent([Device].self, forKey: .devices) {
+            self.devices = devices
+        }
+        if let primary = try? container.decodeIfPresent([String].self, forKey: .primary) {
+            self.primary = primary
+        }
+        if let secondary = try? container.decodeIfPresent([String].self, forKey: .secondary) {
+            self.secondary = secondary
+        }
+        if let services = try? container.decodeIfPresent([Service].self, forKey: .services) {
+            self.services = services
+        }
+        if let isMatter = try? container.decodeIfPresent(Bool.self, forKey: .isMatter) {
+            self.isMatter = isMatter
+        }
+        if let matter_node_id = try? container.decodeIfPresent(String.self, forKey: .matter_node_id) {
+            self.matter_node_id = matter_node_id
+        }
+        if let data = try? container.decode(Data.self, forKey: .metadata), let meta = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            metadata = meta
+        }
+        if let node_type = try? container.decodeIfPresent(String?.self, forKey: .node_type) {
+            self.node_id = node_type
+        }
         let configContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .config)
-        info = try configContainer.decode(Info?.self, forKey: .info)
-        config_version = try configContainer.decode(String.self, forKey: .config_version)
+        if let info = try? configContainer.decode(Info.self, forKey: .info) {
+            self.info = info
+        }
+        if let config_version = try? configContainer.decode(String.self, forKey: .config_version) {
+            self.config_version = config_version
+        }
         timestamp = 0
-
         if let nodeDevices = devices {
             for device in nodeDevices {
                 device.node = self
             }
         }
-        isSchedulingSupported = try container.decodeIfPresent(Bool.self, forKey: .isSchedulingSupported) ?? false
-        maxSchedulesCount = try container.decodeIfPresent(Int.self, forKey: .maxSchedulesCount) ?? -1
-        currentSchedulesCount = try container.decodeIfPresent(Int.self, forKey: .currentSchedulesCount) ?? 0
-        supportsEncryption = try container.decodeIfPresent(Bool.self, forKey: .supportsEncryption) ?? false
-        pop = try container.decodeIfPresent(String.self, forKey: .pop) ?? ""
-        isConnected = try container.decodeIfPresent(Bool.self, forKey: .isConnected) ?? false
-        timestamp = try container.decodeIfPresent(Int.self, forKey: .timestamp) ?? 0
+        if let isSchedulingSupported = try? container.decode(Bool.self, forKey: .isSchedulingSupported) {
+            self.isSchedulingSupported = isSchedulingSupported
+        }
+        if let maxSchedulesCount = try? container.decode(Int.self, forKey: .maxSchedulesCount) {
+            self.maxSchedulesCount = maxSchedulesCount
+        }
+        if let currentSchedulesCount = try? container.decode(Int.self, forKey: .currentSchedulesCount) {
+            self.currentSchedulesCount = currentSchedulesCount
+        }
+        if let supportsEncryption = try? container.decode(Bool.self, forKey: .supportsEncryption) {
+            self.supportsEncryption = supportsEncryption
+        }
+        if let pop = try? container.decode(String.self, forKey: .pop) {
+            self.pop = pop
+        }
+        if let isConnected = try? container.decode(Bool.self, forKey: .isConnected) {
+            self.isConnected = isConnected
+        }
+        if let timestamp = try? container.decode(Int.self, forKey: .timestamp) {
+            self.timestamp = timestamp
+        }
         fromLocalStorage = true
     }
 

@@ -56,7 +56,6 @@ class ESPGetNodeGroupsService: ESPGetNodeGroupsLogic {
             let endpoint = ESPMatterAPIEndpoint.getNodeGroupsMatterFabricDetails(url: url, token: token)
             apiWorker.callDataAPI(endPoint: endpoint) { data, error in
                 if let data = data {
-                    print("parseNodeArray: \(String(data: data, encoding: .utf8 )!)")
                     let decoder = JSONDecoder()
                     if let response = try? decoder.decode(ESPNodeGroups.self, from: data) {
                         self.presenter?.receivedNodeGroupsData(data: response, error: nil)

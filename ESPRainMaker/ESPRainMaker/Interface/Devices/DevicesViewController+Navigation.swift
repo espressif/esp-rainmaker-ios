@@ -89,6 +89,9 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                 deviceScreen.node = node
                 deviceScreen.matterNodeId = node.getMatterNodeId()
                 deviceScreen.rainmakerNodes = User.shared.associatedNodeList
+                if let id = node.nodeID, let rmakerNode = User.shared.getNode(id: id) {
+                    deviceScreen.rainmakerNode = rmakerNode
+                }
                 if let groupId = group.groupID, let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
                     if let groups = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId)?.groups, groups.count > 0, let allNodes = groups[0].nodeDetails {
                         deviceScreen.allNodes = allNodes
@@ -100,7 +103,11 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                         deviceScreen.deviceName = deviceName
                     }
                 }
-                self.navigationController?.isNavigationBarHidden = false
+                #if ESPRainMakerMatter
+                if #available(iOS 16.4, *) {
+                    self.stopMatterDiscovery()
+                }
+                #endif
                 self.navigationController?.pushViewController(deviceScreen, animated: true)
             }
         }
@@ -114,36 +121,38 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
     ///   - endpointClusterId: endpointclusterid
     ///   - indexPath: indexpath
     func showDeviceTraitListVC(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath) {
-        NetworkManager.shared.getNodes { rainmakerNodes, _ in
-            if let rainmakerNodes = rainmakerNodes {
-                for rainmakerNode in rainmakerNodes {
-                    if let rainmakerNodeId = rainmakerNode.node_id, let nodeId = node.nodeID, rainmakerNodeId.lowercased() == nodeId.lowercased(), let rainmakerDevices = rainmakerNode.devices, rainmakerDevices.count > 0 {
-                        let storyboard = UIStoryboard(name: Storyboard.deviceDetails.storyboardId, bundle: nil)
-                        if let deviceTraitList = storyboard.instantiateViewController(withIdentifier: Constants.deviceTraitListVCIdentifier) as? DeviceTraitListViewController {
-                            deviceTraitList.group = group
-                            deviceTraitList.device = rainmakerDevices[0]
-                            deviceTraitList.indePath = indexPath
-                            deviceTraitList.node = node
-                            if let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: nodeId), let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
-                                if let groups = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId)?.groups, groups.count > 0, let allNodes = groups[0].nodeDetails {
-                                    deviceTraitList.allNodes = allNodes
-                                }
-                                let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
-                                if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 0 {
-                                    if !ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
-                                        deviceTraitList.isSwitch = true
-                                    }
-                                    deviceTraitList.endpointClusterId = endpointClusterId
-                                }
-                                if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 1 {
-                                    deviceTraitList.deviceName = "\(deviceName).\(indexPath.item)"
-                                } else {
-                                    deviceTraitList.deviceName = deviceName
-                                }
+        if let nodeId = node.nodeID, let rainmakerNode = User.shared.getNode(id: nodeId) {
+            if let rainmakerNodeId = rainmakerNode.node_id, let nodeId = node.nodeID, rainmakerNodeId.lowercased() == nodeId.lowercased(), let rainmakerDevices = rainmakerNode.devices, rainmakerDevices.count > 0 {
+                let storyboard = UIStoryboard(name: Storyboard.deviceDetails.storyboardId, bundle: nil)
+                if let deviceTraitList = storyboard.instantiateViewController(withIdentifier: Constants.deviceTraitListVCIdentifier) as? DeviceTraitListViewController {
+                    deviceTraitList.group = group
+                    deviceTraitList.device = rainmakerDevices[0]
+                    deviceTraitList.node = node
+                    if let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: nodeId), let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
+                        deviceTraitList.matterNodeId = matterNodeId
+                        if let groups = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId)?.groups, groups.count > 0, let allNodes = groups[0].nodeDetails {
+                            deviceTraitList.allNodes = allNodes
+                        }
+                        let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
+                        if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 0 {
+                            if !ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
+                                deviceTraitList.isSwitch = true
                             }
-                            self.navigationController?.pushViewController(deviceTraitList, animated: true)
+                            deviceTraitList.endpointClusterId = endpointClusterId
+                        }
+                        if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 1 {
+                            deviceTraitList.deviceName = "\(deviceName).\(indexPath.item)"
+                            deviceTraitList.switchIndex = indexPath.item
+                        } else {
+                            deviceTraitList.deviceName = deviceName
                         }
                     }
+                    #if ESPRainMakerMatter
+                    if #available(iOS 16.4, *) {
+                        self.stopMatterDiscovery()
+                    }
+                    #endif
+                    self.navigationController?.pushViewController(deviceTraitList, animated: true)
                 }
             }
         }
@@ -160,10 +169,30 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
         if #available(iOS 16.4, *) {
             let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
             if let deviceScreen = storyboard.instantiateViewController(withIdentifier: DeviceViewController.storyboardId) as? DeviceViewController {
-                deviceScreen.isDelete = true
                 deviceScreen.group = group
                 deviceScreen.node = node
+                deviceScreen.isDeviceOffline = true
                 deviceScreen.rainmakerNodes = User.shared.associatedNodeList
+                deviceScreen.rainmakerNode = rainmakerNode
+                if let groupId = group.groupID, let node = node, let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal {
+                    let result = ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId)
+                    let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
+                    var endpointClusterId: [String: UInt]?
+                    var switchIndex: Int?
+                    if result, clients.count == 1 {
+                        endpointClusterId = clients
+                    } else if result, indexPath.item < clients.count {
+                        let sortedKeys = clients.keys.sorted { $0 < $1 }
+                        let key = sortedKeys[indexPath.item]
+                        switchIndex = indexPath.item
+                        if let value = clients[key] {
+                            endpointClusterId = [key: value]
+                        }
+                    }
+                    deviceScreen.endpointClusterId = endpointClusterId
+                    deviceScreen.switchIndex = switchIndex
+                    deviceScreen.matterNodeId = matterNodeId
+                }
                 if let groupId = group.groupID, let matterNodeId = node?.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
                     deviceScreen.matterNodeId = matterNodeId
                     if let groups = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId)?.groups, groups.count > 0, let allNodes = groups[0].nodeDetails {
@@ -185,7 +214,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                         }
                     }
                 }
-                self.navigationController?.isNavigationBarHidden = false
+                self.stopMatterDiscovery()
                 self.navigationController?.pushViewController(deviceScreen, animated: true)
             }
         }

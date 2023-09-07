@@ -49,6 +49,10 @@ extension ESPMTRCommissioner {
         }
     }
     
+    /// Get vendor Id
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion with device id
     func getVendorId(deviceId: UInt64, completion: @escaping (Int?) -> Void) {
         self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
             if let cluster = cluster {
@@ -65,6 +69,10 @@ extension ESPMTRCommissioner {
         }
     }
     
+    /// Get product id
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion with product id
     func getProductId(deviceId: UInt64, completion: @escaping (Int?) -> Void) {
         self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
             if let cluster = cluster {
@@ -81,6 +89,10 @@ extension ESPMTRCommissioner {
         }
     }
     
+    /// Get software version
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion with software version
     func getSoftwareVersion(deviceId: UInt64, completion: @escaping (Int?) -> Void) {
         self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
             if let cluster = cluster {
@@ -90,6 +102,54 @@ extension ESPMTRCommissioner {
                     } else {
                         completion(nil)
                     }
+                }
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
+    /// Get device serial number
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion with serial number
+    func getDeviceSerialNumber(deviceId: UInt64, completion: @escaping (String?) -> Void) {
+        self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                cluster.readAttributeSerialNumber { val, _ in
+                    completion(val)
+                }
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
+    /// Get device manufacturer name
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion with vendor name
+    func getManufacturerName(deviceId: UInt64, completion: @escaping (String?) -> Void) {
+        self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                cluster.readAttributeVendorName { val, _ in
+                    completion(val)
+                }
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
+    /// Get product name
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion with vendor name
+    func getProductName(deviceId: UInt64, completion: @escaping (String?) -> Void) {
+        self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                cluster.readAttributeProductName { val, _ in
+                    completion(val)
                 }
             } else {
                 completion(nil)

@@ -19,6 +19,7 @@
 #if ESPRainMakerMatter
 import Foundation
 import Matter
+import UIKit
 
 @available(iOS 16.4, *)
 protocol ParamSliderLevelControlProtocol {
@@ -34,45 +35,60 @@ protocol ParamSliderLevelControlProtocol {
 @available(iOS 16.4, *)
 extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
     
+    /// Setup initial level values
     func setupInitialLevelValues() {
         DispatchQueue.main.async {
             self.title.text = "Brightness"
             self.slider.minimumValue = 0.0
-            self.slider.maximumValue = 254.0
+            self.slider.maximumValue = 100.0
             self.minLabel.text = "0"
-            self.maxLabel.text = "254"
-            self.slider.setValue(50.0, animated: true)
+            self.maxLabel.text = "100"
+            self.minImage.image = UIImage(named: "brightness_low")
+            self.maxImage.image = UIImage(named: "brightness_high")
+            guard let node = self.node, let id = self.deviceId, let levelValue = node.getMatterLevelValue(deviceId: id) as? Int else {
+                self.slider.setValue(50.0, animated: true)
+                return
+            }
+            self.slider.setValue(Float(levelValue), animated: true)
         }
     }
     
+    /// Subscribe to level attribute
+    func subscribeToLevelAttribute() {
+        if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
+            ESPMTRCommissioner.shared.subscribeToLevelValue(groupId: grpId, deviceId: deviceId) { level in
+                let finalLevelValue = Float(CGFloat(level)/2.55)
+                if let node = self.node, let id = self.deviceId {
+                    node.setMatterLevelValue(level: level, deviceId: id)
+                }
+                self.currentLevel = Int(finalLevelValue)
+                DispatchQueue.main.async {
+                    self.slider.setValue(finalLevelValue, animated: true)
+                }
+            }
+        }
+    }
+    
+    /// Get current level value
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
     func getCurrentLevelValues(groupId: String, deviceId: UInt64) {
         self.setupInitialLevelValues()
         if let controller = ESPMTRCommissioner.shared.sController {
             self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: controller) { levelControl in
                 if let levelControl = levelControl {
                     self.getMinLevelValue(levelControl: levelControl) { min, _ in
-                        DispatchQueue.main.async {
-                            if let min = min {
-                                self.minLevel = min.intValue
-                                self.minLabel.text = "\(min.intValue)"
-                            }
-                        }
-                        self.getMaxLevelValue(levelControl: levelControl) { max, _ in
+                        self.getCurrentLevelValue(levelControl: levelControl) { current, _ in
                             DispatchQueue.main.async {
-                                if let max = max {
-                                    self.maxLevel = max.intValue
-                                }
-                            }
-                            self.getCurrentLevelValue(levelControl: levelControl) { current, _ in
-                                DispatchQueue.main.async {
-                                    if let current = current {
-                                        self.currentLevel = current.intValue
+                                if let current = current {
+                                    if let node = self.node, let id = self.deviceId {
+                                        node.setMatterLevelValue(level: current.intValue, deviceId: id)
                                     }
-                                    Utility.hideLoader(view: self)
-                                    self.slider.minimumValue = Float(self.minLevel)
-                                    self.slider.maximumValue = Float(self.maxLevel)
-                                    self.slider.value = Float(self.currentLevel)
+                                    self.currentLevel = current.intValue
                                 }
+                                Utility.hideLoader(view: self)
+                                self.slider.setValue(Float(self.currentLevel), animated: true)
                             }
                         }
                     }
@@ -81,9 +97,115 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
         }
     }
     
+    /// Setup initial saturation values
+    func setupInitialSaturationValue() {
+        DispatchQueue.main.async {
+            self.title.text = "Saturation"
+            self.slider.minimumValue = 0.0
+            self.slider.maximumValue = 100.0
+            self.minLabel.text = "0"
+            self.maxLabel.text = "100"
+            if let id = self.deviceId, let node = self.node, let saturationValue = node.getMatterSaturationValue(deviceId: id) {
+                self.slider.setValue(Float(saturationValue), animated: true)
+            } else {
+                self.slider.setValue(50.0, animated: true)
+            }
+        }
+        self.minImage.image = UIImage(named: "saturation_low")
+        self.maxImage.image = UIImage(named: "saturation_high")
+    }
+    
+    /// Get current level value
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    func getCurrentSaturationValue(groupId: String, deviceId: UInt64) {
+        self.setupInitialSaturationValue()
+        if let _ = ESPMTRCommissioner.shared.sController {
+            self.getColorCluster(timeout: 10.0) { cluster in
+                if let cluster = cluster {
+                    cluster.readAttributeCurrentSaturation { val, _ in
+                        if let val = val {
+                            DispatchQueue.main.async {
+                                let saturation = Int(val.floatValue*2.55)
+                                if let node = self.node, let id = self.deviceId {
+                                    node.setMatterSaturationValue(saturation: saturation, deviceId: id)
+                                }
+                                self.currentLevel = saturation
+                                self.slider.setValue(Float(self.currentLevel), animated: true)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Change saturation
+    /// - Parameters:
+    ///   - value: value
+    ///   - completion: completion
+    func changeSaturation(value: Float) {
+        if let controller = ESPMTRCommissioner.shared.sController {
+            self.getColorCluster(timeout: 10.0) { cluster in
+                if let cluster = cluster {
+                    let saturation = Int(value*2.55)
+                    let params = MTRColorControlClusterMoveToSaturationParams()
+                    params.saturation = NSNumber(value: saturation)
+                    params.transitionTime = NSNumber(value: 0)
+                    params.optionsMask = NSNumber(value: 0)
+                    params.optionsOverride = NSNumber(value: 0)
+                    cluster.moveToSaturation(with: params) { error in
+                        if let _ = error {
+                            DispatchQueue.main.async {
+                                self.slider.value = Float(self.currentLevel)
+                            }
+                            return
+                        }
+                        DispatchQueue.main.async {
+                            if let node = self.node, let id = self.deviceId {
+                                node.setMatterSaturationValue(saturation: saturation, deviceId: id)
+                            }
+                            self.currentLevel = Int(value)
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.slider.setValue(Float(self.currentLevel), animated: true)
+                    }
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.slider.setValue(Float(self.currentLevel), animated: true)
+            }
+        }
+    }
+    
+    /// Subscribe to saturation attribute
+    func subscribeToSaturationAttribute() {
+        if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
+            ESPMTRCommissioner.shared.subscribeToSaturationValue(groupId: grpId, deviceId: deviceId) { saturation in
+                DispatchQueue.main.async {
+                    let finalSaturationValue = Int(CGFloat(saturation)/2.55)
+                    if let node = self.node, let id = self.deviceId {
+                        node.setMatterSaturationValue(saturation: saturation, deviceId: id)
+                    }
+                    self.currentLevel = finalSaturationValue
+                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                }
+            }
+        }
+    }
+    
     /// Setup Offline UI
     func setupOfflineUI() {
-        self.setupInitialLevelValues()
+        if self.isSaturation {
+            self.setupInitialLevelValues()
+        } else {
+            self.setupInitialSaturationValue()
+        }
     }
     
     /// Get level controller
@@ -145,20 +267,24 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
         if let cont = ESPMTRCommissioner.shared.sController {
             self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: cont) { controller in
                 if let controller = controller {
+                    let finalValue = Int(val*2.55)
                     let levelParams = MTRLevelControlClusterMoveToLevelParams()
-                    levelParams.level = NSNumber(value: UInt(val))
+                    levelParams.level = NSNumber(value: finalValue)
                     controller.moveToLevel(with: levelParams) { error in
                         DispatchQueue.main.async {
                             if let _ = error {
-                                self.slider.value = Float(self.currentLevel)
+                                self.slider.setValue(Float(self.currentLevel), animated: true)
                             } else {
-                                self.currentLevel = Int(self.slider.value)
+                                if let node = self.node, let id = self.deviceId {
+                                    node.setMatterLevelValue(level: finalValue, deviceId: id)
+                                }
+                                self.currentLevel = finalValue
                             }
                         }
                     }
                 } else {
                     DispatchQueue.main.async {
-                        self.slider.value = Float(self.currentLevel)
+                        self.slider.setValue(Float(self.currentLevel), animated: true)
                     }
                 }
             }

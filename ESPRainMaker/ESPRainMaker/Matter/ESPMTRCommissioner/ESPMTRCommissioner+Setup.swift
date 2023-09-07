@@ -50,7 +50,7 @@ extension ESPMTRCommissioner {
                 let keys = MTRCSRKeys(groupId: grpId)
                 if let details = matterFabricData.fabricDetails, let rootCA = details.rootCACertificate, let rootCADerBytes = ESPDefaultData.convertPEMString(toDER: rootCA), let certs = userNOCData.certificates, certs.count > 0, let noc = certs[0].userNOC, let nocDerBytes = ESPDefaultData.convertPEMString(toDER: noc) {
                     var finalIPK = keys.ipk
-                    if let ipkString = ESPMatterFabricDetails.shared.getIPK(groupId: grpId), ipkString.replacingOccurrences(of: " ", with: "").lowercased() != "", let savedIpk = ipkString.hexadecimal {
+                    if let ipkString = self.fabricDetails.getIPK(groupId: grpId), ipkString.replacingOccurrences(of: " ", with: "").lowercased() != "", let savedIpk = ipkString.hexadecimal {
                         finalIPK = savedIpk
                     }
                     let params = MTRDeviceControllerStartupParams(ipk: finalIPK,
@@ -58,7 +58,7 @@ extension ESPMTRCommissioner {
                                                                   operationalCertificate: nocDerBytes,
                                                                   intermediateCertificate: nil,
                                                                   rootCertificate: rootCADerBytes)
-                    params.vendorID = NSNumber(value: kEspressifVendorId)
+                    params.vendorID = NSNumber(value: Configuration.shared.appConfiguration.matterVendorId)
                     params.operationalCertificateIssuer = self
                     params.operationalCertificateIssuerQueue = self.matterQueue
                     if let controller = try? factory.createController(onNewFabric: params) {
@@ -84,7 +84,7 @@ extension ESPMTRCommissioner: MTRDeviceControllerDelegate {
     func controller(_ controller: MTRDeviceController, commissioningComplete error: Error?) {
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         guard let _ = error else {
-            if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].getMatterNodeId() {
+            if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].getMatterNodeId() {
                 self.performPostCommissioningAction(groupId: grpId, requestId: requestId, matterNodeId: matterNodeId)
             }
             return

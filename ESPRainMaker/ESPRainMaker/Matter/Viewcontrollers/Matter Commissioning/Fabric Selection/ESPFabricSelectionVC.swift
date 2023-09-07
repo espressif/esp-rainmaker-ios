@@ -22,17 +22,21 @@ import UIKit
 @available(iOS 16.4, *)
 class ESPFabricSelectionVC: UIViewController {
     
-    @IBOutlet var fabricTableView: UITableView!
+    // UI elements
+    @IBOutlet weak var topBarTitle: UILabel!
+    @IBOutlet weak var addGroupNavBarButton: UIButton!
     @IBOutlet weak var addGroupButton: PrimaryButton!
     @IBOutlet weak var noGroupIcon: UIImageView!
     @IBOutlet weak var noGroupAddedLabel: UILabel!
+    @IBOutlet var fabricTableView: UITableView!
+    
     var addGroupNavbarButton: UIBarButtonItem?
     static let storyboardId = "ESPFabricSelectionVC"
     var nodeGroups: [NodeGroup]?
     var matterFabrics: [ESPNodeGroup]?
     var groupId: String?
-    var onboardingPayload: String = ""
-
+    var onboardingPayload: String? = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupNavigationBar()
@@ -50,27 +54,22 @@ class ESPFabricSelectionVC: UIViewController {
     
     /// Setup navigation bar
     func setupNavigationBar() {
-        //Navigation bar clear color
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default) 
-        self.navigationController?.navigationBar.shadowImage = UIImage()
-        self.navigationController?.navigationBar.isTranslucent = true
-        self.navigationController?.view.backgroundColor = .clear
-        //Custom Bottom Line
-        self.navigationController?.addCustomBottomLine(color: .darkGray, height: 0.5)
-        //Title text attributes
-        self.title = ESPMatterConstants.selectGroupTxt
-        //Navigation text attributes
-        self.setNavigationTextAttributes(color: .white)
-        //Left bar button item
-        let goBackButton = UIBarButtonItem(title: ESPMatterConstants.backTxt, style: .done, target: self, action: #selector(goBack))
-        goBackButton.tintColor = .white
-        self.navigationItem.leftBarButtonItem = goBackButton
-        //Right bar button item
-        self.addGroupNavbarButton = UIBarButtonItem(title: ESPMatterConstants.addGroupTxt, style: .done, target: self, action: #selector(addGroup))
-        self.addGroupNavbarButton?.tintColor = .white
-        self.navigationItem.rightBarButtonItem = self.addGroupNavbarButton
-        self.addGroupNavbarButton?.isHidden = true
-        self.addGroupButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(addGroup)))
+        self.topBarTitle.text = ESPMatterConstants.selectGroupTxt
+        self.addGroupButton.setTitle(ESPMatterConstants.addGroupTxt, for: .normal)
+        self.addGroupButton.isHidden = true
+    }
+    
+    
+    /// Back button pressed
+    /// - Parameter sender: button pressed
+    @IBAction func backButtonPressed(_ sender: Any) {
+        self.goBack()
+    }
+    
+    /// Add group button pressed
+    /// - Parameter sender: button pressed
+    @IBAction func addGroupButtonPressed(_ sender: Any) {
+        self.addGroup()
     }
     
     /// Register cells
@@ -312,6 +311,7 @@ extension ESPFabricSelectionVC: ESPCreateMatterFabricPresentationLogic {
     ///   - error: error
     func matterFabricCreated(data: ESPCreateMatterFabricResponse?, error: Error?) {
         guard let _ = error else {
+            User.shared.updateDeviceList = true
             if let data = data, let grpid = data.groupId {
                 self.groupId = grpid
             }

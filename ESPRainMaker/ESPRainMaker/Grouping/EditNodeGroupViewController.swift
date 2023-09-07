@@ -38,8 +38,7 @@ class EditNodeGroupViewController: UIViewController {
         super.viewDidLoad()
         tabBarController?.tabBar.isHidden = true
         #if ESPRainMakerMatter
-        self.shareButton.setTitle("", for: .normal)
-        self.shareButton.imageView?.image = UIImage(named: ESPMatterConstants.share)
+        self.shareButton.setTitle("Share", for: .normal)
         #else
         self.shareButton.isHidden = true
         #endif
@@ -141,7 +140,7 @@ class EditNodeGroupViewController: UIViewController {
     
     #if ESPRainMakerMatter
     @IBAction func shareButtonPressed(_ sender: Any) {
-        let alert = UIAlertController(title: ESPMatterConstants.shareGroupTxt, message: ESPMatterConstants.shareGroupMsg, preferredStyle: .alert)
+        let alert = UIAlertController(title: "Add member", message: "", preferredStyle: .alert)
         alert.addTextField { emailIdField in
             self.emailField = emailIdField
             self.emailField?.keyboardType = .emailAddress
@@ -155,7 +154,10 @@ class EditNodeGroupViewController: UIViewController {
                     Utility.hideLoader(view: self.view)
                     if let data = data, let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = response[ESPMatterConstants.status] as? String {
                         if status.lowercased() == ESPMatterConstants.success {
-                            self.alertUser(title: "", message: ESPMatterConstants.groupShareSuccessMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+                            self.alertUser(title: ESPMatterConstants.emptyString,
+                                           message: ESPMatterConstants.groupShareSuccessMsg,
+                                           buttonTitle: ESPMatterConstants.okTxt,
+                                           callback: {})
                         } else if let errorDescription = response[ESPMatterConstants.description] as? String {
                             self.showGroupSharingFailedDialog(message: errorDescription)
                         } else {
@@ -172,7 +174,10 @@ class EditNodeGroupViewController: UIViewController {
     #endif
     
     private func showGroupSharingFailedDialog(message: String) {
-        self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: message, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+        self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                            message: message,
+                            buttonTitle: ESPMatterConstants.okTxt,
+                            callback: {})
     }
 
     private func getSingleDeviceNodeCount() {

@@ -65,6 +65,13 @@ class ESPMatterConnectionManager: NSObject {
         updateServiceList()
     }
     
+    
+    /// Stop scanning matter devices
+    /// 
+    func stopService() {
+        serviceBrowser.stop()
+    }
+    
     /// Tell delegate there is change in available services.
     ///
     private func updateServiceList() {
@@ -97,6 +104,24 @@ extension ESPMatterConnectionManager: NetServiceBrowserDelegate {
         serviceTimeout.invalidate()
         servicesBeingResolved.append(service)
         service.resolve(withTimeout: 5.0)
+    }
+    
+    func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+        self.servicesBeingResolved.append(service)
+        if self.hosts.count > 0 {
+            let name = service.name
+            var index = 0
+            for host in self.hosts {
+                if host == name {
+                    break
+                }
+                index+=1
+            }
+            if index < self.hosts.count {
+                self.hosts.remove(at: index)
+            }
+        }
+        self.removeServiceFromResolveQueue(service: service)
     }
 }
 

@@ -136,7 +136,7 @@ extension ESPMatterFabricDetails {
         if let _ = UserDefaults.standard.value(forKey: unlinkedDevicesKey) {
             UserDefaults.standard.removeObject(forKey: unlinkedDevicesKey)
         }
-        if let nodeDetails = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId), let groups = nodeDetails.groups, groups.count > 0, let nodes = groups[0].nodeDetails, nodes.count > 0 {
+        if let nodeDetails = self.getNodeGroupDetails(groupId: groupId), let groups = nodeDetails.groups, groups.count > 0, let nodes = groups[0].nodeDetails, nodes.count > 0 {
             for node in nodes {
                 if let nodeId = node.getMatterNodeId()?.hexToDecimal, nodeId != deviceId {
                     self.removeDeviceFromLinkedDevices(groupId: groupId, sourceDeviceId: nodeId, deviceId: deviceId, endpointClusterId: endpointClusterId)

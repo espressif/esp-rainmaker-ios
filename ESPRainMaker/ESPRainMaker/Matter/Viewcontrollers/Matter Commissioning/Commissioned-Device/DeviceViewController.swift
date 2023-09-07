@@ -26,6 +26,10 @@ class DeviceViewController: UIViewController {
     
     static let storyboardId = "DeviceViewController"
     
+    @IBOutlet weak var topBarTitle: BarTitle!
+    @IBOutlet weak var infoButton: BarButton!
+    @IBOutlet weak var bindingButton: BarButton!
+    
     @IBOutlet weak var offlineView: UIView!
     @IBOutlet weak var offlineViewHeight: NSLayoutConstraint!
     @IBOutlet weak var deviceTableView: UITableView!
@@ -44,16 +48,20 @@ class DeviceViewController: UIViewController {
     var rainmakerNode: Node?
     var deviceName: String?
     var switchIndex: Int?
-    var isDelete: Bool = false
+    var isDeviceOffline: Bool = false
+    let fabricDetails = ESPMatterFabricDetails.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.restartMatterController()
-        if let deviceName = self.deviceName {
-            title = deviceName
+        if let node = self.rainmakerNode, let deviceName = node.rainmakerDeviceName {
+            self.topBarTitle.text = deviceName
+        } else if let deviceName = self.deviceName {
+            self.topBarTitle.text = deviceName
         } else {
-            title = ESPMatterConstants.deviceTxt
+            self.topBarTitle.text = ESPMatterConstants.deviceTxt
         }
+        
         self.navigationController?.view.backgroundColor = .white
         self.navigationController?.addCustomBottomLine(color: .lightGray, height: 0.5)
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard))
@@ -82,11 +90,6 @@ class DeviceViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         self.setNavigationTextAttributes(color: .darkGray)
         tabBarController?.tabBar.isHidden = true
-        self.navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     /// Show beta label
@@ -103,13 +106,23 @@ class DeviceViewController: UIViewController {
             self.betaLabelHeightConstraint.constant = 0.0
         }
     }
-
+    
+    /// Back button pressed
+    /// - Parameter sender: button pressed
+    @IBAction func backButtonPressed(_ sender: Any) {
+        self.goBack()
+    }
+    
     /// Restart matter controller
     func restartMatterController() {
-        if let group = self.group, let groupId = group.groupID, let userNOCDetails = ESPMatterFabricDetails.shared.getUserNOCDetails(groupId: groupId) {
-            ESPMTRCommissioner.shared.shutDownController()
-            ESPMTRCommissioner.shared.group = self.group
-            ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCDetails)
+        if let group = self.group, let groupId = group.groupID, let userNOCDetails = self.fabricDetails.getUserNOCDetails(groupId: groupId) {
+            if let grp = ESPMTRCommissioner.shared.group, let grpId = grp.groupID, grpId != groupId {
+                ESPMTRCommissioner.shared.shutDownController()
+            }
+            if ESPMTRCommissioner.shared.sController == nil {
+                ESPMTRCommissioner.shared.group = self.group
+                ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCDetails)
+            }
         }
     }
     
@@ -137,6 +150,11 @@ class DeviceViewController: UIViewController {
         let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
         let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
         destination.currentNode = self.rainmakerNode
+        destination.group = self.group
+        destination.allNodes = self.allNodes
+        destination.endpointClusterId = endpointClusterId
+        destination.switchIndex = self.switchIndex
+        destination.sourceNode = self.node
         navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -144,28 +162,18 @@ class DeviceViewController: UIViewController {
     
     /// show binding button in right bar button item
     func showRightBarButtons(showInfo: Bool) {
-        var buttons = [UIBarButtonItem]()
         if showInfo {
-            let infoButton = UIBarButtonItem(image: UIImage(named: "info_icon"), style: .done, target: self, action: #selector(showNodeInfo))
-            infoButton.tintColor = .darkGray
-            buttons.append(infoButton)
-        }
-        if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
-            if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId) {
-                let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
-                if clients.count > 0, !self.isDelete {
-                    let bindingButton = UIBarButtonItem(image: UIImage(named: ESPMatterConstants.binding), style: .plain, target: self, action: #selector(openBindingWindow))
-                    bindingButton.tintColor = .darkGray
-                    buttons.append(bindingButton)
-                }
+            if let infoImage = UIImage(named: "info_icon") {
+                self.infoButton.imageView?.image = infoImage
             }
+            self.infoButton.addTarget(self, action: #selector(showNodeInfo), for: .touchUpInside)
         }
-        self.navigationItem.rightBarButtonItems = buttons
     }
     
     /// Register cells
     func registerCells() {
         self.deviceTableView.register(UINib(nibName: SliderTableViewCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: SliderTableViewCell.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: DeviceNameCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceNameCell.reuseIdentifier)
         self.generateCells()
     }
     
@@ -173,6 +181,9 @@ class DeviceViewController: UIViewController {
     func generateCells() {
         cellInfo.removeAll()
         if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
+            if let node = self.rainmakerNode, let _ = node.rainmakerDeviceName {
+                cellInfo.append(ESPMatterConstants.deviceName)
+            }
             if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
                 cellInfo.append(ESPMatterConstants.onOff)
             }
@@ -181,28 +192,23 @@ class DeviceViewController: UIViewController {
             }
             if ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId).0 {
                 cellInfo.append(ESPMatterConstants.colorControl)
-            }
-            if ESPMatterClusterUtil.shared.isOpenCommissioningWindowSupported(groupId: groupId, deviceId: deviceId).0 {
-                cellInfo.append(ESPMatterConstants.openCW)
+                cellInfo.append(ESPMatterConstants.saturationControl)
             }
             if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
                 cellInfo.append(ESPMatterConstants.rainmakerController)
             }
-            if !self.isDelete {
+            if !self.isDeviceOffline {
                 ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { _ in }
             }
         }
-        /*
-         cellInfo.append(ESPMatterConstants.delete)
-         */
-        self.deviceTableView.isUserInteractionEnabled = !self.isDelete
+        self.deviceTableView.isUserInteractionEnabled = !self.isDeviceOffline
         self.setupOfflineUI()
         self.deviceTableView.reloadData()
     }
     
     /// Setup offline UI
     func setupOfflineUI() {
-        if self.isDelete {
+        if self.isDeviceOffline {
             self.offlineView.isHidden = false
             self.offlineViewHeight.constant = 17.0
         } else {
@@ -230,9 +236,9 @@ class DeviceViewController: UIViewController {
     ///   - groupId: group id
     ///   - deviceId: device id
     func fetchDeviceDetails(groupId: String, deviceId: UInt64) {
-        let serversData = ESPMatterFabricDetails.shared.fetchServersData(groupId: groupId, deviceId: deviceId)
-        let clientsData = ESPMatterFabricDetails.shared.fetchClientsData(groupId: groupId, deviceId: deviceId)
-        let endpointsData = ESPMatterFabricDetails.shared.fetchEndpointsData(groupId: groupId, deviceId: deviceId)
+        let serversData = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
+        let clientsData = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
+        let endpointsData = self.fabricDetails.fetchEndpointsData(groupId: groupId, deviceId: deviceId)
         if serversData.count == 0, clientsData.count == 0, endpointsData.count == 0 {
             Utility.showLoader(message: ESPMatterConstants.fetchingEndpointsMsg, view: self.view)
             ESPMTRCommissioner.shared.addDeviceDetails(groupId: groupId, deviceId: deviceId) {

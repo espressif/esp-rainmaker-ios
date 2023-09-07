@@ -34,6 +34,11 @@
 		0C50EC912A39E3ED0065DAB2 /* DeviceViewController+RemoveDeviceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50EC902A39E3ED0065DAB2 /* DeviceViewController+RemoveDeviceDelegate.swift */; };
 		0C50EC932A39E4350065DAB2 /* DeviceViewController+ParamCHIPDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50EC922A39E4350065DAB2 /* DeviceViewController+ParamCHIPDelegate.swift */; };
 		0C50EC952A39E4640065DAB2 /* DeviceViewController+ESPAddNodeToMatterFabricPresentationLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50EC942A39E4640065DAB2 /* DeviceViewController+ESPAddNodeToMatterFabricPresentationLogic.swift */; };
+		0C50F64B2AAEEC5200BA7B6B /* NodeDetailActionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0C50F6492AAEEC5100BA7B6B /* NodeDetailActionTableViewCell.xib */; };
+		0C50F64C2AAEEC5200BA7B6B /* NodeDetailActionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50F64A2AAEEC5100BA7B6B /* NodeDetailActionTableViewCell.swift */; };
+		0C50F64E2AAEECA600BA7B6B /* ESPMTRCommissioner+Subsciber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50F64D2AAEECA600BA7B6B /* ESPMTRCommissioner+Subsciber.swift */; };
+		0C50F6512AAEECDA00BA7B6B /* DeviceNameCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0C50F64F2AAEECDA00BA7B6B /* DeviceNameCell.xib */; };
+		0C50F6522AAEECDA00BA7B6B /* DeviceNameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50F6502AAEECDA00BA7B6B /* DeviceNameCell.swift */; };
 		0C5110022A25F712002414FD /* ESPMatter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C5110012A25F712002414FD /* ESPMatter.storyboard */; };
 		0C65879C27D5FA9100C5E0DB /* ESPScheduleConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C65879B27D5FA9100C5E0DB /* ESPScheduleConstants.swift */; };
 		0C69D72326E9ED4500AF6985 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C69D72126E9ED4400AF6985 /* Node.swift */; };
@@ -44,6 +49,7 @@
 		0C6FE3BB2A6522C800AB3194 /* DevicesViewController+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6FE3BA2A6522C800AB3194 /* DevicesViewController+Navigation.swift */; };
 		0C6FE3BD2A667ACD00AB3194 /* ESPMatterFabricDetails+NodeGroupSharingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6FE3BC2A667ACD00AB3194 /* ESPMatterFabricDetails+NodeGroupSharingData.swift */; };
 		0C71B9D82A360B8000978005 /* Node+MatterUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C71B9D72A360B8000978005 /* Node+MatterUtility.swift */; };
+		0C72353D2AC5782200824825 /* ESPMTRCommissioner+EnhancedCommissioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C72353C2AC5782200824825 /* ESPMTRCommissioner+EnhancedCommissioning.swift */; };
 		0C75B2552A30739500BB4661 /* ParamSliderTableViewCell+ParamSliderLevelControlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C75B2452A30739500BB4661 /* ParamSliderTableViewCell+ParamSliderLevelControlProtocol.swift */; };
 		0C75B2562A30739500BB4661 /* DeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C75B2462A30739500BB4661 /* DeviceViewController.swift */; };
 		0C75B2572A30739500BB4661 /* DevicesBindingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C75B2482A30739500BB4661 /* DevicesBindingViewController.swift */; };
@@ -355,8 +361,6 @@
 		F1950F172A3BB93B0091FDAA /* Configuration.plist in Resources */ = {isa = PBXBuildFile; fileRef = F164A2F82581E73000B879BC /* Configuration.plist */; };
 		F1950F192A4044320091FDAA /* NSNumber+ShortDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1950F182A4044320091FDAA /* NSNumber+ShortDate.swift */; };
 		F1950F1A2A4044380091FDAA /* NSNumber+ShortDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1950F182A4044320091FDAA /* NSNumber+ShortDate.swift */; };
-		F195745325B5AA41005F6601 /* AddMemberTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195745125B5AA41005F6601 /* AddMemberTableViewCell.swift */; };
-		F195745425B5AA41005F6601 /* AddMemberTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195745225B5AA41005F6601 /* AddMemberTableViewCell.xib */; };
 		F195745925B5AD09005F6601 /* MembersInfoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195745725B5AD09005F6601 /* MembersInfoTableViewCell.swift */; };
 		F195745A25B5AD09005F6601 /* MembersInfoTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */; };
 		F195746625B69DDB005F6601 /* NodeDetailsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */; };
@@ -624,6 +628,11 @@
 		0C50EC902A39E3ED0065DAB2 /* DeviceViewController+RemoveDeviceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceViewController+RemoveDeviceDelegate.swift"; sourceTree = "<group>"; };
 		0C50EC922A39E4350065DAB2 /* DeviceViewController+ParamCHIPDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceViewController+ParamCHIPDelegate.swift"; sourceTree = "<group>"; };
 		0C50EC942A39E4640065DAB2 /* DeviceViewController+ESPAddNodeToMatterFabricPresentationLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceViewController+ESPAddNodeToMatterFabricPresentationLogic.swift"; sourceTree = "<group>"; };
+		0C50F6492AAEEC5100BA7B6B /* NodeDetailActionTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NodeDetailActionTableViewCell.xib; sourceTree = "<group>"; };
+		0C50F64A2AAEEC5100BA7B6B /* NodeDetailActionTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeDetailActionTableViewCell.swift; sourceTree = "<group>"; };
+		0C50F64D2AAEECA600BA7B6B /* ESPMTRCommissioner+Subsciber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ESPMTRCommissioner+Subsciber.swift"; sourceTree = "<group>"; };
+		0C50F64F2AAEECDA00BA7B6B /* DeviceNameCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DeviceNameCell.xib; sourceTree = "<group>"; };
+		0C50F6502AAEECDA00BA7B6B /* DeviceNameCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceNameCell.swift; sourceTree = "<group>"; };
 		0C5110012A25F712002414FD /* ESPMatter.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ESPMatter.storyboard; sourceTree = "<group>"; };
 		0C65879B27D5FA9100C5E0DB /* ESPScheduleConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScheduleConstants.swift; sourceTree = "<group>"; };
 		0C69D72126E9ED4400AF6985 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
@@ -632,6 +641,7 @@
 		0C6FE3BA2A6522C800AB3194 /* DevicesViewController+Navigation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DevicesViewController+Navigation.swift"; sourceTree = "<group>"; };
 		0C6FE3BC2A667ACD00AB3194 /* ESPMatterFabricDetails+NodeGroupSharingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPMatterFabricDetails+NodeGroupSharingData.swift"; sourceTree = "<group>"; };
 		0C71B9D72A360B8000978005 /* Node+MatterUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+MatterUtility.swift"; sourceTree = "<group>"; };
+		0C72353C2AC5782200824825 /* ESPMTRCommissioner+EnhancedCommissioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPMTRCommissioner+EnhancedCommissioning.swift"; sourceTree = "<group>"; };
 		0C75B2452A30739500BB4661 /* ParamSliderTableViewCell+ParamSliderLevelControlProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ParamSliderTableViewCell+ParamSliderLevelControlProtocol.swift"; sourceTree = "<group>"; };
 		0C75B2462A30739500BB4661 /* DeviceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceViewController.swift; sourceTree = "<group>"; };
 		0C75B2482A30739500BB4661 /* DevicesBindingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DevicesBindingViewController.swift; sourceTree = "<group>"; };
@@ -941,8 +951,6 @@
 		F1950F142A3BAFE70091FDAA /* RMWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RMWidgetExtension.entitlements; sourceTree = "<group>"; };
 		F1950F152A3BB2280091FDAA /* SelectDeviceIntent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SelectDeviceIntent.entitlements; sourceTree = "<group>"; };
 		F1950F182A4044320091FDAA /* NSNumber+ShortDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNumber+ShortDate.swift"; sourceTree = "<group>"; };
-		F195745125B5AA41005F6601 /* AddMemberTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMemberTableViewCell.swift; sourceTree = "<group>"; };
-		F195745225B5AA41005F6601 /* AddMemberTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddMemberTableViewCell.xib; sourceTree = "<group>"; };
 		F195745725B5AD09005F6601 /* MembersInfoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersInfoTableViewCell.swift; sourceTree = "<group>"; };
 		F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MembersInfoTableViewCell.xib; sourceTree = "<group>"; };
 		F195746525B69DDB005F6601 /* NodeDetailsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeDetailsHeaderView.swift; sourceTree = "<group>"; };
@@ -1227,6 +1235,8 @@
 		0C75B2492A30739500BB4661 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				0C50F6502AAEECDA00BA7B6B /* DeviceNameCell.swift */,
+				0C50F64F2AAEECDA00BA7B6B /* DeviceNameCell.xib */,
 				0CE2E8C82A790FF600BDB0EB /* LaunchControllerCell.swift */,
 				0C75B24D2A30739500BB4661 /* OpenCommissioningWindowCell.swift */,
 				0C75B24E2A30739500BB4661 /* DeviceBindingHeaderView.swift */,
@@ -1476,6 +1486,7 @@
 		0CD3592B2A2D25F30081017C /* ESPMTRCommissioner */ = {
 			isa = PBXGroup;
 			children = (
+				0C50F64D2AAEECA600BA7B6B /* ESPMTRCommissioner+Subsciber.swift */,
 				0CD359332A2D25F30081017C /* FabricKeys */,
 				0CD3593A2A2D25F30081017C /* ESPDefaultData.swift */,
 				0CD359402A2D25F30081017C /* ESPMTRCommissioner.swift */,
@@ -1493,6 +1504,7 @@
 				0CD3592C2A2D25F30081017C /* ESPMTRCommissioner+AccessControl.swift */,
 				0CD3593D2A2D25F30081017C /* ESPMTRCommissioner+OnOffCluster.swift */,
 				0CD3593B2A2D25F30081017C /* ESPMTRCommissioner+Binding.swift */,
+				0C72353C2AC5782200824825 /* ESPMTRCommissioner+EnhancedCommissioning.swift */,
 				0CB4A0632A83C8A500908AE0 /* Custom Clusters */,
 			);
 			path = ESPMTRCommissioner;
@@ -2068,8 +2080,8 @@
 		F199216925B024320066BCB0 /* Sharing */ = {
 			isa = PBXGroup;
 			children = (
-				F195745125B5AA41005F6601 /* AddMemberTableViewCell.swift */,
-				F195745225B5AA41005F6601 /* AddMemberTableViewCell.xib */,
+				0C50F64A2AAEEC5100BA7B6B /* NodeDetailActionTableViewCell.swift */,
+				0C50F6492AAEEC5100BA7B6B /* NodeDetailActionTableViewCell.xib */,
 				F195745725B5AD09005F6601 /* MembersInfoTableViewCell.swift */,
 				F195745825B5AD09005F6601 /* MembersInfoTableViewCell.xib */,
 				F133495425E24CE200CCB308 /* NodeSharingManager.swift */,
@@ -2729,14 +2741,15 @@
 				0C38E60D283E27560031C345 /* ActionTableViewCell.xib in Resources */,
 				0C75B25D2A30739600BB4661 /* DeviceBindingHeaderView.xib in Resources */,
 				F1402AB9239677B300C989F8 /* StaticControlTableViewCell.xib in Resources */,
+				0C50F64B2AAEEC5200BA7B6B /* NodeDetailActionTableViewCell.xib in Resources */,
 				F10C2B2A25EB82DA00B60696 /* Settings.storyboard in Resources */,
 				0CD359862A2D2AC40081017C /* ESPFabricCell.xib in Resources */,
+				0C50F6512AAEECDA00BA7B6B /* DeviceNameCell.xib in Resources */,
 				F1CC3C2B295EFD9C0000D6DC /* checkUpdate.gif in Resources */,
 				F15EAC0A23E198FF008A766B /* Login.storyboard in Resources */,
 				F1CE29612861D030009EFC8E /* ESPChartPointView.xib in Resources */,
 				F1AC6D7F27A447B20051F6E7 /* TriggerTableViewCell.xib in Resources */,
 				F164A2F92581E73000B879BC /* Configuration.plist in Resources */,
-				F195745425B5AA41005F6601 /* AddMemberTableViewCell.xib in Resources */,
 				F195745A25B5AD09005F6601 /* MembersInfoTableViewCell.xib in Resources */,
 				F10B073325CD714100723254 /* NodeGrouping.storyboard in Resources */,
 				0CB34FF0283E325A00DD1813 /* Scanner.storyboard in Resources */,
@@ -3085,6 +3098,7 @@
 				0C387F7D2A2F399600C5EFA4 /* ESPMatterConnectionManager.swift in Sources */,
 				F1CC3C20295D866D0000D6DC /* ESPGetOTAUpdateStatusService.swift in Sources */,
 				F133495525E24CE200CCB308 /* NodeSharingManager.swift in Sources */,
+				0C50F64E2AAEECA600BA7B6B /* ESPMTRCommissioner+Subsciber.swift in Sources */,
 				0C2A3D432A39989E0097D16D /* ESPUpdateCATIdService.swift in Sources */,
 				0CD3591C2A2D25E30081017C /* ESPIssueUserNOCResponse.swift in Sources */,
 				F1A866A327EBC45300A9858B /* AutomationNameTableViewCell.swift in Sources */,
@@ -3130,6 +3144,7 @@
 				F190B9C424C0A6C8006D136D /* SelectDevicesViewController.swift in Sources */,
 				0C80AA2C26FDBD4B00480C53 /* ESPLoginService.swift in Sources */,
 				0C6FE3BB2A6522C800AB3194 /* DevicesViewController+Navigation.swift in Sources */,
+				0C50F6522AAEECDA00BA7B6B /* DeviceNameCell.swift in Sources */,
 				F10B075625CF147C00723254 /* ErrorResponse.swift in Sources */,
 				F172F96B27B2A5D400E62017 /* Double+StartEndDate.swift in Sources */,
 				F15FFF882402643A00E72D01 /* NoInternetConnection.swift in Sources */,
@@ -3234,7 +3249,6 @@
 				F1FB153C234D91000053B0ED /* SliderTableViewCell.swift in Sources */,
 				F190B9C624C0D842006D136D /* DeviceHeaderView.swift in Sources */,
 				0CF69242270A34140098F515 /* AppDelegate+ESPAlexa.swift in Sources */,
-				F195745325B5AA41005F6601 /* AddMemberTableViewCell.swift in Sources */,
 				F1AC6D7E27A447B20051F6E7 /* TriggerTableViewCell.swift in Sources */,
 				F1A866A527EBC4E200A9858B /* AutomationEventTableViewCell.swift in Sources */,
 				0CB34FF2283E35D800DD1813 /* ESPScannerViewController.swift in Sources */,
@@ -3254,6 +3268,7 @@
 				0CD359512A2D25F30081017C /* ESPMTRCommissioner+GetDescriptor.swift in Sources */,
 				F11DC9D72578D5D100603BF5 /* DeviceControlHelper.swift in Sources */,
 				F13F273E238CF6170003AABB /* ScannerViewController.swift in Sources */,
+				0C50F64C2AAEEC5200BA7B6B /* NodeDetailActionTableViewCell.swift in Sources */,
 				0C80AA3226FDBD4B00480C53 /* ESPChangePasswordService.swift in Sources */,
 				F1CC3C19295D866D0000D6DC /* ESPPushOTAUpdateResponse.swift in Sources */,
 				F13B821427E77FAB00511BBB /* ESPAutomationTriggerAction+GetPayload.swift in Sources */,
@@ -3263,6 +3278,7 @@
 				F1EAACAD23E2A74300E9A6A8 /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
 				F13B820E27E0C75F00511BBB /* ESPListUserDevicesService.swift in Sources */,
 				0CD359232A2D25E30081017C /* ESPDeleteMatterFabricResponse.swift in Sources */,
+				0C72353D2AC5782200824825 /* ESPMTRCommissioner+EnhancedCommissioning.swift in Sources */,
 				0CD359752A2D26010081017C /* Extensions.swift in Sources */,
 				F1BDFED327DCFC83005AF812 /* ESPAutomationTriggerAction.swift in Sources */,
 				0CD3599F2A2D47B20081017C /* DeviceCollectionViewCell.swift in Sources */,

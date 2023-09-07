@@ -35,7 +35,6 @@ protocol ESPMTRUIDelegate: AnyObject {
 class ESPMTRCommissioner: NSObject {
     
     var discoveryStarted: Bool = false
-    let kEspressifVendorId: UInt16 = 0x131B
     var group: ESPNodeGroup?
     var fabricIndex: UInt8?
     var keys: MTRCSRKeys?
@@ -50,6 +49,7 @@ class ESPMTRCommissioner: NSObject {
     var matterDeviceNotFoundCompletion: ((Bool) -> Void)?
     var isMaterTaskCompleted: Bool = false
     var lightQueue: DispatchQueue = DispatchQueue(label: "com.matter.light.queue")
+    let fabricDetails = ESPMatterFabricDetails.shared
     
     override init() {
         super.init()
@@ -174,11 +174,11 @@ extension ESPMTRCommissioner: ESPAddNodeToMatterFabricPresentationLogic {
         ESPMTRCommissioner.shared.matterQueue.sync {
             let deviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
             if let completion = completion, let response = response {
-                ESPMatterFabricDetails.shared.saveAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId, data: response)
-                if let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId), let certs = data.certificates, certs.count > 0, let noc = certs[0].nodeNOC, let nocData = ESPDefaultData.convertPEMString(toDER: noc), let fabricData = group?.fabricDetails, let rootCACert = fabricData.rootCACertificate, let rootCertData = ESPDefaultData.convertPEMString(toDER: rootCACert) {
+                self.fabricDetails.saveAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId, data: response)
+                if let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId), let certs = data.certificates, certs.count > 0, let noc = certs[0].nodeNOC, let nocData = ESPDefaultData.convertPEMString(toDER: noc), let fabricData = group?.fabricDetails, let rootCACert = fabricData.rootCACertificate, let rootCertData = ESPDefaultData.convertPEMString(toDER: rootCACert) {
                     
-                    if let fabData = group?.fabricDetails, let catIdAdmin = fabData.catIdAdmin, let id = "FFFFFFFD\(catIdAdmin)".hexToDecimal {
-                        let params = MTROperationalCertificateChain(operationalCertificate: nocData, intermediateCertificate: nil, rootCertificate: rootCertData, adminSubject: NSNumber(value: id))
+                    if let fabData = group?.fabricDetails, let catIdAdmin = fabData.catIdAdminDecimal {
+                        let params = MTROperationalCertificateChain(operationalCertificate: nocData, intermediateCertificate: nil, rootCertificate: rootCertData, adminSubject: NSNumber(value: catIdAdmin))
                         completion(params, nil)
                     }
                 }
@@ -225,7 +225,7 @@ extension ESPMTRCommissioner: MTRDevicePairingDelegate {
     func onCommissioningComplete(_ error: Error?) {
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         guard let _ = error else {
-            if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].getMatterNodeId() {
+            if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].getMatterNodeId() {
                 self.performPostCommissioningAction(groupId: grpId, requestId: requestId, matterNodeId: matterNodeId)
             }
             return

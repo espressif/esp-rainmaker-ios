@@ -575,6 +575,7 @@
                         <outlet property="agreementView" destination="hLU-MQ-KTc" id="tCF-CZ-ub2"/>
                         <outlet property="appVersionLabel" destination="hsH-f0-cFH" id="Pyy-rc-LUW"/>
                         <outlet property="appleLoginButton" destination="vpi-yr-s7g" id="tHA-lE-YAO"/>
+                        <outlet property="brandLogo" destination="bSh-Uq-p9g" id="vBi-8W-j2p"/>
                         <outlet property="checkBox" destination="kfM-iD-Fe4" id="KTm-7W-Xou"/>
                         <outlet property="closeButton" destination="A1q-wB-oQH" id="ENu-Yw-066"/>
                         <outlet property="confirmPassword" destination="knx-CG-y5r" id="7cY-dp-TOg"/>

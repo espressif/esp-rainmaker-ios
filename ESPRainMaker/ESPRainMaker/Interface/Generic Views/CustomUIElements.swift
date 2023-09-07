@@ -131,7 +131,7 @@ class BarButton: UIButton {
         changeTheme()
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
     }
-
+    
     @objc func changeTheme() {
         var currentBGColor: UIColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1)
         if let color = AppConstants.shared.appThemeColor {

@@ -33,6 +33,7 @@ struct JSONParser {
         var singleDeviceNodeList: [Node] = []
         var multiDeviceNodeList: [Node] = []
         var nodeList: [Node] = []
+        let fabricDetails = ESPMatterFabricDetails.shared
 
         for node_details in data {
             var result: [Device] = []
@@ -44,17 +45,17 @@ struct JSONParser {
                 node.isMatter = true
             }
             if node.isMatter {
-                if let nodeId = node.node_id, let matterNodeId = ESPMatterFabricDetails.shared.getMatterNodeId(nodeId: nodeId) {
+                if let nodeId = node.node_id, let matterNodeId = fabricDetails.getMatterNodeId(nodeId: nodeId) {
                     node.matter_node_id = matterNodeId
                 } else {
                     continue
                 }
                 if let metadata = node_details["metadata"] as? [String: Any] {
                     node.metadata = metadata
-                    if let id = node.node_id, let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: id), let matternodeId = node.matterNodeId {
-                        ESPMatterFabricDetails.shared.saveMetadata(details: metadata, groupId: groupId, matterNodeId: matternodeId)
+                    if let id = node.node_id, let groupId = fabricDetails.getGroupId(nodeId: id), let matternodeId = node.matterNodeId {
+                        fabricDetails.saveMetadata(details: metadata, groupId: groupId, matterNodeId: matternodeId)
                         if let controllerNodeId = metadata[ESPMatterConstants.controllerNodeId] as? String {
-                            ESPMatterFabricDetails.shared.saveControllerNodeId(controllerNodeId: controllerNodeId, matterNodeId: matternodeId)
+                            fabricDetails.saveControllerNodeId(controllerNodeId: controllerNodeId, matterNodeId: matternodeId)
                         }
                     }
                 }

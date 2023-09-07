@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  AddMembersTableViewCell.swift
+//  NodeDetailActionTableViewCell.swift
 //  ESPRainMaker
 //
 
 import UIKit
 
-class AddMemberTableViewCell: UITableViewCell {
+class NodeDetailActionTableViewCell: UITableViewCell {
     // Closure that contains block of code executed on the action of Add Member button
     var addMemberButtonAction: () -> Void = {}
-
+    @IBOutlet weak var nodeDetailActionLabel: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // UI Customisation

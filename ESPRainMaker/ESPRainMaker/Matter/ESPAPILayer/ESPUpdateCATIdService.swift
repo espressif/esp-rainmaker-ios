@@ -25,12 +25,15 @@ class ESPUpdateCATIdService {
     var index: Int
     var matterNodes: [Node]?
     var completion: (() -> Void)?
+    let fabricDetails = ESPMatterFabricDetails.shared
     
     init() {
         index = 0
         matterNodes = self.getNodes()
     }
     
+    /// Get nodes list
+    /// - Returns: nodes list
     func getNodes() -> [Node] {
         var matterNodes: [Node] = [Node]()
         if let nodes = User.shared.associatedNodeList {
@@ -47,45 +50,72 @@ class ESPUpdateCATIdService {
         return matterNodes
     }
     
+    /// Initialize matter controller
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - group: group
+    func initMatterController(groupId: String, group: ESPNodeGroup) {
+        ESPMTRCommissioner.shared.shutDownController()
+        ESPMTRCommissioner.shared.group = group
+        if let noc = self.fabricDetails.getUserNOCDetails(groupId: groupId) {
+            ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: noc)
+        }
+    }
+    
+    /// Get ACL entries to be updated
+    /// - Parameters:
+    ///   - entries: ACL entries read from device
+    ///   - catIdOperate: CAT Id Operate
+    /// - Returns: (updated ACL list, should update)
+    func getUpdatedACL(entries: [MTRAccessControlClusterAccessControlEntryStruct], catIdOperate: UInt64) -> ([MTRAccessControlClusterAccessControlEntryStruct], Bool) {
+        var updateACL: Bool = false
+        var newEntries = [MTRAccessControlClusterAccessControlEntryStruct]()
+        for entry in entries {
+            var newEntry = MTRAccessControlClusterAccessControlEntryStruct()
+            if let subjects = entry.subjects as? [NSNumber] {
+                let privilege = entry.privilege.intValue
+                if privilege == 5 {
+                    newEntries.append(entry)
+                } else if privilege == 3 {
+                    if !subjects.contains(NSNumber(value: catIdOperate)) {
+                        newEntry = entry
+                        newEntry.subjects = [NSNumber(value: catIdOperate)]
+                        newEntries.append(newEntry)
+                        updateACL = true
+                    }
+                } else {
+                    newEntries.append(entry)
+                }
+            }
+        }
+        return (newEntries, updateACL)
+    }
+    
+    /// Updte CAT id
+    /// - Parameter completion: completion
     func updateCATId(completion: @escaping () -> Void) {
         self.completion = completion
         self.update(index: index)
     }
     
+    /// Update
+    /// - Parameter index: group index in groups list
     func update(index: Int) {
         if let matterNodes = self.matterNodes, index < matterNodes.count {
             let node = matterNodes[index]
-            if let nodeId = node.node_id, let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: nodeId), let group = ESPMatterFabricDetails.shared.getGroupData(groupId: groupId), let matterNodeId = node.matterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
-                ESPMTRCommissioner.shared.shutDownController()
-                ESPMTRCommissioner.shared.group = group
-                if let noc = ESPMatterFabricDetails.shared.getUserNOCDetails(groupId: groupId) {
-                    ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: noc)
+            if let nodeId = node.node_id, let groupId = self.fabricDetails.getGroupId(nodeId: nodeId), let group = self.fabricDetails.getGroupData(groupId: groupId), let matterNodeId = node.matterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+                if let _ = ESPMTRCommissioner.shared.sController {
+                    if let group = ESPMTRCommissioner.shared.group, let grpId = group.groupID, grpId != groupId {
+                        self.initMatterController(groupId: groupId, group: group)
+                    }
+                } else {
+                    self.initMatterController(groupId: groupId, group: group)
                 }
                 ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { entries in
-                    if let entries = entries, let fabricDetails = group.fabricDetails, let catIdAdminHex = fabricDetails.catIdAdmin, let catIdAdmin = "FFFFFFFD\(catIdAdminHex)".hexToDecimal, let catIdOperateHex = fabricDetails.catIdOperate, let catIdOperate = "FFFFFFFD\(catIdOperateHex)".hexToDecimal {
-                        var updateACL: Bool = false
-                        var newEntries = [MTRAccessControlClusterAccessControlEntryStruct]()
-                        for entry in entries {
-                            var newEntry = MTRAccessControlClusterAccessControlEntryStruct()
-                            if let subjects = entry.subjects as? [UInt64] {
-                                let privilege = entry.privilege.intValue
-                                if privilege == 5, !subjects.contains(catIdAdmin) {
-                                    newEntry = entry
-                                    newEntry.subjects = [catIdAdmin]
-                                    newEntries.append(newEntry)
-                                    updateACL = true
-                                } else if privilege == 3, !subjects.contains(catIdOperate) {
-                                    newEntry = entry
-                                    newEntry.subjects = [catIdOperate]
-                                    newEntries.append(newEntry)
-                                    updateACL = true
-                                } else {
-                                    newEntries.append(entry)
-                                }
-                            }
-                        }
-                        if newEntries.count > 0, updateACL == true {
-                            ESPMTRCommissioner.shared.writeAllACLAttributes(deviceId: deviceId, accessControlEntry: newEntries) { _ in
+                    if let entries = entries, let fabricDetails = group.fabricDetails, let catIdOperate = fabricDetails.catIdOperateDecimal {
+                        let newEntries = self.getUpdatedACL(entries: entries, catIdOperate: catIdOperate)
+                        if newEntries.0.count > 0, newEntries.1 == true {
+                            ESPMTRCommissioner.shared.writeAllACLAttributes(deviceId: deviceId, accessControlEntry: newEntries.0) { status in
                                 self.update(index: index+1)
                             }
                         } else {

@@ -25,16 +25,24 @@ extension DeviceViewController: LaunchControllerDelegate {
     
     func launchController() {
         if let groupId = self.group?.groupID, let matterNodeId = self.matterNodeId, let deviceId = matterNodeId.hexToDecimal {
+            let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
+            var endpoint: UInt16 = 0
+            if let point = clusterInfo.1, let id = UInt16(point) {
+                endpoint = id
+            }
             DispatchQueue.main.async {
                 Utility.showLoader(message: "", view: self.view)
             }
-            ESPMTRCommissioner.shared.readAttributeUserNOCInstalledOnDevice(deviceId: deviceId) { result in
+            ESPMTRCommissioner.shared.readAttributeUserNOCInstalledOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
                 if result {
-                    ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId) { result in
+                    ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
                         DispatchQueue.main.async {
                             Utility.hideLoader(view: self.view)
                             if !result {
-                                self.alertUser(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.operationFailedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+                                self.alertUser(title: ESPMatterConstants.failureTxt,
+                                               message: ESPMatterConstants.operationFailedMsg,
+                                               buttonTitle: ESPMatterConstants.okTxt,
+                                               callback: {})
                             }
                         }
                     }
@@ -67,13 +75,13 @@ extension DeviceViewController: LaunchControllerDelegate {
     ///   - deviceId: device id
     ///   - refreshToken: refresh token
     ///   - completion: completion
-    func appendRefreshToken(deviceId: UInt64, refreshToken: String, completion: @escaping (Bool) -> Void) {
+    func appendRefreshToken(deviceId: UInt64, endpoint: UInt16, refreshToken: String, completion: @escaping (Bool) -> Void) {
         let index = refreshToken.index(refreshToken.startIndex, offsetBy: 960)
         let firstPayload = refreshToken[..<index]
         let secondPayload = refreshToken.replacingOccurrences(of: firstPayload, with: "")
-        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: String(firstPayload)) { result in
+        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: String(firstPayload)) { result in
             if result {
-                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: secondPayload) { result in
+                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: secondPayload) { result in
                     completion(result)
                 }
                 return
@@ -87,19 +95,19 @@ extension DeviceViewController: LaunchControllerDelegate {
     ///   - deviceId: device id
     ///   - endpointURL: endpoint URL
     ///   - completion: completion
-    func authorize(matterNodeId: String, deviceId: UInt64, endpointURL: String) {
-        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
+    func authorize(matterNodeId: String, deviceId: UInt64, endpoint: UInt16, endpointURL: String) {
+        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
             if result {
-                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId) { result in
+                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
                     if result, let controller = ESPMTRCommissioner.shared.sController, let id = controller.controllerNodeID?.uint64Value {
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id) { result in
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
                             if result {
                                 DispatchQueue.main.async {
                                     Utility.hideLoader(view: self.view)
                                 }
                                 User.shared.updateDeviceList = true
                                 let str = String(id, radix:16)
-                                ESPMatterFabricDetails.shared.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
+                                self.fabricDetails.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
                             } else {
                                 DispatchQueue.main.async {
                                     self.hideLoaderAndShowError()
@@ -129,16 +137,21 @@ extension DeviceViewController: RainmakerControllerFlowDelegate {
     
     func cloudLoginConcluded(cloudResponse: ESPSessionResponse?, groupId: String, matterNodeId: String) {
         if let cloudResponse = cloudResponse, cloudResponse.isValid, let refreshToken = cloudResponse.refreshToken {
-            ESPMatterFabricDetails.shared.saveAWSTokens(cloudResponse: cloudResponse, groupId: groupId, matterNodeId: matterNodeId)
+            self.fabricDetails.saveAWSTokens(cloudResponse: cloudResponse, groupId: groupId, matterNodeId: matterNodeId)
             if let deviceId = matterNodeId.hexToDecimal {
                 DispatchQueue.main.async {
                     Utility.showLoader(message: "", view: self.view)
                 }
-                ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId) { result in
+                let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
+                var endpoint: UInt16 = 0
+                if let point = clusterInfo.1, let id = UInt16(point) {
+                    endpoint = id
+                }
+                ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId, endpoint: endpoint) { result in
                     if result {
-                        self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
+                        self.appendRefreshToken(deviceId: deviceId, endpoint: endpoint, refreshToken: refreshToken) { result in
                             if result {
-                                self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL)
+                                self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL)
                             } else {
                                 DispatchQueue.main.async {
                                     self.hideLoaderAndShowError()
@@ -158,7 +171,10 @@ extension DeviceViewController: RainmakerControllerFlowDelegate {
     /// Hide loader and show error
     func hideLoaderAndShowError() {
         Utility.hideLoader(view: self.view)
-        self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.operationFailedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+        self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                            message: ESPMatterConstants.operationFailedMsg,
+                            buttonTitle: ESPMatterConstants.okTxt,
+                            callback: {})
     }
 }
 #endif

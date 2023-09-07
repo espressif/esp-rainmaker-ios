@@ -59,6 +59,8 @@ class DeviceOnOffCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
+    /// Toggle button pressed
+    /// - Parameter sender: sender
     @IBAction func toggleButtonPressed(sender: UISwitch) {
         self.onOffStatus.text = sender.isOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
         if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
@@ -111,6 +113,19 @@ class DeviceOnOffCell: UITableViewCell {
             } else {
                 self.toggleSwitch.setOn(false, animated: true)
                 self.onOffStatus.text = ESPMatterConstants.offTxt
+            }
+        }
+    }
+    
+    /// Subscribe to on/off attribute value
+    func subscribeToOnOffAttribute() {
+        if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
+            ESPMTRCommissioner.shared.subscribeToOnOffValue(groupId: groupId, deviceId: deviceId) { status in
+                DispatchQueue.main.async {
+                    self.node?.setMatterLightOnStatus(status: status, deviceId: deviceId)
+                    self.onOffStatus.text = status ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+                    self.toggleSwitch.setOn(status, animated: true)
+                }
             }
         }
     }

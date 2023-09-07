@@ -29,6 +29,8 @@ protocol ParamCHIPDelegate: AnyObject {
 }
 
 class ParamSliderTableViewCell: SliderTableViewCell {
+    
+    var node: ESPNodeDetails?
 
     override func layoutSubviews() {
         // Customise slider element for param screen
@@ -136,7 +138,11 @@ class ParamSliderTableViewCell: SliderTableViewCell {
             #if ESPRainMakerMatter
             if let grouoId = nodeGroup?.groupID, let deviceId = deviceId {
                 let val = sender.value
-                self.changeLevel(groupId: grouoId, deviceId: deviceId, toValue: val)
+                if self.isSaturation {
+                    self.changeSaturation(value: val)
+                } else {
+                    self.changeLevel(groupId: grouoId, deviceId: deviceId, toValue: val)
+                }
             }
             #endif
         }

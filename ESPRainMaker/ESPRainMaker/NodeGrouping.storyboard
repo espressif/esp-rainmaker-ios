@@ -367,19 +367,18 @@
                                             <action selector="removeGroupButtonPressed:" destination="E95-5n-8Co" eventType="touchUpInside" id="4vH-G3-hmd"/>
                                         </connections>
                                     </button>
-                                    <button contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oTp-KT-VNk" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="288" y="58" width="25" height="25"/>
+                                    <button contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oTp-KT-VNk" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="279" y="48.5" width="44" height="44"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="oTp-KT-VNk" secondAttribute="height" id="Hwu-xe-g86"/>
-                                            <constraint firstAttribute="width" constant="25" id="R8D-R1-SkJ"/>
                                         </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="tintColor" systemColor="systemBlueColor"/>
-                                        <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="plain" image="share">
-                                            <backgroundConfiguration key="background"/>
-                                            <color key="baseForegroundColor" systemColor="systemBlueColor"/>
-                                        </buttonConfiguration>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="Share">
+                                            <color key="titleColor" red="0.32549019607843138" green="0.18823529411764706" blue="0.72549019607843135" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="shareButtonPressed:" destination="E95-5n-8Co" eventType="touchUpInside" id="ZJF-cj-rVl"/>
                                         </connections>
@@ -395,7 +394,7 @@
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="96" id="UjO-hV-Z24"/>
                                     <constraint firstAttribute="bottom" secondItem="QdR-Yr-rOM" secondAttribute="bottom" constant="14" id="iby-gc-Geu"/>
                                     <constraint firstItem="QdR-Yr-rOM" firstAttribute="centerX" secondItem="mTx-hW-Xz9" secondAttribute="centerX" id="kzP-5b-j4U"/>
-                                    <constraint firstItem="RYK-hR-a8L" firstAttribute="leading" secondItem="oTp-KT-VNk" secondAttribute="trailing" constant="15" id="q8A-Ly-u2c"/>
+                                    <constraint firstItem="RYK-hR-a8L" firstAttribute="leading" secondItem="oTp-KT-VNk" secondAttribute="trailing" constant="5" id="q8A-Ly-u2c"/>
                                     <constraint firstItem="oTp-KT-VNk" firstAttribute="centerY" secondItem="RYK-hR-a8L" secondAttribute="centerY" id="sJo-rr-Pkm"/>
                                     <constraint firstItem="7ig-gZ-afK" firstAttribute="leading" secondItem="mTx-hW-Xz9" secondAttribute="leading" constant="16" id="xKP-xO-yQV"/>
                                     <constraint firstItem="4Jf-WX-XkK" firstAttribute="top" secondItem="7ig-gZ-afK" secondAttribute="bottom" id="zc9-TP-teP"/>
@@ -1350,7 +1349,6 @@
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="refresh_icon" width="128" height="128"/>
         <image name="right_arrow" width="6.5" height="12"/>
-        <image name="share" width="17.5" height="23.5"/>
         <image name="unselected_empty" width="10" height="10"/>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

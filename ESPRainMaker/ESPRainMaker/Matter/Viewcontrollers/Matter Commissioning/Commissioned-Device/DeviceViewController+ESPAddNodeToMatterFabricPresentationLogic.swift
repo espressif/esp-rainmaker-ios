@@ -43,8 +43,8 @@ extension DeviceViewController: ESPAddNodeToMatterFabricPresentationLogic {
         }
         if status {
             if let group = self.group, let groupId = group.groupID, let node = self.node, let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal {
-                ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: matterNodeId)
-                ESPMatterFabricDetails.shared.removeLinkedDevice(groupId: groupId, deviceId: deviceId, endpointClusterId: endpointClusterId)
+                self.fabricDetails.removeControllerNodeId(matterNodeId: matterNodeId)
+                self.fabricDetails.removeLinkedDevice(groupId: groupId, deviceId: deviceId, endpointClusterId: endpointClusterId)
             }
             DispatchQueue.main.async {
                 User.shared.updateDeviceList = true
@@ -52,7 +52,10 @@ extension DeviceViewController: ESPAddNodeToMatterFabricPresentationLogic {
             }
         } else {
             DispatchQueue.main.async {
-                self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.failedToRemoveDeviceMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+                self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                    message: ESPMatterConstants.failedToRemoveDeviceMsg,
+                                    buttonTitle: ESPMatterConstants.okTxt,
+                                    callback: {})
             }
         }
     }
