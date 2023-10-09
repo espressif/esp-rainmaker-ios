@@ -26,7 +26,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature].contains(value) {
+            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter].contains(value) {
                 return 100.0
             } else if [ESPMatterConstants.delete].contains(value) {
                 return 75.0
@@ -171,8 +171,17 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                     return cell
                 }
             } else if value == ESPMatterConstants.rainmakerController {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: LaunchControllerCell.reuseIdentifier, for: indexPath) as? LaunchControllerCell {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier, for: indexPath) as? CustomActionCell {
                     cell.delegate = self
+                    cell.setupWorkflow(workflow: .launchController)
+                    self.setAutoresizingMask(cell)
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
+                    return cell
+                }
+            } else if value == ESPMatterConstants.borderRouter {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier, for: indexPath) as? CustomActionCell {
+                    cell.delegate = self
+                    cell.setupWorkflow(workflow: .updateThreadDataset)
                     self.setAutoresizingMask(cell)
                     cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell

@@ -136,6 +136,9 @@ struct JSONParser {
                                         } else if type == Constants.paramMatterControllerDataVersion {
                                             node.setMatterControllerDataVersion(matterControllerDataVersion: paramName)
                                         }
+                                        if type == Constants.paramMatterControllerData {
+                                            node.setMatterControllerData(matterControllerData: paramName)
+                                        }
                                     }
                                 }
                             }

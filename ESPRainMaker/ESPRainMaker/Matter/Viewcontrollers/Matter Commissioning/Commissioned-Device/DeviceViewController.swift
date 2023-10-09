@@ -315,6 +315,9 @@ class DeviceViewController: UIViewController {
             cellInfo.append(ESPMatterConstants.occupiedCoolingSetpoint)
             cellInfo.append(ESPMatterConstants.systemMode)
         }
+        if ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.borderRouter)
+        }
     }
     
     /// Setup tableview UI

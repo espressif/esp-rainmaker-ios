@@ -58,7 +58,7 @@ extension Node {
         return endpointClusters
     }
     
-    /// Is on off server supported
+    /// Is controllerserver supported
     var isControllerServerSupported: (Bool, String?) {
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
@@ -314,5 +314,22 @@ extension Node {
             }
         }
         return "Matter-Controller-Data-Version"
+    }
+    
+    func setMatterControllerData(matterControllerData: String) {
+        if let id = self.node_id {
+            let key = "esp.param.matter-controller-data.\(id)"
+            UserDefaults.standard.set(matterControllerData, forKey: key)
+        }
+    }
+    
+    var matterControllerData: String {
+        if let id = self.node_id {
+            let key = "esp.param.matter-controller-data.\(id)"
+            if let value = UserDefaults.standard.value(forKey: key) as? String {
+                return value
+            }
+        }
+        return "Matter-Controller-Data"
     }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  DeviceViewController+LaunchControllerDelegate.swift
+//  DeviceViewController+CustomActionDelegate.swift
 //  ESPRainmaker
 //
 
@@ -21,8 +21,10 @@ import Foundation
 import UIKit
 
 @available(iOS 16.4, *)
-extension DeviceViewController: LaunchControllerDelegate {
+extension DeviceViewController: CustomActionDelegate {
     
+    //MARK: Custom Action
+    /// Launch controller
     func launchController() {
         if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
             let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
@@ -56,6 +58,70 @@ extension DeviceViewController: LaunchControllerDelegate {
         }
     }
     
+    /// Update thread dataset
+    func updateThreadDataset() {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Sending thread data", view: self.view)
+        }
+        if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
+             ThreadCredentialsManager.shared.fetchThreadOperationalDataset { dataset in
+                 if let dataset = dataset {
+                     let datasetStr = dataset.hexadecimalString
+                     ESPMTRCommissioner.shared.updateActiveThreadOperationalDataset(deviceId: deviceId, operationalDataset: datasetStr) { result in
+                         if result {
+                             ESPMTRCommissioner.shared.startThreadNetwork(deviceId: deviceId) { res in
+                                 DispatchQueue.main.async {
+                                     Utility.hideLoader(view: self.view)
+                                     if !res {
+                                         Utility.showToastMessage(view: self.view, message: ESPMatterConstants.operationFailedMsg)
+                                     }
+                                 }
+                             }
+                             return
+                         }
+                         DispatchQueue.main.async {
+                             Utility.hideLoader(view: self.view)
+                             Utility.showToastMessage(view: self.view, message: ESPMatterConstants.operationFailedMsg)
+                         }
+                     }
+                 } else {
+                     if let groupId = self.group?.groupID, let key = ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId).1, let endpoint = UInt16(key) {
+                         ESPMTRCommissioner.shared.readAttributeActiveOpDataset(deviceId: deviceId, endpoint: endpoint) { activeDataset in
+                             if let activeDataset = activeDataset {
+                                 ESPMTRCommissioner.shared.readAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { baId in
+                                     if let baId = baId {
+                                         ESPMatterEcosystemInfo.shared.saveBorderAgentIdKey(borderAgentId: baId)
+                                         ESPMTRCommissioner.shared.startThreadNetwork(deviceId: deviceId) { result in
+                                             if result {
+                                                 ThreadCredentialsManager.shared.saveThreadOperationalCredentials(activeOpsDataset: activeDataset, borderAgentId: baId) { _ in
+                                                     DispatchQueue.main.async {
+                                                         Utility.hideLoader(view: self.view)
+                                                     }
+                                                 }
+                                             } else {
+                                                 DispatchQueue.main.async {
+                                                     Utility.hideLoader(view: self.view)
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
+        } else {
+            DispatchQueue.main.async {
+                Utility.showToastMessage(view: self.view, message: ESPMatterConstants.operationFailedMsg)
+            }
+        }
+    }
+    
+    /// Launch login screen
+    /// - Parameters:
+    ///   - groupId: group Id
+    ///   - matterNodeId: matter node id
     func launchLoginScreen(groupId: String, matterNodeId: String) {
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {

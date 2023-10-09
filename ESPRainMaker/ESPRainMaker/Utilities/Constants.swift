@@ -175,6 +175,7 @@ struct Constants {
     static let matterControllerServiceType = "esp.service.matter-controller"
     static let paramMatterDevices = "esp.param.matter-devices"
     static let paramMatterControllerDataVersion = "esp.param.matter-controller-data-version"
+    static let paramMatterControllerData = "esp.param.matter-controller-data"
     
     static let services = "services"
     static let type = "type"

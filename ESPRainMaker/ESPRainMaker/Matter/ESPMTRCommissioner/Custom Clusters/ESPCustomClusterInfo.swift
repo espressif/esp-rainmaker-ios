@@ -177,3 +177,41 @@ enum airConditioner {
 
 
 
+/*
+ // MARK: Custom Rainmaker Cluster Info
+ */
+enum borderRouter {
+    
+    enum attributes {
+        case activeOperationalDataset
+        case borderAgentId
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .activeOperationalDataset:
+                return NSNumber(value: 0)
+            case .borderAgentId:
+                return NSNumber(value: 2)
+            }
+        }
+    }
+    
+    enum commands {
+        case configureThreadDataset
+        case startThreadNetwork
+        case stopThreadNetwork
+        
+        var commandId: NSNumber {
+            switch self {
+            case .configureThreadDataset:
+                return NSNumber(value: 0)
+            case .startThreadNetwork:
+                return NSNumber(value: 1)
+            case .stopThreadNetwork:
+                return NSNumber(value: 2)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 320601090)
+}

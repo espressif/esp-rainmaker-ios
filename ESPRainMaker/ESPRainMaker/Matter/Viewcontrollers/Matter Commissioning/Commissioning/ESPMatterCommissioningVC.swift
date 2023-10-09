@@ -144,28 +144,6 @@ class ESPMatterCommissioningVC: UIViewController {
         }
     }
     
-    /// Start controller update process
-    /// - Parameter deviceId: device id
-    func startControllerUpdate(deviceId: UInt64, endpoint: UInt16, matterNodeId: String, refreshToken: String) {
-        ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId, endpoint: endpoint) { result in
-            if result {
-                self.appendRefreshToken(deviceId: deviceId, endpoint: endpoint, refreshToken: refreshToken) { result in
-                    if result {
-                        self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL)
-                    } else {
-                        DispatchQueue.main.async {
-                            self.hideLoaderAndAlertUser()
-                        }
-                    }
-                }
-            } else {
-                DispatchQueue.main.async {
-                    self.hideLoaderAndAlertUser()
-                }
-            }
-        }
-    }
-    
     /// Hide loader and alert user
     func hideLoaderAndAlertUser() {
         Utility.hideLoader(view: self.view)
@@ -177,18 +155,16 @@ class ESPMatterCommissioningVC: UIViewController {
         })
     }
     
-    /// Show Rainmaker Login Screen
-    func showRainmakerLoginScreen(groupId: String, matterNodeId: String) {
-        let storyboard = UIStoryboard(name: "Login", bundle: nil)
-        if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {
-            if let signInVC = nav.viewControllers.first as? SignInViewController, let tab = self.tabBarController {
-                signInVC.setRainmakerControllerProperties(isRainmakerControllerFlow: true,
-                                                          groupId: groupId,
-                                                          matterNodeId: matterNodeId,
-                                                          rainmakerControllerDelegate: self)
-                nav.modalPresentationStyle = .fullScreen
-                tab.present(nav, animated: true, completion: nil)
+    
+    
+    /// Navigate to devices screen
+    func navigateToDevicesScreen(hideLoader: Bool = true) {
+        DispatchQueue.main.async {
+            if hideLoader {
+                Utility.hideLoader(view: self.view)
             }
+            User.shared.updateDeviceList = true
+            self.navigationController?.popToRootViewController(animated: true)
         }
     }
     
@@ -200,11 +176,7 @@ class ESPMatterCommissioningVC: UIViewController {
                     Utility.showLoader(message: "", view: self.view)
                 }
                 self.updateDeviceName {
-                    DispatchQueue.main.async {
-                        Utility.hideLoader(view: self.view)
-                        User.shared.updateDeviceList = true
-                        self.navigationController?.popToRootViewController(animated: true)
-                    }
+                    self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
                 }
             } else {
                 if let name = ESPMatterEcosystemInfo.shared.getDeviceName() {
@@ -216,152 +188,14 @@ class ESPMatterCommissioningVC: UIViewController {
                         if result {
                             self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: name)
                         }
-                        DispatchQueue.main.async {
-                            Utility.hideLoader(view: self.view)
-                            User.shared.updateDeviceList = true
-                            self.navigationController?.popToRootViewController(animated: true)
-                        }
+                        self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
                     }
                 } else {
-                    DispatchQueue.main.async {
-                        User.shared.updateDeviceList = true
-                        self.navigationController?.popToRootViewController(animated: true)
-                    }
+                    self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId, hideLoader: false)
                 }
             }
         } else {
-            DispatchQueue.main.async {
-                User.shared.updateDeviceList = true
-                self.navigationController?.popToRootViewController(animated: true)
-            }
-        }
-    }
-    
-    /// Update device name for rainmaker + matter nodes
-    /// - Parameter completion: completion handler
-    func updateDeviceName(completion: @escaping () -> Void) {
-        NetworkManager.shared.getNodes { nodes, _ in
-            if let nodes = nodes, nodes.count > 0 {
-                User.shared.associatedNodeList = nodes
-                for node in nodes {
-                    if let nodeId = node.node_id, node.isRainmaker, let deviceName = node.userDefinaedName, let groupId = self.groupId, let savedDeviceName = ESPMatterEcosystemInfo.shared.getDeviceName(), savedDeviceName == deviceName, let devices = node.devices, devices.count > 0 {
-                        let device = devices[0]
-                        for param in device.params ?? [] {
-                            if let type = param.type, type == Constants.deviceNameParam, let properties = param.properties, properties.contains("write"), let name = device.name {
-                                let attributeKey = param.name ?? ""
-                                DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: [name: [attributeKey: deviceName]], delegate: self) { _ in
-                                    completion()
-                                }
-                                return
-                            }
-                        }
-                    }
-                }
-                completion()
-            } else {
-                completion()
-            }
-        }
-    }
-}
-
-//MARK: rainmaker controller methods
-@available(iOS 16.4, *)
-extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
-    
-    /// Controller flow cancelled
-    func controllerFlowCancelled() {
-        DispatchQueue.main.async {
-            self.navigationController?.popToRootViewController(animated: true)
-        }
-    }
-    
-    /// Append refresh token
-    /// - Parameters:
-    ///   - deviceId: device id
-    ///   - refreshToken: refresh token
-    ///   - completion: completion
-    func appendRefreshToken(deviceId: UInt64, endpoint: UInt16, refreshToken: String, completion: @escaping (Bool) -> Void) {
-        let index = refreshToken.index(refreshToken.startIndex, offsetBy: 960)
-        let firstPayload = refreshToken[..<index]
-        let secondPayload = refreshToken.replacingOccurrences(of: firstPayload, with: "")
-        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: String(firstPayload)) { result in
-            if result {
-                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: secondPayload) { result in
-                    completion(result)
-                }
-                return
-            }
-            completion(false)
-        }
-    }
-
-    /// Authorize
-    /// - Parameters:
-    ///   - deviceId: device id
-    ///   - endpointURL: endpoint URL
-    ///   - completion: completion
-    func authorize(matterNodeId: String, deviceId: UInt64, endpoint: UInt16, endpointURL: String) {
-        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
-            if result {
-                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
-                    if result {
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { isDeviceListUpdated in
-                            DispatchQueue.main.async {
-                                if isDeviceListUpdated {
-                                    self.goToHomeScreen()
-                                } else {
-                                    self.hideLoaderAndAlertUser()
-                                }
-                            }
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.hideLoaderAndAlertUser()
-                        }
-                    }
-                }
-                return
-            }
-            DispatchQueue.main.async {
-                self.hideLoaderAndAlertUser()
-            }
-        }
-    }
-
-    /// Cloud login completed
-    /// - Parameters:
-    ///   - cloudResponse: cloud response
-    ///   - groupId: group id
-    ///   - matterNodeId: matter node id
-    func cloudLoginConcluded(cloudResponse: ESPSessionResponse?, groupId: String, matterNodeId: String) {
-        if let cloudResponse = cloudResponse, var refreshToken = cloudResponse.refreshToken, let deviceId = matterNodeId.hexToDecimal {
-            let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
-            var endpoint: UInt16 = 0
-            if let point = clusterInfo.1, let id = UInt16(point) {
-                endpoint = id
-            }
-            self.fabricDetails.saveAWSTokens(cloudResponse: cloudResponse, groupId: groupId, matterNodeId: matterNodeId)
-            DispatchQueue.main.async {
-                Utility.showLoader(message: ESPMatterConstants.updatingDeviceListMsg, view: self.view)
-            }
-            ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId, endpoint: endpoint) { result in
-                if result {
-                    self.appendRefreshToken(deviceId: deviceId, endpoint: endpoint, refreshToken: refreshToken) { result in
-                        if result {
-                            self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL)
-                        } else {
-                            DispatchQueue.main.async {
-                                self.hideLoaderAndAlertUser()
-                            }
-                        }
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.hideLoaderAndAlertUser()
-                    }
-                }
-            }
+            self.navigateToDevicesScreen(hideLoader: false)
         }
     }
 }

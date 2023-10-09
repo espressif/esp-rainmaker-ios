@@ -28,6 +28,8 @@ class ESPMatterEcosystemInfo {
     static let certDeclarationKey: String = "certificate.declaration.key"
     static let attestationInfoKey: String = "attestation.information.key"
     
+    static let borderAgentIdKey = "com.espressif.rainmaker.boder.agent.id"
+    
     /// Save homes data
     /// - Parameter data: homes
     func saveHomesData(data: [String: String]) {
@@ -236,5 +238,18 @@ class ESPMatterEcosystemInfo {
         if let _ = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.attestationInfoKey) {
             localStorage.cleanupData(forKey: ESPMatterEcosystemInfo.attestationInfoKey)
         }
+    }
+    
+    func saveBorderAgentIdKey(borderAgentId: Data) {
+        let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
+        localStorage.saveDataInUserDefault(data: borderAgentId, key: ESPMatterEcosystemInfo.borderAgentIdKey)
+    }
+    
+    func getBorderAgentIdKey() -> Data? {
+        let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
+        if let borderAgentIdData = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.borderAgentIdKey) {
+            return borderAgentIdData
+        }
+        return nil
     }
 }

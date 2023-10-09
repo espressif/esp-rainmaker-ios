@@ -92,6 +92,21 @@ public class ESPMatterClusterUtil {
         return (false, nil)
     }
     
+    /// Is thread border router server supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: (status, endpoint id)
+    public func isBRSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        let val = ESPMatterFabricDetails.shared.fetchServersData(groupId: groupId, deviceId: deviceId)
+        for key in val.keys {
+            if let list = val[key], list.count > 0, list.contains(borderRouter.clusterId.uintValue) {
+                return (true, key)
+            }
+        }
+        return (false, nil)
+    }
+    
     /// Is rainmaker server supported
     /// - Parameters:
     ///   - groupId: group id
