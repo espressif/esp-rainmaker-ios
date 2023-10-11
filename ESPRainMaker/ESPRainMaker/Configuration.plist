@@ -40,6 +40,8 @@
             <true/>
             <key>Enable OTA Update</key>
             <false/>
+            <key>Enable Config Override</key>
+            <true/>
             <key>User Pool</key>
             <integer>2</integer>
             <key>Enable Continuous Updates</key>
@@ -48,6 +50,8 @@
             <integer>400</integer>
             <key>Matter Ecosystem</key>
             <string>ESP Rainmaker</string>
+            <key>Matter Vendor Id</key>
+            <integer>4891</integer>
         </dict>
         <key>Provision Settings</key>
         <dict>

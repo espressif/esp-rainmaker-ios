@@ -40,6 +40,7 @@ enum NodeConnectionStatus {
 }
 
 class DevicesViewController: UIViewController {
+    
     // IB outlets
     @IBOutlet var collectionView: UICollectionView!
     @IBOutlet var addButton: UIButton!
@@ -60,6 +61,7 @@ class DevicesViewController: UIViewController {
     private var absoluteSegmentPosition: [CGFloat] = []
     var groups: [ESPNodeGroup]?
     var nodeGroups: [NodeGroup]?
+    let fabricDetails = ESPMatterFabricDetails.shared
     
     // MARK: - Overriden Methods
 
@@ -192,6 +194,11 @@ class DevicesViewController: UIViewController {
         }
     }
     
+    /// Set groups UI
+    /// Invoked Node groups API
+    /// Fetch matter node group details
+    /// Fetch User NOCs
+    /// Fetch nodes and update UI
     private func setupGroupsUI() {
         //get node groups data
         NodeGroupManager.shared.getNodeGroups { groups, error in
@@ -199,11 +206,8 @@ class DevicesViewController: UIViewController {
                 self.nodeGroups = groups
                 #if ESPRainMakerMatter
                 if #available(iOS 16.4, *) {
-                    self.getMatterNodeDetails(groups: groups) {
+                    self.getMatterNodeGroupDetails(groups: groups) {
                         //fetch user nocs for groups
-                        DispatchQueue.main.async {
-                            Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
-                        }
                         self.fetchUserNOCs(groups: groups) {
                             //fetch node configs
                             self.fetchNodesAndUpdateUI(groups: groups, error: error)
@@ -225,7 +229,6 @@ class DevicesViewController: UIViewController {
         self.getNodes {
             DispatchQueue.main.async {
                 NodeGroupManager.shared.updateNodeListInNodeGroup(nodeGroup: groups)
-                Utility.hideLoader(view: self.view)
                 self.discoverDevicesAndFormatUI(error: error)
             }
         }
@@ -249,17 +252,28 @@ class DevicesViewController: UIViewController {
         }
     }
     
+    #if ESPRainMakerMatter
+    func searchForMatterDevicesOnLocalNetwork() {
+        if #available(iOS 16.4, *) {
+            DispatchQueue.main.async {
+                self.stopMatterDiscovery()
+                self.searchForMatterDevices { _ in
+                    self.collectionView.reloadData()
+                }
+            }
+        }
+    }
+    #endif
+    
     private func discoverDevicesAndFormatUI(error: ESPNetworkError?) {
         #if ESPRainMakerMatter
         if #available(iOS 16.4, *) {
             if let nodes = User.shared.associatedNodeList, nodes.count > 0 {
-                if let data = ESPMatterFabricDetails.shared.getGroupsData(), let groups = data.groups, groups.count > 0 {
-                    self.searchForMatterDevices { _ in
-                        DispatchQueue.main.async {
-                            Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
-                            self.formatUI(error: error)
-                            self.getNodeGroupMatterFabricDetails()
-                        }
+                if let data = self.fabricDetails.getGroupsData(), let groups = data.groups, groups.count > 0 {
+                    DispatchQueue.main.async {
+                        Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
+                        self.formatUI(error: error)
+                        self.getNodeGroupMatterFabricDetails()
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -327,6 +341,11 @@ class DevicesViewController: UIViewController {
 
         // Check if scan is enabled in ap
         if Configuration.shared.espProvSetting.scanEnabled {
+            #if ESPRainMakerMatter
+            if #available(iOS 16.4, *) {
+                self.stopMatterDiscovery()
+            }
+            #endif
             let scannerVC = mainStoryboard.instantiateViewController(withIdentifier: "scannerVC") as! ScannerViewController
             navigationController?.pushViewController(scannerVC, animated: true)
         } else {
@@ -439,6 +458,12 @@ class DevicesViewController: UIViewController {
             addButton.isHidden = true
         } else {
             self.collectionView.reloadData()
+            #if ESPRainMakerMatter
+            if #available(iOS 16.4, *) {
+                self.stopMatterDiscovery()
+            }
+            self.searchForMatterDevicesOnLocalNetwork()
+            #endif
         }
     }
 

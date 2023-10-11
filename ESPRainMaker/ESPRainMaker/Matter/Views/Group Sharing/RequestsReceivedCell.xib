@@ -21,8 +21,8 @@
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MAZ-P1-O8D">
                                 <rect key="frame" x="20" y="20" width="295" height="30.666666666666671"/>
-                                <fontDescription key="fontDescription" name="Arial-BoldMT" family="Arial" pointSize="15"/>
-                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MiF-zE-jWx">
@@ -34,19 +34,12 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8az-Yv-lcG">
-                                <rect key="frame" x="0.0" y="71" width="167.33333333333334" height="35"/>
+                                <rect key="frame" x="0.0" y="71" width="133.66666666666666" height="35"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JU4-xS-NQe">
-                                        <rect key="frame" x="56.666666666666671" y="8.6666666666666714" width="53.666666666666671" height="18"/>
-                                        <attributedString key="attributedText">
-                                            <fragment content="Accept">
-                                                <attributes>
-                                                    <color key="NSColor" red="0.0" green="0.32941176470588235" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <font key="NSFont" size="16" name="Arial-BoldMT"/>
-                                                    <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                </attributes>
-                                            </fragment>
-                                        </attributedString>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Decline" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JU4-xS-NQe">
+                                        <rect key="frame" x="37" y="6.6666666666666732" width="60" height="21.666666666666671"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                        <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
@@ -58,26 +51,19 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hLK-1o-vau">
-                                <rect key="frame" x="167.33333333333334" y="71" width="1" height="35"/>
+                                <rect key="frame" x="133.66666666666666" y="71" width="1" height="35"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="1" id="UBz-yV-TWi"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oSz-BJ-WgW">
-                                <rect key="frame" x="167.66666666666663" y="71" width="167.33333333333337" height="35"/>
+                                <rect key="frame" x="134.33333333333337" y="71" width="200.66666666666663" height="35"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TG3-1g-nFT">
-                                        <rect key="frame" x="55.333333333333343" y="8.6666666666666714" width="57" height="18"/>
-                                        <attributedString key="attributedText">
-                                            <fragment content="Decline">
-                                                <attributes>
-                                                    <color key="NSColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <font key="NSFont" size="16" name="Arial-BoldMT"/>
-                                                    <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                </attributes>
-                                            </fragment>
-                                        </attributedString>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Accept" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TG3-1g-nFT">
+                                        <rect key="frame" x="72" y="6.6666666666666732" width="56.666666666666657" height="21.666666666666671"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                        <color key="textColor" red="0.0" green="0.32941176470588235" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
@@ -99,9 +85,9 @@
                             <constraint firstItem="8az-Yv-lcG" firstAttribute="leading" secondItem="rGt-9H-yax" secondAttribute="leading" id="Fhx-it-NEp"/>
                             <constraint firstItem="hLK-1o-vau" firstAttribute="leading" secondItem="8az-Yv-lcG" secondAttribute="trailing" id="Fvt-vc-8rz"/>
                             <constraint firstItem="MiF-zE-jWx" firstAttribute="leading" secondItem="rGt-9H-yax" secondAttribute="leading" id="MN1-pD-SMp"/>
-                            <constraint firstItem="8az-Yv-lcG" firstAttribute="width" secondItem="rGt-9H-yax" secondAttribute="width" multiplier="0.5" constant="-0.25" id="OIe-lt-LW1"/>
+                            <constraint firstItem="8az-Yv-lcG" firstAttribute="width" secondItem="rGt-9H-yax" secondAttribute="width" multiplier="0.4" constant="-0.25" id="OIe-lt-LW1"/>
                             <constraint firstAttribute="trailing" secondItem="MAZ-P1-O8D" secondAttribute="trailing" constant="20" id="Q9F-po-qa5"/>
-                            <constraint firstItem="oSz-BJ-WgW" firstAttribute="width" secondItem="rGt-9H-yax" secondAttribute="width" multiplier="0.5" constant="-0.25" id="VBx-Gs-kM6"/>
+                            <constraint firstItem="oSz-BJ-WgW" firstAttribute="width" secondItem="rGt-9H-yax" secondAttribute="width" multiplier="0.6" constant="-0.25" id="VBx-Gs-kM6"/>
                             <constraint firstItem="MiF-zE-jWx" firstAttribute="top" secondItem="MAZ-P1-O8D" secondAttribute="bottom" constant="20" id="YUn-I0-MBx"/>
                             <constraint firstItem="hLK-1o-vau" firstAttribute="top" secondItem="8az-Yv-lcG" secondAttribute="top" id="oWL-ca-xSB"/>
                             <constraint firstAttribute="bottom" secondItem="oSz-BJ-WgW" secondAttribute="bottom" id="rUE-2N-dWt"/>
@@ -125,9 +111,9 @@
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
-                <outlet property="acceptRequestView" destination="8az-Yv-lcG" id="56f-Mt-L9T"/>
+                <outlet property="acceptRequestView" destination="oSz-BJ-WgW" id="0Qn-1J-ym8"/>
                 <outlet property="container" destination="rGt-9H-yax" id="e88-9z-3U9"/>
-                <outlet property="declineRequestView" destination="oSz-BJ-WgW" id="XQA-Xs-gfd"/>
+                <outlet property="declineRequestView" destination="8az-Yv-lcG" id="fQX-s6-f1m"/>
                 <outlet property="sharingRequestMessage" destination="MAZ-P1-O8D" id="HI1-bc-zM7"/>
             </connections>
             <point key="canvasLocation" x="21" y="20"/>

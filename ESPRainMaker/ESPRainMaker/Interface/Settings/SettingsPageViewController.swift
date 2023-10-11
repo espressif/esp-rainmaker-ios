@@ -122,7 +122,7 @@ class SettingsPageViewController: UIViewController {
         let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
         let sharingVC = storyboard.instantiateViewController(withIdentifier: NodeGroupSharingRequestsViewController.storyboardId) as! NodeGroupSharingRequestsViewController
         tabBarController?.tabBar.isHidden = false
-        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.setNavigationBarHidden(true, animated: true)
         navigationController?.pushViewController(sharingVC, animated: true)
     }
 

@@ -45,38 +45,63 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completionHandler: completion
     func addDeviceDetails(groupId: String, deviceId: UInt64, completionHandler: @escaping () -> Void) {
+        //Read and save vendor id
         self.getVendorId(deviceId: deviceId) { vid in
             if let vid = vid {
-                ESPMatterFabricDetails.shared.saveVendorId(groupId: groupId, deviceId: deviceId, vendorId: vid)
+                self.fabricDetails.saveVendorId(groupId: groupId, deviceId: deviceId, vendorId: vid)
             }
-            self.getProductId(deviceId: deviceId) { pid in
-                if let pid = pid {
-                    ESPMatterFabricDetails.shared.saveProductId(groupId: groupId, deviceId: deviceId, productId: pid)
+            //Read and save device serial number
+            self.getDeviceSerialNumber(deviceId: deviceId) { serialNumber in
+                if let serialNumber = serialNumber {
+                    self.fabricDetails.saveSerialNumber(groupId: groupId, deviceId: deviceId, serialNumber: serialNumber)
                 }
-                self.getSoftwareVersion(deviceId: deviceId) { sw in
-                    if let sw = sw {
-                        ESPMatterFabricDetails.shared.saveSoftwareVersion(groupId: groupId, deviceId: deviceId, softwareVersion: sw)
+                //Read and save manufacturer name
+                self.getManufacturerName(deviceId: deviceId) { manufacturerName in
+                    if let manufacturerName = manufacturerName {
+                        self.fabricDetails.saveManufacturerName(groupId: groupId, deviceId: deviceId, manufacturerName: manufacturerName)
                     }
-                    self.getDeviceTypeList(deviceId: deviceId) { deviceType in
-                        if let type = deviceType {
-                            ESPMatterFabricDetails.shared.saveDeviceType(groupId: groupId, deviceId: deviceId, type: type)
+                    //Read and save product name
+                    self.getProductName(deviceId: deviceId) { productName in
+                        if let productName = productName {
+                            self.fabricDetails.saveProductName(groupId: groupId, deviceId: deviceId, productName: productName)
                         }
-                        self.getAllDeviceEndpoints(deviceId: deviceId) { endpoints in
-                            if endpoints.count > 0 {
-                                ESPMatterFabricDetails.shared.saveEndpointsData(groupId: groupId, deviceId: deviceId, endpoints: endpoints)
-                                self.getAllClients(deviceId: deviceId, index: 0, endpoints: endpoints) { clients in
-                                    if clients.count > 0 {
-                                        ESPMatterFabricDetails.shared.saveClientsData(groupId: groupId, deviceId: deviceId, clients: clients)
+                        //Read and save product id
+                        self.getProductId(deviceId: deviceId) { pid in
+                            if let pid = pid {
+                                self.fabricDetails.saveProductId(groupId: groupId, deviceId: deviceId, productId: pid)
+                            }
+                            //Read and save software version
+                            self.getSoftwareVersion(deviceId: deviceId) { sw in
+                                if let sw = sw {
+                                    self.fabricDetails.saveSoftwareVersion(groupId: groupId, deviceId: deviceId, softwareVersion: sw)
+                                }
+                                //Read and save device type
+                                self.getDeviceTypeList(deviceId: deviceId) { deviceType in
+                                    if let type = deviceType {
+                                        self.fabricDetails.saveDeviceType(groupId: groupId, deviceId: deviceId, type: type)
                                     }
-                                    self.getAllServers(deviceId: deviceId, index: 0, endpoints: endpoints) { servers in
-                                        if servers.count > 0 {
-                                            ESPMatterFabricDetails.shared.saveServersData(groupId: groupId, deviceId: deviceId, servers: servers)
+                                    //Read and save all device endpoints
+                                    self.getAllDeviceEndpoints(deviceId: deviceId) { endpoints in
+                                        if endpoints.count > 0 {
+                                            self.fabricDetails.saveEndpointsData(groupId: groupId, deviceId: deviceId, endpoints: endpoints)
+                                            //Read and save all clients on all endpoints
+                                            self.getAllClients(deviceId: deviceId, index: 0, endpoints: endpoints) { clients in
+                                                if clients.count > 0 {
+                                                    self.fabricDetails.saveClientsData(groupId: groupId, deviceId: deviceId, clients: clients)
+                                                }
+                                                //Read and save all servers on all endpoints
+                                                self.getAllServers(deviceId: deviceId, index: 0, endpoints: endpoints) { servers in
+                                                    if servers.count > 0 {
+                                                        self.fabricDetails.saveServersData(groupId: groupId, deviceId: deviceId, servers: servers)
+                                                    }
+                                                    completionHandler()
+                                                }
+                                            }
+                                        } else {
+                                            completionHandler()
                                         }
-                                        completionHandler()
                                     }
                                 }
-                            } else {
-                                completionHandler()
                             }
                         }
                     }

@@ -57,6 +57,21 @@ class ESPNodeDetails: Codable {
         return "\(deviceId).matter.light.status"
     }
     
+    /// Returns matter light status key
+    var matterLevelValueKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.level.value"
+    }
+    
+    /// Returns matter light status key
+    var matterHueValueKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.hue.value"
+    }
+    
+    /// Returns matter light status key
+    var matterSaturationValueKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.saturation.value"
+    }
+    
     /// Device id
     var deviceId: UInt64? {
         if let matterNodeID = getMatterNodeId(), let deviceId = matterNodeID.hexToDecimal {
@@ -79,6 +94,60 @@ class ESPNodeDetails: Codable {
     func isMatterLightOn(deviceId: UInt64) -> Bool? {
         if let status = UserDefaults.standard.value(forKey: matterLightStatusKey(deviceId)) as? Bool {
             return status
+        }
+        return nil
+    }
+    
+    /// Set matter level
+    /// - Parameters:
+    ///   - level: level
+    ///   - deviceId: device id
+    func setMatterLevelValue(level: Int, deviceId: UInt64) {
+        UserDefaults.standard.set(level, forKey: matterLevelValueKey(deviceId))
+    }
+    
+    /// Get matter level value
+    /// - Parameter deviceId: device id
+    /// - Returns: value
+    func getMatterLevelValue(deviceId: UInt64) -> Int? {
+        if let value = UserDefaults.standard.value(forKey: matterLevelValueKey(deviceId)) as? Int {
+            return value
+        }
+        return nil
+    }
+    
+    /// Set matter hue value
+    /// - Parameters:
+    ///   - hue: hue
+    ///   - deviceId: device id
+    func setMatterHueValue(hue: Int, deviceId: UInt64) {
+        UserDefaults.standard.set(hue, forKey: matterHueValueKey(deviceId))
+    }
+    
+    /// Gte matter hue value
+    /// - Parameter deviceId: device id
+    /// - Returns: heu value
+    func getMatterHueValue(deviceId: UInt64) -> Int? {
+        if let value = UserDefaults.standard.value(forKey: matterHueValueKey(deviceId)) as? Int {
+            return value
+        }
+        return nil
+    }
+    
+    /// Set saturation value
+    /// - Parameters:
+    ///   - level: level value
+    ///   - deviceId: device id
+    func setMatterSaturationValue(saturation: Int, deviceId: UInt64) {
+        UserDefaults.standard.set(saturation, forKey: matterSaturationValueKey(deviceId))
+    }
+    
+    /// Get matter saturation value
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMatterSaturationValue(deviceId: UInt64) -> Int? {
+        if let saturation = UserDefaults.standard.value(forKey: matterSaturationValueKey(deviceId)) as? Int {
+            return saturation
         }
         return nil
     }

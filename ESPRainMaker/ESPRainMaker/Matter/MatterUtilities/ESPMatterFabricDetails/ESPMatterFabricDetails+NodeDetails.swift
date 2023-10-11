@@ -93,8 +93,8 @@ extension ESPMatterFabricDetails {
         if let data = getAddNodeToMatterFabricDetails(groupId: groupId, deviceId: temporaryDeviceId) {
             saveAddNodeToMatterFabricDetailsMatterNodeId(groupId: groupId, matterNodeId: matterNodeId, data: data)
             if let id = matterNodeId.hexToDecimal {
-                if ESPMatterFabricDetails.shared.getRainmakerType(groupId: groupId, deviceId: temporaryDeviceId) {
-                    ESPMatterFabricDetails.shared.saveRainmakerType(groupId: groupId, deviceId: id, val: ESPMatterConstants.trueFlag)
+                if self.getRainmakerType(groupId: groupId, deviceId: temporaryDeviceId) {
+                    self.saveRainmakerType(groupId: groupId, deviceId: id, val: ESPMatterConstants.trueFlag)
                 }
             }
             removeAddNodeToMatterFabricDetails(groupId: groupId, deviceId: temporaryDeviceId)

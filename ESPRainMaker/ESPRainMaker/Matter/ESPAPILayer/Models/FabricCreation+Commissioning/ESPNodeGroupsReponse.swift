@@ -64,4 +64,18 @@ class ESPNodeGroupMatterFabricDetails: Codable {
         case userCatId = "user_cat_id"
         case ipk
     }
+    
+    var catIdAdminDecimal: UInt64? {
+        if let catIdAdminHex = self.catIdAdmin, let catIdAdmin = "\(ESPMatterConstants.prefixCATId)\(catIdAdminHex)".hexToDecimal {
+            return catIdAdmin
+        }
+        return nil
+    }
+    
+    var catIdOperateDecimal: UInt64? {
+        if let catIdOperateHex = self.catIdOperate, let catIdOperate = "\(ESPMatterConstants.prefixCATId)\(catIdOperateHex)".hexToDecimal {
+            return catIdOperate
+        }
+        return nil
+    }
 }

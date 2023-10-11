@@ -28,25 +28,31 @@ extension ESPMTRCommissioner {
     ///   - requestId: request id
     func performPostCommissioningAction(groupId: String, requestId: String, matterNodeId: String) {
         if let deviceId = matterNodeId.hexToDecimal {
-            self.readAttributeRainmakerNodeIdFromDevice(deviceId: deviceId) { rainmakerNodeId in
-                if let rainmakerNodeId = rainmakerNodeId {
-                    ESPMatterFabricDetails.shared.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.trueFlag)
-                    self.sendMatterNodeIdToDevice(deviceId: deviceId, matterNodeId: matterNodeId) { result in
-                        if result {
-                            self.readAttributeChallengeFromDevice(deviceId: deviceId) { challenge in
-                                if let challenge = challenge {
-                                    self.confirmMatterRainmakerCommissioning(requestId: requestId, groupId: groupId, rainmakerNodeId: rainmakerNodeId, challenge: challenge)
-                                } else {
-                                    self.hideLoaderAndShowFailure(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.challengeFailedMsg, buttonTitle: ESPMatterConstants.okTxt)
+            let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
+            let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerServerSupported(groupId: groupId, deviceId: temporaryDeviceId)
+            if clusterInfo.0, let endpoint = clusterInfo.1, let point = UInt16(endpoint) {
+                self.readAttributeRainmakerNodeIdFromDevice(deviceId: deviceId, endpoint: point) { rainmakerNodeId in
+                    if let rainmakerNodeId = rainmakerNodeId {
+                        self.fabricDetails.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.trueFlag)
+                        self.sendMatterNodeIdToDevice(deviceId: deviceId, endpoint: point, matterNodeId: matterNodeId) { result in
+                            if result {
+                                self.readAttributeChallengeFromDevice(deviceId: deviceId, endpoint: point) { challenge in
+                                    if let challenge = challenge {
+                                        self.confirmMatterRainmakerCommissioning(requestId: requestId, groupId: groupId, rainmakerNodeId: rainmakerNodeId, challenge: challenge)
+                                    } else {
+                                        self.hideLoaderAndShowFailure(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.challengeFailedMsg, buttonTitle: ESPMatterConstants.okTxt)
+                                    }
                                 }
+                            } else {
+                                self.hideLoaderAndShowFailure(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.fetchChallengeFailedMsg, buttonTitle: ESPMatterConstants.okTxt)
                             }
-                        } else {
-                            self.hideLoaderAndShowFailure(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.fetchChallengeFailedMsg, buttonTitle: ESPMatterConstants.okTxt)
                         }
+                    } else {
+                        self.confirmMatterNodeCommissioning(requestId: requestId, groupId: groupId)
                     }
-                } else {
-                    self.confirmMatterNodeCommissioning(requestId: requestId, groupId: groupId)
                 }
+            } else {
+                self.confirmMatterNodeCommissioning(requestId: requestId, groupId: groupId)
             }
         }
     }
@@ -93,10 +99,10 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
     ///   - temporaryDeviceId: temporary device id
     func exportMatterNodeData(isRainmaker: Bool, groupId: String, matterNodeId: String, temporaryDeviceId: UInt64) {
         if let id = matterNodeId.hexToDecimal {
-            ESPMatterFabricDetails.shared.exportData(groupId: groupId, temporaryDeviceId: temporaryDeviceId, matterNodeId: matterNodeId)
+            self.fabricDetails.exportData(groupId: groupId, temporaryDeviceId: temporaryDeviceId, matterNodeId: matterNodeId)
             let isRainmakerFlag = isRainmaker ? ESPMatterConstants.trueFlag : ESPMatterConstants.falseFlag
-            ESPMatterFabricDetails.shared.saveRainmakerType(groupId: groupId, deviceId: id, val: isRainmakerFlag)
-            ESPMatterFabricDetails.shared.saveDeviceName(groupId: groupId, matterNodeId: matterNodeId)
+            self.fabricDetails.saveRainmakerType(groupId: groupId, deviceId: id, val: isRainmakerFlag)
+            self.fabricDetails.saveDeviceName(groupId: groupId, matterNodeId: matterNodeId)
             DispatchQueue.main.async {
                 self.uidelegate?.showLoaderInView(message: ESPMatterConstants.fetchingEndpointsMsg)
             }
@@ -115,7 +121,7 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
         self.uidelegate?.hideLoaderFromView()
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         if let _ = status {
-            if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].getMatterNodeId() {
+            if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].getMatterNodeId() {
                 self.exportMatterNodeData(isRainmaker: true, groupId: grpId, matterNodeId: matterNodeId, temporaryDeviceId: temporaryDeviceId)
             }
         } else {
@@ -132,7 +138,7 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         guard let _ = error else {
             if let response = response, let status = response.status, status.lowercased() == ESPMatterConstants.success {
-                if let group = group, let grpId = group.groupID, let data = ESPMatterFabricDetails.shared.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].matterNodeId {
+                if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].matterNodeId {
                     self.exportMatterNodeData(isRainmaker: false, groupId: grpId, matterNodeId: matterNodeId, temporaryDeviceId: temporaryDeviceId)
                 }
             }

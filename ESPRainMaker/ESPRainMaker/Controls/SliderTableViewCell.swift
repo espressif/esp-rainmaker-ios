@@ -81,7 +81,7 @@ class SliderTableViewCell: UITableViewCell {
     var minHue: Int = 0
     var maxHue: Int = 100
     weak var paramChipDelegate: ParamCHIPDelegate?
-    
+    var isSaturation: Bool = false
 
     override func awakeFromNib() {
         super.awakeFromNib()

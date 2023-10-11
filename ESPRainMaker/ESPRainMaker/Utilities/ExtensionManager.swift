@@ -484,6 +484,12 @@ extension UINavigationController {
 
 extension UIViewController {
     
+    /// Update device list and navigate to home screen
+    func updateDeviceListAndNavigateToHomeScreen() {
+        User.shared.updateDeviceList = true
+        self.navigationController?.popToRootViewController(animated: false)
+    }
+    
     /// Set autoresizing mask
     /// - Parameter cell: table view cell
     func setAutoresizingMask(_ cell: UITableViewCell) {

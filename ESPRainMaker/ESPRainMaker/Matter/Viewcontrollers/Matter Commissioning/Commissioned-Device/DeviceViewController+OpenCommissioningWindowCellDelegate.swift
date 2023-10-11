@@ -25,38 +25,43 @@ extension DeviceViewController: OpenCommissioningWindowCellDelegate {
     
     /// Open commissioning Window
     func openCommissioningWindow() {
-        if let matterNodeId = self.matterNodeId, let id = matterNodeId.hexToDecimal, let controller = ESPMTRCommissioner.shared.sController {
-            controller.getBaseDevice(id, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let commissioningWindowCluster = MTRBaseClusterAdministratorCommissioning(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue), let saltData = ESPDefaultData.threadSaltData.data(using: .utf8), let pakeVerifierData = ESPDefaultData.threadPAKEVerifierData.data(using: .utf8), let pakeVerifier = Data(base64Encoded: pakeVerifierData), let salt = Data(base64Encoded: saltData) {
-                    let params = MTRAdministratorCommissioningClusterOpenCommissioningWindowParams()
-                    params.pakeVerifier = pakeVerifier
-                    params.salt = salt
-                    params.discriminator = NSNumber(value: 3840)
-                    params.iterations = NSNumber(value: 15000)
-                    params.commissioningTimeout = NSNumber(value: 300)
-                    params.timedInvokeTimeoutMs = NSNumber(value: 60000)
-                    commissioningWindowCluster.openWindow(with: params) { error in
-                        if let error = error {
-                            DispatchQueue.main.async {
-                                self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.openCWFailureMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+        if let matterNodeId = self.matterNodeId, let id = matterNodeId.hexToDecimal {
+            if User.shared.discoveredNodes.contains(matterNodeId) {
+                ESPMTRCommissioner.shared.isCommissioningWindowOpen(deviceId: id) { status, error in
+                    guard let error = error else {
+                        if let status = status, !status {
+                            ESPMTRCommissioner.shared.openCommissioningWindow(deviceId: id) { setupPasscode in
+                                if let setupPasscode = setupPasscode {
+                                    self.showManualPairingCode(setupPasscode: setupPasscode)
+                                } else {
+                                    self.alertUser(title: ESPMatterConstants.failureTxt,
+                                                   message: ESPMatterConstants.commissioningWindowOpenFailedMsg,
+                                                   buttonTitle: ESPMatterConstants.okTxt,
+                                                   callback: {})
+                                }
                             }
                         } else {
-                            DispatchQueue.main.async {
-                                self.showManualPairingCode()
-                            }
+                            self.alertUser(title: ESPMatterConstants.emptyString,
+                                           message: ESPMatterConstants.commissioningWindowAlreadyOpenMsg,
+                                           buttonTitle: ESPMatterConstants.okTxt,
+                                           callback: {})
                         }
+                        return
                     }
                 }
+            } else {
+                Utility.showToastMessage(view: self.view,
+                                         message: ESPMatterConstants.deviceNotReachableMsg)
             }
         }
     }
     
     /// Show manual pairing code
-    func showManualPairingCode() {
+    func showManualPairingCode(setupPasscode: String) {
         let dismissAction = UIAlertAction(title: ESPMatterConstants.dismissTxt, style: .default) { _ in}
         let copyMsgAction = UIAlertAction(title: ESPMatterConstants.copyCodeMsg, style: .default) { _ in
             let pasteboard = UIPasteboard.general
-            pasteboard.string = ESPDefaultData.openCWManualPairingCode
+            pasteboard.string = setupPasscode
         }
         self.showAlertWithOptions(title: ESPMatterConstants.pairingModeTitle, message: ESPMatterConstants.pairingModeMessage, actions: [copyMsgAction, dismissAction])
     }

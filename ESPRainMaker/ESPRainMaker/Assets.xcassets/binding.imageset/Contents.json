@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "link@1x.png",
+      "filename" : "binding@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "link@2x.png",
+      "filename" : "binding@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "link@3x.png",
+      "filename" : "binding@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
@@ -19,5 +19,8 @@
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "original"
   }
 }

@@ -25,7 +25,7 @@ import Matter
 protocol ParamSliderColorControlProtocol {
     func setupInitialHueValues()
     func setCurrentHueValue()
-    func getColorController(timeout: TimeInterval, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void)
+    func getColorCluster(timeout: TimeInterval, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void)
     func getCurrentHueValue(completionHandler: @escaping (NSNumber?, Error?) -> Void)
     func changeHue(toValue _: CGFloat)
 }
@@ -33,34 +33,11 @@ protocol ParamSliderColorControlProtocol {
 @available(iOS 16.4, *)
 extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
     
-    func setupInitialHueValues() {
-        DispatchQueue.main.async {
-            self.title.text = "Hue"
-            self.hueSlider.minimumValue = 0.0
-            self.hueSlider.maximumValue = 254.0
-            self.hueSlider.hasRainbow = false
-            self.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
-            self.minLabel.text = "0"
-            self.maxLabel.text = "254"
-            self.hueSlider.value = 0.0
-            self.minImage.image = UIImage(named: "saturation_low")
-            self.maxImage.image = UIImage(named: "saturation_high")
-        }
-    }
-    
-    func setCurrentHueValue() {
-        self.getCurrentHueValue() { hue, error in
-            DispatchQueue.main.async {
-                if let hue = hue {
-                    self.currentHueValue = CGFloat(hue.intValue)
-                    self.hueSlider.value = self.currentHueValue
-                    self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                }
-            }
-        }
-    }
-    
-    func getColorController(timeout: TimeInterval, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
+    /// Get color cluster
+    /// - Parameters:
+    ///   - timeout: timeout
+    ///   - completionHandler: completion
+    func getColorCluster(timeout: TimeInterval, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
         if let group = nodeGroup, let groupId = group.groupID, let id = deviceId, let controller = ESPMTRCommissioner.shared.sController {
             let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: id)
             controller.getBaseDevice(id, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
@@ -75,10 +52,30 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
         }
     }
     
+    /// Set initial hue values
+    func setupInitialHueValues() {
+        DispatchQueue.main.async {
+            self.title.text = "Hue"
+            self.hueSlider.minimumValue = 0.0
+            self.hueSlider.maximumValue = 360.0
+            self.hueSlider.hasRainbow = false
+            self.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
+            self.minLabel.text = "0"
+            self.maxLabel.text = "360"
+            if let node = self.node, let id = self.deviceId, let val = node.getMatterHueValue(deviceId: id) {
+                self.hueSlider.value = CGFloat(val)
+            } else {
+                self.hueSlider.value = 0.0
+            }
+            self.minImage.image = nil
+            self.maxImage.image = nil
+        }
+    }
     
-    
+    /// Get current hue value
+    /// - Parameter completionHandler: completion
     func getCurrentHueValue(completionHandler: @escaping (NSNumber?, Error?) -> Void) {
-        self.getColorController(timeout: 10.0) { controller in
+        self.getColorCluster(timeout: 10.0) { controller in
             if let controller = controller {
                 controller.readAttributeCurrentHue() { hue, error in
                     completionHandler(hue, error)
@@ -89,22 +86,68 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
         }
     }
     
+    /// Set current hue value
+    func setCurrentHueValue() {
+        self.getCurrentHueValue() { hue, error in
+            DispatchQueue.main.async {
+                if let hue = hue {
+                    if let node = self.node, let id = self.deviceId {
+                        node.setMatterHueValue(hue: Int((hue.floatValue*360.0)/255.0), deviceId: id)
+                    }
+                    self.currentHueValue = CGFloat((hue.floatValue*360.0)/255.0)
+                    self.hueSlider.value = self.currentHueValue
+                    self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                }
+            }
+        }
+    }
+    
+    /// Change hue
+    /// - Parameter val: hue value
     func changeHue(toValue val: CGFloat) {
-        self.getColorController(timeout: 10.0) { controller in
-            if let controller = controller {
+        self.getColorCluster(timeout: 10.0) { cluster in
+            if let cluster = cluster {
                 let params = MTRColorControlClusterMoveToHueParams()
-                let finalHue = Float((val*255.0)/360.0)
+                let finalHue = Int(val*(255.0/360.0))
                 params.hue = NSNumber(value: finalHue)
-                controller.moveToHue(with: params) { error in
+                if CGFloat(finalHue) < self.currentHueValue {
+                    params.direction = NSNumber(value: 0)
+                } else {
+                    params.direction = NSNumber(value: 1)
+                }
+                params.optionsMask = NSNumber(value: 0)
+                params.optionsOverride = NSNumber(value: 0)
+                params.transitionTime = NSNumber(value: 1)
+                cluster.moveToHue(with: params) { error in
                     DispatchQueue.main.async {
                         if let _ = error {
                             self.hueSlider.value = self.currentHueValue
                             self.paramChipDelegate?.alertUserError(message: "Failed to update hue!")
                             self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
                         } else {
+                            if let node = self.node, let id = self.deviceId {
+                                node.setMatterHueValue(hue: Int(val), deviceId: id)
+                            }
                             self.currentHueValue = val
                         }
                     }
+                }
+            }
+        }
+    }
+    
+    /// Subscribe to hue attribute
+    func subscribeToHueAttribute() {
+        if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
+            ESPMTRCommissioner.shared.subscribeToHueValue(groupId: grpId, deviceId: deviceId) { hue in
+                DispatchQueue.main.async {
+                    let finalValue = (CGFloat(hue)*360.0)/255.0
+                    if let node = self.node, let id = self.deviceId {
+                        node.setMatterHueValue(hue: Int(finalValue), deviceId: id)
+                    }
+                    self.currentHueValue = finalValue
+                    self.hueSlider.value = self.currentHueValue
+                    self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
                 }
             }
         }

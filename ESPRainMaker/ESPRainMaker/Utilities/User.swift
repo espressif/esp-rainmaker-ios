@@ -152,13 +152,21 @@ class User {
     }
     
     /// Start search for matter devices on local network
-    ///
+    /// - Parameter discoveredNodesCompletion: discovered nodes completion
     func startCommissionedMatterServiceDiscovery(discoveredNodesCompletion: @escaping ([String]) -> Void) {
         DispatchQueue.main.async {
             self.discoveredNodes.removeAll()
             self.discoveredNodesCompletion = discoveredNodesCompletion
             self.matterConnectionManager.delegate = self
             self.matterConnectionManager.searchForServicesOfType(type: Constants.matterCommissionedServiceType, domain: Constants.serviceDomain)
+        }
+    }
+    
+    /// Stop matter discovery
+    func stopMatterDiscovery() {
+        DispatchQueue.main.async {
+            self.matterConnectionManager.stopService()
+            self.matterConnectionManager.delegate = nil
         }
     }
     
@@ -203,7 +211,6 @@ extension User: ESPLocalControlDelegate {
 
 extension User: ESPMatterNodesDiscoveredDelegate {
     func matterDevicesDiscovered(matterNodes: [String]) {
-        self.matterConnectionManager.delegate = nil
         self.discoveredNodes = matterNodes
         self.discoveredNodesCompletion?(matterNodes)
     }

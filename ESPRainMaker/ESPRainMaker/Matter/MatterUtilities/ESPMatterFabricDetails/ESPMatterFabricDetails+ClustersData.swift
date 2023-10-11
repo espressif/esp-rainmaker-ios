@@ -213,6 +213,75 @@ extension ESPMatterFabricDetails {
         return nil
     }
     
+    /// Save device serial number
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - softwareVersion: serial number
+    func saveSerialNumber(groupId: String, deviceId: UInt64, serialNumber: String) {
+        let key = ESPMatterFabricKeys.shared.groupSerialNumberKey(groupId, deviceId)
+        UserDefaults.standard.set(serialNumber as Any, forKey: key)
+    }
+    
+    /// Get serial number
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: serial number
+    func getSerialNumber(groupId: String, deviceId: UInt64) -> String? {
+        let key = ESPMatterFabricKeys.shared.groupSerialNumberKey(groupId, deviceId)
+        if let sw = UserDefaults.standard.value(forKey: key) as? String {
+            return sw
+        }
+        return nil
+    }
+    
+    /// Save device serial number
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - softwareVersion: serial number
+    func saveManufacturerName(groupId: String, deviceId: UInt64, manufacturerName: String) {
+        let key = ESPMatterFabricKeys.shared.groupManufacturerNameKey(groupId, deviceId)
+        UserDefaults.standard.set(manufacturerName as Any, forKey: key)
+    }
+    
+    /// Get serial number
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: serial number
+    func getManufacturerName(groupId: String, deviceId: UInt64) -> String? {
+        let key = ESPMatterFabricKeys.shared.groupManufacturerNameKey(groupId, deviceId)
+        if let manufacturerName = UserDefaults.standard.value(forKey: key) as? String {
+            return manufacturerName
+        }
+        return nil
+    }
+    
+    /// Save product name
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - softwareVersion: serial number
+    func saveProductName(groupId: String, deviceId: UInt64, productName: String) {
+        let key = ESPMatterFabricKeys.shared.groupProductNameKey(groupId, deviceId)
+        UserDefaults.standard.set(productName as Any, forKey: key)
+    }
+    
+    /// Get serial number
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: serial number
+    func getProductName(groupId: String, deviceId: UInt64) -> String? {
+        let key = ESPMatterFabricKeys.shared.groupProductNameKey(groupId, deviceId)
+        if let productName = UserDefaults.standard.value(forKey: key) as? String {
+            return productName
+        }
+        return nil
+    }
+    
     /// Remove all clusters data
     /// - Parameters:
     ///   - groupId: group ud
@@ -238,21 +307,21 @@ extension ESPMatterFabricDetails {
         }
         if let deviceId = matterNodeId.hexToDecimal {
             if let endpointsData = metadata[ESPMatterConstants.endpointsData] as? [UInt] {
-                ESPMatterFabricDetails.shared.saveEndpointsData(groupId: groupId, deviceId: deviceId, endpoints: endpointsData)
+                self.saveEndpointsData(groupId: groupId, deviceId: deviceId, endpoints: endpointsData)
             }
             if let clientsData = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
-                ESPMatterFabricDetails.shared.saveClientsData(groupId: groupId, deviceId: deviceId, clients: clientsData)
+                self.saveClientsData(groupId: groupId, deviceId: deviceId, clients: clientsData)
             }
             if let serversData = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
-                ESPMatterFabricDetails.shared.saveServersData(groupId: groupId, deviceId: deviceId, servers: serversData)
+                self.saveServersData(groupId: groupId, deviceId: deviceId, servers: serversData)
             }
             if let isRainmaker = metadata[ESPMatterConstants.isRainmaker] as? Bool, isRainmaker {
-                ESPMatterFabricDetails.shared.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.trueFlag)
+                self.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.trueFlag)
             } else {
-                ESPMatterFabricDetails.shared.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.falseFlag)
+                self.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.falseFlag)
             }
             if let deviceName = metadata[ESPMatterConstants.deviceName] as? String {
-                ESPMatterFabricDetails.shared.saveDeviceName(groupId: groupId, matterNodeId: matterNodeId, deviceName: deviceName)
+                self.saveDeviceName(groupId: groupId, matterNodeId: matterNodeId, deviceName: deviceName)
             }
         }
     }

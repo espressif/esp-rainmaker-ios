@@ -26,6 +26,7 @@ class ESPNodeGroupMetadataService {
     let url = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes"
     let groupURL = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/node_group"
     var switchIndex: Int?
+    let fabricDetails = ESPMatterFabricDetails.shared
     
     init(switchIndex: Int? = nil) {
         self.switchIndex = switchIndex
@@ -85,7 +86,7 @@ class ESPNodeGroupMetadataService {
     ///   - destinationNodeId: destination node id
     func addDeviceToGroupMetadata(groupId: String, node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
         var finalMetadata: [String: Any]?
-        if let sourceNodeId = node.node_id, var metadata = ESPMatterFabricDetails.shared.getGroupMetadata(groupId: groupId) {
+        if let sourceNodeId = node.node_id, var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
             let keys = metadata.keys
             if keys.contains(sourceNodeId), let value = metadata[sourceNodeId] as? String {
                 if !value.contains(destinationNodeId) {
@@ -107,9 +108,9 @@ class ESPNodeGroupMetadataService {
             self.updateGroupMetadata(groupId: groupId, groupMetadata: data) { result in
                 if result {
                     if data.isEmpty {
-                        ESPMatterFabricDetails.shared.removeGroupMetadata(groupId: groupId)
+                        self.fabricDetails.removeGroupMetadata(groupId: groupId)
                     } else {
-                        ESPMatterFabricDetails.shared.saveGroupMetadata(groupId: groupId, groupMetadata: data)
+                        self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: data)
                     }
                 }
                 completion(result)
@@ -126,7 +127,7 @@ class ESPNodeGroupMetadataService {
     ///   - destinationNodeId: destination node id
     ///   - completion: completion
     func removeDeviceFromGroupMetadata(groupId: String, node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
-        if let sourceNodeId = node.node_id, var metadata = ESPMatterFabricDetails.shared.getGroupMetadata(groupId: groupId) {
+        if let sourceNodeId = node.node_id, var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
             let keys = metadata.keys
             if keys.contains(sourceNodeId), let value = metadata[sourceNodeId] as? String {
                 var finalIds = [String]()
@@ -148,9 +149,9 @@ class ESPNodeGroupMetadataService {
                 self.updateGroupMetadata(groupId: groupId, groupMetadata: metadata) { result in
                     if result {
                         if metadata.isEmpty {
-                            ESPMatterFabricDetails.shared.removeGroupMetadata(groupId: groupId)
+                            self.fabricDetails.removeGroupMetadata(groupId: groupId)
                         } else {
-                            ESPMatterFabricDetails.shared.saveGroupMetadata(groupId: groupId, groupMetadata: metadata)
+                            self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: metadata)
                         }
                     }
                     completion(result)
@@ -169,7 +170,7 @@ class ESPNodeGroupMetadataService {
     ///   - groupMetadata: group metadata
     ///   - completion: completion
     func updateGroupMetadata(groupId: String, groupMetadata: [String: Any], completion: @escaping (Bool) -> Void) {
-        if let group = ESPMatterFabricDetails.shared.getGroupData(groupId: groupId), let groupName = group.groupName {
+        if let group = self.fabricDetails.getGroupData(groupId: groupId), let groupName = group.groupName {
             let sessionWorker = ESPExtendUserSessionWorker()
             sessionWorker.checkUserSession { token, _ in
                 if let token = token {

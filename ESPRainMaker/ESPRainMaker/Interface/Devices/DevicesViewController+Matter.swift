@@ -27,12 +27,15 @@ extension DevicesViewController {
     /// - Parameter completion: completion handler
     func searchForMatterDevices(completion: @escaping ([String]) -> Void) {
         DispatchQueue.main.async {
-            Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
             User.shared.startCommissionedMatterServiceDiscovery() { discoveredNodes in
-                Utility.hideLoader(view: self.view)
                 completion(discoveredNodes)
             }
         }
+    }
+    
+    /// Stop matter discovery
+    func stopMatterDiscovery() {
+        User.shared.stopMatterDiscovery()
     }
     
     /// Get node group matter fabric details
@@ -54,15 +57,9 @@ extension DevicesViewController {
     /// - Parameters:
     ///   - groups: matter groups
     ///   - completion: completion handler
-    func getMatterNodeDetails(groups: [NodeGroup], completion: @escaping () -> Void) {
-        DispatchQueue.main.async {
-            Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
-        }
+    func getMatterNodeGroupDetails(groups: [NodeGroup], completion: @escaping () -> Void) {
         let service = ESPMatterNodeDetailsService(groups: groups)
         service.getNodeDetails {
-            DispatchQueue.main.async {
-                Utility.hideLoader(view: self.view)
-            }
             completion()
         }
     }
@@ -97,7 +94,7 @@ extension DevicesViewController {
                 if let savedGroupId = savedGroup.groupID, let groupId = group.groupID, savedGroupId == groupId {
                     if let savedCATIdAdmin = savedGroup.fabricDetails?.catIdAdmin, let savedCATIdOperate = savedGroup.fabricDetails?.catIdOperate, let catIdAdmin = group.fabricDetails?.catIdAdmin, let catIdOperate = group.fabricDetails?.catIdOperate {
                         if (savedCATIdAdmin != catIdAdmin) || (savedCATIdOperate != catIdOperate) {
-                            ESPMatterFabricDetails.shared.removeUserNOCDetails(groupId: groupId)
+                            self.fabricDetails.removeUserNOCDetails(groupId: groupId)
                         }
                     }
                 }
@@ -114,10 +111,10 @@ extension DevicesViewController: ESPGetNodeGroupsPresentationLogic {
             Utility.hideLoader(view: self.view)
         }
         if let data = data, let groups = data.groups, groups.count > 0 {
-            if let savedGroupsData = ESPMatterFabricDetails.shared.getGroupsData(), let savedGroups = savedGroupsData.groups {
+            if let savedGroupsData = self.fabricDetails.getGroupsData(), let savedGroups = savedGroupsData.groups {
                 self.removeSavedUserNOCs(savedGroups: savedGroups, groups: groups)
             }
-            ESPMatterFabricDetails.shared.saveGroupsData(groups: data)
+            self.fabricDetails.saveGroupsData(groups: data)
             self.groups?.removeAll()
             self.groups = data.groups
             if let nodeGroups = self.nodeGroups {
@@ -127,12 +124,18 @@ extension DevicesViewController: ESPGetNodeGroupsPresentationLogic {
                 self.fetchUserNOCs(groups: nodeGroups) {
                     DispatchQueue.main.async {
                         Utility.hideLoader(view: self.view)
-                        Utility.showLoader(message: ESPMatterConstants.updatingDeviceDetailsMsg, view: self.view)
                     }
-                    let updateCATService = ESPUpdateCATIdService()
-                    updateCATService.updateCATId {
+                    self.searchForMatterDevices { _ in
                         DispatchQueue.main.async {
-                            Utility.hideLoader(view: self.view)
+                            self.stopMatterDiscovery()
+                            self.collectionView.reloadData()
+                        }
+                        let updateCATService = ESPUpdateCATIdService()
+                        updateCATService.updateCATId {
+                            DispatchQueue.main.async {
+                                self.stopMatterDiscovery()
+                                self.searchForMatterDevicesOnLocalNetwork()
+                            }
                         }
                     }
                 }

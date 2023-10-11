@@ -87,7 +87,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         let sessionWorker = ESPExtendUserSessionWorker()
         sessionWorker.checkUserSession() { accessToken, error in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 var url = Constants.getNodes + "?node_details=true&num_records=10"
                 if nextNodeID != nil {
                     url += "&start_id=" + nextNodeID!
@@ -136,8 +136,8 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                                     completionHandler(finalNodeList, nil)
                                 }
                                 return
-                            } else if let status = json["status"] as? String, let description = json["description"] as? String {
-                                if status == "failure" {
+                            } else if let status = json[Constants.statusKey] as? String, let description = json[Constants.descriptionKey] as? String {
+                                if status == Constants.failure {
                                     completionHandler(nil, ESPNetworkError.serverError(description))
                                     return
                                 }
@@ -171,7 +171,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 let url = Constants.getNodes + "?node_id=" + nodeId
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     if !self.validateJSONResponse(response: response) {
@@ -188,8 +188,8 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                                 }
                                 completionHandler(nil, ESPNetworkError.emptyConfigData)
                                 return
-                            } else if let status = json["status"] as? String, let description = json["description"] as? String {
-                                if status == "failure" {
+                            } else if let status = json[Constants.statusKey] as? String, let description = json[Constants.descriptionKey] as? String {
+                                if status == Constants.failure {
                                     completionHandler(nil, ESPNetworkError.serverError(description))
                                     return
                                 }
@@ -218,7 +218,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 let url = Constants.setParam + "?node_id=" + (device.node?.node_id ?? "")
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     if !self.validateJSONResponse(response: response) {
@@ -265,7 +265,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 let url = Constants.getNodeStatus + "?nodeid=" + (node.node_id ?? "")
                 self.session.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     if !self.validateJSONResponse(response: response) {
@@ -306,7 +306,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 self.session.request(Constants.addDevice, method: .put, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     if !self.validateJSONResponse(response: response) {
                         completionHandler(nil, .emptyToken)
@@ -314,14 +314,14 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                     }
                     switch response.result {
                     case let .success(value):
-                        if let json = value as? [String: String] {
+                        if let json = value as? [String: Any] {
                             // Get request id for add device request
                             // This request id will be used for getting the status of add request
-                            if let requestId = json[Constants.requestID] {
+                            if let requestId = json[Constants.requestID] as? String {
                                 completionHandler(requestId, nil)
                                 return
-                            } else if let status = json["status"], let description = json["description"] {
-                                if status == "failure" {
+                            } else if let status = json[Constants.statusKey] as? String, let description = json[Constants.descriptionKey] as? String {
+                                if status.lowercased() == Constants.failure.lowercased() {
                                     completionHandler(nil, ESPNetworkError.serverError(description))
                                     return
                                 }
@@ -353,7 +353,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
             if let token = accessToken {
                 let url = Constants.checkStatus + "?node_id=" + nodeID
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 self.session.request(url + "&request_id=" + requestID + "&user_request=true", method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     if !self.validateJSONResponse(response: response) {
                         completionHandler("error")
@@ -392,7 +392,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
             ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
                 if let token = accessToken {
                     let url = Constants.setParam + "?nodeid=" + nodeid
-                    let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                    let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                     self.session.request(url, method: .put, parameters: parameter, encoding: ESPCustomJsonEncoder.default, headers: headers).responseJSON { response in
                         if !self.validateJSONResponse(response: response) {
                             completionHandler?(.failure)
@@ -459,7 +459,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 self.session.request(url, method: method, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseData { response in
                     if !self.validateDataResponse(response: response) {
                         completionHandler(nil, .emptyToken)
@@ -496,7 +496,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 self.session.request(url, method: method, parameters: parameter, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
                     if !self.validateJSONResponse(response: response) {
                         completionHandler(nil, .emptyToken)
@@ -530,7 +530,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
             if let token = accessToken {
-                let headers: HTTPHeaders = ["Content-Type": "application/json", "Authorization": token]
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
                 let params = [ESPCustomJsonEncoder.key: parameter as Any]
                 self.session.request(url, method: .put, parameters: params, encoding: ESPCustomJsonEncoder.default, headers: headers).responseData { response in
                     if !self.validateDataResponse(response: response) {
@@ -580,5 +580,4 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
             }
         }
     }
-    
 }

@@ -120,14 +120,29 @@ extension Node {
     
     /// Is rainmaker
     var isRainmaker: Bool {
+        if let node_type = node_type {
+            if node_type.lowercased() == ESPMatterConstants.rainmakerMatter.lowercased() {
+                return true
+            }
+        }
         if let metadata = metadata, let val = metadata[ESPMatterConstants.isRainmaker] as? Bool {
             return val
         }
         return false
     }
     
+    var userDefinaedName: String? {
+        if let metadata = metadata, let matterDeviceName = metadata[ESPMatterConstants.deviceName] as? String {
+            return matterDeviceName
+        }
+        return nil
+    }
+    
     /// Matter device name
     var matterDeviceName: String? {
+        if let deviceName = self.rainmakerDeviceName {
+            return deviceName
+        }
         if let metadata = metadata, let matterDeviceName = metadata[ESPMatterConstants.deviceName] as? String {
             return matterDeviceName
         }
@@ -184,6 +199,30 @@ extension Node {
         return nil
     }
     
+    /// Software version
+    var serialNumber: Int? {
+        if let metadata = metadata, let serialNumber = metadata[ESPMatterConstants.serialNumber] as? Int {
+            return serialNumber
+        }
+        return nil
+    }
+    
+    /// Software version
+    var manufacturerName: String? {
+        if let metadata = metadata, let manufacturerName = metadata[ESPMatterConstants.manufacturerName] as? String {
+            return manufacturerName
+        }
+        return nil
+    }
+    
+    /// Software version
+    var productName: String? {
+        if let metadata = metadata, let productName = metadata[ESPMatterConstants.productName] as? String {
+            return productName
+        }
+        return nil
+    }
+    
     /// group Id
     var groupId: String? {
         if let metadata = metadata, let id = metadata[ESPMatterConstants.groupId] as? String {
@@ -208,6 +247,27 @@ extension Node {
     var controllerNodeId: String? {
         if let metadata = metadata, let id = metadata[ESPMatterConstants.controllerNodeId] as? String {
             return id
+        }
+        return nil
+    }
+    
+    var deviceType: Int? {
+        if let metadata = metadata, let type = metadata[ESPMatterConstants.deviceType] as? Int {
+            return type
+        }
+        return nil
+    }
+    
+    var rainmakerDeviceName: String? {
+        if self.isRainmaker, let devices = self.devices, devices.count > 0 {
+            let device = devices[0]
+            if let params = device.params {
+                for param in params {
+                    if let type = param.type, type == Constants.deviceNameParam, let properties = param.properties, properties.contains("write"), let value = param.value as? String {
+                        return value
+                    }
+                }
+            }
         }
         return nil
     }

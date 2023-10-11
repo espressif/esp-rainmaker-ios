@@ -29,37 +29,38 @@ class ESPMatterCommissioningVC: UIViewController {
     let csrQueue = DispatchQueue(label: "com.matterqueue.generate.csr")
     var groupId: String?
     var group: ESPNodeGroup?
+    var matterNodeId: String?
     var nodes: [ESPNodeDetails]?
     var onboardingPayload: String?
+    let fabricDetails = ESPMatterFabricDetails.shared
+    let paramTypes = [Constants.scanQRCode,
+                 Constants.slider,
+                 Constants.hue,
+                 Constants.toggle,
+                 Constants.hueCircle,
+                 Constants.bigSwitch,
+                 Constants.dropdown,
+                 Constants.trigger,
+                 Constants.hidden]
+    
+    @IBOutlet weak var topBarTitle: BarTitle!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.setNavigationBar()
+        self.topBarTitle.text = ESPMatterConstants.commissioning
         self.issueUserNOC()
     }
     
-    func setNavigationBar() {
-        //Navigation bar clear color
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        self.navigationController?.navigationBar.shadowImage = UIImage()
-        self.navigationController?.navigationBar.isTranslucent = true
-        self.navigationController?.view.backgroundColor = .clear
-        //Custom Bottom Line
-        self.navigationController?.addCustomBottomLine(color: .darkGray, height: 0.5)
-        //Title text attributes
-        self.title = "Commissioning"
-        //Navigation text attributes
-        self.setNavigationTextAttributes(color: .darkGray)
-        //Left bar button item
-        let goBackButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(goBack))
-        goBackButton.tintColor = .darkGray
-        self.navigationItem.leftBarButtonItem = goBackButton
+    /// Back pressed by user
+    /// - Parameter sender: button
+    @IBAction func backButtonPressed(_ sender: Any) {
+        self.goBack()
     }
     
     /// Issue user NOC
     func issueUserNOC() {
         if let group = group, let groupId = group.groupID {
-            guard let _ = ESPMatterFabricDetails.shared.getUserNOCDetails(groupId: groupId) else {
+            guard let _ = self.fabricDetails.getUserNOCDetails(groupId: groupId) else {
                 Utility.showLoader(message: "Issuing user NOC...", view: self.view)
                 var finalCSRString = ""
                 self.csrQueue.async {
@@ -76,13 +77,15 @@ class ESPMatterCommissioningVC: UIViewController {
                 return
             }
             ESPMTRCommissioner.shared.shutDownController()
-            self.startCommissioningProcess()
+            Task {
+                await self.setup()
+            }
         }
     }
     
     /// Initialize matter controller
     func initializeMatterController() {
-        if let group = group, let grpId = group.groupID, let userNOCData = ESPMatterFabricDetails.shared.getUserNOCDetails(groupId: grpId) {
+        if let group = group, let grpId = group.groupID, let userNOCData = self.fabricDetails.getUserNOCDetails(groupId: grpId) {
             ESPMTRCommissioner.shared.shutDownController()
             ESPMTRCommissioner.shared.group = group
             ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCData)
@@ -102,28 +105,51 @@ class ESPMatterCommissioningVC: UIViewController {
         ESPMatterEcosystemInfo.shared.removeDeviceName()
         ESPMatterEcosystemInfo.shared.removeCertDeclaration()
         ESPMatterEcosystemInfo.shared.removeAttestationInfo()
-        if let group = self.group, let groupName = group.groupName, let onboardingPayload = self.onboardingPayload, let setupPayload = try? MTRSetupPayload(onboardingPayload: onboardingPayload) {
-            Task {
-                let topology = MatterAddDeviceRequest.Topology(ecosystemName: Configuration.shared.appConfiguration.matterEcosystemName, homes: [MatterAddDeviceRequest.Home(displayName: groupName)])
-                let setupRequest = MatterAddDeviceRequest(topology: topology, setupPayload: setupPayload)
-                do {
-                    try await setupRequest.perform()
-                    self.validatePayloadAndStartCommissioning(groupName: groupName)
-                } catch {
-                    self.validatePayloadAndStartCommissioning(groupName: groupName)
-                }
+        if let group = self.group, let groupName = group.groupName, let groupId = group.groupID {
+            if let onboardingPayload = self.onboardingPayload, let setupPayload = try? MTRSetupPayload(onboardingPayload: onboardingPayload) {
+                self.startEcosystemCommissioning(matterEcosystemName: Configuration.shared.appConfiguration.matterEcosystemName,
+                                                 groupName: groupName,
+                                                 setupPayload: setupPayload)
+            } else {
+                self.startEcosystemCommissioning(matterEcosystemName: Configuration.shared.appConfiguration.matterEcosystemName,
+                                                 groupName: groupName,
+                                                 groupId: groupId,
+                                                 showDeviceCriteria: true,
+                                                 setupPayload: nil)
+            }
+        }
+    }
+    
+    /// Start commissioning to Apple's ecosystem
+    /// - Parameters:
+    ///   - matterEcosystemName: matter ecosystem name
+    ///   - groupName: group name
+    ///   - showDeviceCriteria: show device criteria
+    ///   - setupPayload: setup payload
+    func startEcosystemCommissioning(matterEcosystemName: String, groupName: String, groupId: String? = nil, showDeviceCriteria: Bool = false, setupPayload: MTRSetupPayload?) {
+        Task {
+            let topology = MatterAddDeviceRequest.Topology(ecosystemName: matterEcosystemName, homes: [MatterAddDeviceRequest.Home(displayName: groupName)])
+            var setupRequest = MatterAddDeviceRequest(topology: topology, setupPayload: setupPayload)
+            if showDeviceCriteria {
+                setupRequest.showDeviceCriteria = .allDevices
+            }
+            do {
+                try await setupRequest.perform()
+                self.validatePayloadAndStartCommissioning(groupName: groupName)
+            } catch {
+                self.validatePayloadAndStartCommissioning(groupName: groupName)
             }
         }
     }
     
     /// Start controller update process
     /// - Parameter deviceId: device id
-    func startControllerUpdate(deviceId: UInt64, matterNodeId: String, refreshToken: String) {
-        ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId) { result in
+    func startControllerUpdate(deviceId: UInt64, endpoint: UInt16, matterNodeId: String, refreshToken: String) {
+        ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId, endpoint: endpoint) { result in
             if result {
-                self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
+                self.appendRefreshToken(deviceId: deviceId, endpoint: endpoint, refreshToken: refreshToken) { result in
                     if result {
-                        self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL)
+                        self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL)
                     } else {
                         DispatchQueue.main.async {
                             self.hideLoaderAndAlertUser()
@@ -141,7 +167,10 @@ class ESPMatterCommissioningVC: UIViewController {
     /// Hide loader and alert user
     func hideLoaderAndAlertUser() {
         Utility.hideLoader(view: self.view)
-        self.alertUser(title: "", message: ESPMatterConstants.operationFailedMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {
+        self.alertUser(title: ESPMatterConstants.emptyString,
+                       message: ESPMatterConstants.operationFailedMsg,
+                       buttonTitle: ESPMatterConstants.okTxt,
+                       callback: {
             User.shared.updateDeviceList = true
             self.navigationController?.popToRootViewController(animated: true)
         })
@@ -164,8 +193,43 @@ class ESPMatterCommissioningVC: UIViewController {
     
     /// Go to Home screen
     func goToHomeScreen() {
-        User.shared.updateDeviceList = true
-        self.navigationController?.popToRootViewController(animated: true)
+        if let groupId = self.groupId, let matterNodeId = self.matterNodeId, let deviceId = matterNodeId.hexToDecimal, ESPMatterClusterUtil.shared.isRainmakerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+            Utility.showLoader(message: "", view: self.view)
+            self.updateDeviceName {
+                Utility.hideLoader(view: self.view)
+                User.shared.updateDeviceList = true
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+        } else {
+            User.shared.updateDeviceList = true
+            self.navigationController?.popToRootViewController(animated: true)
+        }
+    }
+    
+    ///Update device name for rainmaker + matter nodes
+    func updateDeviceName(completion: @escaping () -> Void) {
+        NetworkManager.shared.getNodes { nodes, _ in
+            if let nodes = nodes, nodes.count > 0 {
+                User.shared.associatedNodeList = nodes
+                for node in nodes {
+                    if let nodeId = node.node_id, node.isRainmaker, let deviceName = node.userDefinaedName, let groupId = self.groupId, let savedDeviceName = ESPMatterEcosystemInfo.shared.getDeviceName(), savedDeviceName == deviceName, let devices = node.devices, devices.count > 0 {
+                        let device = devices[0]
+                        for param in device.params ?? [] {
+                            if let type = param.type, type == Constants.deviceNameParam, let properties = param.properties, properties.contains("write"), let name = device.name {
+                                let attributeKey = param.name ?? ""
+                                DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: [name: [attributeKey: deviceName]], delegate: self) { _ in
+                                    completion()
+                                }
+                                return
+                            }
+                        }
+                    }
+                }
+                completion()
+            } else {
+                completion()
+            }
+        }
     }
 }
 
@@ -185,13 +249,13 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
     ///   - deviceId: device id
     ///   - refreshToken: refresh token
     ///   - completion: completion
-    func appendRefreshToken(deviceId: UInt64, refreshToken: String, completion: @escaping (Bool) -> Void) {
+    func appendRefreshToken(deviceId: UInt64, endpoint: UInt16, refreshToken: String, completion: @escaping (Bool) -> Void) {
         let index = refreshToken.index(refreshToken.startIndex, offsetBy: 960)
         let firstPayload = refreshToken[..<index]
         let secondPayload = refreshToken.replacingOccurrences(of: firstPayload, with: "")
-        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: String(firstPayload)) { result in
+        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: String(firstPayload)) { result in
             if result {
-                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, token: secondPayload) { result in
+                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: secondPayload) { result in
                     completion(result)
                 }
                 return
@@ -205,15 +269,15 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
     ///   - deviceId: device id
     ///   - endpointURL: endpoint URL
     ///   - completion: completion
-    func authorize(matterNodeId: String, deviceId: UInt64, endpointURL: String) {
-        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
+    func authorize(matterNodeId: String, deviceId: UInt64, endpoint: UInt16, endpointURL: String) {
+        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
             if result {
-                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId) { result in
+                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
                     if result, let controller = ESPMTRCommissioner.shared.sController, let id = controller.controllerNodeID?.uint64Value {
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id) { result in
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
                             if result {
                                 let str = String(id, radix:16)
-                                ESPMatterFabricDetails.shared.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
+                                self.fabricDetails.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
                                 DispatchQueue.main.async {
                                     self.goToHomeScreen()
                                 }
@@ -244,15 +308,20 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
     ///   - matterNodeId: matter node id
     func cloudLoginConcluded(cloudResponse: ESPSessionResponse?, groupId: String, matterNodeId: String) {
         if let cloudResponse = cloudResponse, var refreshToken = cloudResponse.refreshToken, let deviceId = matterNodeId.hexToDecimal {
-            ESPMatterFabricDetails.shared.saveAWSTokens(cloudResponse: cloudResponse, groupId: groupId, matterNodeId: matterNodeId)
+            let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
+            var endpoint: UInt16 = 0
+            if let point = clusterInfo.1, let id = UInt16(point) {
+                endpoint = id
+            }
+            self.fabricDetails.saveAWSTokens(cloudResponse: cloudResponse, groupId: groupId, matterNodeId: matterNodeId)
             DispatchQueue.main.async {
                 Utility.showLoader(message: ESPMatterConstants.updatingDeviceListMsg, view: self.view)
             }
-            ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId) { result in
+            ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId, endpoint: endpoint) { result in
                 if result {
-                    self.appendRefreshToken(deviceId: deviceId, refreshToken: refreshToken) { result in
+                    self.appendRefreshToken(deviceId: deviceId, endpoint: endpoint, refreshToken: refreshToken) { result in
                         if result {
-                            self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpointURL: Configuration.shared.awsConfiguration.baseURL)
+                            self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL)
                         } else {
                             DispatchQueue.main.async {
                                 self.hideLoaderAndAlertUser()
@@ -286,7 +355,10 @@ extension ESPMatterCommissioningVC {
     /// Launch commissioning dialog
     /// - Parameter groupName: group name
     func launchCommissioningDialog(groupName: String) {
-        self.alertUser(title: ESPMatterConstants.info, message: ESPMatterConstants.scanQRCodeMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {
+        self.alertUser(title: ESPMatterConstants.info,
+                       message: ESPMatterConstants.scanQRCodeMsg,
+                       buttonTitle: ESPMatterConstants.okTxt,
+                       callback: {
             Task {
                 let topology = MatterAddDeviceRequest.Topology(ecosystemName: Configuration.shared.appConfiguration.matterEcosystemName, homes: [MatterAddDeviceRequest.Home(displayName: groupName)])
                 let setupRequest = MatterAddDeviceRequest(topology: topology)
@@ -305,7 +377,10 @@ extension ESPMatterCommissioningVC {
         if let _ = ESPMatterEcosystemInfo.shared.getOnboardingPayload() {
             self.startCommissioning()
         } else {
-            self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.commissioningFailureMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
+            self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                message: ESPMatterConstants.commissioningFailureMsg,
+                                buttonTitle: ESPMatterConstants.okTxt,
+                                callback: {})
         }
     }
     
@@ -331,9 +406,11 @@ extension ESPMatterCommissioningVC: ESPIssueUserNOCPresentationLogic {
         Utility.hideLoader(view: self.view)
         guard let _ = error else {
             if let response = response {
-                ESPMatterFabricDetails.shared.saveUserNOCDetails(groupId: groupId, data: response)
+                self.fabricDetails.saveUserNOCDetails(groupId: groupId, data: response)
                 ESPMTRCommissioner.shared.shutDownController()
-                self.startCommissioningProcess()
+                Task {
+                    await self.setup()
+                }
             }
             return
         }
@@ -365,10 +442,13 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
     }
     
     func reloadData(groupId: String? = nil, matterNodeId: String? = nil) {
+        self.matterNodeId = matterNodeId
         if let groupId = groupId, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
             if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
                 //Show login screen
-                self.alertUser(title: "", message: ESPMatterConstants.controllerNeedsAccessMsg, buttonTitle: ESPMatterConstants.okTxt) {
+                self.alertUser(title: ESPMatterConstants.emptyString,
+                               message: ESPMatterConstants.controllerNeedsAccessMsg,
+                               buttonTitle: ESPMatterConstants.okTxt) {
                     DispatchQueue.main.async {
                         self.showRainmakerLoginScreen(groupId: groupId, matterNodeId: matterNodeId)
                     }
@@ -389,7 +469,12 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                         DispatchQueue.main.async {
                             Utility.showLoader(message: "", view: self.view)
                         }
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id) { result in
+                        var endpoint: UInt16 = 0
+                        let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: id)
+                        if let point = clusterInfo.1, let id = UInt16(point) {
+                            endpoint = id
+                        }
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
                             DispatchQueue.main.async {
                                 Utility.hideLoader(view: self.view)
                                 self.goToHomeScreen()
@@ -405,6 +490,8 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                         self.goToHomeScreen()
                     }
                 }
+                   
+               
             }
         }
     }
@@ -412,14 +499,17 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
     
     func showError(title: String, message: String, buttonTitle: String) {
         DispatchQueue.main.async {
-            self.showErrorAlert(title: title, message: message, buttonTitle: buttonTitle, callback: {})
+            self.showErrorAlert(title: title,
+                                message: message,
+                                buttonTitle: buttonTitle,
+                                callback: {})
         }
     }
     
     //TODO: update_device_cat_ids: Write to ACL
     func updateDeviceCATIds(completion: @escaping () -> Void) {
         var index = 0
-        if let group = self.group, group.shouldUpdate, let fabricDetails = group.fabricDetails, let catIdAdminHex = fabricDetails.catIdAdmin, let catIdAdmin = "FFFFFFFD\(catIdAdminHex)".hexToDecimal, let catIdOperateHex = fabricDetails.catIdOperate, let catIdOperate = "FFFFFFFD\(catIdOperateHex)".hexToDecimal, let nodes = self.nodes, nodes.count > 0 {
+        if let group = self.group, group.shouldUpdate, let fabricDetails = group.fabricDetails, let catIdAdmin = fabricDetails.catIdAdminDecimal, let catIdOperate = fabricDetails.catIdOperateDecimal, let nodes = self.nodes, nodes.count > 0 {
             for node in nodes {
                 if let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal {
                     ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { accessControlEntries in
@@ -428,16 +518,13 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                             for index in 0..<accessControlEntries.count {
                                 var entry = accessControlEntries[index]
                                 if entry.privilege.intValue == 5 {
-                                    entry.subjects = [catIdAdmin]
+                                    entry.subjects = [NSNumber(value: catIdAdmin)]
                                 } else if entry.privilege.intValue == 3 {
-                                    entry.subjects = [catIdOperate]
+                                    entry.subjects = [NSNumber(value: catIdOperate)]
                                 }
                                 entries.append(entry)
                             }
                             ESPMTRCommissioner.shared.writeAllACLAttributes(deviceId: deviceId, accessControlEntry: entries) { result in
-                                if result {
-                                    print("cat ids updated successfully: admin: \(catIdAdmin), operate: \(catIdOperate)")
-                                }
                                 index+=1
                                 if index >= nodes.count {
                                     completion()
@@ -460,6 +547,14 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
         } else {
             completion()
         }
+    }
+}
+
+@available(iOS 16.4, *)
+extension ESPMatterCommissioningVC: ParamUpdateProtocol {
+    
+    func failureInUpdatingParam() {
+        
     }
 }
 #endif
