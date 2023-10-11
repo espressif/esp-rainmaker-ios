@@ -20,6 +20,7 @@ import AuthenticationServices
 import Foundation
 import JWTDecode
 import SafariServices
+import WidgetKit
 
 #if ESPRainMakerMatter
 protocol RainmakerControllerFlowDelegate: AnyObject {
@@ -317,6 +318,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
                     DispatchQueue.main.async {
                         // Configure remote notification.
                         self.appDelegate?.configureRemoteNotifications()
+                        self.refreshWidgets()
                         self.dismiss(animated: true, completion: nil)
                     }
                 }
@@ -559,6 +561,16 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         self.controllerSigninButton.isHidden = true
         self.signInButton.isHidden = false
     }
+    
+    /// Reload timelines for widget
+    func refreshWidgets() {
+        if #available(iOS 14.0, *) {
+            if #available(iOS 16.0, *) {
+                WidgetCenter.shared.invalidateConfigurationRecommendations()
+            }
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
 }
 
 extension SignInViewController: UIAdaptivePresentationControllerDelegate {
@@ -659,6 +671,7 @@ extension SignInViewController: ESPLoginPresentationLogic {
                 User.shared.updateUserInfo = true
                 // Configure remote notification.
                 self.appDelegate?.configureRemoteNotifications()
+                self.refreshWidgets()
                 self.dismiss(animated: true, completion: nil)
             }
         }
@@ -718,6 +731,7 @@ extension SignInViewController: ESPIdProviderLoginPresenter {
                 // Configure remote notification.
                 self.appDelegate?.configureRemoteNotifications()
                 self.dismiss(animated: true, completion: nil)
+                self.refreshWidgets()
             }
         }
     }

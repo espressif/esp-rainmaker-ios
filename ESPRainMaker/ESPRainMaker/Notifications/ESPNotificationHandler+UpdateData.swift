@@ -31,6 +31,7 @@ extension ESPNotificationHandler {
                 if let connectivityJSON = eventData[ESPNotificationKeys.connectivityKey] as? [String:Any], let timestamp = connectivityJSON[ESPNotificationKeys.timestampKey] as? Int {
                     node.timestamp = timestamp
                 }
+                ESPLocalStorageHandler().saveNodeDetails(nodes: User.shared.associatedNodeList)
                 // Triggered local notification to let classes update their UI elements.
                 NotificationCenter.default.post(Notification(name: Notification.Name(Constants.reloadCollectionView)))
                 NotificationCenter.default.post(Notification(name: Notification.Name(Constants.reloadParamTableView)))

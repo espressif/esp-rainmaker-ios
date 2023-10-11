@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import WidgetKit
 
 // Protocol for handling silent notifications.
 protocol ESPSilentNotificationProtocol {
@@ -55,6 +56,11 @@ struct ESPSilentNotificationHandler: ESPSilentNotificationProtocol {
                                                 // Triggered local notification to let classes update their UI elements.
                                                 NotificationCenter.default.post(Notification(name: Notification.Name(Constants.reloadCollectionView)))
                                                 NotificationCenter.default.post(Notification(name: Notification.Name(Constants.reloadParamTableView)))
+                                                // Save node details for reflecting updated parameter value in Widget.
+                                                ESPLocalStorageHandler().saveNodeDetails(nodes: User.shared.associatedNodeList)
+                                                if #available(iOS 14.0, *) {
+                                                    WidgetCenter.shared.reloadAllTimelines()
+                                                }
                                             }
                                         }
                                     }
