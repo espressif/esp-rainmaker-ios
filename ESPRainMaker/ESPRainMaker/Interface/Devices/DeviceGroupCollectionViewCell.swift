@@ -319,13 +319,21 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             if let rMakerDeviceName = rainmakerNode.rainmakerDeviceName {
                 cell.deviceName.text = isSingleDeviceNode ? rMakerDeviceName : rMakerDeviceName+".\(indexPath.item)"
             } else {
-                cell.deviceName.text = isSingleDeviceNode ? deviceName : deviceName+".\(indexPath.item)"
+                if let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                    cell.deviceName.text = isSingleDeviceNode ? name : name+".\(indexPath.item)"
+                } else {
+                    cell.deviceName.text = isSingleDeviceNode ? deviceName : deviceName+".\(indexPath.item)"
+                }
             }
         } else {
             if let rMakerDeviceName = rainmakerNode.rainmakerDeviceName {
                 cell.deviceName.text = isSingleDeviceNode ? rMakerDeviceName : rMakerDeviceName+".\(indexPath.item)"
             } else {
-                cell.deviceName.text = isSingleDeviceNode ? matterNodeId : matterNodeId+".\(indexPath.item)"
+                if let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                    cell.deviceName.text = isSingleDeviceNode ? name : name+".\(indexPath.item)"
+                } else {
+                    cell.deviceName.text = isSingleDeviceNode ? matterNodeId : matterNodeId+".\(indexPath.item)"
+                }
             }
         }
         let (result, _) = ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId)

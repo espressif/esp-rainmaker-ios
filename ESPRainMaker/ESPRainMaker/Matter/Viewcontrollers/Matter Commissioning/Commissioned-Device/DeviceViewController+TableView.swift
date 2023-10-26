@@ -26,7 +26,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController].contains(value) {
+            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel].contains(value) {
                 return 100.0
             } else if value == ESPMatterConstants.delete {
                 return 75.0
@@ -56,12 +56,19 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
         }
         if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let _ = matterNodeId.hexToDecimal, let deviceId = matterNodeId.hexToDecimal, indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if value == ESPMatterConstants.deviceName {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: DeviceNameCell.reuseIdentifier, for: indexPath) as? DeviceNameCell {
+            if value == ESPMatterConstants.deviceName || value == ESPMatterConstants.nodeLabel {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: DeviceInfoCell.reuseIdentifier, for: indexPath) as? DeviceInfoCell {
                     cell.delegate = self
                     cell.rainmakerNode = self.rainmakerNode
-                    if let node = self.rainmakerNode, let name = node.rainmakerDeviceName {
+                    if let node = self.rainmakerNode, node.isRainmaker, let name = node.rainmakerDeviceName {
+                        cell.deviceInfo = .deviceName
                         cell.deviceName.text = name
+                    } else {
+                        cell.deviceInfo = .nodeLabel
+                        cell.propertyName.text = "Name"
+                        if let name = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                            cell.deviceName.text = name
+                        }
                     }
                     return cell
                 }
@@ -234,6 +241,66 @@ extension DeviceViewController: DeviceNameDelegate {
                     self.topBarTitle.text = name
                     completion(name)
                 }
+            }
+        }
+    }
+    
+    /// Edit node label called
+    /// - Parameters:
+    ///   - rainmakerNode: rainmaker node
+    ///   - nodeLabel: node label
+    ///   - completion: completion handler
+    func editNodeLabelPressed(rainmakerNode: Node?, nodeLabel: String, completion: @escaping (String?) -> Void) {
+        if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.getMatterNodeId?.hexToDecimal {
+            let input = UIAlertController(title: "Name", message: ESPMatterConstants.enterDeviceNameMsg, preferredStyle: .alert)
+            input.addTextField { textField in
+                textField.placeholder = "Enter device name"
+                self.addHeightConstraint(textField: textField)
+            }
+            input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
+                let valueTextField = input?.textFields![0]
+                if let text = valueTextField?.text, text.replacingOccurrences(of: " ", with: "").count > 0, text.count <= 32 {
+                    let finalTxt = text.replacingOccurrences(of: " ", with: "")
+                    if finalTxt.count > 0 {
+                        self.deviceName = valueTextField?.text
+                        self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId, completion: completion)
+                        return
+                    }
+                }
+                self.alertUser(title: ESPMatterConstants.failureTxt,
+                               message: ESPMatterConstants.enterValidDeviceNameMsg,
+                               buttonTitle: ESPMatterConstants.okTxt,
+                               callback: {})
+            }))
+            input.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            self.present(input, animated: true, completion: nil)
+        }
+    }
+    
+    /// Update
+    /// - Parameters:
+    ///   - nodeLabel: node label
+    ///   - node: node
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - completion: completion handler
+    func updateMatterNodeLabel(nodeLabel: String, node: Node, groupId: String, deviceId: UInt64, completion: @escaping (String?) -> Void) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
+        }
+        ESPMTRCommissioner.shared.setNodeLabel(deviceId: deviceId, nodeLabel: nodeLabel) { result in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+            }
+            if result {
+                DispatchQueue.main.async {
+                    self.topBarTitle.text = nodeLabel
+                }
+                self.fabricDetails.removeNodeLabel(groupId: groupId, deviceId: deviceId)
+                self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
+                completion(nodeLabel)
+            } else {
+                completion(nil)
             }
         }
     }

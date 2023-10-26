@@ -29,6 +29,9 @@ extension DeviceViewController: RemoveDeviceDelegate {
             let worker = ESPExtendUserSessionWorker()
             worker.checkUserSession { token, _ in
                 if let token = token, let node = self.node, let nodeId = node.nodeID, let rainmakerNode = User.shared.getNode(id: nodeId), let groupId = rainmakerNode.groupId {
+                    if let deviceId = node.deviceId {
+                        self.fabricDetails.removeNodeLabel(groupId: groupId, deviceId: deviceId)
+                    }
                     DispatchQueue.main.async {
                         Utility.showLoader(message: ESPMatterConstants.removingDeviceMsg, view: self.view)
                     }

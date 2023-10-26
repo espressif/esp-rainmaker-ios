@@ -42,6 +42,30 @@ extension ESPMatterFabricDetails {
         return nil
     }
     
+    /// Save node label
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - nodeLabel: node label
+    func saveNodeLabel(groupId: String, deviceId: UInt64, nodeLabel: String) {
+        ESPTokenWorker.shared.saveDeviceName(nodeLabel, forGroupId: groupId, andDeviceId: deviceId)
+    }
+    
+    /// Save node label
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - type: device type
+    func getNodeLabel(groupId: String, deviceId: UInt64) -> String? {
+        if let nodeLabel = ESPTokenWorker.shared.getDeviceName(forGroupId: groupId, andDeviceId: deviceId) {
+            return nodeLabel
+        }
+        return nil
+    }
+    
+    func removeNodeLabel(groupId: String, deviceId: UInt64) {
+        ESPTokenWorker.shared.removeDeviceName(forGroupId: groupId, andDeviceId: deviceId)
+    }
+    
     /// Set rainmaker type
     /// - Parameters:
     ///   - groupId: group id

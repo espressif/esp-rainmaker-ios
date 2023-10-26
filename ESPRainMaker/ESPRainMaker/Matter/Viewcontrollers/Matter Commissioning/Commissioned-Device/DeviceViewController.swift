@@ -56,6 +56,8 @@ class DeviceViewController: UIViewController {
         self.restartMatterController()
         if let node = self.rainmakerNode, let deviceName = node.rainmakerDeviceName {
             self.topBarTitle.text = deviceName
+        } else if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.getMatterNodeId?.hexToDecimal, let name = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+            self.topBarTitle.text = name
         } else if let deviceName = self.deviceName {
             self.topBarTitle.text = deviceName
         } else {
@@ -192,47 +194,80 @@ class DeviceViewController: UIViewController {
     /// Register cells
     func registerCells() {
         self.deviceTableView.register(UINib(nibName: SliderTableViewCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: SliderTableViewCell.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: DeviceNameCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceNameCell.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: DeviceInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceInfoCell.reuseIdentifier)
         self.generateCells()
     }
     
     /// Generate cells
     func generateCells() {
-        cellInfo.removeAll()
+        self.cellInfo.removeAll()
         if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
-            if let node = self.rainmakerNode, let _ = node.rainmakerDeviceName {
-                cellInfo.append(ESPMatterConstants.deviceName)
+            if let node = self.rainmakerNode, let _ = node.rainmakerDeviceName, node.isRainmaker {
+                self.cellInfo.append(ESPMatterConstants.deviceName)
+                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                self.setupTableUI()
+            } else {
+                if let _ = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                    self.cellInfo.append(ESPMatterConstants.nodeLabel)
+                    self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                    self.setupTableUI()
+                } else if !self.isDeviceOffline {
+                    ESPMTRCommissioner.shared.shutDownController()
+                    self.restartMatterController()
+                    ESPMTRCommissioner.shared.getNodeLabel(deviceId: deviceId) { nodeLabel in
+                        if let nodeLabel = nodeLabel {
+                            ESPMatterFabricDetails.shared.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
+                            self.cellInfo.append(ESPMatterConstants.nodeLabel)
+                        }
+                        self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                        self.setupTableUI()
+                    }
+                }
             }
-            if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
-                cellInfo.append(ESPMatterConstants.onOff)
-            }
-            if ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId).0 {
-                cellInfo.append(ESPMatterConstants.levelControl)
-            }
-            if ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId).0 {
-                cellInfo.append(ESPMatterConstants.colorControl)
-                cellInfo.append(ESPMatterConstants.saturationControl)
-            }
-            if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
-                cellInfo.append(ESPMatterConstants.rainmakerController)
-            }
-            if !self.isDeviceOffline {
-                ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { _ in }
-            }
+        } else {
+            self.setupTableUI()
         }
-        self.deviceTableView.isUserInteractionEnabled = !self.isDeviceOffline
-        self.setupOfflineUI()
-        self.deviceTableView.reloadData()
+    }
+    
+    /// Add cells for cluster commands
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    func addClusterUtilCells(groupId: String, deviceId: UInt64) {
+        if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.onOff)
+        }
+        if ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.levelControl)
+        }
+        if ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.colorControl)
+            cellInfo.append(ESPMatterConstants.saturationControl)
+        }
+        if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.rainmakerController)
+        }
+    }
+    
+    /// Setup tableview UI
+    func setupTableUI() {
+        DispatchQueue.main.async {
+            self.deviceTableView.isUserInteractionEnabled = !self.isDeviceOffline
+            self.setupOfflineUI()
+            self.deviceTableView.reloadData()
+        }
     }
     
     /// Setup offline UI
     func setupOfflineUI() {
-        if self.isDeviceOffline {
-            self.offlineView.isHidden = false
-            self.offlineViewHeight.constant = 17.0
-        } else {
-            self.offlineView.isHidden = true
-            self.offlineViewHeight.constant = 0.0
+        DispatchQueue.main.async {
+            if self.isDeviceOffline {
+                self.offlineView.isHidden = false
+                self.offlineViewHeight.constant = 17.0
+            } else {
+                self.offlineView.isHidden = true
+                self.offlineViewHeight.constant = 0.0
+            }
         }
     }
     

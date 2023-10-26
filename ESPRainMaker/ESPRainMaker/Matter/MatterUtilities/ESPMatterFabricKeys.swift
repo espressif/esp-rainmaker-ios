@@ -95,9 +95,11 @@ class ESPMatterFabricKeys {
     var serversDataKey: (_ deviceId: UInt64) -> String = { deviceId in
         return "\(deviceId).servers.data"
     }
-    
     var groupDeviceTypeKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
         return "\(groupId).\(deviceId).device.type"
+    }
+    var groupNodeLabelKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
+        return "\(groupId).\(deviceId).node.label"
     }
     var groupDeviceRainmakerTypeKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
         return "\(groupId).\(deviceId).rainmaker.type"

@@ -231,7 +231,10 @@ class DevicesBindingViewController: UIViewController {
     func configureCell(cell: inout BindingTableViewCell, action: Action, destinationNode: ESPNodeDetails) {
         if let destinationDeviceMatterNodeID = destinationNode.getMatterNodeId() {
             if let group = self.group, let groupId = group.groupID {
-                if let deviceName = self.fabricDetails.getDeviceName(groupId: groupId, matterNodeId: destinationDeviceMatterNodeID) {
+                if let deviceId = destinationDeviceMatterNodeID.hexToDecimal, let deviceName = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                    cell.deviceName.text = deviceName
+                    cell.name = deviceName
+                } else if let deviceName = self.fabricDetails.getDeviceName(groupId: groupId, matterNodeId: destinationDeviceMatterNodeID) {
                     cell.deviceName.text = deviceName
                     cell.name = deviceName
                 } else {

@@ -69,6 +69,11 @@ extension ESPMTRCommissioner {
         }
     }
     
+    /// Remove fabric at a given fabric index
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - index: fabric index
+    ///   - completion: completion
     func removeFabricAtIndex(deviceId: UInt64, atIndex index: NSNumber, completion: @escaping (Bool) -> Void) {
         self.getOpCredsCluster(deviceId: deviceId) { cluster in
             guard let cluster = cluster else {
