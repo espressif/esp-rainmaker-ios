@@ -32,6 +32,8 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 return 75.0
             } else if [ESPMatterConstants.levelControl, ESPMatterConstants.colorControl, ESPMatterConstants.saturationControl].contains(value) {
                 return 126.0
+            } else if value == ESPMatterConstants.participantData {
+                return 278.0
             }
         }
         return 0.0
@@ -51,6 +53,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
             if value == ESPMatterConstants.delete, let cell = tableView.dequeueReusableCell(withIdentifier: RemoveDeviceCell.reuseIdentifier, for: indexPath) as? RemoveDeviceCell {
                 cell.delegate = self
                 self.setAutoresizingMask(cell)
+                cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             }
         }
@@ -70,6 +73,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                             cell.deviceName.text = name
                         }
                     }
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
             } else if value == ESPMatterConstants.onOff {
@@ -85,6 +89,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.setupInitialUI()
                         cell.subscribeToOnOffAttribute()
                     }
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
             } else if value == ESPMatterConstants.levelControl {
@@ -106,6 +111,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
                     cell.subscribeToLevelAttribute()
                 }
+                cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             } else if value == ESPMatterConstants.colorControl {
                 let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
@@ -122,6 +128,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 self.setAutoresizingMask(cell)
                 cell.setupInitialHueValues()
                 cell.subscribeToHueAttribute()
+                cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             } else if value == ESPMatterConstants.saturationControl {
                 let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
@@ -138,23 +145,37 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 self.setAutoresizingMask(cell)
                 cell.setupInitialSaturationValue()
                 cell.subscribeToSaturationAttribute()
+                cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             } else if value == ESPMatterConstants.delete {
                 if let cell = tableView.dequeueReusableCell(withIdentifier: RemoveDeviceCell.reuseIdentifier, for: indexPath) as? RemoveDeviceCell {
                     cell.delegate = self
                     self.setAutoresizingMask(cell)
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
             } else if value == ESPMatterConstants.openCW {
                 if let cell = tableView.dequeueReusableCell(withIdentifier: OpenCommissioningWindowCell.reuseIdentifier, for: indexPath) as? OpenCommissioningWindowCell {
                     cell.delegate = self
                     self.setAutoresizingMask(cell)
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
             } else if value == ESPMatterConstants.rainmakerController {
                 if let cell = tableView.dequeueReusableCell(withIdentifier: LaunchControllerCell.reuseIdentifier, for: indexPath) as? LaunchControllerCell {
                     cell.delegate = self
                     self.setAutoresizingMask(cell)
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
+                    return cell
+                }
+            } else if value == ESPMatterConstants.participantData {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantDataCell.reuseIdentifier, for: indexPath) as? ParticipantDataCell {
+                    cell.delegate = self
+                    if let data = self.fabricDetails.fetchParticipantData(groupId: groupId, deviceId: deviceId) {
+                        cell.setupUI(data: data)
+                    }
+                    self.setAutoresizingMask(cell)
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
             }

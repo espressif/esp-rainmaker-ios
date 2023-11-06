@@ -137,5 +137,8 @@ class ESPMatterFabricKeys {
     var groupProductNameKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
         return "\(groupId).\(deviceId).matter.product.name"
     }
+    var participantDataKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
+        return "\(groupId).\(deviceId).matter.participant.data.key"
+    }
 }
 

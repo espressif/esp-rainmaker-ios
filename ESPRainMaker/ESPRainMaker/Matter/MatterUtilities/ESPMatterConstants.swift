@@ -119,6 +119,7 @@ struct ESPMatterConstants {
     static let colorControl = "colorControl"
     static let saturationControl = "saturationControl"
     static let rainmakerController = "rainmakerController"
+    static let participantData = "participantData"
     
     /// API keys
     static let id = "id"
@@ -280,4 +281,9 @@ struct ESPMatterConstants {
     static let value = "value"
     
     static let prefixCATId = "FFFFFFFD"
+    
+    static let enterBadgeDetails = "Enter Badge Details"
+    static let enterBadgeUserNameMsg = "Please enter a valid user name. Only spaces are not allowed."
+    static let enterBadgeCompanyNameMsg = "Please enter a valid company name. Only spaces are not allowed."
+    static let enterBadgeEventNameMsg = "Please enter a valid event name. Only spaces are not allowed."
 }
