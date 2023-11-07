@@ -46,7 +46,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
     ///   - matterNodeId: matter node id
     ///   - deviceId: device id
     ///   - indexPath: index path
-    func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath) {
+    func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath, rNode: Node? = nil) {
         let result = ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId)
         let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
         var endpointClusterId: [String: UInt]?
@@ -64,7 +64,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
         if let nodeId = node.nodeID, let rainmakerNode = User.shared.getNode(id: nodeId), !rainmakerNode.isRainmaker {
             self.showMatterDeviceVCWithNode(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath, switchIndex: switchIndex)
         } else {
-            if let matterNodeId = node.getMatterNodeId(), User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+            if let rNode = rNode, let matterNodeId = rNode.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                 self.showMatterDeviceVCWithNode(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath, switchIndex: switchIndex)
             } else {
                 self.showDeviceTraitListVC(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath)

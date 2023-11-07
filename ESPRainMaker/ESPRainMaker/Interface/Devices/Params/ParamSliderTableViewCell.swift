@@ -23,6 +23,7 @@ import Matter
 
 protocol ParamCHIPDelegate: AnyObject {
     func levelInitialValuesSet()
+    func levelSet()
     func alertUserError(message: String)
     func matterAPIRequestSent()
     func matterAPIResponseReceived()
@@ -96,21 +97,21 @@ class ParamSliderTableViewCell: SliderTableViewCell {
                 }
                 self.currentFinalValue = self.finalValue
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        var val: Float = 0.0
-                        if self.dataType.lowercased() == "int" {
-                            self.sliderValue = self.paramName + ": \(Int(self.finalValue))"
-                            DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.paramName: Int(self.finalValue)]], delegate: self.paramDelegate)
-                            self.param.value = Int(self.finalValue)
-                            val = Float(Int(self.finalValue))
-                        } else {
-                            self.sliderValue = self.paramName + ": \(self.finalValue)"
-                            DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.paramName: self.finalValue]], delegate: self.paramDelegate)
-                            self.param.value = self.finalValue
-                            val = self.finalValue
-                        }
-                        self.sliderInitialValue = val
-                        sender.setValue(val, animated: true)
+                    var val: Float = 0.0
+                    if self.dataType.lowercased() == "int" {
+                        self.sliderValue = self.paramName + ": \(Int(self.finalValue))"
+                        DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.paramName: Int(self.finalValue)]], delegate: self.paramDelegate)
+                        self.param.value = Int(self.finalValue)
+                        val = Float(Int(self.finalValue))
+                    } else {
+                        self.sliderValue = self.paramName + ": \(self.finalValue)"
+                        DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.paramName: self.finalValue]], delegate: self.paramDelegate)
+                        self.param.value = self.finalValue
+                        val = self.finalValue
                     }
+                    self.sliderInitialValue = val
+                    sender.setValue(val, animated: true)
+                }
             }
         }
     }

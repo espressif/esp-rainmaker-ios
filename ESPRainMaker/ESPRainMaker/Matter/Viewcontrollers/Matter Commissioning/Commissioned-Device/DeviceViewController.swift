@@ -90,6 +90,25 @@ class DeviceViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         self.setNavigationTextAttributes(color: .darkGray)
         tabBarController?.tabBar.isHidden = true
+        NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    @objc func appEnterForeground() {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
+        }
+        ESPMTRCommissioner.shared.shutDownController()
+        self.restartMatterController()
+        DispatchQueue.main.async {
+            self.deviceTableView.reloadData()
+            DispatchQueue.main.asyncAfter(deadline: .now()+2.0) {
+                Utility.hideLoader(view: self.view)
+            }
+        }
     }
     
     /// Show beta label

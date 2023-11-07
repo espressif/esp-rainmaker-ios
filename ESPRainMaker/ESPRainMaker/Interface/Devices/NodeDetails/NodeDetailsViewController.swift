@@ -105,10 +105,10 @@ class NodeDetailsViewController: UIViewController {
             Utility.showLoader(message: "Deleting node", view: self.view)
             #if ESPRainMakerMatter
             self.removeFabric { _ in
-                self.removeDeviceFromRainmaker()
+                self.removeDeviceInformation()
             }
             #else
-            self.removeDeviceFromRainmaker()
+            self.removeDeviceInformation()
             #endif
         }
         let noAction = UIAlertAction(title: "No", style: .default, handler: nil)
@@ -124,7 +124,7 @@ class NodeDetailsViewController: UIViewController {
         view.endEditing(true)
         cell.nodeDetailActionLabel.text = "Turn On Pairing Mode"
         cell.addMemberButtonAction = {
-            if let node = self.currentNode, let matterNodeId = node.matterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+            if let node = self.currentNode, let matterNodeId = node.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                 self.openCommissioningWindow()
             } else {
                 Utility.showToastMessage(view: self.view, message: ESPMatterConstants.deviceNotReachableMsg)
@@ -136,7 +136,7 @@ class NodeDetailsViewController: UIViewController {
     /// Open commissioning Window
     @available(iOS 16.4, *)
     func openCommissioningWindow() {
-        if let node = currentNode, let matterNodeId = node.matterNodeId, let id = matterNodeId.hexToDecimal {
+        if let node = currentNode, let matterNodeId = node.getMatterNodeId, let id = matterNodeId.hexToDecimal {
             ESPMTRCommissioner.shared.openCommissioningWindow(deviceId: id) { setupPasscode in
                 DispatchQueue.main.async {
                     if let setupPasscode = setupPasscode {
@@ -196,7 +196,7 @@ class NodeDetailsViewController: UIViewController {
     /// Remove fabric
     /// - Parameter completion: completion handler
     func removeFabric(completion: @escaping (Bool) -> Void) {
-        if let node = currentNode, let matterNodeId = node.matterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+        if let node = currentNode, let matterNodeId = node.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
             #if ESPRainMakerMatter
             if #available(iOS 16.4, *) {
                 ESPMTRCommissioner.shared.readCurrentFabricIndex(deviceId: deviceId) { index in
@@ -219,47 +219,6 @@ class NodeDetailsViewController: UIViewController {
         }
     }
     
-    /// Remove device from rainmaker
-    func removeDeviceFromRainmaker() {
-        if let nodeId = self.currentNode.node_id {
-            let parameters = ["user_id": User.shared.userInfo.userID,
-                              "node_id": nodeId,
-                              "secret_key": "",
-                              "operation": "remove"]
-            // Call method to dissociate node from user
-            NetworkManager.shared.addDeviceToUser(parameter: parameters) { requestId, error in
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                    guard let removeNodeError = error else {
-                        self.nodeDeletionSuccessful()
-                        return
-                    }
-                    if !ESPNetworkMonitor.shared.isConnectedToNetwork {
-                        Utility.showToastMessage(view: self.view, message: self.nodeRemovalFailedMsg)
-                    } else {
-                        Utility.showToastMessage(view: self.view, message: removeNodeError.description)
-                    }
-                }
-            }
-        } else {
-            self.showErrorAlert(title: ESPMatterConstants.failureTxt,
-                                message: ESPMatterConstants.operationFailedMsg,
-                                buttonTitle: ESPMatterConstants.okTxt,
-                                callback: {})
-        }
-    }
-    
-    /// Node deletion success action
-    func nodeDeletionSuccessful() {
-        if let oMNId = self.currentNode?.originalMatterNodeId {
-            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
-        }
-        User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
-            node.node_id == self.currentNode.node_id
-        })
-        self.updateDeviceListAndNavigateToHomeScreen()
-    }
-
     @IBAction func backButtonPressed(_: Any) {
         navigationController?.popViewController(animated: true)
     }
@@ -386,7 +345,7 @@ class NodeDetailsViewController: UIViewController {
         }
         
         #if ESPRainMakerMatter
-        if #available(iOS 16.4, *), let node = currentNode, let matterNodeId = node.matterNodeId {
+        if #available(iOS 16.4, *), let node = currentNode, let matterNodeId = node.getMatterNodeId {
             if node.isOpenCommissioningWindowSupported.0 {
                 index += 1
                 dataSource.append([])
@@ -824,5 +783,87 @@ extension NodeDetailsViewController: SystemServiceTableViewCellDelegate {
             self.navigationController?.popToRootViewController(animated: false)
         }
     }
+}
+
+//MARK: Node deletion APIs
+extension NodeDetailsViewController {
     
+    /// Remove device information from group metadata
+    /// Remove device from rainmaker cloud
+    func removeDeviceInformation() {
+        self.removeDeviceFromRainmaker { result in
+            if result {
+                self.removeDeviceInfoFromGroupMetadata { _ in
+                    self.nodeDeletionSuccessful()
+                }
+            } else {
+                self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                    message: ESPMatterConstants.operationFailedMsg,
+                                    buttonTitle: ESPMatterConstants.okTxt,
+                                    callback: {})
+            }
+        }
+    }
+    
+    /// Remove device information from group metadata
+    /// - Parameter completion: completion with result
+    func removeDeviceInfoFromGroupMetadata(completion: @escaping (Bool) -> Void) {
+        if let group = self.group, let grpId = group.groupID, let currentNode = self.currentNode, let id = currentNode.node_id {
+            let service = ESPNodeGroupMetadataService()
+            if currentNode.isOnOffServerSupported.0 {
+                service.removeDestinationNodeFromGroupMetadata(groupId: grpId, destinationNodeId: id) { result in
+                    completion(result)
+                    return
+                }
+            } else if currentNode.isOnOffClientSupported {
+                service.removeSourceNodeFromGroupMetadata(groupId: grpId, node: currentNode) { result in
+                    completion(result)
+                    return
+                }
+            }
+        }
+        completion(false)
+    }
+    
+    /// Remove device from rainmaker
+    /// - Parameter completion: completion handler with response
+    func removeDeviceFromRainmaker(completion: @escaping (Bool) -> Void) {
+        if let nodeId = self.currentNode.node_id {
+            let parameters = ["user_id": User.shared.userInfo.userID,
+                              "node_id": nodeId,
+                              "secret_key": "",
+                              "operation": "remove"]
+            // Call method to dissociate node from user
+            NetworkManager.shared.addDeviceToUser(parameter: parameters) { requestId, error in
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                }
+                guard let removeNodeError = error else {
+                    completion(true)
+                    return
+                }
+                DispatchQueue.main.async {
+                    if !ESPNetworkMonitor.shared.isConnectedToNetwork {
+                        Utility.showToastMessage(view: self.view, message: self.nodeRemovalFailedMsg)
+                    } else {
+                        Utility.showToastMessage(view: self.view, message: removeNodeError.description)
+                    }
+                }
+                completion(false)
+            }
+        } else {
+            completion(false)
+        }
+    }
+    
+    /// Node deletion success action
+    func nodeDeletionSuccessful() {
+        if let oMNId = self.currentNode?.originalMatterNodeId {
+            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
+        }
+        User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
+            node.node_id == self.currentNode.node_id
+        })
+        self.updateDeviceListAndNavigateToHomeScreen()
+    }
 }

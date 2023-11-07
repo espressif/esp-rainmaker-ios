@@ -44,7 +44,7 @@ class ESPMatterLightUIService {
             for node in allNodes {
                 let isOnOffServerSupported = node.isOnOffServerSupported
                 if let nodeId = node.node_id, isOnOffServerSupported.0 {
-                    if let groupId = self.fabricDetails.getGroupId(nodeId: nodeId), let matterNodeId = node.matterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let group = self.getGroup(groupId: groupId), let userNOC = self.fabricDetails.getUserNOCDetails(groupId: groupId), let deviceId = matterNodeId.hexToDecimal {
+                    if let groupId = self.fabricDetails.getGroupId(nodeId: nodeId), let matterNodeId = node.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let group = self.getGroup(groupId: groupId), let userNOC = self.fabricDetails.getUserNOCDetails(groupId: groupId), let deviceId = matterNodeId.hexToDecimal {
                         if let grp = ESPMTRCommissioner.shared.group, let grpId = grp.groupID, grpId != groupId {
                             ESPMTRCommissioner.shared.shutDownController()
                             ESPMTRCommissioner.shared.group = group

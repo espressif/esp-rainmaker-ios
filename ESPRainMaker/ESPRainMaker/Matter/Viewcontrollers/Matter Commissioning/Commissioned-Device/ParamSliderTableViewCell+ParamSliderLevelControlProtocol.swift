@@ -268,15 +268,19 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
             self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: cont) { controller in
                 if let controller = controller {
                     let finalValue = Int(val*2.55)
-                    let levelParams = MTRLevelControlClusterMoveToLevelParams()
+                    let levelParams = MTRLevelControlClusterMoveToLevelWithOnOffParams()
                     levelParams.level = NSNumber(value: finalValue)
-                    controller.moveToLevel(with: levelParams) { error in
+                    controller.moveToLevelWithOnOff(with: levelParams) { error in
                         DispatchQueue.main.async {
                             if let _ = error {
                                 self.slider.setValue(Float(self.currentLevel), animated: true)
                             } else {
                                 if let node = self.node, let id = self.deviceId {
                                     node.setMatterLevelValue(level: finalValue, deviceId: id)
+                                    if let flag = node.isMatterLightOn(deviceId: id), !flag {
+                                        node.setMatterLightOnStatus(status: true, deviceId: id)
+                                        self.paramChipDelegate?.levelSet()
+                                    }
                                 }
                                 self.currentLevel = finalValue
                             }

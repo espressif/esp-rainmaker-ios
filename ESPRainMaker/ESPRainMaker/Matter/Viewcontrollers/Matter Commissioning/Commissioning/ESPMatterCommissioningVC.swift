@@ -54,7 +54,9 @@ class ESPMatterCommissioningVC: UIViewController {
     /// Back pressed by user
     /// - Parameter sender: button
     @IBAction func backButtonPressed(_ sender: Any) {
-        self.goBack()
+        DispatchQueue.main.async {
+            self.navigationController?.popToRootViewController(animated: true)
+        }
     }
     
     /// Issue user NOC
@@ -171,8 +173,7 @@ class ESPMatterCommissioningVC: UIViewController {
                        message: ESPMatterConstants.operationFailedMsg,
                        buttonTitle: ESPMatterConstants.okTxt,
                        callback: {
-            User.shared.updateDeviceList = true
-            self.navigationController?.popToRootViewController(animated: true)
+            self.goToHomeScreen()
         })
     }
     
@@ -348,7 +349,9 @@ extension ESPMatterCommissioningVC {
         if let _ = ESPMatterEcosystemInfo.shared.getOnboardingPayload() {
             self.startCommissioning()
         } else {
-            self.launchCommissioningDialog(groupName: groupName)
+            DispatchQueue.main.async {
+                self.hideLoaderAndAlertUser()
+            }
         }
     }
     
@@ -459,7 +462,7 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                     var shouldUpdateDeviceList = false
                     var id: UInt64?
                     for node in  nodes {
-                        if let grpId = node.groupId, let matterNodeId = node.matterNodeId, let deviceId = matterNodeId.hexToDecimal, grpId == groupId, node.isRainmakerControllerSupported.0 {
+                        if let grpId = node.groupId, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, grpId == groupId, node.isRainmakerControllerSupported.0 {
                             shouldUpdateDeviceList = true
                             id = deviceId
                             break

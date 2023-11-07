@@ -30,6 +30,8 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     @IBOutlet var deviceName: UILabel!
     @IBOutlet var onOffButton: UIImageView!
     @IBOutlet weak var accessibilityButton: UILabel!
+    @IBOutlet weak var functionalOnOffButton: UIButton!
+    
     var node: ESPNodeDetails?
     var group: ESPNodeGroup?
     var rainmakerNode: Node?
@@ -44,7 +46,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
         layer.shadowOpacity = 0.5
         layer.masksToBounds = false
         let onOffTap = UITapGestureRecognizer(target: self, action: #selector(toggle))
-        self.onOffButton.addGestureRecognizer(onOffTap)
+        self.functionalOnOffButton.addGestureRecognizer(onOffTap)
     }
     
     /// Toggle button pressed
