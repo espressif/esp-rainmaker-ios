@@ -21,7 +21,7 @@ import UIKit
 protocol DeviceGroupCollectionViewCellDelegate {
     func didSelectDevice(device: Device)
     func didSelectNode(node: Node)
-    func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath)
+    func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath, rNode: Node?)
     func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?)
     func showDeviceTraitListVC(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath)
     func showDeleteDeviceVC(node: ESPNodeDetails?, group: ESPNodeGroup, rainmakerNode: Node?, indexPath: IndexPath)
@@ -78,7 +78,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
         if #available(iOS 16.4, *), node.isMatter {
             var status: NodeConnectionStatus = .offline
             if let id = node.node_id, let groupId = self.fabricDetails.getGroupId(nodeId: id), let group = self.fabricDetails.getGroupData(groupId: groupId), let nodeDetails = self.fabricDetails.getNodeDetails(nodeId: id) {
-                if let matterNodeId = self.fabricDetails.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
+                if let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal {
                     if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                         status = .local
                     } else if node.isRainmaker, node.isConnected {
@@ -87,9 +87,9 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
                     if status == .local {
                         if let devices = node.devices {
                             if devices.count > 1 {
-                                delegate?.launchDeviceScreen(isSingleDeviceNode: false, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath)
+                                delegate?.launchDeviceScreen(isSingleDeviceNode: false, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node)
                             } else {
-                                delegate?.launchDeviceScreen(isSingleDeviceNode: true, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath)
+                                delegate?.launchDeviceScreen(isSingleDeviceNode: true, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node)
                             }
                         }
                     } else if status  == .remote {
@@ -153,7 +153,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         let node = getNodeAt(indexPath: indexPath)
         if #available(iOS 16.4, *), node.isMatter, var cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
             var status: NodeConnectionStatus = .offline
-            if let id = node.node_id, let matterNodeId = self.fabricDetails.getMatterNodeId(nodeId: id), let deviceId = matterNodeId.hexToDecimal {
+            if let id = node.node_id, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal {
                 if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                     status = .local
                 } else if node.isRainmaker, node.isConnected {

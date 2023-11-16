@@ -150,7 +150,7 @@ extension Node {
     }
     
     /// Matter node id
-    var matterNodeId: String? {
+    var getMatterNodeId: String? {
         if let id = controllerNodeId {
             if User.shared.isMatterNodeConnected(matterNodeId: id) {
                 return id

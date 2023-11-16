@@ -24,7 +24,7 @@ import UIKit
 extension DeviceViewController: LaunchControllerDelegate {
     
     func launchController() {
-        if let groupId = self.group?.groupID, let matterNodeId = self.matterNodeId, let deviceId = matterNodeId.hexToDecimal {
+        if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal {
             let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
             var endpoint: UInt16 = 0
             if let point = clusterInfo.1, let id = UInt16(point) {

@@ -53,7 +53,6 @@ extension ESPMTRCommissioner {
                                       params: nil,
                                       queue: self.matterQueue) { value, _  in
                     if let value = value, let data = value.first?[ESPMatterConstants.data] as? [String: Any], let nodeId = data[ESPMatterConstants.value] as? String {
-                        print(nodeId)
                         completion(nodeId)
                         return
                     }
@@ -106,7 +105,6 @@ extension ESPMTRCommissioner {
                                       params: nil,
                                       queue: self.matterQueue) { value, _  in
                     if let value = value, let data = value.first?[ESPMatterConstants.data] as? [String: Any], let nodeId = data[ESPMatterConstants.value] as? String {
-                        print(nodeId)
                         completion(nodeId)
                         return
                     }

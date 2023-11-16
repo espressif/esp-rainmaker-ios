@@ -97,12 +97,20 @@ class ESPNodeGroupMetadataService {
                     }
                 }
             } else {
-                metadata[sourceNodeId] = destinationNodeId as Any
+                if let index = self.switchIndex {
+                    metadata[sourceNodeId] = "\(destinationNodeId).\(index)" as Any
+                } else {
+                    metadata[sourceNodeId] = destinationNodeId as Any
+                }
             }
             finalMetadata = metadata
         } else if let sourceNodeId = node.node_id {
             finalMetadata = [String: Any]()
-            finalMetadata?[sourceNodeId] = destinationNodeId as Any
+            if let index = self.switchIndex {
+                finalMetadata?[sourceNodeId] = "\(destinationNodeId).\(index)" as Any
+            } else {
+                finalMetadata?[sourceNodeId] = destinationNodeId as Any
+            }
         }
         if let data = finalMetadata {
             self.updateGroupMetadata(groupId: groupId, groupMetadata: data) { result in
@@ -161,6 +169,67 @@ class ESPNodeGroupMetadataService {
             }
         } else {
             completion(false)
+        }
+    }
+    
+    /// Remove source node from group metadata
+    /// - Parameters:
+    ///   - groupId: groupId
+    ///   - node: node to be removed
+    ///   - completion: completion
+    func removeSourceNodeFromGroupMetadata(groupId: String, node: Node, completion: @escaping (Bool) -> Void) {
+        if let sourceNodeId = node.node_id, var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
+            if let _ = metadata[sourceNodeId] {
+                metadata[sourceNodeId] = nil
+            }
+            self.updateMetadata(groupId: groupId, groupMetadata: metadata, completion: completion)
+        } else {
+            completion(false)
+        }
+    }
+    
+    /// Remove destination node from groups metadata
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - destinationNodeId: destination node id
+    ///   - completion: completion
+    func removeDestinationNodeFromGroupMetadata(groupId: String, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
+        if var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
+            for key in metadata.keys {
+                if let val = metadata[key] as? String {
+                    let fields = val.components(separatedBy: ",")
+                    let finalList = fields.filter {
+                        return !$0.contains(destinationNodeId)
+                    }
+                    if finalList.count > 0 {
+                        let str = self.getBindingValue(ids: finalList)
+                        metadata[key] = str
+                    } else {
+                        metadata[key] = nil
+                    }
+                }
+            }
+            self.updateMetadata(groupId: groupId, groupMetadata: metadata, completion: completion)
+        } else {
+            completion(false)
+        }
+    }
+    
+    /// Make API call to update metadata on cloud
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - groupMetadata: group metadata
+    ///   - completion: completion
+    func updateMetadata(groupId: String, groupMetadata: [String: Any], completion: @escaping (Bool) -> Void) {
+        self.updateGroupMetadata(groupId: groupId, groupMetadata: groupMetadata) { result in
+            if result {
+                if groupMetadata.isEmpty {
+                    self.fabricDetails.removeGroupMetadata(groupId: groupId)
+                } else {
+                    self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: groupMetadata)
+                }
+            }
+            completion(result)
         }
     }
     

@@ -52,7 +52,7 @@ struct JSONParser {
                 }
                 if let metadata = node_details["metadata"] as? [String: Any] {
                     node.metadata = metadata
-                    if let id = node.node_id, let groupId = fabricDetails.getGroupId(nodeId: id), let matternodeId = node.matterNodeId {
+                    if let id = node.node_id, let groupId = fabricDetails.getGroupId(nodeId: id), let matternodeId = node.getMatterNodeId {
                         fabricDetails.saveMetadata(details: metadata, groupId: groupId, matterNodeId: matternodeId)
                         if let controllerNodeId = metadata[ESPMatterConstants.controllerNodeId] as? String {
                             fabricDetails.saveControllerNodeId(controllerNodeId: controllerNodeId, matterNodeId: matternodeId)

@@ -23,6 +23,18 @@ import UIKit
 @available(iOS 16.4, *)
 extension DeviceViewController: ParamCHIPDelegate {
     
+    func levelSet() {
+        for i in 0..<cellInfo.count {
+            let value = cellInfo[i]
+            if value == ESPMatterConstants.onOff {
+                DispatchQueue.main.async {
+                    self.deviceTableView.reloadRows(at: [IndexPath(row: i, section: 0)], with: .none)
+                }
+                break
+            }
+        }
+    }
+    
     func levelInitialValuesSet() {
         if cellInfo.contains(ESPMatterConstants.colorControl) {
             if let row = cellInfo.firstIndex(of: ESPMatterConstants.colorControl) {

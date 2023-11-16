@@ -155,7 +155,7 @@ class ESPNodeDetails: Codable {
     /// Get matter node id
     /// - Returns: matter node id
     func getMatterNodeId() -> String? {
-        if let matterNodeId = self.matterNodeID,let id = ESPMatterFabricDetails.shared.getControllerNodeId(matterNodeId: matterNodeId) {
+        if let matterNodeId = self.matterNodeID, let id = ESPMatterFabricDetails.shared.getControllerNodeId(matterNodeId: matterNodeId) {
             if User.shared.isMatterNodeConnected(matterNodeId: id) {
                 return id
             }

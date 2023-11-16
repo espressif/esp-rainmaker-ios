@@ -182,6 +182,11 @@ class DevicesViewController: UIViewController {
     
     @objc func refreshDeviceList() {
         showLoader()
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *) {
+            ESPMTRCommissioner.shared.shutDownController()
+        }
+        #endif
         collectionView.isUserInteractionEnabled = false
         User.shared.updateDeviceList = false
         if Configuration.shared.appConfiguration.supportGrouping {
