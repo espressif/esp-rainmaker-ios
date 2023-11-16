@@ -140,6 +140,9 @@ extension Node {
     
     /// Matter device name
     var matterDeviceName: String? {
+        if let groupId = self.groupId, let matterNodeId = self.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+            return name
+        }
         if let deviceName = self.rainmakerDeviceName {
             return deviceName
         }

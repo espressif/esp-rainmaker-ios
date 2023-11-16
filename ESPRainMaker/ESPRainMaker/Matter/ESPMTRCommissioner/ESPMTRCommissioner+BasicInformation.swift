@@ -156,5 +156,42 @@ extension ESPMTRCommissioner {
             }
         }
     }
+    
+    /// Read node label
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion
+    func getNodeLabel(deviceId: UInt64, completion: @escaping (String?) -> Void) {
+        self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                cluster.readAttributeNodeLabel { val, _ in
+                    completion(val)
+                }
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
+    /// Set node label
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - nodeLabel: noide label
+    ///   - completion: completion
+    func setNodeLabel(deviceId: UInt64, nodeLabel: String, completion: @escaping (Bool) -> Void) {
+        self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                let params = MTRWriteParams()
+                params.timedWriteTimeout = NSNumber(value: 1000)
+                cluster.writeAttributeNodeLabel(withValue: nodeLabel, params: params) { error in
+                    guard let error = error else {
+                        completion(true)
+                        return
+                    }
+                    completion(false)
+                }
+            }
+        }
+    }
 }
 #endif

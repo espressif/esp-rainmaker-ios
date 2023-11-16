@@ -194,20 +194,51 @@ class ESPMatterCommissioningVC: UIViewController {
     
     /// Go to Home screen
     func goToHomeScreen() {
-        if let groupId = self.groupId, let matterNodeId = self.matterNodeId, let deviceId = matterNodeId.hexToDecimal, ESPMatterClusterUtil.shared.isRainmakerServerSupported(groupId: groupId, deviceId: deviceId).0 {
-            Utility.showLoader(message: "", view: self.view)
-            self.updateDeviceName {
-                Utility.hideLoader(view: self.view)
+        if let groupId = self.groupId, let matterNodeId = self.matterNodeId, let deviceId = matterNodeId.hexToDecimal {
+            if ESPMatterClusterUtil.shared.isRainmakerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+                DispatchQueue.main.async {
+                    Utility.showLoader(message: "", view: self.view)
+                }
+                self.updateDeviceName {
+                    DispatchQueue.main.async {
+                        Utility.hideLoader(view: self.view)
+                        User.shared.updateDeviceList = true
+                        self.navigationController?.popToRootViewController(animated: true)
+                    }
+                }
+            } else {
+                if let name = ESPMatterEcosystemInfo.shared.getDeviceName() {
+                    DispatchQueue.main.async {
+                        Utility.showLoader(message: "", view: self.view)
+                    }
+                    ESPMTRCommissioner.shared.setNodeLabel(deviceId: deviceId, nodeLabel: name) { result in
+                        self.fabricDetails.removeNodeLabel(groupId: groupId, deviceId: deviceId)
+                        if result {
+                            self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: name)
+                        }
+                        DispatchQueue.main.async {
+                            Utility.hideLoader(view: self.view)
+                            User.shared.updateDeviceList = true
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        User.shared.updateDeviceList = true
+                        self.navigationController?.popToRootViewController(animated: true)
+                    }
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
                 User.shared.updateDeviceList = true
                 self.navigationController?.popToRootViewController(animated: true)
             }
-        } else {
-            User.shared.updateDeviceList = true
-            self.navigationController?.popToRootViewController(animated: true)
         }
     }
     
-    ///Update device name for rainmaker + matter nodes
+    /// Update device name for rainmaker + matter nodes
+    /// - Parameter completion: completion handler
     func updateDeviceName(completion: @escaping () -> Void) {
         NetworkManager.shared.getNodes { nodes, _ in
             if let nodes = nodes, nodes.count > 0 {
@@ -493,8 +524,6 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                         self.goToHomeScreen()
                     }
                 }
-                   
-               
             }
         }
     }

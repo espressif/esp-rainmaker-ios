@@ -12,25 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  DeviceNameCell.swift
+//  DeviceInfoCell.swift
 //  ESPRainmaker
 //
 
 import UIKit
 import Foundation
 
-protocol DeviceNameDelegate: NSObject {
-    func editNamePressed(rainmakerNode: Node?, completion: @escaping (String?) -> Void)
+enum DeviceInfo {
+    case deviceName
+    case nodeLabel
 }
 
-class DeviceNameCell: UITableViewCell {
+protocol DeviceNameDelegate: NSObject {
+    func editNamePressed(rainmakerNode: Node?, completion: @escaping (String?) -> Void)
+    func editNodeLabelPressed(rainmakerNode: Node?, nodeLabel: String, completion: @escaping (String?) -> Void)
+}
+
+class DeviceInfoCell: UITableViewCell {
     
-    static let reuseIdentifier = "DeviceNameCell"
+    static let reuseIdentifier = "DeviceInfoCell"
     @IBOutlet weak var propertyName: UILabel!
     @IBOutlet weak var deviceName: UILabel!
     @IBOutlet weak var container: UIView!
     weak var delegate: DeviceNameDelegate?
     var rainmakerNode: Node?
+    var deviceInfo: DeviceInfo = .deviceName
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -46,9 +53,22 @@ class DeviceNameCell: UITableViewCell {
     }
     
     @IBAction func editButtonPressed(_ sender: Any) {
-        self.delegate?.editNamePressed(rainmakerNode: self.rainmakerNode) { name in
-            if let name = name {
-                self.deviceName.text = name
+        switch deviceInfo {
+        case .deviceName:
+            self.delegate?.editNamePressed(rainmakerNode: self.rainmakerNode) { name in
+                if let name = name {
+                    self.deviceName.text = name
+                }
+            }
+        case .nodeLabel:
+            if let node = self.rainmakerNode, let groupId = node.groupId, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, let label = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                self.delegate?.editNodeLabelPressed(rainmakerNode: self.rainmakerNode, nodeLabel: label) { nodeLabel in
+                    if let nodeLabel = nodeLabel {
+                        DispatchQueue.main.async {
+                            self.deviceName.text = nodeLabel
+                        }
+                    }
+                }
             }
         }
     }

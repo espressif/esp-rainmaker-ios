@@ -49,6 +49,48 @@ class ESPTokenWorker: ESPTokenWorkerDelegate {
     
     private let emailMigrationKey = "com.espressif.migrationEmailKey"
     
+    private let matterDeviceNameKey = "com.matter.device.name"
+    
+    
+    /// Save device name
+    /// - Parameter deviceName: device name
+    /// - Parameter groupId: group id
+    /// - Parameter deviceId: device id
+    func saveDeviceName(_ deviceName: String, forGroupId groupId: String, andDeviceId deviceId: UInt64) {
+        tokenQueue.async(flags: .barrier) {
+            let key = "\(self.matterDeviceNameKey).\(groupId).\(deviceId)"
+            self.save(value: deviceName as Any?, key: key)
+        }
+    }
+    
+    /// Get device name
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: device name
+    func getDeviceName(forGroupId groupId: String, andDeviceId deviceId: UInt64) -> String? {
+        tokenQueue.sync {
+            let key = "\(self.matterDeviceNameKey).\(groupId).\(deviceId)"
+            if let deviceName = try? ESPKeychainWrapper.shared.get(account: key) {
+                return deviceName
+            }
+            return nil
+        }
+    }
+    
+    /// Remove device name
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    func removeDeviceName(forGroupId groupId: String, andDeviceId deviceId: UInt64) {
+        do {
+            let key = "\(self.matterDeviceNameKey).\(groupId).\(deviceId)"
+            try ESPKeychainWrapper.shared.delete(account: key)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
     /// Update keys for tokens
     /// - Parameters:
     ///   - idTokenKey: id token key
