@@ -50,6 +50,13 @@ class DeviceViewController: UIViewController {
     var switchIndex: Int?
     var isDeviceOffline: Bool = false
     let fabricDetails = ESPMatterFabricDetails.shared
+
+    //badge
+    var nameField: UITextField?
+    var companyNameField: UITextField?
+    var emailField: UITextField?
+    var contactField: UITextField?
+    var eventNameField: UITextField?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -195,6 +202,7 @@ class DeviceViewController: UIViewController {
     func registerCells() {
         self.deviceTableView.register(UINib(nibName: SliderTableViewCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: SliderTableViewCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: DeviceInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceInfoCell.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: ParticipantDataCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ParticipantDataCell.reuseIdentifier)
         self.generateCells()
     }
     
@@ -209,8 +217,43 @@ class DeviceViewController: UIViewController {
             } else {
                 if let _ = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
                     self.cellInfo.append(ESPMatterConstants.nodeLabel)
-                    self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                    self.setupTableUI()
+                    let badgeFlag = ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId)
+                    if badgeFlag.0 {
+                        if let _ = self.fabricDetails.fetchParticipantData(groupId: groupId, deviceId: deviceId) {
+                            self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                            self.setupTableUI()
+                        } else {
+                            if let key = badgeFlag.1, let endpoint = UInt16(key) {
+                                if self.isDeviceOffline {
+                                    self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                                    self.setupTableUI()
+                                } else {
+                                    DispatchQueue.main.async {
+                                        Utility.showLoader(message: "", view: self.view)
+                                    }
+                                    ESPMTRCommissioner.shared.readParticipantData(deviceId: deviceId, endpoint: endpoint) { data in
+                                        DispatchQueue.main.async {
+                                            Utility.hideLoader(view: self.view)
+                                        }
+                                        if let data = data {
+                                            self.fabricDetails.saveParticipantData(groupId: groupId, deviceId: deviceId, participantData: data)
+                                        } else {
+                                            let details = ESPParticipantData(eventName: "CSA MM Nov '23")
+                                            self.fabricDetails.saveParticipantData(groupId: groupId, deviceId: deviceId, participantData: details)
+                                        }
+                                        self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                                        self.setupTableUI()
+                                    }
+                                }
+                            } else {
+                                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                                self.setupTableUI()
+                            }
+                        }
+                    } else {
+                        self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                        self.setupTableUI()
+                    }
                 } else if !self.isDeviceOffline {
                     ESPMTRCommissioner.shared.shutDownController()
                     self.restartMatterController()
@@ -247,12 +290,14 @@ class DeviceViewController: UIViewController {
         if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.rainmakerController)
         }
+        if ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.participantData)
+        }
     }
     
     /// Setup tableview UI
     func setupTableUI() {
         DispatchQueue.main.async {
-            self.deviceTableView.isUserInteractionEnabled = !self.isDeviceOffline
             self.setupOfflineUI()
             self.deviceTableView.reloadData()
         }
@@ -261,13 +306,8 @@ class DeviceViewController: UIViewController {
     /// Setup offline UI
     func setupOfflineUI() {
         DispatchQueue.main.async {
-            if self.isDeviceOffline {
-                self.offlineView.isHidden = false
-                self.offlineViewHeight.constant = 17.0
-            } else {
-                self.offlineView.isHidden = true
-                self.offlineViewHeight.constant = 0.0
-            }
+            self.offlineView.isHidden = !self.isDeviceOffline
+            self.offlineViewHeight.constant = self.isDeviceOffline ? 17.0 : 0.0
         }
     }
     

@@ -105,4 +105,47 @@ enum rainmakerController {
     static let clusterId: NSNumber = NSNumber(value: 320601089)
 }
 
+/*
+ // MARK: Custom Cluster to enter participant data
+ */
+enum participantData {
+    
+    enum attributes {
+        case name
+        case companyName
+        case email
+        case contact
+        case eventName
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .name:
+                return NSNumber(value: 0)
+            case .companyName:
+                return NSNumber(value: 1)
+            case .email:
+                return NSNumber(value: 2)
+            case .contact:
+                return NSNumber(value: 3)
+            case .eventName:
+                return NSNumber(value: 4)
+            }
+        }
+    }
+    
+    enum commands {
+        case sendData
+        
+        var commandId: NSNumber {
+            switch self {
+            case .sendData:
+                return NSNumber(value: 0)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 320601091)
+}
+
+
 

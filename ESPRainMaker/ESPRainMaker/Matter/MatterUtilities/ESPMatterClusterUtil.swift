@@ -165,4 +165,19 @@ public class ESPMatterClusterUtil {
         }
         return (false, nil)
     }
+    
+    /// Is Participant Data Supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: (result, endpoint id)
+    public func isParticipantDataSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
+        for key in val.keys {
+            if let list = val[key], list.count > 0, list.contains(participantData.clusterId.uintValue) {
+                return (true, key)
+            }
+        }
+        return (false, nil)
+    }
 }
