@@ -152,8 +152,11 @@ extension ESPMTRCommissioner {
     func appendRefreshTokenToDevice(deviceId: UInt64, endpoint: UInt16, token: String, completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
-                let commandFields = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
+                let data = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
                               ESPMatterConstants.value: token]
+                let commandFields = [ESPMatterConstants.type: ESPMatterConstants.structure,
+                                    ESPMatterConstants.value: [[ESPMatterConstants.contextTag: 0,
+                                                                ESPMatterConstants.data: data]]]
                 device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmakerController.clusterId,
                                      commandID: rainmakerController.commands.appendRefreshToken.commandId,
@@ -180,8 +183,11 @@ extension ESPMTRCommissioner {
     func authorizeDevice(deviceId: UInt64, endpoint: UInt16, endpointURL: String, completion: @escaping (Bool) -> Void) {
         getMatterDevice(deviceId: deviceId) { device in
             if let device = device {
-                let commandFields = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
+                let data = [ESPMatterConstants.type: ESPMatterConstants.UTF8String,
                                      ESPMatterConstants.value: endpointURL]
+                let commandFields = [ESPMatterConstants.type: ESPMatterConstants.structure,
+                                    ESPMatterConstants.value: [[ESPMatterConstants.contextTag: 0,
+                                                                ESPMatterConstants.data: data]]]
                 device.invokeCommand(withEndpointID: NSNumber(value: endpoint),
                                      clusterID: rainmakerController.clusterId,
                                      commandID: rainmakerController.commands.authorize.commandId,
