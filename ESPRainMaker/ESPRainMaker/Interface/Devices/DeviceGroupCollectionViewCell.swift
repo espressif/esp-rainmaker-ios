@@ -78,7 +78,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
         if #available(iOS 16.4, *), node.isMatter {
             var status: NodeConnectionStatus = .offline
             if let id = node.node_id, let groupId = self.fabricDetails.getGroupId(nodeId: id), let group = self.fabricDetails.getGroupData(groupId: groupId), let nodeDetails = self.fabricDetails.getNodeDetails(nodeId: id) {
-                if let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal {
+                if let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
                     if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                         status = .local
                     } else if node.isRainmaker, node.isConnected {
@@ -153,7 +153,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         let node = getNodeAt(indexPath: indexPath)
         if #available(iOS 16.4, *), node.isMatter, var cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
             var status: NodeConnectionStatus = .offline
-            if let id = node.node_id, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal {
+            if let id = node.node_id, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
                 if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                     status = .local
                 } else if node.isRainmaker, node.isConnected {

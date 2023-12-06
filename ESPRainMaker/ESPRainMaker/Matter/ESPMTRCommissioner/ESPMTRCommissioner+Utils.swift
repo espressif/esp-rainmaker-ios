@@ -161,11 +161,6 @@ extension ESPMTRCommissioner {
             metaData[ESPMatterConstants.deviceName] = deviceName
         }
         metaData[ESPMatterConstants.isRainmaker] = ESPMatterClusterUtil.shared.isRainmakerServerSupported(groupId: groupId, deviceId: deviceId).0
-        if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0, let controllerNodeId = self.sController?.controllerNodeID {
-            let id = controllerNodeId.uint64Value
-            let str = String(id, radix: 16)
-            metaData[ESPMatterConstants.controllerNodeId] = str
-        }
         if let deviceType = self.fabricDetails.getDeviceType(groupId: groupId, deviceId: deviceId) {
             metaData[ESPMatterConstants.deviceType] = deviceType
         }

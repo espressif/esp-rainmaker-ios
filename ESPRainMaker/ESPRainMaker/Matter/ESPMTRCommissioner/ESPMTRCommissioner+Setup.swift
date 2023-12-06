@@ -84,7 +84,7 @@ extension ESPMTRCommissioner: MTRDeviceControllerDelegate {
     func controller(_ controller: MTRDeviceController, commissioningComplete error: Error?) {
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         guard let _ = error else {
-            if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].getMatterNodeId() {
+            if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let requestId = data.requestId, let matterNodeId = certs[0].matterNodeId {
                 self.performPostCommissioningAction(groupId: grpId, requestId: requestId, matterNodeId: matterNodeId)
             }
             return

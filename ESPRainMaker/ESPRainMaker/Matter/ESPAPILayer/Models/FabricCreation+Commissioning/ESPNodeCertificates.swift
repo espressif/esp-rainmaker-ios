@@ -30,16 +30,5 @@ struct ESPNodeCertificates: Codable {
         case matterNodeId = "matter_node_id"
         case nodeNOC = "node_noc"
     }
-    
-    /// Get matter node id
-    /// - Returns: matter node id
-    func getMatterNodeId() -> String? {
-        if let matterNodeId = self.matterNodeId,let id = ESPMatterFabricDetails.shared.getControllerNodeId(matterNodeId: matterNodeId) {
-            if User.shared.isMatterNodeConnected(matterNodeId: id) {
-                return id
-            }
-        }
-        return matterNodeId
-    }
 }
 

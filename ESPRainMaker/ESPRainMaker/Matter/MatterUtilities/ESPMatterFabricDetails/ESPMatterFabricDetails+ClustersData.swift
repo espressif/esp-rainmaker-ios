@@ -349,35 +349,6 @@ extension ESPMatterFabricDetails {
             }
         }
     }
-    
-    /// Save controller node id
-    /// - Parameters:
-    ///   - controllerNodeId: controllerNodeId
-    ///   - matterNodeId: matterNodeId
-    func saveControllerNodeId(controllerNodeId: String, matterNodeId: String) {
-        let key = "controller.node.id.\(matterNodeId)"
-        UserDefaults.standard.set(controllerNodeId, forKey: key)
-    }
-    
-    /// Get controller node id
-    /// - Parameter matterNodeId: matterNodeId
-    /// - Returns: id
-    func getControllerNodeId(matterNodeId: String) -> String? {
-        let key = "controller.node.id.\(matterNodeId)"
-        if let val = UserDefaults.standard.value(forKey: key) as? String {
-            return val
-        }
-        return nil
-    }
-    
-    /// Remove controller node id for matter node id
-    /// - Parameter matterNodeId: matter node id
-    func removeControllerNodeId(matterNodeId: String) {
-        let key = "controller.node.id.\(matterNodeId)"
-        if let _ = self.getControllerNodeId(matterNodeId: matterNodeId) {
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-    }
 }
 
 

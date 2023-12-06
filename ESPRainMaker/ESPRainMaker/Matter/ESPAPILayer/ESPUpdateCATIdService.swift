@@ -38,7 +38,7 @@ class ESPUpdateCATIdService {
         var matterNodes: [Node] = [Node]()
         if let nodes = User.shared.associatedNodeList {
             for node in nodes {
-                if node.isMatter, let matterNodeId = node.getMatterNodeId {
+                if node.isMatter, let matterNodeId = node.matter_node_id {
                     for device in User.shared.discoveredNodes {
                         if device.contains(matterNodeId) {
                             matterNodes.append(node)
@@ -103,7 +103,7 @@ class ESPUpdateCATIdService {
     func update(index: Int) {
         if let matterNodes = self.matterNodes, index < matterNodes.count {
             let node = matterNodes[index]
-            if let nodeId = node.node_id, let groupId = self.fabricDetails.getGroupId(nodeId: nodeId), let group = self.fabricDetails.getGroupData(groupId: groupId), let matterNodeId = node.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+            if let nodeId = node.node_id, let groupId = self.fabricDetails.getGroupId(nodeId: nodeId), let group = self.fabricDetails.getGroupData(groupId: groupId), let matterNodeId = node.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
                 if let _ = ESPMTRCommissioner.shared.sController {
                     if let group = ESPMTRCommissioner.shared.group, let grpId = group.groupID, grpId != groupId {
                         self.initMatterController(groupId: groupId, group: group)

@@ -52,12 +52,6 @@ struct JSONParser {
                 }
                 if let metadata = node_details["metadata"] as? [String: Any] {
                     node.metadata = metadata
-                    if let id = node.node_id, let groupId = fabricDetails.getGroupId(nodeId: id), let matternodeId = node.getMatterNodeId {
-                        fabricDetails.saveMetadata(details: metadata, groupId: groupId, matterNodeId: matternodeId)
-                        if let controllerNodeId = metadata[ESPMatterConstants.controllerNodeId] as? String {
-                            fabricDetails.saveControllerNodeId(controllerNodeId: controllerNodeId, matterNodeId: matternodeId)
-                        }
-                    }
                 }
             }
             #endif
@@ -232,6 +226,10 @@ struct JSONParser {
                             result.append(device)
                         }
                     }
+                } else {
+                    let device = Device(name: node.matterDeviceName ?? "", type: nil, node: node, deviceName: node.matterDeviceName ?? "")
+                    device.isMatter = true
+                    result.append(device)
                 }
                 node.devices = result.sorted { $0.name! < $1.name! }
             }

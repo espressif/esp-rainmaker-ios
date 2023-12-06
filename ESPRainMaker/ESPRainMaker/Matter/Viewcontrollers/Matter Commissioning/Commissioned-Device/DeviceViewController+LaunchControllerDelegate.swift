@@ -24,7 +24,7 @@ import UIKit
 extension DeviceViewController: LaunchControllerDelegate {
     
     func launchController() {
-        if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal {
+        if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
             let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
             var endpoint: UInt16 = 0
             if let point = clusterInfo.1, let id = UInt16(point) {
@@ -99,17 +99,13 @@ extension DeviceViewController: LaunchControllerDelegate {
         ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
             if result {
                 ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
-                    if result, let controller = ESPMTRCommissioner.shared.sController, let id = controller.controllerNodeID?.uint64Value {
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
-                            if result {
-                                DispatchQueue.main.async {
+                    if result  {
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { isDeviceListUpdated in
+                            DispatchQueue.main.async {
+                                if isDeviceListUpdated {
                                     Utility.hideLoader(view: self.view)
-                                }
-                                User.shared.updateDeviceList = true
-                                let str = String(id, radix:16)
-                                self.fabricDetails.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
-                            } else {
-                                DispatchQueue.main.async {
+                                    User.shared.updateDeviceList = true
+                                } else {
                                     self.hideLoaderAndShowError()
                                 }
                             }

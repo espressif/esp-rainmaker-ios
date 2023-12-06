@@ -121,7 +121,7 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
         self.uidelegate?.hideLoaderFromView()
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         if let _ = status {
-            if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].getMatterNodeId() {
+            if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].matterNodeId {
                 self.exportMatterNodeData(isRainmaker: true, groupId: grpId, matterNodeId: matterNodeId, temporaryDeviceId: temporaryDeviceId)
             }
         } else {

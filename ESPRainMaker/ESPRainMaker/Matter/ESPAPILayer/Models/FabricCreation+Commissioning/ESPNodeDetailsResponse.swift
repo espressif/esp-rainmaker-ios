@@ -74,7 +74,7 @@ class ESPNodeDetails: Codable {
     
     /// Device id
     var deviceId: UInt64? {
-        if let matterNodeID = getMatterNodeId(), let deviceId = matterNodeID.hexToDecimal {
+        if let matterNodeID = matterNodeID, let deviceId = matterNodeID.hexToDecimal {
             return deviceId
         }
         return nil
@@ -150,17 +150,6 @@ class ESPNodeDetails: Codable {
             return saturation
         }
         return nil
-    }
-    
-    /// Get matter node id
-    /// - Returns: matter node id
-    func getMatterNodeId() -> String? {
-        if let matterNodeId = self.matterNodeID, let id = ESPMatterFabricDetails.shared.getControllerNodeId(matterNodeId: matterNodeId) {
-            if User.shared.isMatterNodeConnected(matterNodeId: id) {
-                return id
-            }
-        }
-        return matterNodeID
     }
 }
 

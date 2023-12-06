@@ -272,7 +272,7 @@ extension DeviceViewController: DeviceNameDelegate {
     ///   - nodeLabel: node label
     ///   - completion: completion handler
     func editNodeLabelPressed(rainmakerNode: Node?, nodeLabel: String, completion: @escaping (String?) -> Void) {
-        if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.getMatterNodeId?.hexToDecimal {
+        if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.matter_node_id?.hexToDecimal {
             let input = UIAlertController(title: "Name", message: ESPMatterConstants.enterDeviceNameMsg, preferredStyle: .alert)
             input.addTextField { textField in
                 textField.placeholder = "Enter device name"

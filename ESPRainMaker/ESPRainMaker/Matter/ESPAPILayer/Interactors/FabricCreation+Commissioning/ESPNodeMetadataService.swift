@@ -44,7 +44,7 @@ class ESPNodeMetadataService {
             if let nodeDetails = nodeDetails {
                 for detail in nodeDetails {
                     for node in nodes {
-                        if let nodeId = node.nodeID, let nodeDetailId = detail[ESPMatterConstants.id] as? String, nodeId == nodeDetailId, let matterNodeId = node.getMatterNodeId() {
+                        if let nodeId = node.nodeID, let nodeDetailId = detail[ESPMatterConstants.id] as? String, nodeId == nodeDetailId, let matterNodeId = node.matterNodeID {
                             ESPMatterFabricDetails.shared.saveMetadata(details: detail, groupId: groupId, matterNodeId: matterNodeId)
                             break
                         }
@@ -64,7 +64,7 @@ class ESPNodeMetadataService {
     private func fetchSingleNodeMetadata(index: Int, groupId: String, token: String, nodes: [ESPNodeDetails], completionHandler: @escaping () -> Void) {
         if index < nodes.count {
             let node = nodes[index]
-            if let nodeId = node.nodeID, let matterNodeId = node.getMatterNodeId() {
+            if let nodeId = node.nodeID, let matterNodeId = node.matterNodeID {
                 self.fetchNodeMetadata(token: token, nodeId: nodeId) { nodeDetails in
                     if let nodeDetails = nodeDetails, let details = nodeDetails.first {
                         ESPMatterFabricDetails.shared.saveMetadata(details: details, groupId: groupId, matterNodeId: matterNodeId)
