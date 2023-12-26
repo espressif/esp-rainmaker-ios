@@ -71,34 +71,39 @@ extension ESPMTRCommissioner {
                                 self.fabricDetails.saveProductId(groupId: groupId, deviceId: deviceId, productId: pid)
                             }
                             //Read and save software version
-                            self.getSoftwareVersion(deviceId: deviceId) { sw in
-                                if let sw = sw {
-                                    self.fabricDetails.saveSoftwareVersion(groupId: groupId, deviceId: deviceId, softwareVersion: sw)
+                            self.getSoftwareVersionString(deviceId: deviceId) { swString in
+                                if let swString = swString {
+                                    self.fabricDetails.saveSoftwareVersionString(groupId: groupId, deviceId: deviceId, softwareVersionString: swString)
                                 }
-                                //Read and save device type
-                                self.getDeviceTypeList(deviceId: deviceId) { deviceType in
-                                    if let type = deviceType {
-                                        self.fabricDetails.saveDeviceType(groupId: groupId, deviceId: deviceId, type: type)
+                                self.getSoftwareVersion(deviceId: deviceId) { sw in
+                                    if let sw = sw {
+                                        self.fabricDetails.saveSoftwareVersion(groupId: groupId, deviceId: deviceId, softwareVersion: sw)
                                     }
-                                    //Read and save all device endpoints
-                                    self.getAllDeviceEndpoints(deviceId: deviceId) { endpoints in
-                                        if endpoints.count > 0 {
-                                            self.fabricDetails.saveEndpointsData(groupId: groupId, deviceId: deviceId, endpoints: endpoints)
-                                            //Read and save all clients on all endpoints
-                                            self.getAllClients(deviceId: deviceId, index: 0, endpoints: endpoints) { clients in
-                                                if clients.count > 0 {
-                                                    self.fabricDetails.saveClientsData(groupId: groupId, deviceId: deviceId, clients: clients)
-                                                }
-                                                //Read and save all servers on all endpoints
-                                                self.getAllServers(deviceId: deviceId, index: 0, endpoints: endpoints) { servers in
-                                                    if servers.count > 0 {
-                                                        self.fabricDetails.saveServersData(groupId: groupId, deviceId: deviceId, servers: servers)
+                                    //Read and save device type
+                                    self.getDeviceTypeList(deviceId: deviceId) { deviceType in
+                                        if let type = deviceType {
+                                            self.fabricDetails.saveDeviceType(groupId: groupId, deviceId: deviceId, type: type)
+                                        }
+                                        //Read and save all device endpoints
+                                        self.getAllDeviceEndpoints(deviceId: deviceId) { endpoints in
+                                            if endpoints.count > 0 {
+                                                self.fabricDetails.saveEndpointsData(groupId: groupId, deviceId: deviceId, endpoints: endpoints)
+                                                //Read and save all clients on all endpoints
+                                                self.getAllClients(deviceId: deviceId, index: 0, endpoints: endpoints) { clients in
+                                                    if clients.count > 0 {
+                                                        self.fabricDetails.saveClientsData(groupId: groupId, deviceId: deviceId, clients: clients)
                                                     }
-                                                    completionHandler()
+                                                    //Read and save all servers on all endpoints
+                                                    self.getAllServers(deviceId: deviceId, index: 0, endpoints: endpoints) { servers in
+                                                        if servers.count > 0 {
+                                                            self.fabricDetails.saveServersData(groupId: groupId, deviceId: deviceId, servers: servers)
+                                                        }
+                                                        completionHandler()
+                                                    }
                                                 }
+                                            } else {
+                                                completionHandler()
                                             }
-                                        } else {
-                                            completionHandler()
                                         }
                                     }
                                 }

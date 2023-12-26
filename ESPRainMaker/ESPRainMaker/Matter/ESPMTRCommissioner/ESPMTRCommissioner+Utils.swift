@@ -173,6 +173,9 @@ extension ESPMTRCommissioner {
         if let softwareVersion = self.fabricDetails.getSoftwareVersion(groupId: groupId, deviceId: deviceId) {
             metaData[ESPMatterConstants.softwareVersion] = softwareVersion
         }
+        if let softwareVersionString = self.fabricDetails.getSoftwareVersionString(groupId: groupId, deviceId: deviceId) {
+            metaData[ESPMatterConstants.softwareVersionString] = softwareVersionString
+        }
         if let serialNumber = self.fabricDetails.getSerialNumber(groupId: groupId, deviceId: deviceId) {
             metaData[ESPMatterConstants.serialNumber] = serialNumber
         }
