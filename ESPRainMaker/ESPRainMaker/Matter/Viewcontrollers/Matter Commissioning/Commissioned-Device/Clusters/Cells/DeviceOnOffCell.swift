@@ -91,13 +91,14 @@ class DeviceOnOffCell: UITableViewCell {
                     if let status = node.isMatterLightOn(deviceId: deviceId) {
                         self.toggleSwitch.setOn(status, animated: true)
                         self.onOffStatus.text = status ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
-                    }
-                }
-                ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
-                    DispatchQueue.main.async {
-                        self.node?.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
-                        self.toggleSwitch.setOn(isLightOn, animated: true)
-                        self.onOffStatus.text = isLightOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+                    } else {
+                        ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
+                            DispatchQueue.main.async {
+                                self.node?.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
+                                self.toggleSwitch.setOn(isLightOn, animated: true)
+                                self.onOffStatus.text = isLightOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+                            }
+                        }
                     }
                 }
             }

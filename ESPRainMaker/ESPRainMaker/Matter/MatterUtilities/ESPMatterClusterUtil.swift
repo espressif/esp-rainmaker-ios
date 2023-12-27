@@ -26,6 +26,7 @@ public class ESPMatterClusterUtil {
     private let colorControlClusterId: UInt = 768
     private let commissioningWindowClusterId: UInt = 60
     private let bindingClusterId: UInt = 30
+    private let thermostatClusterId: UInt = 513
     let fabricDetails = ESPMatterFabricDetails.shared
     
     /// Matter utility methods
@@ -175,6 +176,21 @@ public class ESPMatterClusterUtil {
         let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
         for key in val.keys {
             if let list = val[key], list.count > 0, list.contains(participantData.clusterId.uintValue) {
+                return (true, key)
+            }
+        }
+        return (false, nil)
+    }
+    
+    /// Is air conditioner Supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: (result, endpoint id)
+    public func isAirConditionerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
+        for key in val.keys {
+            if let list = val[key], list.count > 0, list.contains(airConditioner.clusterId.uintValue) {
                 return (true, key)
             }
         }

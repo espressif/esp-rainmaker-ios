@@ -151,6 +151,121 @@ class ESPNodeDetails: Codable {
         }
         return nil
     }
+    
+    /// Returns matter local temperature key
+    var matterLocalTempKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.local.temperature.value"
+    }
+    
+    /// Returns matter light status key
+    var matterOCSValueKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.ocs.value"
+    }
+    
+    /// Returns matter light status key
+    var matterOHSValueKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.ohs.value"
+    }
+    
+    /// Returns matter light status key
+    var matterControlSequenceOfOperationKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.control.sequence.operation.value"
+    }
+    
+    /// Returns matter light status key
+    var matterSystemModeKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.system.mode.value"
+    }
+    
+    /// Set saturation value
+    /// - Parameters:
+    ///   - level: level value
+    ///   - deviceId: device id
+    func setMatterLocalTemperatureValue(temperature: Int16, deviceId: UInt64) {
+        UserDefaults.standard.set(temperature, forKey: matterLocalTempKey(deviceId))
+    }
+    
+    /// Get matter saturation value
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMatterLocalTemperatureValue(deviceId: UInt64) -> Int16? {
+        if let temperature = UserDefaults.standard.value(forKey: matterLocalTempKey(deviceId)) as? Int16 {
+            return temperature
+        }
+        return nil
+    }
+    
+    /// Set matter occupied cooling setpoint value
+    /// - Parameters:
+    ///   - ocs: occupied cooling setpoint
+    ///   - deviceId: device id
+    func setMatterOccupiedCoolingSetpoint(ocs: Int16, deviceId: UInt64) {
+        UserDefaults.standard.set(ocs, forKey: matterOCSValueKey(deviceId))
+    }
+    
+    /// Get matter occupied cooling setpoint value
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMatterOccupiedCoolingSetpoint(deviceId: UInt64) -> Int16? {
+        if let ocs = UserDefaults.standard.value(forKey: matterOCSValueKey(deviceId)) as? Int16 {
+            return ocs
+        }
+        return nil
+    }
+    
+    /// Set matter occupied cooling setpoint value
+    /// - Parameters:
+    ///   - ocs: occupied cooling setpoint
+    ///   - deviceId: device id
+    func setMatterOccupiedHeatingSetpoint(ohs: Int16, deviceId: UInt64) {
+        UserDefaults.standard.set(ohs, forKey: matterOHSValueKey(deviceId))
+    }
+    
+    /// Get matter occupied cooling setpoint value
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMatterOccupiedHeatingSetpoint(deviceId: UInt64) -> Int16? {
+        if let ohs = UserDefaults.standard.value(forKey: matterOHSValueKey(deviceId)) as? Int16 {
+            return ohs
+        }
+        return nil
+    }
+    
+    /// Set matter controlled sequence of operation value
+    /// - Parameters:
+    ///   - ocs: occupied cooling setpoint
+    ///   - deviceId: device id
+    func setMatterControlledSequenceOfOperation(cso: String, deviceId: UInt64) {
+        UserDefaults.standard.set(cso, forKey: matterControlSequenceOfOperationKey(deviceId))
+    }
+    
+    /// Get matter occupied cooling setpoint value
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMatterControlledSequenceOfOperation(deviceId: UInt64) -> String? {
+        if let cso = UserDefaults.standard.value(forKey: matterControlSequenceOfOperationKey(deviceId)) as? String {
+            return cso
+        }
+        return nil
+    }
+    
+    /// Set matter system mode
+    /// - Parameters:
+    ///   - ocs: occupied cooling setpoint
+    ///   - deviceId: device id
+    func setMatterSystemMode(systemMode: String, deviceId: UInt64) {
+        UserDefaults.standard.set(systemMode, forKey: matterControlSequenceOfOperationKey(deviceId))
+    }
+    
+    /// Get matter system mode
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMatterSystemMode(deviceId: UInt64) -> String? {
+        if let systemMode = UserDefaults.standard.value(forKey: matterControlSequenceOfOperationKey(deviceId)) as? String {
+            return systemMode
+        }
+        return nil
+    }
 }
 
 // MARK: - Fabric Details

@@ -43,11 +43,10 @@ struct ESPMatterConstants {
     static let switchDevice = "switch"
     static let outletDevice = "outlet"
     static let defaultDevice = "default"
+    static let airConditioner = "air_conditioner"
     static let pureMatter = "pure_matter"
     static let rainmakerMatter = "rainmaker_matter"
-    
-    
-    
+
     static let noTxt = "No"
     static let okTxt = "OK"
     static let yesTxt = "Yes"
@@ -120,6 +119,10 @@ struct ESPMatterConstants {
     static let saturationControl = "saturationControl"
     static let rainmakerController = "rainmakerController"
     static let participantData = "participantData"
+    static let localTemperature = "localTemperature"
+    static let occupiedCoolingSetpoint = "occupiedCoolingSetpoint"
+    static let controlSequenceOfOperation = "controlSequenceOfOperation"
+    static let systemMode = "systemMode"
     
     /// API keys
     static let id = "id"
@@ -286,4 +289,12 @@ struct ESPMatterConstants {
     static let enterBadgeUserNameMsg = "Please enter a valid user name. Only spaces are not allowed."
     static let enterBadgeCompanyNameMsg = "Please enter a valid company name. Only spaces are not allowed."
     static let enterBadgeEventNameMsg = "Please enter a valid event name. Only spaces are not allowed."
+    
+    //Air conditioner device
+    static let cool = "Cool"
+    static let heat = "Heat"
+    static let off = "Off"
+    static let controlSequence = "Control Sequence"
+    static let systemModeTxt = "System Mode"
+    static let tempDegreesCelsius = "Temperature(°C)"
 }

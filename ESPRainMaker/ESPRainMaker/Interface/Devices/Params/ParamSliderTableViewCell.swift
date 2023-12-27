@@ -139,10 +139,13 @@ class ParamSliderTableViewCell: SliderTableViewCell {
             #if ESPRainMakerMatter
             if let grouoId = nodeGroup?.groupID, let deviceId = deviceId {
                 let val = sender.value
-                if self.isSaturation {
-                    self.changeSaturation(value: val)
-                } else {
+                switch self.sliderParamType {
+                case .brightness:
                     self.changeLevel(groupId: grouoId, deviceId: deviceId, toValue: val)
+                case .saturation:
+                    self.changeSaturation(value: val)
+                case .airConditioner:
+                    self.changeOccupiedSetpoint(setPoint: Int16(val))
                 }
             }
             #endif

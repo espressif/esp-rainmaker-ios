@@ -201,7 +201,9 @@ class DeviceViewController: UIViewController {
     /// Register cells
     func registerCells() {
         self.deviceTableView.register(UINib(nibName: SliderTableViewCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: SliderTableViewCell.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
         self.deviceTableView.register(UINib(nibName: DeviceInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceInfoCell.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: CustomInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: CustomInfoCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: ParticipantDataCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ParticipantDataCell.reuseIdentifier)
         self.generateCells()
     }
@@ -292,6 +294,12 @@ class DeviceViewController: UIViewController {
         }
         if ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.participantData)
+        }
+        if ESPMatterClusterUtil.shared.isAirConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.localTemperature)
+            cellInfo.append(ESPMatterConstants.occupiedCoolingSetpoint)
+            cellInfo.append(ESPMatterConstants.controlSequenceOfOperation)
+            cellInfo.append(ESPMatterConstants.systemMode)
         }
     }
     

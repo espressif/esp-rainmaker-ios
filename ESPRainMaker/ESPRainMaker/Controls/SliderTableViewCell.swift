@@ -19,6 +19,12 @@
 import MBProgressHUD
 import UIKit
 
+enum SliderParamType {
+    case brightness
+    case saturation
+    case airConditioner
+}
+
 enum SliderType {
     case slider
     case hueSlider
@@ -81,7 +87,8 @@ class SliderTableViewCell: UITableViewCell {
     var minHue: Int = 0
     var maxHue: Int = 100
     weak var paramChipDelegate: ParamCHIPDelegate?
-    var isSaturation: Bool = false
+    var sliderParamType: SliderParamType = .brightness
+    var isWindowCovering: Bool = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
