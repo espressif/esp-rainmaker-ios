@@ -71,6 +71,21 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
             self.minImage.image = nil
             self.maxImage.image = nil
         }
+        if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                if let currentHue = MatterControllerParser.shared.getCurrentHue(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    let finalValue = (CGFloat(currentHue)*360.0)/254.0
+                    if let node = self.node, let id = self.deviceId {
+                        node.setMatterHueValue(hue: Int(finalValue), deviceId: id)
+                    }
+                    self.currentHueValue = finalValue
+                    self.hueSlider.value = self.currentHueValue
+                    DispatchQueue.main.async {
+                        self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                    }
+                }
+            }
+        }
     }
     
     /// Get current hue value
@@ -106,13 +121,40 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
     /// Change hue
     /// - Parameter val: hue value
     func changeHue(toValue val: CGFloat) {
+        var finalHue = Int(val*(254.0/360.0))
+        if finalHue == 0 {
+            finalHue = 1
+        }
+        if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                var endpoint = "0x1"
+                if let endpointId = MatterControllerParser.shared.getHueEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    endpoint = endpointId
+                }
+                ESPControllerAPIManager.shared.callHueAPI(rainmakerNode: rainmakerNode,
+                                                          controllerNodeId: controllerNodeId,
+                                                          matterNodeId: matterNodeId,
+                                                          endpoint: endpoint,
+                                                          hue: "\(finalHue)") { result in
+                    if result {
+                        if let node = self.node, let id = self.deviceId {
+                            node.setMatterHueValue(hue: Int(val), deviceId: id)
+                        }
+                        self.currentHueValue = val
+                    } else {
+                        DispatchQueue.main.async {
+                            self.hueSlider.value = self.currentHueValue
+                            self.paramChipDelegate?.alertUserError(message: "Failed to update hue!")
+                            self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                        }
+                    }
+                }
+            }
+            return
+        }
         self.getColorCluster(timeout: 10.0) { cluster in
             if let cluster = cluster {
                 let params = MTRColorControlClusterMoveToHueParams()
-                var finalHue = Int(val*(254.0/360.0))
-                if finalHue == 0 {
-                    finalHue = 1
-                }
                 params.hue = NSNumber(value: finalHue)
                 if CGFloat(finalHue) < self.currentHueValue {
                     params.direction = NSNumber(value: 0)
@@ -123,16 +165,19 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
                 params.optionsOverride = NSNumber(value: 0)
                 params.transitionTime = NSNumber(value: 1)
                 cluster.moveToHue(with: params) { error in
-                    DispatchQueue.main.async {
-                        if let _ = error {
+                    if let _ = error {
+                        DispatchQueue.main.async {
                             self.hueSlider.value = self.currentHueValue
                             self.paramChipDelegate?.alertUserError(message: "Failed to update hue!")
                             self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                        } else {
-                            if let node = self.node, let id = self.deviceId {
-                                node.setMatterHueValue(hue: Int(val), deviceId: id)
-                            }
-                            self.currentHueValue = val
+                        }
+                    } else {
+                        if let node = self.node, let id = self.deviceId {
+                            node.setMatterHueValue(hue: Int(val), deviceId: id)
+                        }
+                        self.currentHueValue = val
+                        DispatchQueue.main.async {
+                            self.hueSlider.thumbColor = UIColor(hue: self.currentHueValue/360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
                         }
                     }
                 }

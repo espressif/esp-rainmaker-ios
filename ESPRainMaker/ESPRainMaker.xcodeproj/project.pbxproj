@@ -180,6 +180,9 @@
 		0CE2E8CB2A79165100BDB0EB /* DeviceViewController+LaunchControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE2E8CA2A79165100BDB0EB /* DeviceViewController+LaunchControllerDelegate.swift */; };
 		0CE3E9F7279017F9002138DA /* String+GetViewHeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE3E9F6279017F9002138DA /* String+GetViewHeight.swift */; };
 		0CE79FF827ABBE8F00972F22 /* CommonDeviceServices+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE79FF727ABBE8F00972F22 /* CommonDeviceServices+Utils.swift */; };
+		0CEEFE172B419877009A3343 /* Node+ControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEEFE162B419877009A3343 /* Node+ControllerUtility.swift */; };
+		0CEEFE192B42D7CE009A3343 /* ESPControllerAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEEFE182B42D7CE009A3343 /* ESPControllerAPIManager.swift */; };
+		0CEEFE1C2B46966D009A3343 /* MatterControllerParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEEFE1B2B46966D009A3343 /* MatterControllerParser.swift */; };
 		0CF0134F2AF960A0001BE5EA /* DeviceViewController+BadgeCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0134E2AF960A0001BE5EA /* DeviceViewController+BadgeCellDelegate.swift */; };
 		0CF69236270A308B0098F515 /* ESPAlexaConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922A270A308B0098F515 /* ESPAlexaConnectViewController.swift */; };
 		0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF6922B270A308B0098F515 /* ESPAlexaAPIEndpoint.swift */; };
@@ -794,6 +797,9 @@
 		0CE2E8CA2A79165100BDB0EB /* DeviceViewController+LaunchControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DeviceViewController+LaunchControllerDelegate.swift"; sourceTree = "<group>"; };
 		0CE3E9F6279017F9002138DA /* String+GetViewHeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+GetViewHeight.swift"; sourceTree = "<group>"; };
 		0CE79FF727ABBE8F00972F22 /* CommonDeviceServices+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CommonDeviceServices+Utils.swift"; sourceTree = "<group>"; };
+		0CEEFE162B419877009A3343 /* Node+ControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+ControllerUtility.swift"; sourceTree = "<group>"; };
+		0CEEFE182B42D7CE009A3343 /* ESPControllerAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPControllerAPIManager.swift; sourceTree = "<group>"; };
+		0CEEFE1B2B46966D009A3343 /* MatterControllerParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatterControllerParser.swift; sourceTree = "<group>"; };
 		0CF0134E2AF960A0001BE5EA /* DeviceViewController+BadgeCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceViewController+BadgeCellDelegate.swift"; sourceTree = "<group>"; };
 		0CF6922A270A308B0098F515 /* ESPAlexaConnectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaConnectViewController.swift; sourceTree = "<group>"; };
 		0CF6922B270A308B0098F515 /* ESPAlexaAPIEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaAPIEndpoint.swift; sourceTree = "<group>"; };
@@ -1223,6 +1229,7 @@
 			isa = PBXGroup;
 			children = (
 				0C71B9D72A360B8000978005 /* Node+MatterUtility.swift */,
+				0CEEFE162B419877009A3343 /* Node+ControllerUtility.swift */,
 			);
 			path = Node;
 			sourceTree = "<group>";
@@ -1430,6 +1437,7 @@
 		0CCD2FC02A121CED00ABB680 /* Matter */ = {
 			isa = PBXGroup;
 			children = (
+				0CEEFE1B2B46966D009A3343 /* MatterControllerParser.swift */,
 				0CD3599B2A2D47A70081017C /* Views */,
 				0CD359912A2D3CB40081017C /* Models */,
 				0CD3597A2A2D27610081017C /* Viewcontrollers */,
@@ -1446,6 +1454,7 @@
 				0C37EEFE2A38830E001562BC /* ESPMatterLightUIService.swift */,
 				0C2A3D422A39989E0097D16D /* ESPUpdateCATIdService.swift */,
 				0CADAB802A3B3F6F0017CB07 /* ESPUpdateNodeGroupService.swift */,
+				0CEEFE1A2B454B86009A3343 /* ESPControllerAPIManager */,
 				0C387F692A2E670F00C5EFA4 /* Details */,
 				0CD359012A2D25E20081017C /* APIEndpoints */,
 				0CD359032A2D25E20081017C /* Node Group Sharing */,
@@ -1665,6 +1674,14 @@
 			children = (
 			);
 			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		0CEEFE1A2B454B86009A3343 /* ESPControllerAPIManager */ = {
+			isa = PBXGroup;
+			children = (
+				0CEEFE182B42D7CE009A3343 /* ESPControllerAPIManager.swift */,
+			);
+			path = ESPControllerAPIManager;
 			sourceTree = "<group>";
 		};
 		0CF69228270A308B0098F515 /* Alexa */ = {
@@ -3108,6 +3125,7 @@
 				0CE2E8C92A790FF600BDB0EB /* LaunchControllerCell.swift in Sources */,
 				0C80AA2326FDBD4B00480C53 /* ESPProtocol.swift in Sources */,
 				F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */,
+				0CEEFE192B42D7CE009A3343 /* ESPControllerAPIManager.swift in Sources */,
 				F1E37E9323D6CF4800A5043F /* PasswordTextField.swift in Sources */,
 				F1CC3C18295D866D0000D6DC /* ESPOTAPresenter.swift in Sources */,
 				F1FFC91125D4A04500DD26C6 /* EditNodeGroupViewController.swift in Sources */,
@@ -3134,6 +3152,8 @@
 				0CF69238270A308B0098F515 /* ESPAlexaTokenWorker.swift in Sources */,
 				F1CC3C27295D87C80000D6DC /* UIImage+GIF.swift in Sources */,
 				143146B320EB22470017E119 /* ProvisionLandingViewController.swift in Sources */,
+				0CEEFE172B419877009A3343 /* Node+ControllerUtility.swift in Sources */,
+				0CEEFE1C2B46966D009A3343 /* MatterControllerParser.swift in Sources */,
 				0CD3596F2A2D26010081017C /* ESPMatterFabricDetails+ClustersData.swift in Sources */,
 				F18C23BE25F1838C009E232D /* CentralSwitchTableViewCell.swift in Sources */,
 				0C387F7D2A2F399600C5EFA4 /* ESPMatterConnectionManager.swift in Sources */,

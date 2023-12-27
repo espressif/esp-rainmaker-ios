@@ -21,8 +21,8 @@ import UIKit
 protocol DeviceGroupCollectionViewCellDelegate {
     func didSelectDevice(device: Device)
     func didSelectNode(node: Node)
-    func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath, rNode: Node?)
-    func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?)
+    func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath, rNode: Node?, nodeConnectionStatus: NodeConnectionStatus)
+    func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?, nodeConnectionStatus: NodeConnectionStatus)
     func showDeviceTraitListVC(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath)
     func showDeleteDeviceVC(node: ESPNodeDetails?, group: ESPNodeGroup, rainmakerNode: Node?, indexPath: IndexPath)
 }
@@ -87,14 +87,21 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
                     if status == .local {
                         if let devices = node.devices {
                             if devices.count > 1 {
-                                delegate?.launchDeviceScreen(isSingleDeviceNode: false, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node)
+                                delegate?.launchDeviceScreen(isSingleDeviceNode: false, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node, nodeConnectionStatus: .local)
                             } else {
-                                delegate?.launchDeviceScreen(isSingleDeviceNode: true, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node)
+                                delegate?.launchDeviceScreen(isSingleDeviceNode: true, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node, nodeConnectionStatus: .local)
                             }
                         }
                     } else if status  == .remote {
                         delegate?.showDeviceTraitListVC(node: nodeDetails, group: group, endpointClusterId: nil, indexPath: indexPath)
                     } else {
+                        if let controller = node.matterControllerNode, controller.connectionStatus == .remote {
+                            if let devices = node.devices {
+                                let isSingleDevice = (devices.count > 1) ? false : true
+                                delegate?.launchDeviceScreen(isSingleDeviceNode: isSingleDevice, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node, nodeConnectionStatus: .controller)
+                            }
+                            return
+                        }
                         delegate?.showDeleteDeviceVC(node: nodeDetails, group: group, rainmakerNode: node, indexPath: indexPath)
                     }
                 } else {
@@ -158,6 +165,13 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
                     status = .local
                 } else if node.isRainmaker, node.isConnected {
                     status = .remote
+                } else {
+                    if let controller = node.matterControllerNode, let controllerNodeId = controller.node_id {
+                        let controllerStatus = controller.connectionStatus
+                        if controllerStatus == .remote, let matterNodeData = MatterControllerParser.shared.getMatterNodeData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let enabled = matterNodeData.enabled, let reachable = matterNodeData.reachable, enabled, reachable {
+                            status = .controller
+                        }
+                    }
                 }
                 if let rainmakerDeviceName = node.rainmakerDeviceName {
                     cell.deviceName.text = rainmakerDeviceName

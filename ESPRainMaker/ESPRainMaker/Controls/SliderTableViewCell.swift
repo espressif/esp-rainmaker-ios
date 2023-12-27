@@ -89,6 +89,7 @@ class SliderTableViewCell: UITableViewCell {
     weak var paramChipDelegate: ParamCHIPDelegate?
     var sliderParamType: SliderParamType = .brightness
     var isWindowCovering: Bool = false
+    var nodeConnectionStatus: NodeConnectionStatus = .local
 
     override func awakeFromNib() {
         super.awakeFromNib()

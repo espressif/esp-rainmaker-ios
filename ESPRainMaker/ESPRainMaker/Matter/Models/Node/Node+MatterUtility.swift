@@ -264,4 +264,55 @@ extension Node {
         }
         return nil
     }
+    
+    func setControllerServiceName(serviceName: String) {
+        if let id = self.node_id {
+            let key = "esp.service.matter-controller.\(id)"
+            UserDefaults.standard.set(serviceName, forKey: key)
+        }
+    }
+    
+    var controllerServiceName: String {
+        if let id = self.node_id {
+            let key = "esp.service.matter-controller.\(id)"
+            if let value = UserDefaults.standard.value(forKey: key) as? String {
+                return value
+            }
+        }
+        return "Matter-Controller"
+    }
+    
+    func setMatterDevicesParamName(matterDevicesParamName: String) {
+        if let id = self.node_id {
+            let key = "esp.param.matter-devices.\(id)"
+            UserDefaults.standard.set(matterDevicesParamName, forKey: key)
+        }
+    }
+    
+    var matterDevicesParamName: String {
+        if let id = self.node_id {
+            let key = "esp.param.matter-devices.\(id)"
+            if let value = UserDefaults.standard.value(forKey: key) as? String {
+                return value
+            }
+        }
+        return "Matter-Devices"
+    }
+    
+    func setMatterControllerDataVersion(matterControllerDataVersion: String) {
+        if let id = self.node_id {
+            let key = "esp.param.matter-controller-data-version.\(id)"
+            UserDefaults.standard.set(matterControllerDataVersion, forKey: key)
+        }
+    }
+    
+    var matterControllerDataVersion: String {
+        if let id = self.node_id {
+            let key = "esp.param.matter-controller-data-version.\(id)"
+            if let value = UserDefaults.standard.value(forKey: key) as? String {
+                return value
+            }
+        }
+        return "Matter-Controller-Data-Version"
+    }
 }

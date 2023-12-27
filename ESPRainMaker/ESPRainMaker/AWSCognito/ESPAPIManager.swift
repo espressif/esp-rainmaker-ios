@@ -41,7 +41,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     ///
     /// - Parameters:
     ///   - filename: name of the certificate file
-    private static func certificate(filename: String) -> SecCertificate {
+    static func certificate(filename: String) -> SecCertificate {
         let filePath = Bundle.main.path(forResource: filename, ofType: "der")!
         let data = try! Data(contentsOf: URL(fileURLWithPath: filePath))
         let certificate = SecCertificateCreateWithData(nil, data as CFData)!

@@ -1,4 +1,4 @@
-// Copyright 2024 Espressif Systems
+// Copyright 2023 Espressif Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ extension ParamSliderTableViewCell {
             }
             if let val = node.getMatterSystemMode(deviceId: id) {
                 status = val
-                if val == "Heat" {
+                if val.lowercased() == ESPMatterConstants.heat.lowercased() {
                     DispatchQueue.main.async {
                         self.minLabel.text = "7"
                         self.maxLabel.text = "30"
@@ -61,8 +61,8 @@ extension ParamSliderTableViewCell {
                 }
             }
             if let status = status {
-                if status == "Heat" {
-                    if let levelValue = node.getMatterOccupiedHeatingSetpoint(deviceId: id) {
+                if status.lowercased() == ESPMatterConstants.heat.lowercased() {
+                    if let levelValue = node.getMatterOccupiedHeatingSetpoint(deviceId: id) as? Int16 {
                         self.currentLevel = Int(levelValue)
                         node.setMatterOccupiedHeatingSetpoint(ohs: levelValue, deviceId: id)
                         DispatchQueue.main.async {
@@ -80,7 +80,7 @@ extension ParamSliderTableViewCell {
                             }
                         }
                     }
-                } else if status == "Heat" {
+                } else if status.lowercased() == ESPMatterConstants.heat.lowercased() {
                     if let levelValue = node.getMatterOccupiedCoolingSetpoint(deviceId: id) as? Int16 {
                         self.currentLevel = Int(levelValue)
                         node.setMatterOccupiedCoolingSetpoint(ocs: levelValue, deviceId: id)
@@ -141,7 +141,7 @@ extension ParamSliderTableViewCell {
     func changeOccupiedSetpoint(setPoint: Int16) {
         if let id = self.deviceId, let grpId = self.nodeGroup?.groupID, let node = self.node {
             self.paramChipDelegate?.matterAPIRequestSent()
-            if let val = node.getMatterSystemMode(deviceId: id), val == "Heat" {
+            if let val = node.getMatterSystemMode(deviceId: id), val == ESPMatterConstants.heat {
                 ESPMTRCommissioner.shared.setOccupiedHeatingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
                     self.paramChipDelegate?.matterAPIResponseReceived()
                     if result {

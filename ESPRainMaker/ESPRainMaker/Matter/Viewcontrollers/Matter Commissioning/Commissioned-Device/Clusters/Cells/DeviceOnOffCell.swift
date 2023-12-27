@@ -41,6 +41,7 @@ class DeviceOnOffCell: UITableViewCell {
     var deviceId: UInt64?
     var endpointId: UInt16?
     var delegate: OnOffDelegate?
+    var nodeConnectionStatus: NodeConnectionStatus = .local
     
     func setGroup(group: ESPNodeGroup?) {
         self.group = group
@@ -63,42 +64,101 @@ class DeviceOnOffCell: UITableViewCell {
     /// - Parameter sender: sender
     @IBAction func toggleButtonPressed(sender: UISwitch) {
         self.onOffStatus.text = sender.isOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
-        if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.toggleSwitch(groupId: groupId, deviceId: deviceId) { result in
-                if !result {
-                    DispatchQueue.main.async {
-                        self.onOffStatus.text = !sender.isOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
-                        self.toggleSwitch.setOn(!sender.isOn, animated: true)
+        if self.nodeConnectionStatus == .local {
+            if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
+                ESPMTRCommissioner.shared.toggleSwitch(groupId: groupId, deviceId: deviceId) { result in
+                    if !result {
+                        DispatchQueue.main.async {
+                            self.onOffStatus.text = !sender.isOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+                            self.toggleSwitch.setOn(!sender.isOn, animated: true)
+                        }
+                    } else {
+                        if let status = self.node?.isMatterLightOn(deviceId: deviceId) {
+                            self.node?.setMatterLightOnStatus(status: !status, deviceId: deviceId)
+                        } else {
+                            ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
+                                self.node?.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
+                            }
+                        }
+                    }
+                }
+            }
+        } else if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                var endpoint = "0x1"
+                if let endpointId = MatterControllerParser.shared.getOnOffEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    endpoint = endpointId
+                }
+                if let isOn = node.isMatterLightOn(deviceId: matterDeviceId), isOn {
+                    ESPControllerAPIManager.shared.callOffAPI(rainmakerNode: rainmakerNode,
+                                                                controllerNodeId: controllerNodeId,
+                                                                matterNodeId: matterNodeId,
+                                                                endpoint: endpoint) { result in
+                        self.setToggleUI(node: node, deviceId: matterDeviceId, result: result, currentStatus: false)
                     }
                 } else {
-                    if let status = self.node?.isMatterLightOn(deviceId: deviceId) {
-                        self.node?.setMatterLightOnStatus(status: !status, deviceId: deviceId)
-                    } else {
-                        ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
-                            self.node?.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
-                        }
+                    ESPControllerAPIManager.shared.callOnAPI(rainmakerNode: rainmakerNode,
+                                                                controllerNodeId: controllerNodeId,
+                                                                matterNodeId: matterNodeId,
+                                                                endpoint: endpoint) { result in
+                        self.setToggleUI(node: node, deviceId: matterDeviceId, result: result, currentStatus: true)
                     }
                 }
             }
         }
     }
     
+    /// Set toggle button UI
+    /// - Parameters:
+    ///   - node: node
+    ///   - deviceId: device id
+    ///   - result: result
+    ///   - currentStatus: current status
+    func setToggleUI(node: ESPNodeDetails, deviceId: UInt64, result: Bool, currentStatus: Bool) {
+        if result {
+            node.setMatterLightOnStatus(status: currentStatus, deviceId: deviceId)
+        } else {
+            if let val = node.isMatterLightOn(deviceId: deviceId) {
+                self.toggleSwitch.setOn(val, animated: true)
+            }
+        }
+    }
+
+    
     /// Setup initial UI
     func setupInitialUI() {
-        DispatchQueue.main.async {
+        if self.nodeConnectionStatus == .local {
             if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
                 if let node = self.node {
                     if let status = node.isMatterLightOn(deviceId: deviceId) {
-                        self.toggleSwitch.setOn(status, animated: true)
-                        self.onOffStatus.text = status ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+                        DispatchQueue.main.async {
+                            self.toggleSwitch.setOn(status, animated: true)
+                            self.onOffStatus.text = status ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+                        }
                     } else {
                         ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
                             DispatchQueue.main.async {
-                                self.node?.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
+                                node.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
                                 self.toggleSwitch.setOn(isLightOn, animated: true)
                                 self.onOffStatus.text = isLightOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
                             }
                         }
+                    }
+                }
+            }
+            self.subscribeToOnOffAttribute()
+        } else if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                if let value = MatterControllerParser.shared.getOnOffValue(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    node.setMatterLightOnStatus(status: value, deviceId: matterDeviceId)
+                    DispatchQueue.main.async {
+                        self.toggleSwitch.setOn(value, animated: true)
+                        self.onOffStatus.text = value ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
+                    }
+                } else if let value = node.isMatterLightOn(deviceId: matterDeviceId) {
+                    DispatchQueue.main.async {
+                        self.toggleSwitch.setOn(value, animated: true)
+                        self.onOffStatus.text = value ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
                     }
                 }
             }

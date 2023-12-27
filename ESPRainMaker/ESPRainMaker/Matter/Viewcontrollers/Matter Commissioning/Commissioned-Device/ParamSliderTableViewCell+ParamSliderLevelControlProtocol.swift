@@ -58,7 +58,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
             self.maxLabel.text = "100"
             self.minImage.image = UIImage(named: "brightness_low")
             self.maxImage.image = UIImage(named: "brightness_high")
-            guard let node = self.node, let id = self.deviceId, let levelValue = node.getMatterLevelValue(deviceId: id) as? Int else {
+            guard let node = self.node, let id = self.deviceId, let levelValue = node.getMatterLevelValue(deviceId: id) else {
                 self.slider.setValue(50.0, animated: true)
                 return
             }
@@ -72,28 +72,42 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
     ///   - deviceId: device id
     func getCurrentLevelValues(groupId: String, deviceId: UInt64) {
         self.setupInitialLevelValues()
-        if let controller = ESPMTRCommissioner.shared.sController {
-            self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: controller) { levelControl in
-                if let levelControl = levelControl {
-                    self.getMinLevelValue(levelControl: levelControl) { min, _ in
-                        self.getCurrentLevelValue(levelControl: levelControl) { current, _ in
-                            DispatchQueue.main.async {
-                                if let current = current {
-                                    if let node = self.node, let id = self.deviceId {
-                                        node.setMatterLevelValue(level: current.intValue, deviceId: id)
+        if self.nodeConnectionStatus == .local {
+            if let controller = ESPMTRCommissioner.shared.sController {
+                self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: controller) { levelControl in
+                    if let levelControl = levelControl {
+                        self.getMinLevelValue(levelControl: levelControl) { min, _ in
+                            self.getCurrentLevelValue(levelControl: levelControl) { current, _ in
+                                DispatchQueue.main.async {
+                                    if let current = current {
+                                        if let node = self.node, let id = self.deviceId {
+                                            node.setMatterLevelValue(level: current.intValue, deviceId: id)
+                                        }
+                                        self.currentLevel = Int(current.floatValue/2.54)
                                     }
-                                    self.currentLevel = current.intValue
+                                    Utility.hideLoader(view: self)
+                                    self.slider.setValue(Float(self.currentLevel), animated: true)
                                 }
-                                Utility.hideLoader(view: self)
-                                self.slider.setValue(Float(self.currentLevel), animated: true)
                             }
                         }
                     }
                 }
             }
+            self.subscribeToLevelAttribute()
+        } else if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                if let currentLevel = MatterControllerParser.shared.getBrightnessLevel(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    let finalValue = Float(currentLevel)/2.54
+                    self.currentLevel = Int(finalValue)
+                    node.setMatterLevelValue(level: currentLevel, deviceId: matterDeviceId)
+                    DispatchQueue.main.async {
+                        self.slider.setValue(Float(self.currentLevel), animated: true)
+                    }
+                }
+            }
         }
-        self.subscribeToLevelAttribute()
     }
+
 
     /// Get level controller
     /// - Parameters:
@@ -151,34 +165,56 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
     ///   - deviceId: device id
     ///   - val: value
     func changeLevel(groupId: String, deviceId: UInt64, toValue val: Float) {
-        if let cont = ESPMTRCommissioner.shared.sController {
-            self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: cont) { controller in
-                if let controller = controller {
-                    var finalValue = Int(val*2.54)
-                    if finalValue == 0 {
-                        finalValue = 1
-                    }
-                    let levelParams = MTRLevelControlClusterMoveToLevelWithOnOffParams()
-                    levelParams.level = NSNumber(value: finalValue)
-                    controller.moveToLevelWithOnOff(with: levelParams) { error in
-                        DispatchQueue.main.async {
-                            if let _ = error {
-                                self.slider.setValue(Float(self.currentLevel), animated: true)
-                            } else {
-                                if let node = self.node, let id = self.deviceId {
-                                    node.setMatterLevelValue(level: finalValue, deviceId: id)
-                                    if let flag = node.isMatterLightOn(deviceId: id), !flag {
-                                        node.setMatterLightOnStatus(status: true, deviceId: id)
-                                        self.paramChipDelegate?.levelSet()
+        let finalValue = Int(val*2.54)
+        if nodeConnectionStatus == .local {
+            if let cont = ESPMTRCommissioner.shared.sController {
+                self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: cont) { controller in
+                    if let controller = controller {
+                        let levelParams = MTRLevelControlClusterMoveToLevelWithOnOffParams()
+                        levelParams.level = NSNumber(value: finalValue)
+                        controller.moveToLevelWithOnOff(with: levelParams) { error in
+                            DispatchQueue.main.async {
+                                if let _ = error {
+                                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                                } else {
+                                    if let node = self.node, let id = self.deviceId {
+                                        node.setMatterLevelValue(level: finalValue, deviceId: id)
+                                        if let flag = node.isMatterLightOn(deviceId: id), !flag {
+                                            node.setMatterLightOnStatus(status: true, deviceId: id)
+                                            self.paramChipDelegate?.levelSet()
+                                        }
                                     }
+                                    self.currentLevel = Int(val)
                                 }
-                                self.currentLevel = finalValue
                             }
                         }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        }
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.slider.setValue(Float(self.currentLevel), animated: true)
+                }
+            }
+        } else if nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                var endpoint = "0x1"
+                if let endpointId = MatterControllerParser.shared.getBrightnessLevelEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    endpoint = endpointId
+                }
+                ESPControllerAPIManager.shared.callBrightnessAPI(rainmakerNode: rainmakerNode,
+                                                                 controllerNodeId: controllerNodeId,
+                                                                 matterNodeId: matterNodeId,
+                                                                 endpoint: endpoint,
+                                                                 brightnessLevel: "\(finalValue)") { result in
+                    if result {
+                        node.setMatterLevelValue(level: finalValue, deviceId: matterDeviceId)
+                        self.currentLevel = Int(val)
+                        node.setMatterLightOnStatus(status: true, deviceId: matterDeviceId)
+                        self.paramChipDelegate?.levelSet()
+                    } else {
+                        DispatchQueue.main.async {
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        }
                     }
                 }
             }
