@@ -697,9 +697,6 @@ extension DeviceTraitListViewController: ESPAddNodeToMatterFabricPresentationLog
     ///   - status: status
     ///   - error: error
     func nodeRemoved(status: Bool, error: Error?) {
-        if status, let matterNodeId = self.node?.getMatterNodeId() {
-            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: matterNodeId)
-        }
         User.shared.updateDeviceList = true
         Utility.hideLoader(view: self.view)
         self.navigationController?.popViewController(animated: true)

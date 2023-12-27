@@ -64,7 +64,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
         if let nodeId = node.nodeID, let rainmakerNode = User.shared.getNode(id: nodeId), !rainmakerNode.isRainmaker {
             self.showMatterDeviceVCWithNode(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath, switchIndex: switchIndex)
         } else {
-            if let rNode = rNode, let matterNodeId = rNode.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+            if let rNode = rNode, let matterNodeId = rNode.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                 self.showMatterDeviceVCWithNode(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath, switchIndex: switchIndex)
             } else {
                 self.showDeviceTraitListVC(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath)
@@ -87,12 +87,12 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                 deviceScreen.endpointClusterId = endpointClusterId
                 deviceScreen.group = group
                 deviceScreen.node = node
-                deviceScreen.matterNodeId = node.getMatterNodeId()
+                deviceScreen.matterNodeId = node.matterNodeID
                 deviceScreen.rainmakerNodes = User.shared.associatedNodeList
                 if let id = node.nodeID, let rmakerNode = User.shared.getNode(id: id) {
                     deviceScreen.rainmakerNode = rmakerNode
                 }
-                if let groupId = group.groupID, let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
+                if let groupId = group.groupID, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
                     if let groups = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId)?.groups, groups.count > 0, let allNodes = groups[0].nodeDetails {
                         deviceScreen.allNodes = allNodes
                     }
@@ -128,7 +128,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                     deviceTraitList.group = group
                     deviceTraitList.device = rainmakerDevices[0]
                     deviceTraitList.node = node
-                    if let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: nodeId), let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
+                    if let groupId = ESPMatterFabricDetails.shared.getGroupId(nodeId: nodeId), let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
                         deviceTraitList.matterNodeId = matterNodeId
                         if let groups = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId)?.groups, groups.count > 0, let allNodes = groups[0].nodeDetails {
                             deviceTraitList.allNodes = allNodes
@@ -174,7 +174,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                 deviceScreen.isDeviceOffline = true
                 deviceScreen.rainmakerNodes = User.shared.associatedNodeList
                 deviceScreen.rainmakerNode = rainmakerNode
-                if let groupId = group.groupID, let node = node, let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal {
+                if let groupId = group.groupID, let node = node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal {
                     let result = ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId)
                     let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
                     var endpointClusterId: [String: UInt]?
@@ -193,7 +193,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                     deviceScreen.switchIndex = switchIndex
                     deviceScreen.matterNodeId = matterNodeId
                 }
-                if let groupId = group.groupID, let matterNodeId = node?.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
+                if let groupId = group.groupID, let matterNodeId = node?.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let deviceName = ESPMatterFabricDetails.shared.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
                     deviceScreen.matterNodeId = matterNodeId
                     if let groups = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId)?.groups, groups.count > 0, let allNodes = groups[0].nodeDetails {
                         deviceScreen.allNodes = allNodes

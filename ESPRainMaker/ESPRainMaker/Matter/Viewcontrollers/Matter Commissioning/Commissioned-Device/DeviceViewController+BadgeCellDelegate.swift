@@ -27,7 +27,7 @@ extension DeviceViewController: BadgeCellDelegate {
     /// Get saved badge data
     /// - Returns: badge data
     func getData() -> ESPParticipantData? {
-        if let groupId = self.group?.groupID, let matterNodeId = self.rainmakerNode?.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, let data = self.fabricDetails.fetchParticipantData(groupId: groupId, deviceId: deviceId) as? ESPParticipantData {
+        if let groupId = self.group?.groupID, let matterNodeId = self.rainmakerNode?.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let data = self.fabricDetails.fetchParticipantData(groupId: groupId, deviceId: deviceId) as? ESPParticipantData {
             return data
         }
         return nil
@@ -140,7 +140,7 @@ extension DeviceViewController: BadgeCellDelegate {
     func validateAndUpdateBadgeInfo() {
         let result = self.validateBadgeInfo()
         if result.0 {
-            if let groupId = self.group?.groupID, let matterNodeId = self.rainmakerNode?.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, let data = result.1 {
+            if let groupId = self.group?.groupID, let matterNodeId = self.rainmakerNode?.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let data = result.1 {
                 let value = ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId)
                 if let key = value.1, let endpoint = UInt16(key) {
                     DispatchQueue.main.async {

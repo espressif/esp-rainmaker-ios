@@ -55,7 +55,7 @@ extension DeviceViewController: RemoveDeviceDelegate {
     ///   - node: node
     ///   - completion: completion
     func checkConnectionAndRemoveFabric(node: ESPNodeDetails, completion: @escaping (Bool) -> Void) {
-        if let nodeId = node.nodeID, let matterNodeId = node.getMatterNodeId(), User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+        if let nodeId = node.nodeID, let matterNodeId = node.matterNodeID, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
             ESPMTRCommissioner.shared.readCurrentFabricIndex(deviceId: deviceId) { index in
                 if let index = index {
                     ESPMTRCommissioner.shared.removeFabricAtIndex(deviceId: deviceId, atIndex: index) { result in

@@ -63,7 +63,7 @@ class DeviceViewController: UIViewController {
         self.restartMatterController()
         if let node = self.rainmakerNode, let deviceName = node.rainmakerDeviceName {
             self.topBarTitle.text = deviceName
-        } else if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.getMatterNodeId?.hexToDecimal, let name = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+        } else if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.matter_node_id?.hexToDecimal, let name = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
             self.topBarTitle.text = name
         } else if let deviceName = self.deviceName {
             self.topBarTitle.text = deviceName

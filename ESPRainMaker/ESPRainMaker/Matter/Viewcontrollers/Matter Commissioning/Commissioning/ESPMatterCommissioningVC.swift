@@ -305,16 +305,12 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
         ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
             if result {
                 ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
-                    if result, let controller = ESPMTRCommissioner.shared.sController, let id = controller.controllerNodeID?.uint64Value {
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
-                            if result {
-                                let str = String(id, radix:16)
-                                self.fabricDetails.saveControllerNodeId(controllerNodeId: str, matterNodeId: matterNodeId)
-                                DispatchQueue.main.async {
+                    if result {
+                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { isDeviceListUpdated in
+                            DispatchQueue.main.async {
+                                if isDeviceListUpdated {
                                     self.goToHomeScreen()
-                                }
-                            } else {
-                                DispatchQueue.main.async {
+                                } else {
                                     self.hideLoaderAndAlertUser()
                                 }
                             }
@@ -493,7 +489,7 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                     var shouldUpdateDeviceList = false
                     var id: UInt64?
                     for node in  nodes {
-                        if let grpId = node.groupId, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, grpId == groupId, node.isRainmakerControllerSupported.0 {
+                        if let grpId = node.groupId, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, grpId == groupId, node.isRainmakerControllerSupported.0 {
                             shouldUpdateDeviceList = true
                             id = deviceId
                             break
@@ -543,7 +539,7 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
         var index = 0
         if let group = self.group, group.shouldUpdate, let fabricDetails = group.fabricDetails, let catIdAdmin = fabricDetails.catIdAdminDecimal, let catIdOperate = fabricDetails.catIdOperateDecimal, let nodes = self.nodes, nodes.count > 0 {
             for node in nodes {
-                if let matterNodeId = node.getMatterNodeId(), let deviceId = matterNodeId.hexToDecimal {
+                if let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal {
                     ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { accessControlEntries in
                         if var accessControlEntries = accessControlEntries, accessControlEntries.count > 0 {
                             var entries = [MTRAccessControlClusterAccessControlEntryStruct]()

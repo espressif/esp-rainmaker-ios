@@ -61,7 +61,7 @@ class DeviceInfoCell: UITableViewCell {
                 }
             }
         case .nodeLabel:
-            if let node = self.rainmakerNode, let groupId = node.groupId, let matterNodeId = node.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, let label = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+            if let node = self.rainmakerNode, let groupId = node.groupId, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let label = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
                 self.delegate?.editNodeLabelPressed(rainmakerNode: self.rainmakerNode, nodeLabel: label) { nodeLabel in
                     if let nodeLabel = nodeLabel {
                         DispatchQueue.main.async {

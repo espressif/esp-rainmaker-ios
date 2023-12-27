@@ -76,7 +76,7 @@ extension ESPMatterNodeDetailsService: ESPGetNodeGroupsPresentationLogic {
                                     ESPMatterFabricDetails.shared.saveNodeDetails(nodeId: nodeId, groupId: groupId, data: nodeDetail)
                                     for node in User.shared.associatedNodeList ?? [] {
                                         if let id = node.node_id, id == nodeId {
-                                            if let metadata = node.metadata, let matterNodeId = nodeDetail.getMatterNodeId() {
+                                            if let metadata = node.metadata, let matterNodeId = nodeDetail.matterNodeID {
                                                 ESPMatterFabricDetails.shared.saveMetadata(details: metadata, groupId: groupId, matterNodeId: matterNodeId)
                                             }
                                             break

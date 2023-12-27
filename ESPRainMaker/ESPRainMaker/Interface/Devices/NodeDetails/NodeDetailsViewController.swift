@@ -124,7 +124,7 @@ class NodeDetailsViewController: UIViewController {
         view.endEditing(true)
         cell.nodeDetailActionLabel.text = "Turn On Pairing Mode"
         cell.addMemberButtonAction = {
-            if let node = self.currentNode, let matterNodeId = node.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+            if let node = self.currentNode, let matterNodeId = node.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                 self.openCommissioningWindow()
             } else {
                 Utility.showToastMessage(view: self.view, message: ESPMatterConstants.deviceNotReachableMsg)
@@ -136,7 +136,7 @@ class NodeDetailsViewController: UIViewController {
     /// Open commissioning Window
     @available(iOS 16.4, *)
     func openCommissioningWindow() {
-        if let node = currentNode, let matterNodeId = node.getMatterNodeId, let id = matterNodeId.hexToDecimal {
+        if let node = currentNode, let matterNodeId = node.matter_node_id, let id = matterNodeId.hexToDecimal {
             ESPMTRCommissioner.shared.openCommissioningWindow(deviceId: id) { setupPasscode in
                 DispatchQueue.main.async {
                     if let setupPasscode = setupPasscode {
@@ -196,7 +196,7 @@ class NodeDetailsViewController: UIViewController {
     /// Remove fabric
     /// - Parameter completion: completion handler
     func removeFabric(completion: @escaping (Bool) -> Void) {
-        if let node = currentNode, let matterNodeId = node.getMatterNodeId, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+        if let node = currentNode, let matterNodeId = node.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
             #if ESPRainMakerMatter
             if #available(iOS 16.4, *) {
                 ESPMTRCommissioner.shared.readCurrentFabricIndex(deviceId: deviceId) { index in
@@ -345,7 +345,7 @@ class NodeDetailsViewController: UIViewController {
         }
         
         #if ESPRainMakerMatter
-        if #available(iOS 16.4, *), let node = currentNode, let matterNodeId = node.getMatterNodeId {
+        if #available(iOS 16.4, *), let node = currentNode, let matterNodeId = node.matter_node_id {
             if node.isOpenCommissioningWindowSupported.0 {
                 index += 1
                 dataSource.append([])
@@ -858,9 +858,6 @@ extension NodeDetailsViewController {
     
     /// Node deletion success action
     func nodeDeletionSuccessful() {
-        if let oMNId = self.currentNode?.originalMatterNodeId {
-            ESPMatterFabricDetails.shared.removeControllerNodeId(matterNodeId: oMNId)
-        }
         User.shared.associatedNodeList?.removeAll(where: { node -> Bool in
             node.node_id == self.currentNode.node_id
         })

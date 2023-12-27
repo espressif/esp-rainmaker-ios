@@ -42,7 +42,6 @@ struct ESPMatterConstants {
     static let switchDevice = "switch"
     static let outletDevice = "outlet"
     static let defaultDevice = "default"
-    static let controllerNodeId = "controllerNodeId"
     static let pureMatter = "pure_matter"
     static let rainmakerMatter = "rainmaker_matter"
     

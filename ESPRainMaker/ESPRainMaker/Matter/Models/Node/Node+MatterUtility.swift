@@ -140,7 +140,7 @@ extension Node {
     
     /// Matter device name
     var matterDeviceName: String? {
-        if let groupId = self.groupId, let matterNodeId = self.getMatterNodeId, let deviceId = matterNodeId.hexToDecimal, let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+        if let groupId = self.groupId, let matterNodeId = self.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
             return name
         }
         if let deviceName = self.rainmakerDeviceName {
@@ -150,16 +150,6 @@ extension Node {
             return matterDeviceName
         }
         return nil
-    }
-    
-    /// Matter node id
-    var getMatterNodeId: String? {
-        if let id = controllerNodeId {
-            if User.shared.isMatterNodeConnected(matterNodeId: id) {
-                return id
-            }
-        }
-        return originalMatterNodeId
     }
     
     /// Original matter node id
@@ -244,14 +234,6 @@ extension Node {
             }
         }
         return (true, nil)
-    }
-    
-    /// Controller node id
-    var controllerNodeId: String? {
-        if let metadata = metadata, let id = metadata[ESPMatterConstants.controllerNodeId] as? String {
-            return id
-        }
-        return nil
     }
     
     var deviceType: Int? {
