@@ -109,7 +109,10 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
         self.getColorCluster(timeout: 10.0) { cluster in
             if let cluster = cluster {
                 let params = MTRColorControlClusterMoveToHueParams()
-                let finalHue = Int(val*(255.0/360.0))
+                var finalHue = Int(val*(254.0/360.0))
+                if finalHue == 0 {
+                    finalHue = 1
+                }
                 params.hue = NSNumber(value: finalHue)
                 if CGFloat(finalHue) < self.currentHueValue {
                     params.direction = NSNumber(value: 0)
@@ -142,7 +145,7 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
             ESPMTRCommissioner.shared.subscribeToHueValue(groupId: grpId, deviceId: deviceId) { hue in
                 DispatchQueue.main.async {
-                    let finalValue = (CGFloat(hue)*360.0)/255.0
+                    let finalValue = (CGFloat(hue)*360.0)/254.0
                     if let node = self.node, let id = self.deviceId {
                         node.setMatterHueValue(hue: Int(finalValue), deviceId: id)
                     }

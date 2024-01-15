@@ -111,7 +111,6 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.setupOfflineUI()
                 } else {
                     cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
-                    cell.subscribeToLevelAttribute()
                 }
                 cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
@@ -129,7 +128,9 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.paramChipDelegate = self
                 self.setAutoresizingMask(cell)
                 cell.setupInitialHueValues()
-                cell.subscribeToHueAttribute()
+                if !self.isDeviceOffline {
+                    cell.subscribeToHueAttribute()
+                }
                 cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             } else if value == ESPMatterConstants.saturationControl {
@@ -145,8 +146,11 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.slider.isHidden = false
                 cell.paramChipDelegate = self
                 self.setAutoresizingMask(cell)
-                cell.setupInitialSaturationValue()
-                cell.subscribeToSaturationAttribute()
+                if self.isDeviceOffline {
+                    cell.setupOfflineUI()
+                } else {
+                    cell.getCurrentSaturationValue(groupId: groupId, deviceId: deviceId)
+                }
                 cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             } else if value == ESPMatterConstants.delete {

@@ -92,8 +92,9 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
                 }
             }
         }
+        self.subscribeToLevelAttribute()
     }
-    
+
     /// Get level controller
     /// - Parameters:
     ///   - timeout: time out
@@ -153,7 +154,10 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
         if let cont = ESPMTRCommissioner.shared.sController {
             self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: cont) { controller in
                 if let controller = controller {
-                    let finalValue = Int(val*2.55)
+                    var finalValue = Int(val*2.54)
+                    if finalValue == 0 {
+                        finalValue = 1
+                    }
                     let levelParams = MTRLevelControlClusterMoveToLevelWithOnOffParams()
                     levelParams.level = NSNumber(value: finalValue)
                     controller.moveToLevelWithOnOff(with: levelParams) { error in
@@ -185,7 +189,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
     func subscribeToLevelAttribute() {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
             ESPMTRCommissioner.shared.subscribeToLevelValue(groupId: grpId, deviceId: deviceId) { level in
-                let finalLevelValue = Float(CGFloat(level)/2.55)
+                let finalLevelValue = Float(CGFloat(level)/2.54)
                 if let node = self.node, let id = self.deviceId {
                     node.setMatterLevelValue(level: level, deviceId: id)
                 }
