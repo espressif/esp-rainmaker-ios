@@ -237,6 +237,29 @@ extension ESPMatterFabricDetails {
         return nil
     }
     
+    /// Save software version
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - softwareVersion: software version
+    func saveSoftwareVersionString(groupId: String, deviceId: UInt64, softwareVersionString: String) {
+        let key = ESPMatterFabricKeys.shared.groupSwVersionStringKey(groupId, deviceId)
+        UserDefaults.standard.set(softwareVersionString as Any, forKey: key)
+    }
+    
+    /// Get software version
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: software version
+    func getSoftwareVersionString(groupId: String, deviceId: UInt64) -> String? {
+        let key = ESPMatterFabricKeys.shared.groupSwVersionStringKey(groupId, deviceId)
+        if let swString = UserDefaults.standard.value(forKey: key) as? String {
+            return swString
+        }
+        return nil
+    }
+    
     /// Save device serial number
     /// - Parameters:
     ///   - groupId: group id

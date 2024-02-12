@@ -128,6 +128,9 @@ class ESPMatterFabricKeys {
     var groupSwVersionKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
         return "\(groupId).\(deviceId).software.version"
     }
+    var groupSwVersionStringKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
+        return "\(groupId).\(deviceId).software.string.version"
+    }
     var groupSerialNumberKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
         return "\(groupId).\(deviceId).matter.serial.version"
     }

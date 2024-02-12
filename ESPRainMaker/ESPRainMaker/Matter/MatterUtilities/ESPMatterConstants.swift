@@ -31,6 +31,7 @@ struct ESPMatterConstants {
     static let vendorId = "vendorId"
     static let productId = "productId"
     static let softwareVersion = "softwareVersion"
+    static let softwareVersionString = "softwareVersionString"
     static let serialNumber = "serialNumber"
     static let manufacturerName = "manufacturerName"
     static let productName = "productName"

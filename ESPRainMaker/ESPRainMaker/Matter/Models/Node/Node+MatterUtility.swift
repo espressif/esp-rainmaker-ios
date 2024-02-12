@@ -192,6 +192,14 @@ extension Node {
         return nil
     }
     
+    /// Software version string
+    var swVersionString: Int? {
+        if let metadata = metadata, let swString = metadata[ESPMatterConstants.softwareVersionString] as? Int {
+            return swString
+        }
+        return nil
+    }
+    
     /// Software version
     var serialNumber: Int? {
         if let metadata = metadata, let serialNumber = metadata[ESPMatterConstants.serialNumber] as? Int {

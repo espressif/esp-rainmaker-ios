@@ -254,6 +254,9 @@ class NodeDetailsViewController: UIViewController {
         if let softwareVersion = currentNode.swVersion {
             dataSource[index].append("Software version:\(softwareVersion)")
         }
+        if let softwareVersionString = currentNode.swVersionString {
+            dataSource[index].append("Software version string:\(softwareVersionString)")
+        }
         if let sn = currentNode.serialNumber {
             dataSource[index].append("Serial Number:\(sn)")
         }

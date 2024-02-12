@@ -109,6 +109,26 @@ extension ESPMTRCommissioner {
         }
     }
     
+    /// Get software version
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion with software version
+    func getSoftwareVersionString(deviceId: UInt64, completion: @escaping (String?) -> Void) {
+        self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                cluster.readAttributeSoftwareVersionString { swString, _ in
+                    if let swString = swString {
+                        completion(swString)
+                    } else {
+                        completion(nil)
+                    }
+                }
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
     /// Get device serial number
     /// - Parameters:
     ///   - deviceId: device id
