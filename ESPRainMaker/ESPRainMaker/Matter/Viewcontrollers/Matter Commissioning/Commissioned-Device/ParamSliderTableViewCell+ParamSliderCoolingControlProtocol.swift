@@ -62,7 +62,7 @@ extension ParamSliderTableViewCell {
             }
             if let status = status {
                 if status == "Heat" {
-                    if let levelValue = node.getMatterOccupiedHeatingSetpoint(deviceId: id) as? Int16 {
+                    if let levelValue = node.getMatterOccupiedHeatingSetpoint(deviceId: id) {
                         self.currentLevel = Int(levelValue)
                         node.setMatterOccupiedHeatingSetpoint(ohs: levelValue, deviceId: id)
                         DispatchQueue.main.async {
