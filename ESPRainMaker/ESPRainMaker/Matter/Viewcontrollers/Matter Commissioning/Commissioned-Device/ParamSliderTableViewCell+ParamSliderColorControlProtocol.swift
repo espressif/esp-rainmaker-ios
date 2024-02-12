@@ -23,11 +23,12 @@ import Matter
 
 @available(iOS 16.4, *)
 protocol ParamSliderColorControlProtocol {
-    func setupInitialHueValues()
-    func setCurrentHueValue()
     func getColorCluster(timeout: TimeInterval, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void)
+    func setupInitialHueValues()
     func getCurrentHueValue(completionHandler: @escaping (NSNumber?, Error?) -> Void)
+    func setCurrentHueValue()
     func changeHue(toValue _: CGFloat)
+    func subscribeToHueAttribute()
 }
 
 @available(iOS 16.4, *)

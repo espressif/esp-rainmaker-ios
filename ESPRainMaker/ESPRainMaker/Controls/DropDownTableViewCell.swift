@@ -42,6 +42,17 @@ class DropDownTableViewCell: UITableViewCell {
     var paramDelegate: ParamUpdateProtocol?
     var service: Service?
     var node: Node?
+    
+    //Matter
+    var matterNode: ESPNodeDetails?
+    var type: DropDownType = .rainmaker
+    var deviceId: UInt64?
+    var isRainmaker = true
+    weak var matterParamDelegate: MTRACParamDelegate?
+    weak var nodeGroup: ESPNodeGroup?
+    @IBOutlet weak var topViewHeightConstraint: NSLayoutConstraint!
+    weak var paramChipDelegate: ParamCHIPDelegate?
+    weak var acParamDelegate: MTRACParamDelegate?
 
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -26,14 +26,16 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel].contains(value) {
+            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature].contains(value) {
                 return 100.0
-            } else if value == ESPMatterConstants.delete {
+            } else if [ESPMatterConstants.delete].contains(value) {
                 return 75.0
-            } else if [ESPMatterConstants.levelControl, ESPMatterConstants.colorControl, ESPMatterConstants.saturationControl].contains(value) {
+            } else if [ESPMatterConstants.levelControl, ESPMatterConstants.colorControl, ESPMatterConstants.saturationControl, ESPMatterConstants.occupiedCoolingSetpoint].contains(value) {
                 return 126.0
             } else if value == ESPMatterConstants.participantData {
                 return 278.0
+            } else if [ESPMatterConstants.controlSequenceOfOperation, ESPMatterConstants.systemMode].contains(value) {
+                return 90.0
             }
         }
         return 0.0
@@ -98,7 +100,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 let cell = sliderCell as! ParamSliderTableViewCell
                 cell.node = self.node
                 cell.isRainmaker = false
-                cell.isSaturation = false
+                cell.sliderParamType = .brightness
                 cell.nodeGroup = self.group
                 cell.deviceId = deviceId
                 cell.hueSlider.isHidden = true
@@ -136,7 +138,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 let cell = sliderCell as! ParamSliderTableViewCell
                 cell.node = self.node
                 cell.isRainmaker = false
-                cell.isSaturation = true
+                cell.sliderParamType = .saturation
                 cell.nodeGroup = self.group
                 cell.deviceId = deviceId
                 cell.hueSlider.isHidden = true
@@ -178,6 +180,66 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
+            } else if value == ESPMatterConstants.localTemperature {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: CustomInfoCell.reuseIdentifier, for: indexPath) as? CustomInfoCell {
+                    cell.type.text = "Local Temperature"
+                    cell.node = self.node
+                    cell.deviceId = deviceId
+                    cell.nodeGroup = self.group
+                    cell.setupInitialIndoorTempUI()
+                    self.setAutoresizingMask(cell)
+                    return cell
+                }
+            } else if value == ESPMatterConstants.occupiedCoolingSetpoint {
+                let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
+                object_setClass(sliderCell, ParamSliderTableViewCell.self)
+                let cell = sliderCell as! ParamSliderTableViewCell
+                cell.node = self.node
+                cell.isRainmaker = false
+                cell.sliderParamType = .airConditioner
+                cell.nodeGroup = self.group
+                cell.deviceId = deviceId
+                cell.hueSlider.isHidden = true
+                cell.slider.isHidden = false
+                cell.paramChipDelegate = self
+                self.setAutoresizingMask(cell)
+                cell.setupInitialCoolingSetpointValues()
+                cell.isUserInteractionEnabled = !self.isDeviceOffline
+                return cell
+            } else if value == ESPMatterConstants.controlSequenceOfOperation {
+                let dropDownCell = tableView.dequeueReusableCell(withIdentifier: DropDownTableViewCell.reuseIdentifier, for: indexPath) as! DropDownTableViewCell
+                object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
+                let cell = dropDownCell as! ParamDropDownTableViewCell
+                cell.topViewHeightConstraint.constant = 30.0
+                cell.matterNode = self.node
+                cell.datasource = [ESPMatterConstants.cool]
+                cell.type = .controlSequenceOfOperation
+                cell.isRainmaker = false
+                cell.deviceId = deviceId
+                cell.nodeGroup = self.group
+                cell.paramChipDelegate = self
+                cell.controlName.text = ESPMatterConstants.controlSequence
+                cell.setInitialControlSequenceOfOperation()
+                cell.acParamDelegate = self
+                return cell
+            } else if value == ESPMatterConstants.systemMode {
+                let dropDownCell = tableView.dequeueReusableCell(withIdentifier: DropDownTableViewCell.reuseIdentifier, for: indexPath) as! DropDownTableViewCell
+                object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
+                let cell = dropDownCell as! ParamDropDownTableViewCell
+                cell.topViewHeightConstraint.constant = 30.0
+                cell.matterNode = self.node
+                cell.datasource = [ESPMatterConstants.off, 
+                                   ESPMatterConstants.cool,
+                                   ESPMatterConstants.heat]
+                cell.type = .systemMode
+                cell.isRainmaker = false
+                cell.deviceId = deviceId
+                cell.nodeGroup = self.group
+                cell.controlName.text = ESPMatterConstants.systemModeTxt
+                cell.paramChipDelegate = self
+                cell.acParamDelegate = self
+                cell.setInitialSystemMode()
+                return cell
             }
         }
         return UITableViewCell()

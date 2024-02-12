@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,6 +17,13 @@
                 <rect key="frame" x="0.0" y="0.0" width="322" height="60"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <view contentMode="scaleToFill" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="PGd-Qz-k2a">
+                        <rect key="frame" x="0.0" y="0.0" width="322" height="0.0"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="height" id="7Ih-98-TuL"/>
+                        </constraints>
+                    </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rYM-co-SZV">
                         <rect key="frame" x="15" y="0.0" width="292" height="60"/>
                         <subviews>
@@ -70,12 +77,15 @@
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="D4L-nJ-jmn" secondAttribute="bottom" id="5Zv-2W-CIx"/>
+                    <constraint firstItem="PGd-Qz-k2a" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="5sd-P0-Q1n"/>
                     <constraint firstItem="D4L-nJ-jmn" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="HX4-a2-d3e"/>
-                    <constraint firstItem="rYM-co-SZV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="PiM-1X-rth"/>
+                    <constraint firstItem="rYM-co-SZV" firstAttribute="top" secondItem="PGd-Qz-k2a" secondAttribute="bottom" id="MaU-pD-UJi"/>
                     <constraint firstAttribute="trailing" secondItem="rYM-co-SZV" secondAttribute="trailing" constant="15" id="Qz0-5h-QwQ"/>
                     <constraint firstAttribute="bottom" secondItem="rYM-co-SZV" secondAttribute="bottom" id="VP8-be-oar"/>
+                    <constraint firstItem="PGd-Qz-k2a" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="Yb7-sf-Yee"/>
                     <constraint firstItem="rYM-co-SZV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="aF1-b4-BYj"/>
                     <constraint firstItem="D4L-nJ-jmn" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="mN5-9Z-IeY"/>
+                    <constraint firstAttribute="trailing" secondItem="PGd-Qz-k2a" secondAttribute="trailing" id="oRu-2N-onT"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
@@ -86,6 +96,7 @@
                 <outlet property="controlValueLabel" destination="vrC-eq-6dd" id="jpK-91-2CQ"/>
                 <outlet property="dropDownButton" destination="usy-Ub-uOC" id="p1W-7K-HJV"/>
                 <outlet property="leadingSpaceConstraint" destination="aF1-b4-BYj" id="jQx-pP-6XB"/>
+                <outlet property="topViewHeightConstraint" destination="7Ih-98-TuL" id="mqS-gu-1xz"/>
                 <outlet property="trailingSpaceConstraint" destination="Qz0-5h-QwQ" id="Tbc-Ew-uYj"/>
             </connections>
             <point key="canvasLocation" x="139.13043478260872" y="72.991071428571431"/>

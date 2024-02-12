@@ -147,5 +147,33 @@ enum participantData {
     static let clusterId: NSNumber = NSNumber(value: 320601091)
 }
 
+/*
+ // MARK: Custom Cluster to for air conditioner
+ */
+enum airConditioner {
+    
+    enum attributes {
+        case localtemperature
+        case occupiedCoolingSetpoint
+        case controlSequenceOfOperation
+        case systemMode
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .localtemperature:
+                return NSNumber(value: 0)
+            case .occupiedCoolingSetpoint:
+                return NSNumber(value: 17)
+            case .controlSequenceOfOperation:
+                return NSNumber(value: 27)
+            case .systemMode:
+                return NSNumber(value: 28)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 513)
+}
+
 
 

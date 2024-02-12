@@ -19,7 +19,18 @@
 import DropDown
 import UIKit
 
+enum DropDownType {
+    case rainmaker
+    case controlSequenceOfOperation
+    case systemMode
+}
+
+protocol MTRACParamDelegate: AnyObject {
+    func acSystemModeSet()
+}
+
 class ParamDropDownTableViewCell: DropDownTableViewCell {
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         // Customise dropdown element for param screen
@@ -56,16 +67,62 @@ class ParamDropDownTableViewCell: DropDownTableViewCell {
         }
         // Assigning action for dropdown item selection
         dropDown.selectionAction = { [unowned self] (_: Int, item: String) in
-            if self.param.dataType?.lowercased() == "string" {
-                DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": item]], delegate: paramDelegate)
-                param.value = item
+            if isRainmaker {
+                if self.param.dataType?.lowercased() == "string" {
+                    DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": item]], delegate: paramDelegate)
+                    param.value = item
+                } else {
+                    DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": Int(item)]], delegate: paramDelegate)
+                    param.value = Int(item)
+                }
+                currentValue = item
+                DispatchQueue.main.async {
+                    self.controlValueLabel.text = item
+                }
             } else {
-                DeviceControlHelper.shared.updateParam(nodeID: self.device.node?.node_id, parameter: [self.device.name ?? "": [self.param.name ?? "": Int(item)]], delegate: paramDelegate)
-                param.value = Int(item)
-            }
-            currentValue = item
-            DispatchQueue.main.async {
-                controlValueLabel.text = item
+                #if ESPRainMakerMatter
+                if #available(iOS 16.4, *), let grpId = self.nodeGroup?.groupID, let dId = self.deviceId {
+                    switch self.type {
+                    case .controlSequenceOfOperation:
+                        var value = 0
+                        if item == ESPMatterConstants.cool {
+                            value = 4
+                        }
+                        self.paramChipDelegate?.matterAPIRequestSent()
+                        ESPMTRCommissioner.shared.setControlSequenceOfOperation(groupId: grpId, deviceId: dId, cos: NSNumber(value: value)) { result in
+                            self.paramChipDelegate?.matterAPIResponseReceived()
+                            if result {
+                                self.matterNode?.setMatterControlledSequenceOfOperation(cso: item, deviceId: dId)
+                                DispatchQueue.main.async {
+                                    self.controlValueLabel.text = item
+                                }
+                            }
+                        }
+                    case .systemMode:
+                        var value = 0
+                        if item == ESPMatterConstants.off {
+                            value = 0
+                        } else if item == ESPMatterConstants.cool {
+                            value = 3
+                        } else if item == ESPMatterConstants.heat {
+                            value = 4
+                        }
+                        self.paramChipDelegate?.matterAPIRequestSent()
+                        ESPMTRCommissioner.shared.setSystemMode(groupId: grpId, deviceId: dId, mode: NSNumber(value: value)) { result in
+                            self.paramChipDelegate?.matterAPIResponseReceived()
+                            if result {
+                                self.matterNode?.setMatterSystemMode(systemMode: item, deviceId: dId)
+                                DispatchQueue.main.async {
+                                    self.controlValueLabel.text = item
+                                    self.acParamDelegate?.acSystemModeSet()
+                                }
+                            }
+                        }
+                    default:
+                        break
+                    }
+                }
+                #endif
             }
         }
     }
