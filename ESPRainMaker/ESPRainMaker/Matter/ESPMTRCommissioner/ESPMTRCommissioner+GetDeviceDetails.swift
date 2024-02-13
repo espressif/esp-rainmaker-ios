@@ -98,7 +98,13 @@ extension ESPMTRCommissioner {
                                                         if servers.count > 0 {
                                                             self.fabricDetails.saveServersData(groupId: groupId, deviceId: deviceId, servers: servers)
                                                         }
-                                                        completionHandler()
+                                                        //Read and save all attributes on all endpoints
+                                                        self.getMatterAttributes(groupID: groupId, deviceId: deviceId) { attributes in
+                                                            if attributes.count > 0 {
+                                                                self.fabricDetails.saveAttributesData(groupId: groupId, deviceId: deviceId, attributes: attributes)
+                                                            }
+                                                            completionHandler()
+                                                        }
                                                     }
                                                 }
                                             } else {

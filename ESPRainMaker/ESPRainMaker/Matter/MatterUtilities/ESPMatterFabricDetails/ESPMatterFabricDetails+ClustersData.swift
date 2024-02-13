@@ -168,6 +168,28 @@ extension ESPMatterFabricDetails {
         return [String: [UInt]]()
     }
     
+    /// Save attributes data
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - servers: servers
+    func saveAttributesData(groupId: String, deviceId: UInt64, attributes: [String: [UInt]]) {
+        let key = ESPMatterFabricKeys.shared.groupAttributessDataKey(groupId, deviceId)
+        if let data = try? JSONSerialization.data(withJSONObject: attributes) {
+            UserDefaults.standard.set(data as Any, forKey: key)
+        }
+    }
+    
+    /// fetch attributes data
+    /// - Parameter deviceId: device id
+    /// - Returns: [endpoints: [servers]]
+    func fetchAttributesData(groupId: String, deviceId: UInt64) -> [String: [UInt]] {
+        let key = ESPMatterFabricKeys.shared.groupAttributessDataKey(groupId, deviceId)
+        if let data = UserDefaults.standard.value(forKey: key) as? Data, let val = try? JSONSerialization.jsonObject(with: data) as? [String: [UInt]] {
+            return val
+        }
+        return [String: [UInt]]()
+    }
+    
     /// Save vendor id
     /// - Parameters:
     ///   - groupId: group id
@@ -361,6 +383,9 @@ extension ESPMatterFabricDetails {
             }
             if let serversData = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
                 self.saveServersData(groupId: groupId, deviceId: deviceId, servers: serversData)
+            }
+            if let attributesData = metadata[ESPMatterConstants.attributesData] as? [String: [UInt]] {
+                self.saveAttributesData(groupId: groupId, deviceId: deviceId, attributes: attributesData)
             }
             if let isRainmaker = metadata[ESPMatterConstants.isRainmaker] as? Bool, isRainmaker {
                 self.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.trueFlag)

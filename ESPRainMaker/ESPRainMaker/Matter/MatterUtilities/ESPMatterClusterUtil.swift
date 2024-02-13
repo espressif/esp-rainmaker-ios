@@ -21,13 +21,7 @@ import Foundation
 public class ESPMatterClusterUtil {
     
     public static let shared = ESPMatterClusterUtil()
-    private let onOffClusterId: UInt = 6
-    private let levelControlClusterId: UInt = 8
-    private let colorControlClusterId: UInt = 768
-    private let commissioningWindowClusterId: UInt = 60
-    private let bindingClusterId: UInt = 30
-    private let thermostatClusterId: UInt = 513
-    let fabricDetails = ESPMatterFabricDetails.shared
+    private let fabricDetails = ESPMatterFabricDetails.shared
     
     /// Matter utility methods
     /// Is on/off client supported
@@ -38,27 +32,11 @@ public class ESPMatterClusterUtil {
     public func isOnOffClientSupported(groupId: String, deviceId: UInt64) -> Bool {
         let val = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
         for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(onOffClusterId) {
+            if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
                 return true
             }
         }
         return false
-    }
-    
-    /// fetch on off clients
-    /// - Parameters:
-    ///   - groupId: group id
-    ///   - deviceId: device id
-    /// - Returns: [endpoint id: cluster id]
-    public func fetchOnOffClients(groupId: String, deviceId: UInt64) -> [String: UInt] {
-        let val = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
-        var endpointClusters: [String: UInt] = [String: UInt]()
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(onOffClusterId) {
-                endpointClusters[key] = onOffClusterId
-            }
-        }
-        return endpointClusters
     }
     
     /// fetch binding servers
@@ -70,8 +48,8 @@ public class ESPMatterClusterUtil {
         let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
         var endpointClusters: [String: UInt] = [String: UInt]()
         for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(bindingClusterId) {
-                endpointClusters[key] = bindingClusterId
+            if let list = val[key], list.count > 0, list.contains(binding.clusterId.uintValue) {
+                endpointClusters[key] = binding.clusterId.uintValue
             }
         }
         return endpointClusters
@@ -83,13 +61,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (status, endpoint id)
     public func isOnOffServerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(onOffClusterId) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: onOff.clusterId.uintValue)
     }
     
     /// Is thread border router server supported
@@ -98,13 +70,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (status, endpoint id)
     public func isBRSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = ESPMatterFabricDetails.shared.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(borderRouter.clusterId.uintValue) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: borderRouter.clusterId.uintValue)
     }
     
     /// Is rainmaker server supported
@@ -113,13 +79,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: is rainmaker supported
     public func isRainmakerServerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(rainmaker.clusterId.uintValue) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: rainmaker.clusterId.uintValue)
     }
     
     /// Is level control server supported
@@ -128,13 +88,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (status, endpoint if)
     public func isLevelControlServerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(levelControlClusterId) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: levelControl.clusterId.uintValue)
     }
     
     /// Is color control server supported
@@ -143,13 +97,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (result, endpoint id)
     public func isColorControlServerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(colorControlClusterId) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: colorControl.clusterId.uintValue)
     }
     
     /// Is color control server supported
@@ -158,13 +106,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (result, endpoint id)
     public func isRainmakerControllerServerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.controllerClusterId) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: rainmakerController.clusterId.uintValue)
     }
     
     /// Is open commissioning window supported
@@ -173,13 +115,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (result, endpoint id)
     public func isOpenCommissioningWindowSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(commissioningWindowClusterId) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: commissioningWindow.clusterId.uintValue)
     }
     
     /// Is Participant Data Supported
@@ -188,13 +124,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (result, endpoint id)
     public func isParticipantDataSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(participantData.clusterId.uintValue) {
-                return (true, key)
-            }
-        }
-        return (false, nil)
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: participantData.clusterId.uintValue)
     }
     
     /// Is air conditioner Supported
@@ -203,12 +133,78 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     /// - Returns: (result, endpoint id)
     public func isAirConditionerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: airConditioner.clusterId.uintValue)
+    }
+    
+    /// Is on off attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is supported
+    public func isOnOffAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: onOff.clusterIdString, attributeId: onOff.attributes.onOff.attributeId.uintValue)
+    }
+    
+    /// Is current level attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is supported
+    public func isCurrentLevelAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: levelControl.clusterIdString, attributeId: levelControl.attributes.currentLevel.attributeId.uintValue)
+    }
+    
+    /// Is current hue attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is supported
+    public func isCurrentHueAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: colorControl.clusterIdString, attributeId: colorControl.attributes.currentHue.attributeId.uintValue)
+    }
+    
+    /// Is current saturation attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is supported
+    public func isCurrentSaturationAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: colorControl.clusterIdString, attributeId: colorControl.attributes.currentSaturation.attributeId.uintValue)
+    }
+    
+    /// Is server cluster for a cluster id is supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - clusterId: cluster id
+    /// - Returns: (is cluster supported, endpoint id)
+    private func isServerClusterSupported(groupId: String, deviceId: UInt64, clusterId: UInt) -> (Bool, String?) {
         let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
         for key in val.keys {
-            if let list = val[key], list.count > 0, list.contains(airConditioner.clusterId.uintValue) {
+            if let list = val[key], list.count > 0, list.contains(clusterId) {
                 return (true, key)
             }
         }
         return (false, nil)
+    }
+    
+    /// Is current level attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is supported
+    private func isAttributeSupported(groupId: String, deviceId: UInt64, clusterId: String, attributeId: UInt) -> Bool {
+        let attributesData = self.fabricDetails.fetchAttributesData(groupId: groupId, deviceId: deviceId)
+        if attributesData.count == 0 {
+            return true
+        }
+        if let attributeIds = attributesData[clusterId] {
+            for id in attributeIds {
+                if id == attributeId {
+                    return true
+                }
+            }
+        }
+        return false
     }
 }

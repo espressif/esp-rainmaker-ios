@@ -103,6 +103,7 @@ struct ESPMatterConstants {
     static let isRainmaker = "isRainmaker"
     static let serversData = "serversData"
     static let clientsData = "clientsData"
+    static let attributesData = "attributesData"
     static let deviceLinks = "Device Links"
     static let endpointsData = "endpointsData"
     static let linkedDevices = "LINKED DEVICES"
@@ -207,7 +208,7 @@ struct ESPMatterConstants {
     static let cancellingRequestMsg = "Cancelling request..."
     static let pairingModeTitle = "Accessory Ready to Connect"
     static let updatingNodeGroupMsg = "Fetching groups data..."
-    static let commissioningFailedMsg = "Commissioning failed."
+    static let commissioningFailedMsg = "Commissioning failed!"
     static let fetchingGroupsDataMsg = "Fetching groups data..."
     static let unbindingFailureMsg = "Failed to unbind devices."
     static let matterRainmakerDevices = "matter.rainmaker.devices"
@@ -268,14 +269,6 @@ struct ESPMatterConstants {
     
     /// color hexcodes
     static let customBackgroundColor: String = "#005493"
-    
-    
-    static let onOffClusterId: UInt = 6
-    static let levelControlClusterId: UInt = 8
-    static let colorControlClusterId: UInt = 768
-    static let commissioningWindowClusterId: UInt = 60
-    static let bindingClusterId: UInt = 30
-    static let controllerClusterId: UInt = 320601089
     
     static let csrHeader = "-----BEGIN CERTIFICATE REQUEST-----"
     static let csrFooter = "-----END CERTIFICATE REQUEST-----"

@@ -364,7 +364,11 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
             self.showErrorAlert(title: title,
                                 message: message,
                                 buttonTitle: buttonTitle,
-                                callback: {})
+                                callback: {
+                DispatchQueue.main.async {
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+            })
         }
     }
     

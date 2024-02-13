@@ -295,14 +295,22 @@ class DeviceViewController: UIViewController {
     ///   - deviceId: device id
     func addClusterUtilCells(groupId: String, deviceId: UInt64) {
         if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
-            cellInfo.append(ESPMatterConstants.onOff)
+            if ESPMatterClusterUtil.shared.isOnOffAttributeSupported(groupId: groupId, deviceId: deviceId) {
+                cellInfo.append(ESPMatterConstants.onOff)
+            }
         }
         if ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId).0 {
-            cellInfo.append(ESPMatterConstants.levelControl)
+            if ESPMatterClusterUtil.shared.isCurrentLevelAttributeSupported(groupId: groupId, deviceId: deviceId) {
+                cellInfo.append(ESPMatterConstants.levelControl)
+            }
         }
         if ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId).0 {
-            cellInfo.append(ESPMatterConstants.colorControl)
-            cellInfo.append(ESPMatterConstants.saturationControl)
+            if ESPMatterClusterUtil.shared.isCurrentHueAttributeSupported(groupId: groupId, deviceId: deviceId) {
+                cellInfo.append(ESPMatterConstants.colorControl)
+            }
+            if ESPMatterClusterUtil.shared.isCurrentSaturationAttributeSupported(groupId: groupId, deviceId: deviceId) {
+                cellInfo.append(ESPMatterConstants.saturationControl)
+            }
         }
         if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.rainmakerController)

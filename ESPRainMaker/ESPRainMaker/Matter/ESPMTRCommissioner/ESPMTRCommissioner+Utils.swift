@@ -156,6 +156,10 @@ extension ESPMTRCommissioner {
         if endpointsData.count > 0 {
             metaData[ESPMatterConstants.endpointsData] = endpointsData
         }
+        let attributesData = self.fabricDetails.fetchAttributesData(groupId: groupId, deviceId: deviceId)
+        if attributesData.count > 0 {
+            metaData[ESPMatterConstants.attributesData] = attributesData
+        }
         metaData[ESPMatterConstants.groupId] = groupId
         if let deviceName = ESPMatterEcosystemInfo.shared.getDeviceName() {
             metaData[ESPMatterConstants.deviceName] = deviceName

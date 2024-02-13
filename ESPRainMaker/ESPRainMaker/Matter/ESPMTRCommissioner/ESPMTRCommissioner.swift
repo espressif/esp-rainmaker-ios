@@ -44,6 +44,7 @@ class ESPMTRCommissioner: NSObject {
     var utilsDelegate: UtilsDelegate?
     var serverData: [String: [UInt]] = [String: [UInt]]()
     var clientData: [String: [UInt]] = [String: [UInt]]()
+    var attributesData: [String: [UInt]] = [String: [UInt]]()
     var completion: ((MTROperationalCertificateChain?, Error?) -> Void)?
     weak var uidelegate: ESPMTRUIDelegate?
     var matterDeviceNotFoundCompletion: ((Bool) -> Void)?
