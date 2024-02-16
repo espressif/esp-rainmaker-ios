@@ -80,6 +80,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 }
             } else if value == ESPMatterConstants.onOff {
                 if let cell = tableView.dequeueReusableCell(withIdentifier: DeviceOnOffCell.reuseIdentifier, for: indexPath) as? DeviceOnOffCell {
+                    cell.nodeConnectionStatus = self.nodeConnectionStatus
                     cell.node = self.node
                     cell.deviceId = deviceId
                     cell.delegate = self
@@ -89,7 +90,6 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.setupOfflineUI(deviceId: deviceId)
                     } else {
                         cell.setupInitialUI()
-                        cell.subscribeToOnOffAttribute()
                     }
                     cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
@@ -98,6 +98,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
                 object_setClass(sliderCell, ParamSliderTableViewCell.self)
                 let cell = sliderCell as! ParamSliderTableViewCell
+                cell.nodeConnectionStatus = self.nodeConnectionStatus
                 cell.node = self.node
                 cell.isRainmaker = false
                 cell.sliderParamType = .brightness
@@ -118,6 +119,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
                 object_setClass(sliderCell, ParamSliderTableViewCell.self)
                 let cell = sliderCell as! ParamSliderTableViewCell
+                cell.nodeConnectionStatus = self.nodeConnectionStatus
                 cell.node = self.node
                 cell.isRainmaker = false
                 cell.nodeGroup = self.group
@@ -137,6 +139,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
                 object_setClass(sliderCell, ParamSliderTableViewCell.self)
                 let cell = sliderCell as! ParamSliderTableViewCell
+                cell.nodeConnectionStatus = self.nodeConnectionStatus
                 cell.node = self.node
                 cell.isRainmaker = false
                 cell.sliderParamType = .saturation

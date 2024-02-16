@@ -57,25 +57,37 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     ///   - deviceId: device id
     func getCurrentSaturationValue(groupId: String, deviceId: UInt64) {
         self.setupInitialSaturationValue()
-        if let _ = ESPMTRCommissioner.shared.sController {
-            self.getColorCluster(timeout: 10.0) { cluster in
-                if let cluster = cluster {
-                    cluster.readAttributeCurrentSaturation { val, _ in
-                        if let val = val {
-                            DispatchQueue.main.async {
-                                let saturation = Int(val.floatValue*2.54)
-                                if let node = self.node, let id = self.deviceId {
-                                    node.setMatterSaturationValue(saturation: saturation, deviceId: id)
+        if self.nodeConnectionStatus == .local {
+            if let _ = ESPMTRCommissioner.shared.sController {
+                self.getColorCluster(timeout: 10.0) { cluster in
+                    if let cluster = cluster {
+                        cluster.readAttributeCurrentSaturation { val, _ in
+                            if let val = val {
+                                DispatchQueue.main.async {
+                                    let saturation = Int(val.floatValue*2.54)
+                                    if let node = self.node, let id = self.deviceId {
+                                        node.setMatterSaturationValue(saturation: saturation, deviceId: id)
+                                    }
+                                    self.currentLevel = saturation
+                                    self.slider.setValue(Float(self.currentLevel), animated: true)
                                 }
-                                self.currentLevel = saturation
-                                self.slider.setValue(Float(self.currentLevel), animated: true)
                             }
                         }
                     }
                 }
             }
+            self.subscribeToSaturationAttribute()
+        } else if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                if let currentSaturation = MatterControllerParser.shared.getCurrentSaturation(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    self.currentLevel = Int(Float(currentSaturation)/2.54)
+                    node.setMatterSaturationValue(saturation: currentSaturation, deviceId: matterDeviceId)
+                    DispatchQueue.main.async {
+                        self.slider.setValue(Float(self.currentLevel), animated: true)
+                    }
+                }
+            }
         }
-        self.subscribeToSaturationAttribute()
     }
     
     /// Change saturation
@@ -83,42 +95,67 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     ///   - value: value
     ///   - completion: completion
     func changeSaturation(value: Float) {
-        if let controller = ESPMTRCommissioner.shared.sController {
-            self.getColorCluster(timeout: 10.0) { cluster in
-                if let cluster = cluster {
-                    var saturation = Int(value*2.54)
-                    if saturation == 0 {
-                        saturation = 1
-                    }
-                    let params = MTRColorControlClusterMoveToSaturationParams()
-                    params.saturation = NSNumber(value: saturation)
-                    params.transitionTime = NSNumber(value: 0)
-                    params.optionsMask = NSNumber(value: 0)
-                    params.optionsOverride = NSNumber(value: 0)
-                    cluster.moveToSaturation(with: params) { error in
-                        if let _ = error {
-                            DispatchQueue.main.async {
-                                self.slider.value = Float(self.currentLevel)
+        var saturation = Int(value*2.54)
+        if saturation == 0 {
+            saturation = 1
+        }
+        if self.nodeConnectionStatus == .local {
+            if let _ = ESPMTRCommissioner.shared.sController {
+                self.getColorCluster(timeout: 10.0) { cluster in
+                    if let cluster = cluster {
+                        let params = MTRColorControlClusterMoveToSaturationParams()
+                        params.saturation = NSNumber(value: saturation)
+                        params.transitionTime = NSNumber(value: 0)
+                        params.optionsMask = NSNumber(value: 0)
+                        params.optionsOverride = NSNumber(value: 0)
+                        cluster.moveToSaturation(with: params) { error in
+                            if let _ = error {
+                                DispatchQueue.main.async {
+                                    self.slider.value = Float(self.currentLevel)
+                                }
+                                return
                             }
-                            return
-                        }
-                        DispatchQueue.main.async {
                             if let node = self.node, let id = self.deviceId {
                                 node.setMatterSaturationValue(saturation: saturation, deviceId: id)
                             }
                             self.currentLevel = Int(value)
+                            DispatchQueue.main.async {
+                                self.slider.setValue(Float(self.currentLevel), animated: true)
+                            }
+                        }
+                    } else {
+                        DispatchQueue.main.async {
                             self.slider.setValue(Float(self.currentLevel), animated: true)
                         }
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.slider.setValue(Float(self.currentLevel), animated: true)
-                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.slider.setValue(Float(self.currentLevel), animated: true)
                 }
             }
-        } else {
-            DispatchQueue.main.async {
-                self.slider.setValue(Float(self.currentLevel), animated: true)
+        } else if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                var endpoint = "0x1"
+                if let endpointId = MatterControllerParser.shared.getSaturationLevelEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    endpoint = endpointId
+                }
+                ESPControllerAPIManager.shared.callSaturationAPI(rainmakerNode: rainmakerNode,
+                                                                 controllerNodeId: controllerNodeId,
+                                                                 matterNodeId: matterNodeId,
+                                                                 endpoint: endpoint,
+                                                                 saturationLevel: "\(saturation)") { result in
+                    if result {
+                        if let node = self.node, let id = self.deviceId {
+                            node.setMatterSaturationValue(saturation: saturation, deviceId: id)
+                        }
+                        self.currentLevel = Int(value)
+                    } else {
+                        DispatchQueue.main.async {
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        }
+                    }
+                }
             }
         }
     }

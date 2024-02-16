@@ -167,6 +167,19 @@ struct Constants {
     static let matterCommissionedServiceType = "_matter._tcp"
     static let serviceDomain = "local"
     
+    static let sceneServiceType = "esp.service.scenes"
+    static let sceneParamType = "esp.param.scenes"
+    static let sceneKey = "Scene"
+    static let scenesKey = "Scenes"
+    
+    static let matterControllerServiceType = "esp.service.matter-controller"
+    static let paramMatterDevices = "esp.param.matter-devices"
+    static let paramMatterControllerDataVersion = "esp.param.matter-controller-data-version"
+    
+    static let services = "services"
+    static let type = "type"
+    static let name = "name"
+    static let params = "params"
     
     // APIs JSON keys
     static let contentType = "Content-Type"
@@ -176,11 +189,6 @@ struct Constants {
     static let successKey = "success"
     static let descriptionKey = "description"
     static let statusKey = "status"
-
-    static let sceneServiceType = "esp.service.scenes"
-    static let sceneParamType = "esp.param.scenes"
-    static let sceneKey = "Scene"
-    static let scenesKey = "Scenes"
     
     static let edit = "Edit"
     

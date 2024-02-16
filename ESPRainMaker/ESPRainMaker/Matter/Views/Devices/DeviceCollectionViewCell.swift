@@ -17,6 +17,7 @@
 //
 
 import UIKit
+import Alamofire
 
 #if ESPRainMakerMatter
 /// Device collection view cell.
@@ -37,6 +38,8 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     var rainmakerNode: Node?
     var endpointClusterId: [String: Any]?
     var connectionStatus: NodeConnectionStatus = .local
+    
+    var session: Session!
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -85,6 +88,45 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                         }
                     }
                 }
+            } else if self.connectionStatus == .controller {
+                if let rainmakerNode = self.rainmakerNode, let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id {
+                    var endpoint = "0x1"
+                    if let endpointId = MatterControllerParser.shared.getOnOffEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                        endpoint = endpointId
+                    }
+                    if let isOn = node.isMatterLightOn(deviceId: deviceId), isOn {
+                        ESPControllerAPIManager.shared.callOffAPI(rainmakerNode: rainmakerNode,
+                                                                    controllerNodeId: controllerNodeId,
+                                                                    matterNodeId: matterNodeId,
+                                                                    endpoint: endpoint) { result in
+                            self.setToggleUI(node: node, deviceId: deviceId, result: result, currentStatus: false)
+                        }
+                    } else {
+                        ESPControllerAPIManager.shared.callOnAPI(rainmakerNode: rainmakerNode,
+                                                                    controllerNodeId: controllerNodeId,
+                                                                    matterNodeId: matterNodeId,
+                                                                    endpoint: endpoint) { result in
+                            self.setToggleUI(node: node, deviceId: deviceId, result: result, currentStatus: true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Set toggle UI
+    /// - Parameters:
+    ///   - node: node
+    ///   - deviceId: matter device id
+    ///   - result: result
+    ///   - currentStatus: current status
+    func setToggleUI(node: ESPNodeDetails, deviceId: UInt64, result: Bool, currentStatus: Bool) {
+        if result {
+            node.setMatterLightOnStatus(status: currentStatus, deviceId: deviceId)
+            self.setToggleButtonUI(isLightOn: currentStatus)
+        } else {
+            if let val = node.isMatterLightOn(deviceId: deviceId) {
+                self.setToggleButtonUI(isLightOn: val)
             }
         }
     }
@@ -116,11 +158,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
             self.onOffButton.isHidden = true
         }
         DispatchQueue.main.async {
-            if status == .local {
-                self.overlay.isHidden = true
-                self.isUserInteractionEnabled = true
-                self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
-            } else if status == .remote {
+            if status == .local || status == .remote || status == .controller {
                 self.overlay.isHidden = true
                 self.isUserInteractionEnabled = true
                 self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor

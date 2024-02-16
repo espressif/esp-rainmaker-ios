@@ -266,6 +266,19 @@ class ESPNodeDetails: Codable {
         }
         return nil
     }
+    
+    /// Get rainmaker node
+    /// - Returns: node
+    func getRainmakerNode() -> Node? {
+        if let nodes = User.shared.associatedNodeList {
+            for node in nodes {
+                if let id = self.nodeID, let nodeId = node.node_id, id == nodeId {
+                    return node
+                }
+            }
+        }
+        return nil
+    }
 }
 
 // MARK: - Fabric Details

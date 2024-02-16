@@ -26,6 +26,7 @@ enum NodeConnectionStatus {
     case local
     case remote
     case offline
+    case controller
     
     var description: String {
         switch self {
@@ -33,6 +34,8 @@ enum NodeConnectionStatus {
             return "Local"
         case .remote:
             return "Remote"
+        case .controller:
+            return "Controller"
         case .offline:
             return "Offline"
         }

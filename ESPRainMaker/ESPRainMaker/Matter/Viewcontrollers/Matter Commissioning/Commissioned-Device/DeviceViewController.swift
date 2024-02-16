@@ -57,6 +57,7 @@ class DeviceViewController: UIViewController {
     var emailField: UITextField?
     var contactField: UITextField?
     var eventNameField: UITextField?
+    var nodeConnectionStatus: NodeConnectionStatus = .local
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -258,14 +259,28 @@ class DeviceViewController: UIViewController {
                     }
                 } else if !self.isDeviceOffline {
                     ESPMTRCommissioner.shared.shutDownController()
-                    self.restartMatterController()
-                    ESPMTRCommissioner.shared.getNodeLabel(deviceId: deviceId) { nodeLabel in
-                        if let nodeLabel = nodeLabel {
-                            ESPMatterFabricDetails.shared.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
+                    switch self.nodeConnectionStatus {
+                    case .local:
+                        if let _ = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
                             self.cellInfo.append(ESPMatterConstants.nodeLabel)
+                            self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                            self.setupTableUI()
+                        } else {
+                            self.restartMatterController()
+                            ESPMTRCommissioner.shared.getNodeLabel(deviceId: deviceId) { nodeLabel in
+                                if let nodeLabel = nodeLabel {
+                                    ESPMatterFabricDetails.shared.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
+                                    self.cellInfo.append(ESPMatterConstants.nodeLabel)
+                                }
+                                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                                self.setupTableUI()
+                            }
                         }
+                    case .controller:
                         self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
                         self.setupTableUI()
+                    default:
+                        break
                     }
                 }
             }

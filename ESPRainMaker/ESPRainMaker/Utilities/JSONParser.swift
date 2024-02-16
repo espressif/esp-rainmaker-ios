@@ -57,10 +57,10 @@ struct JSONParser {
             #endif
             
             if let config = node_details["config"] as? [String: Any] {
-                if let services = config["services"] as? [[String: Any]] {
+                if let services = config[Constants.services] as? [[String: Any]] {
                     var nodeServices: [Service] = []
                     for serviceJSON in services {
-                        if let type = serviceJSON["type"] as? String {
+                        if let type = serviceJSON[Constants.type] as? String {
                             let service = Service()
                             service.type = type
                             service.name = serviceJSON["name"] as? String
@@ -74,15 +74,15 @@ struct JSONParser {
                 }
 
                 if Configuration.shared.appConfiguration.supportScene { // Check whether scene is supported in the node
-                    if let services = config["services"] as? [[String: Any]] {
+                    if let services = config[Constants.services] as? [[String: Any]] {
                         for service in services {
-                            if let type = service["type"] as? String, type == Constants.sceneServiceType {
+                            if let type = service[Constants.type] as? String, type == Constants.sceneServiceType {
                                 if let name = service["name"] as? String, name.count > 0 {
                                     node.sceneName = name
                                 }
                                 if let params = service["params"] as? [[String: Any]] {
                                     for param in params {
-                                        if let paramType = param["type"] as? String, paramType == Constants.sceneParamType {
+                                        if let paramType = param[Constants.type] as? String, paramType == Constants.sceneParamType {
                                             node.isSceneSupported = true
                                             if let name = param["name"] as? String, name.count > 0 {
                                                 node.scenesName = name
@@ -99,15 +99,15 @@ struct JSONParser {
                 }
                 
                 if Configuration.shared.appConfiguration.supportSchedule { // Check whether scheduling is supported in the node
-                    if let services = config["services"] as? [[String: Any]] {
+                    if let services = config[Constants.services] as? [[String: Any]] {
                         for service in services {
-                            if let type = service["type"] as? String, type == Constants.scheduleServiceType {
+                            if let type = service[Constants.type] as? String, type == Constants.scheduleServiceType {
                                 if let name = service["name"] as? String, name.count > 0 {
                                     node.scheduleName = name
                                 }
                                 if let params = service["params"] as? [[String: Any]] {
                                     for param in params {
-                                        if let paramType = param["type"] as? String, paramType == Constants.scheduleParamType {
+                                        if let paramType = param[Constants.type] as? String, paramType == Constants.scheduleParamType {
                                             node.isSchedulingSupported = true
                                             if let name = param["name"] as? String, name.count > 0 {
                                                 node.schedulesName = name
@@ -122,9 +122,30 @@ struct JSONParser {
                         }
                     }
                 }
+                
+                #if ESPRainMakerMatter
+                if let services = config[Constants.services] as? [[String: Any]] {
+                    for service in services {
+                        if let type = service[Constants.type] as? String, type == Constants.matterControllerServiceType, let serviceName = service[Constants.name] as? String {
+                            node.setControllerServiceName(serviceName: serviceName)
+                            if let params = service[Constants.params] as? [[String: Any]] {
+                                for param in params {
+                                    if let type = param[Constants.type] as? String, let paramName = param[Constants.name] as? String {
+                                        if type == Constants.paramMatterDevices {
+                                            node.setMatterDevicesParamName(matterDevicesParamName: paramName)
+                                        } else if type == Constants.paramMatterControllerDataVersion {
+                                            node.setMatterControllerDataVersion(matterControllerDataVersion: paramName)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                #endif
 
                 if let nodeInfo = config["info"] as? [String: String] {
-                    node.info = Info(name: nodeInfo["name"], fw_version: nodeInfo["fw_version"], type: nodeInfo["type"])
+                    node.info = Info(name: nodeInfo["name"], fw_version: nodeInfo["fw_version"], type: nodeInfo[Constants.type])
                 }
                 node.config_version = config["config_version"] as? String
                 if let attributeList = config["attributes"] as? [[String: Any]] {
@@ -142,7 +163,7 @@ struct JSONParser {
                         let item = devices[index]
                         let newDevice = Device()
                         newDevice.name = item["name"] as? String
-                        newDevice.type = item["type"] as? String
+                        newDevice.type = item[Constants.type] as? String
                         newDevice.primary = item["primary"] as? String
                         newDevice.node = node
                         newDevice.isMatter = node.isMatter
@@ -159,7 +180,7 @@ struct JSONParser {
                                 dynamicAttr.dataType = attr["data_type"] as? String
                                 dynamicAttr.properties = attr["properties"] as? [String]
                                 dynamicAttr.bounds = attr["bounds"] as? [String: Any]
-                                dynamicAttr.type = attr["type"] as? String
+                                dynamicAttr.type = attr[Constants.type] as? String
                                 dynamicAttr.valid_strs = attr["valid_strs"] as? [String]
 
                                 if dynamicAttr.properties?.contains("write") ?? false {
@@ -267,7 +288,14 @@ struct JSONParser {
                         }
                     }
                 }
-
+                
+                #if ESPRainMakerMatter
+                if #available(iOS 16.4, *) {
+                    if let nodeId = node.node_id {
+                        MatterControllerParser.shared.saveMatterControllerData(matterControllerData: paramInfo, nodeId: nodeId)
+                    }
+                }
+                #endif
                 if Configuration.shared.appConfiguration.supportSchedule {
                     if let schedule = paramInfo[node.scheduleName] as? [String: Any], let schedules = schedule[node.schedulesName] as? [[String: Any]] {
                         node.currentSchedulesCount = schedules.count
@@ -344,7 +372,7 @@ struct JSONParser {
             dynamicAttr.dataType = attr["data_type"] as? String
             dynamicAttr.properties = attr["properties"] as? [String]
             dynamicAttr.bounds = attr["bounds"] as? [String: Any]
-            dynamicAttr.type = attr["type"] as? String
+            dynamicAttr.type = attr[Constants.type] as? String
             dynamicAttr.valid_strs = attr["valid_strs"] as? [String]
 
             if dynamicAttr.properties?.contains("write") ?? false {
