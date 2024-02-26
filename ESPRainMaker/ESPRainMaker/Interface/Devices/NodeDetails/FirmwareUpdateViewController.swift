@@ -34,6 +34,7 @@ class FirmwareUpdateViewController: UIViewController {
     @IBOutlet var currentFirmwareVersionLabel: UILabel!
     @IBOutlet var newFirmwareVersionLabel: UILabel!
     @IBOutlet var checkFirmwareUpdateIcon: UIImageView!
+    @IBOutlet var otaUpdateAvlDescLabel: UILabel!
     
     // MARK: - Constants
     let checkAgainConstant = "Check Again"
@@ -304,6 +305,9 @@ extension FirmwareUpdateViewController: ESPCheckOTAUpdatePresentationLogic {
             self.currentOTAJob = otaUpdate
             // OTA update is available
             if otaUpdate.otaAvailable {
+                if let desc = otaUpdate.otaStatusDescription {
+                    self.otaUpdateAvlDescLabel.text = desc
+                }
                 Utility.showLoader(message: "Checking OTA update status...", view: self.view)
                 self.getOTAUpdateService?.getOTAUpdateStatusFor(nodeID: self.currentNode.node_id ?? "", otaJobID: otaUpdate.otaJobID ?? "")
             } else {
