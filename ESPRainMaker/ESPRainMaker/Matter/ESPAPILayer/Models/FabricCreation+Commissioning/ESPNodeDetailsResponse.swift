@@ -157,6 +157,11 @@ class ESPNodeDetails: Codable {
         return "\(deviceId).matter.local.temperature.value"
     }
     
+    /// Returns matter measured temperature key
+    var matterMeasuredTempKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.measured.temperature.value"
+    }
+    
     /// Returns matter light status key
     var matterOCSValueKey: (UInt64) -> String = { deviceId in
         return "\(deviceId).matter.ocs.value"
@@ -177,7 +182,7 @@ class ESPNodeDetails: Codable {
         return "\(deviceId).matter.system.mode.value"
     }
     
-    /// Set saturation value
+    /// Set local temp value
     /// - Parameters:
     ///   - level: level value
     ///   - deviceId: device id
@@ -185,11 +190,29 @@ class ESPNodeDetails: Codable {
         UserDefaults.standard.set(temperature, forKey: matterLocalTempKey(deviceId))
     }
     
-    /// Get matter saturation value
+    /// Get local temp value
     /// - Parameter deviceId: device id
     /// - Returns: saturation value
     func getMatterLocalTemperatureValue(deviceId: UInt64) -> Int16? {
         if let temperature = UserDefaults.standard.value(forKey: matterLocalTempKey(deviceId)) as? Int16 {
+            return temperature
+        }
+        return nil
+    }
+    
+    /// Set measured temp value
+    /// - Parameters:
+    ///   - level: level value
+    ///   - deviceId: device id
+    func setMeasuredTemperatureValue(temperature: Int16, deviceId: UInt64) {
+        UserDefaults.standard.set(temperature, forKey: matterMeasuredTempKey(deviceId))
+    }
+    
+    /// Get measured temp value
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMeasuredTemperatureValue(deviceId: UInt64) -> Int16? {
+        if let temperature = UserDefaults.standard.value(forKey: matterMeasuredTempKey(deviceId)) as? Int16 {
             return temperature
         }
         return nil

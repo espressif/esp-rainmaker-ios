@@ -117,6 +117,15 @@ public class ESPMatterClusterUtil {
     public func isOpenCommissioningWindowSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
         return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: commissioningWindow.clusterId.uintValue)
     }
+
+    /// Is temperature measurement supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is temp measurement supported
+    public func isTempMeasurementSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: temperatureMeasurement.clusterId.uintValue)
+    }
     
     /// Is Participant Data Supported
     /// - Parameters:
@@ -132,8 +141,8 @@ public class ESPMatterClusterUtil {
     ///   - groupId: group id
     ///   - deviceId: device id
     /// - Returns: (result, endpoint id)
-    public func isAirConditionerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
-        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: airConditioner.clusterId.uintValue)
+    public func isThermostatConditionerSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: thermostat.clusterId.uintValue)
     }
     
     /// Is on off attribute supported
@@ -170,6 +179,24 @@ public class ESPMatterClusterUtil {
     /// - Returns: is supported
     public func isCurrentSaturationAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
         return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: colorControl.clusterIdString, attributeId: colorControl.attributes.currentSaturation.attributeId.uintValue)
+    }
+    
+    /// Is local temperature attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is supported
+    public func isLocalTemperatureAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: thermostat.clusterIdString, attributeId: thermostat.attributes.localtemperature.attributeId.uintValue)
+    }
+    
+    /// Is temperature measurement
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is measure value attribute supported
+    public func isMeasuredValueAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: temperatureMeasurement.clusterIdString, attributeId: temperatureMeasurement.attributes.measuredValue.attributeId.uintValue)
     }
     
     /// Is server cluster for a cluster id is supported

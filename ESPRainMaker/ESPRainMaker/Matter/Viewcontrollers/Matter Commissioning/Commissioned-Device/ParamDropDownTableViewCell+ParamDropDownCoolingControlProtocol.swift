@@ -83,23 +83,53 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
         self.controlValueLabel.text = "_"
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
             if let systemMode = self.matterNode?.getMatterSystemMode(deviceId: id) {
-                self.controlValueLabel.text = systemMode
-                self.matterNode?.setMatterSystemMode(systemMode: systemMode, deviceId: id)
-            } else {
-                ESPMTRCommissioner.shared.readSystemMode(groupId: grpId, deviceId: id) { value in
-                    if let value = value {
-                        let val = value.intValue
-                        var systemMode = ESPMatterConstants.off
-                        if val == 0 {
-                            systemMode = ESPMatterConstants.off
-                        } else if val == 3 {
-                            systemMode = ESPMatterConstants.cool
-                        } else if val == 4 {
-                            systemMode = ESPMatterConstants.heat
-                        }
-                        self.controlValueLabel.text = systemMode
-                        self.matterNode?.setMatterSystemMode(systemMode: systemMode, deviceId: id)
+                DispatchQueue.main.async {
+                    self.controlValueLabel.text = systemMode
+                }
+            }
+        }
+    }
+    
+    func readControllerMode() {
+        if let node = self.node, let controller = node.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = node.matter_node_id, let deviceId = self.deviceId {
+            if let mode = MatterControllerParser.shared.getCurrentSystemMode(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                var systemMode = ESPMatterConstants.off
+                switch mode {
+                case 3:
+                    systemMode = ESPMatterConstants.cool
+                case 4:
+                    systemMode = ESPMatterConstants.heat
+                default:
+                    break
+                }
+                self.matterNode?.setMatterSystemMode(systemMode: systemMode, deviceId: deviceId)
+                DispatchQueue.main.async {
+                    self.controlValueLabel.text = systemMode
+                }
+                self.acParamDelegate?.acSystemModeSet()
+            }
+        }
+    }
+    
+    func readMode() {
+        if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
+            ESPMTRCommissioner.shared.readSystemMode(groupId: grpId, deviceId: id) { value in
+                if let value = value {
+                    let mode = value.intValue
+                    var systemMode = ESPMatterConstants.off
+                    switch mode {
+                    case 3:
+                        systemMode = ESPMatterConstants.cool
+                    case 4:
+                        systemMode = ESPMatterConstants.heat
+                    default:
+                        break
                     }
+                    self.matterNode?.setMatterSystemMode(systemMode: systemMode, deviceId: id)
+                    DispatchQueue.main.async {
+                        self.controlValueLabel.text = systemMode
+                    }
+                    self.acParamDelegate?.acSystemModeSet()
                 }
             }
         }
@@ -110,17 +140,21 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
             ESPMTRCommissioner.shared.subscribeSystemMode(groupId: grpId, deviceId: id) { value in
                 if let value = value {
-                    let val = value.intValue
-                    var systemMode = "_"
-                    if val == 0 {
-                        systemMode = ESPMatterConstants.off
-                    } else if val == 3 {
+                    let mode = value.intValue
+                    var systemMode = ESPMatterConstants.off
+                    switch mode {
+                    case 3:
                         systemMode = ESPMatterConstants.cool
-                    } else if val == 4 {
+                    case 4:
                         systemMode = ESPMatterConstants.heat
+                    default:
+                        break
                     }
-                    self.controlValueLabel.text = systemMode
                     self.matterNode?.setMatterSystemMode(systemMode: systemMode, deviceId: id)
+                    DispatchQueue.main.async {
+                        self.controlValueLabel.text = systemMode
+                    }
+                    self.acParamDelegate?.acSystemModeSet()
                 }
             }
         }

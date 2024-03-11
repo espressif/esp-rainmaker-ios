@@ -74,6 +74,12 @@ extension ESPMTRCommissioner {
                         param.node = NSNumber(value: destinationDeviceId)
                         param.cluster = NSNumber(value: 6)
                         param.endpoint = NSNumber(value: 1)
+                        if let group = self.group, let groupId = group.groupID {
+                            let destinationECId = ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: destinationDeviceId)
+                            if let key = destinationECId.1, let ep = UInt16(key) {
+                                param.endpoint = NSNumber(value: ep)
+                            }
+                        }
                         finalParams.append(param)
                         bindingCluster.writeAttributeBinding(withValue: finalParams) { error in
                             if let _ = error {

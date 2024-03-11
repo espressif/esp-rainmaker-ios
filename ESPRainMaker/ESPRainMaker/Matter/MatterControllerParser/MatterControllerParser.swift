@@ -49,6 +49,13 @@ class ESPControllerAPIKeys {
     static let moveToHueCommandId = "0x0"
     static let currentHueAttributeId = "0x0"
     static let currentSaturationAttributeId = "0x1"
+    static let thermostatClusterId = "0x201"
+    static let localTemperatureAttributeId = "0x0"
+    static let systemModeAttributeId = "0x1c"
+    static let occupiedCoolingSetpointAttributeId = "0x11"
+    static let occupiedHeatingSetpointAttributeId = "0x12"
+    static let temperatureMeasurementClusterId = "0x402"
+    static let measuredTemperatureAttributeId = "0x0"
 }
 
 
@@ -152,19 +159,17 @@ class MatterControllerParser {
     ///   - matterNodeId: matter node id
     /// - Returns: on/off status
     func getOnOffValue(controllerNodeId: String, matterNodeId: String) -> Bool? {
-        if let matterNodesData = self.getMatterNodesData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            if let endpointsData = self.getMatterEndpointsData(matterNodeId: matterNodeId, matterNodesData: matterNodesData) {
-                if let eId = self.getOnOffEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
-                    for endpoint in endpoints {
-                        if let clusters = endpoint.clusters {
-                            for clusterData in clusters {
-                                if let cluster = clusterData.cluster {
-                                    if let onOffValue = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.onOffClusterId, attributeId: ESPControllerAPIKeys.onOffAttributeId) {
-                                        if onOffValue.lowercased() == "1" {
-                                            return true
-                                        }
-                                        return false
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getOnOffEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let onOffValue = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.onOffClusterId, attributeId: ESPControllerAPIKeys.onOffAttributeId) {
+                                    if onOffValue.lowercased() == "1" {
+                                        return true
                                     }
+                                    return false
                                 }
                             }
                         }
@@ -192,16 +197,14 @@ class MatterControllerParser {
     ///   - matterNodeId: matter node id
     /// - Returns: brightness level
     func getBrightnessLevel(controllerNodeId: String, matterNodeId: String) -> Int? {
-        if let matterNodesData = self.getMatterNodesData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            if let endpointsData = self.getMatterEndpointsData(matterNodeId: matterNodeId, matterNodesData: matterNodesData) {
-                if let eId = self.getBrightnessLevelEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
-                    for endpoint in endpoints {
-                        if let clusters = endpoint.clusters {
-                            for clusterData in clusters {
-                                if let cluster = clusterData.cluster {
-                                    if let brightnessLevel = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.levelControlClusterId, attributeId: ESPControllerAPIKeys.brightnessLevelAttributeId) {
-                                        return Int(brightnessLevel)
-                                    }
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getBrightnessLevelEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let brightnessLevel = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.levelControlClusterId, attributeId: ESPControllerAPIKeys.brightnessLevelAttributeId) {
+                                    return Int(brightnessLevel)
                                 }
                             }
                         }
@@ -229,22 +232,31 @@ class MatterControllerParser {
     ///   - matterNodeId: matter node id
     /// - Returns: brightness level
     func getCurrentHue(controllerNodeId: String, matterNodeId: String) -> Int? {
-        if let matterNodesData = self.getMatterNodesData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            if let endpointsData = self.getMatterEndpointsData(matterNodeId: matterNodeId, matterNodesData: matterNodesData) {
-                if let eId = self.getHueEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
-                    for endpoint in endpoints {
-                        if let clusters = endpoint.clusters {
-                            for clusterData in clusters {
-                                if let cluster = clusterData.cluster {
-                                    if let currentHue = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.colorControlClusterId, attributeId: ESPControllerAPIKeys.currentHueAttributeId) {
-                                        return Int(currentHue)
-                                    }
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getHueEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let currentHue = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.colorControlClusterId, attributeId: ESPControllerAPIKeys.currentHueAttributeId) {
+                                    return Int(currentHue)
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+        return nil
+    }
+    
+    /// Get color control cluster endpoint id
+    /// - Parameters:
+    ///   - controllerNodeId: controller node id
+    ///   - matterNodeId: matter node id
+    func getSaturationLevelEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
+        if let endpointId = self.getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.colorControlClusterId) {
+            return endpointId
         }
         return nil
     }
@@ -275,31 +287,45 @@ class MatterControllerParser {
         return nil
     }
     
-    /// Get color control cluster endpoint id
+    /// Get on off cluster endpoint id
     /// - Parameters:
     ///   - controllerNodeId: controller node id
     ///   - matterNodeId: matter node id
-    func getSaturationLevelEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
-        if let endpointId = self.getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.colorControlClusterId) {
+    func getThermostatEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
+        if let endpointId = self.getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.thermostatClusterId) {
             return endpointId
         }
         return nil
     }
     
-    /// Get value for cluster id/attribute id
+    /// Get on off cluster endpoint id
     /// - Parameters:
-    ///   - cluster: cluster
-    ///   - clusterId: cluster id
-    ///   - attributeId: attriubute id
-    /// - Returns: cluster/attribute value
-    func getClusterAttributeValue(cluster: [String: MatterAttributeData]?, clusterId: String, attributeId: String) -> String? {
-        if let cluster = cluster {
-            for cId in cluster.keys {
-                if cId == clusterId {
-                    if let attributesData = cluster[clusterId], let attributes = attributesData.attributes {
-                        for aId in attributes.keys {
-                            if aId == attributeId, let attributeValue = attributes[attributeId] {
-                                return attributeValue
+    ///   - controllerNodeId: controller node id
+    ///   - matterNodeId: matter node id
+    func getTemperatureMeasurementEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
+        if let endpointId = self.getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.temperatureMeasurementClusterId) {
+            return endpointId
+        }
+        return nil
+    }
+    
+    /// Get current local temperature
+    /// - Parameters:
+    ///   - controllerNodeId: controller node id
+    ///   - matterNodeId: matter node id
+    /// - Returns: current local temoerature
+    func getCurrentLocalTemperature(controllerNodeId: String, matterNodeId: String) -> Int? {
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getThermostatEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let localTemperature = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.thermostatClusterId, attributeId: ESPControllerAPIKeys.localTemperatureAttributeId) {
+                                    if let localTemp = Int(localTemperature) {
+                                        return (localTemp/100)
+                                    }
+                                }
                             }
                         }
                     }
@@ -309,30 +335,25 @@ class MatterControllerParser {
         return nil
     }
     
-    /// Matter nodes data
-    /// - Parameters:
-    ///   - controllerNodeId: controller node id
-    ///   - matterNodeId: device matter node id
-    /// - Returns: matter nodes data
-    func getMatterNodesData(controllerNodeId: String, matterNodeId: String) -> [String: MatterNodeData]? {
-        if let controller = self.fetchMatterControllerData(nodeId: controllerNodeId) {
-            if let controllerData = controller.matterControllerData as? MatterControllerData, let matterNodesData = controllerData.matterNodesData {
-                return matterNodesData
-            }
-        }
-        return nil
-    }
-    
-    /// Get matter node data
+    /// Get current local temperature
     /// - Parameters:
     ///   - controllerNodeId: controller node id
     ///   - matterNodeId: matter node id
-    func getMatterNodeData(controllerNodeId: String, matterNodeId: String) -> MatterNodeData? {
-        if let controller = self.fetchMatterControllerData(nodeId: controllerNodeId) {
-            if let controllerData = controller.matterControllerData, let matterNodesData = controllerData.matterNodesData {
-                for mtrId in matterNodesData.keys {
-                    if mtrId.lowercased() == matterNodeId.lowercased(), let matterNodeData = matterNodesData[mtrId] {
-                        return matterNodeData
+    /// - Returns: current local temoerature
+    func getCurrentMeasuredTemperature(controllerNodeId: String, matterNodeId: String) -> Int? {
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getTemperatureMeasurementEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let measuredTemperature = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.temperatureMeasurementClusterId, attributeId: ESPControllerAPIKeys.measuredTemperatureAttributeId) {
+                                    if let measuredTemp = Int(measuredTemperature) {
+                                        return (measuredTemp/100)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -340,57 +361,70 @@ class MatterControllerParser {
         return nil
     }
     
-    /// Get endpoints data
+    /// Get current system mode
     /// - Parameters:
+    ///   - controllerNodeId: controller node id
     ///   - matterNodeId: matter node id
-    ///   - matterNodesData: matter nodes data
-    /// - Returns: endpoints data
-    func getMatterEndpointsData(matterNodeId: String, matterNodesData: [String: MatterNodeData]) -> [String: MatterEndpointsData]? {
-        for mId in matterNodesData.keys {
-            if mId.lowercased() == matterNodeId.lowercased() {
-                if let matterNodeData = matterNodesData[mId], let endpointsData = matterNodeData.endpointsData {
-                    return endpointsData
+    /// - Returns: current system mode
+    func getCurrentSystemMode(controllerNodeId: String, matterNodeId: String) -> Int? {
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getThermostatEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let systemMode = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.thermostatClusterId, attributeId: ESPControllerAPIKeys.systemModeAttributeId) {
+                                    if let mode = Int(systemMode) {
+                                        return mode
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
         return nil
     }
     
-    /// Get matter endpoints
+    /// Get occupied cooling setpoint
     /// - Parameters:
-    ///   - endpointsData: endpoints data
-    ///   - endpointId: endpoint id
-    /// - Returns: matter endpoints
-    func getMatterEndpoints(endpointsData: [String: MatterEndpointsData], endpointId: String) -> [MatterEndpointData]? {
-        for eId in endpointsData.keys {
-            if eId == endpointId, let matterEndpointsData = endpointsData[endpointId] as? MatterEndpointsData, let endpoints = matterEndpointsData.endpoints as? [MatterEndpointData] {
-                return endpoints
+    ///   - controllerNodeId: controller node id
+    ///   - matterNodeId: matter node id
+    /// - Returns: occupied cooling setpoint
+    func getCurrentOccupiedCoolingSetpoint(controllerNodeId: String, matterNodeId: String) -> Int? {
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getThermostatEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let ocs = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.thermostatClusterId, attributeId: ESPControllerAPIKeys.occupiedCoolingSetpointAttributeId), let setpoint = Int(ocs) {
+                                    return setpoint/100
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return nil
     }
     
-    /// Get ,matter endpoint id
+    /// Get occupied heating setpoint
     /// - Parameters:
     ///   - controllerNodeId: controller node id
     ///   - matterNodeId: matter node id
-    ///   - clusterId: cluster id
-    /// - Returns: matter cluster endpoint id
-    func getMatterEndpointId(controllerNodeId: String, matterNodeId: String, clusterId: String) -> String? {
-        if let matterNodesData = self.getMatterNodesData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            if let endpointsData = self.getMatterEndpointsData(matterNodeId: matterNodeId, matterNodesData: matterNodesData) {
-                for endpointId in endpointsData.keys {
-                    if let matterEndpointsData = endpointsData[endpointId] as? MatterEndpointsData, let endpoints = matterEndpointsData.endpoints as? [MatterEndpointData] {
-                        for endpoint in endpoints {
-                            if let clusters = endpoint.clusters {
-                                for clusterData in clusters {
-                                    if let cluster = clusterData.cluster {
-                                        for cId in cluster.keys {
-                                            if cId == clusterId {
-                                                return endpointId
-                                            }
-                                        }
-                                    }
+    /// - Returns: occupied cooling setpoint
+    func getCurrentOccupiedHeatingSetpoint(controllerNodeId: String, matterNodeId: String) -> Int? {
+        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let eId = self.getThermostatEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                for endpoint in endpoints {
+                    if let clusters = endpoint.clusters {
+                        for clusterData in clusters {
+                            if let cluster = clusterData.cluster {
+                                if let ohs = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.thermostatClusterId, attributeId: ESPControllerAPIKeys.occupiedHeatingSetpointAttributeId), let setpoint = Int(ohs) {
+                                    return setpoint/100
                                 }
                             }
                         }

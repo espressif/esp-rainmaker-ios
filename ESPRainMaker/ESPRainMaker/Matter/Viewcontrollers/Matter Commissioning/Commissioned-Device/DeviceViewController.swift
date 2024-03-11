@@ -209,6 +209,121 @@ class DeviceViewController: UIViewController {
         self.generateCells()
     }
     
+    func formatUI() {
+        if !isDeviceOffline, let groupId = self.group?.groupID, let deviceId = self.matterNodeId?.hexToDecimal {
+            self.setupAC(groupId: groupId, deviceId: deviceId) {
+                self.generateCells()
+            }
+        } else {
+            self.generateCells()
+        }
+    }
+    
+    func setupAC(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Fetching System Mode...", view: self.view)
+        }
+        self.readSystemMode(groupId: groupId, deviceId: deviceId) {
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                Utility.showLoader(message: "Fetching local temperature...", view: self.view)
+            }
+            self.readLocalTemperature(groupId: groupId, deviceId: deviceId) {
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    Utility.showLoader(message: "Fetching cooling setpoint...", view: self.view)
+                }
+                self.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) {
+                    DispatchQueue.main.async {
+                        Utility.hideLoader(view: self.view)
+                        Utility.showLoader(message: "Fetching heating setpoint...", view: self.view)
+                    }
+                    self.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) {
+                        DispatchQueue.main.async {
+                            Utility.hideLoader(view: self.view)
+                        }
+                       completion()
+                    }
+                }
+            }
+        }
+    }
+    
+    func readSystemMode(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
+        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
+            ESPMTRCommissioner.shared.readSystemMode(groupId: groupId, deviceId: deviceId) { value in
+                if let value = value {
+                    let mode = value.intValue
+                    var systemMode = ESPMatterConstants.off
+                    switch mode {
+                    case 3:
+                        systemMode = ESPMatterConstants.cool
+                    case 4:
+                        systemMode = ESPMatterConstants.heat
+                    default:
+                        break
+                    }
+                    self.node?.setMatterSystemMode(systemMode: systemMode, deviceId: deviceId)
+                }
+                completion()
+            }
+        } else {
+            completion()
+        }
+    }
+    
+    func readLocalTemperature(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
+        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
+            ESPMTRCommissioner.shared.readLocalTemperature(groupId: groupId, deviceId: deviceId) { localTemperature in
+                if let localTemperature = localTemperature {
+                    self.node?.setMatterLocalTemperatureValue(temperature: localTemperature, deviceId: deviceId)
+                }
+                completion()
+            }
+        } else {
+            completion()
+        }
+    }
+    
+    func readOccupiedCoolingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
+        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
+            ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+                if let value = value {
+                    self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: deviceId)
+                }
+                completion()
+            }
+        } else {
+            completion()
+        }
+    }
+    
+    func readOccupiedHeatingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
+        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
+            ESPMTRCommissioner.shared.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+                if let value = value {
+                    self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: deviceId)
+                }
+                completion()
+            }
+        } else {
+            completion()
+        }
+    }
+    
+    func readMeasuredTemoerature(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
+        if ESPMatterClusterUtil.shared.isTempMeasurementSupported(groupId: groupId, deviceId: deviceId).0 {
+            ESPMTRCommissioner.shared.readMeasuredTemperatureValue(groupId: groupId, deviceId: deviceId) { measuredTemperature in
+                if let measuredTemperature = measuredTemperature {
+                    self.node?.setMeasuredTemperatureValue(temperature: measuredTemperature, deviceId: deviceId)
+                }
+                completion()
+            }
+        } else {
+            completion()
+        }
+    }
+    
     /// Generate cells
     func generateCells() {
         self.cellInfo.removeAll()
@@ -282,6 +397,9 @@ class DeviceViewController: UIViewController {
                     default:
                         break
                     }
+                } else {
+                    self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                    self.setupTableUI()
                 }
             }
         } else {
@@ -318,13 +436,20 @@ class DeviceViewController: UIViewController {
         if ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.participantData)
         }
-        if ESPMatterClusterUtil.shared.isAirConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
-            cellInfo.append(ESPMatterConstants.localTemperature)
-            cellInfo.append(ESPMatterConstants.occupiedCoolingSetpoint)
+        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.systemMode)
+            if ESPMatterClusterUtil.shared.isLocalTemperatureAttributeSupported(groupId: groupId, deviceId: deviceId) {
+                cellInfo.append(ESPMatterConstants.localTemperature)
+            }
+            cellInfo.append(ESPMatterConstants.occupiedCoolingSetpoint)
         }
         if ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.borderRouter)
+        }
+        if ESPMatterClusterUtil.shared.isTempMeasurementSupported(groupId: groupId, deviceId: deviceId).0 {
+            if ESPMatterClusterUtil.shared.isMeasuredValueAttributeSupported(groupId: groupId, deviceId: deviceId) {
+                cellInfo.append(ESPMatterConstants.measuredTemperature)
+            }
         }
     }
     

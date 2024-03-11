@@ -370,7 +370,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.defaultDevice)
             cell.onOffButton.isHidden = true
         }
-        if ESPMatterClusterUtil.shared.isAirConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
+        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.airConditioner)
         } else if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0, let type = rainmakerNode.deviceType, type == 266 {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.outletDevice)

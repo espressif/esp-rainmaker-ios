@@ -208,18 +208,16 @@ struct JSONParser {
                         #if ESPRainMakerMatter
                         if node.isMatter, node.isRainmaker {
                             newDevice.isMatter = true
-                            if node.isOnOffClientSupported {
-                                let clients = node.bindingServers
-                                if clients.count > 0 {
-                                    let sortedKeys = clients.keys.sorted { $0 < $1 }
-                                    for i in 0..<sortedKeys.count {
-                                        if i == index {
-                                            let key = sortedKeys[i]
-                                            if let value = clients[key] {
-                                                newDevice.endpointClusterId = [key: value]
-                                            }
-                                            break
+                            let clients = node.bindingServers
+                            if clients.count > 0 {
+                                let sortedKeys = clients.keys.sorted { $0 < $1 }
+                                for i in 0..<sortedKeys.count {
+                                    if i == index {
+                                        let key = sortedKeys[i]
+                                        if let value = clients[key] {
+                                            newDevice.endpointClusterId = [key: value]
                                         }
+                                        break
                                     }
                                 }
                             }
@@ -232,11 +230,7 @@ struct JSONParser {
             }
             #if ESPRainMakerMatter
             if node.isMatter, !node.isRainmaker {
-                if node.isOnOffServerSupported.0 {
-                    let device = Device(name: node.matterDeviceName ?? "", type: nil, node: node, deviceName: node.matterDeviceName ?? "")
-                    device.isMatter = true
-                    result.append(device)
-                } else if node.isOnOffClientSupported {
+                if node.bindingServers.count > 0 {
                     let clients = node.bindingServers
                     if clients.count > 0 {
                         let sortedKeys = clients.keys.sorted { $0 < $1 }

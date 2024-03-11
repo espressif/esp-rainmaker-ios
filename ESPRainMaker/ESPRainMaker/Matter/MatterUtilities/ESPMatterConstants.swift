@@ -121,6 +121,7 @@ struct ESPMatterConstants {
     static let rainmakerController = "rainmakerController"
     static let participantData = "participantData"
     static let localTemperature = "localTemperature"
+    static let measuredTemperature = "measuredTemperature"
     static let occupiedCoolingSetpoint = "occupiedCoolingSetpoint"
     static let controlSequenceOfOperation = "controlSequenceOfOperation"
     static let systemMode = "systemMode"

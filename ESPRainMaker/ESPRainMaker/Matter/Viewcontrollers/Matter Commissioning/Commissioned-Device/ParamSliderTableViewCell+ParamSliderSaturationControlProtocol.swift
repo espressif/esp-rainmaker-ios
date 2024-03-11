@@ -59,7 +59,7 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
         self.setupInitialSaturationValue()
         if self.nodeConnectionStatus == .local {
             if let _ = ESPMTRCommissioner.shared.sController {
-                self.getColorCluster(timeout: 10.0) { cluster in
+                self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         cluster.readAttributeCurrentSaturation { val, _ in
                             if let val = val {
@@ -101,7 +101,7 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
         }
         if self.nodeConnectionStatus == .local {
             if let _ = ESPMTRCommissioner.shared.sController {
-                self.getColorCluster(timeout: 10.0) { cluster in
+                self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         let params = MTRColorControlClusterMoveToSaturationParams()
                         params.saturation = NSNumber(value: saturation)

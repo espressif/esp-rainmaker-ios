@@ -42,7 +42,17 @@ extension ESPMTRCommissioner {
                     if let color = color {
                         self.attributesData[colorControl.clusterIdString] = color
                     }
-                    completionHandler(self.attributesData)
+                    self.getTherostatAttributes(groupID: groupID, deviceId: deviceId) { thermostatAttrs in
+                        if let thermostatAttrs = thermostatAttrs {
+                            self.attributesData[thermostat.clusterIdString] = thermostatAttrs
+                        }
+                        self.getTemperatureMeasurementAttributes(groupID: groupID, deviceId: deviceId) { tempMeasurementAttrs in
+                            if let tempMeasurementAttrs = tempMeasurementAttrs {
+                                self.attributesData[temperatureMeasurement.clusterIdString] = tempMeasurementAttrs
+                            }
+                            completionHandler(self.attributesData)
+                        }
+                    }
                 }
             }
         }
@@ -75,7 +85,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completionHadnler: completion
     func getLevelAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
-        self.getLevelController(timeout: 10.0, groupId: groupID, deviceId: deviceId) { levelControl in
+        self.getLevelController(groupId: groupID, deviceId: deviceId) { levelControl in
             if let levelControl = levelControl {
                 levelControl.readAttributeAttributeList { attributesList, _ in
                     if let attributesList = attributesList as? [UInt] {
@@ -96,9 +106,51 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completionHadnler: completion
     func getColorAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
-        self.getColorCluster(timeout: 10.0, groupId: groupID, deviceId: deviceId) { colorControl in
+        self.getColorCluster(groupId: groupID, deviceId: deviceId) { colorControl in
             if let colorControl = colorControl {
                 colorControl.readAttributeAttributeList { attributesList, _ in
+                    if let attributesList = attributesList as? [UInt] {
+                        completionHandler(attributesList)
+                    } else {
+                        completionHandler(nil)
+                    }
+                }
+            } else {
+                completionHandler(nil)
+            }
+        }
+    }
+    
+    /// Get thermostat cluster attributes
+    /// - Parameters:
+    ///   - groupID: group id
+    ///   - deviceId: device id
+    ///   - completionHadnler: completion
+    func getTherostatAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
+        self.getThermostatCluster(groupId: groupID, deviceId: deviceId) { thermostat in
+            if let thermostat = thermostat {
+                thermostat.readAttributeAttributeList { attributesList, _ in
+                    if let attributesList = attributesList as? [UInt] {
+                        completionHandler(attributesList)
+                    } else {
+                        completionHandler(nil)
+                    }
+                }
+            } else {
+                completionHandler(nil)
+            }
+        }
+    }
+    
+    /// Get temperature measurement attributes
+    /// - Parameters:
+    ///   - groupID: group id
+    ///   - deviceId: device id
+    ///   - completionHadnler: completion
+    func getTemperatureMeasurementAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
+        self.getTempMeasurementCluster(groupId: groupID, deviceId: deviceId) { tempMeasurement in
+            if let tempMeasurement = tempMeasurement {
+                tempMeasurement.readAttributeAttributeList { attributesList, _ in
                     if let attributesList = attributesList as? [UInt] {
                         completionHandler(attributesList)
                     } else {
