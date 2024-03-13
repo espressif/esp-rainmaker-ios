@@ -313,7 +313,6 @@ class DeviceViewController: UIViewController {
         if ESPMatterClusterUtil.shared.isAirConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.localTemperature)
             cellInfo.append(ESPMatterConstants.occupiedCoolingSetpoint)
-            cellInfo.append(ESPMatterConstants.controlSequenceOfOperation)
             cellInfo.append(ESPMatterConstants.systemMode)
         }
     }

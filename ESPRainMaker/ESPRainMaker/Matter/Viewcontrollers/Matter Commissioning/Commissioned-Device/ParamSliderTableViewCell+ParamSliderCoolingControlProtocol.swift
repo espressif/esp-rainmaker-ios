@@ -24,6 +24,32 @@ import Matter
 @available(iOS 16.4, *)
 extension ParamSliderTableViewCell {
     
+    func readOHS(groupId: String, deviceId: UInt64) {
+        ESPMTRCommissioner.shared.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+            if let value = value {
+                let val = value.intValue
+                self.currentLevel = val/100
+                self.node?.setMatterOccupiedHeatingSetpoint(ohs: Int16(val), deviceId: deviceId)
+                DispatchQueue.main.async {
+                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                }
+            }
+        }
+    }
+    
+    func readOCS(groupId: String, deviceId: UInt64) {
+        ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+            if let value = value {
+                let val = value.intValue
+                self.currentLevel = val/100
+                self.node?.setMatterOccupiedCoolingSetpoint(ocs: Int16(val), deviceId: deviceId)
+                DispatchQueue.main.async {
+                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                }
+            }
+        }
+    }
+    
     //MARK: Occupied cooling/heating setpoint
     /// Setup initial level values
     func setupInitialCoolingSetpointValues() {
@@ -63,41 +89,23 @@ extension ParamSliderTableViewCell {
             if let status = status {
                 if status == "Heat" {
                     if let levelValue = node.getMatterOccupiedHeatingSetpoint(deviceId: id) {
-                        self.currentLevel = Int(levelValue)
-                        node.setMatterOccupiedHeatingSetpoint(ohs: levelValue, deviceId: id)
+                        self.currentLevel = Int(levelValue)/100
                         DispatchQueue.main.async {
-                            self.slider.setValue(Float(levelValue), animated: true)
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
                         }
+                        self.readOHS(groupId: grpId, deviceId: id)
                     } else {
-                        ESPMTRCommissioner.shared.readOccupiedHeatingSetpoint(groupId: grpId, deviceId: id) { value in
-                            if let value = value {
-                                let val = value.intValue
-                                self.currentLevel = val
-                                self.node?.setMatterOccupiedHeatingSetpoint(ohs: Int16(val), deviceId: id)
-                                DispatchQueue.main.async {
-                                    self.slider.setValue(Float(val), animated: true)
-                                }
-                            }
-                        }
+                        self.readOHS(groupId: grpId, deviceId: id)
                     }
-                } else if status == "Heat" {
-                    if let levelValue = node.getMatterOccupiedCoolingSetpoint(deviceId: id) as? Int16 {
+                } else if status != "Heat" {
+                    if let levelValue = node.getMatterOccupiedCoolingSetpoint(deviceId: id) {
                         self.currentLevel = Int(levelValue)
-                        node.setMatterOccupiedCoolingSetpoint(ocs: levelValue, deviceId: id)
                         DispatchQueue.main.async {
-                            self.slider.setValue(Float(levelValue), animated: true)
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
                         }
+                        self.readOCS(groupId: grpId, deviceId: id)
                     } else {
-                        ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
-                            if let value = value {
-                                let val = value.intValue
-                                self.currentLevel = val
-                                self.node?.setMatterOccupiedCoolingSetpoint(ocs: Int16(val), deviceId: id)
-                                DispatchQueue.main.async {
-                                    self.slider.setValue(Float(val), animated: true)
-                                }
-                            }
-                        }
+                        self.readOCS(groupId: grpId, deviceId: id)
                     }
                 }
             }
@@ -145,7 +153,7 @@ extension ParamSliderTableViewCell {
                 ESPMTRCommissioner.shared.setOccupiedHeatingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
                     self.paramChipDelegate?.matterAPIResponseReceived()
                     if result {
-                        node.setMatterOccupiedHeatingSetpoint(ohs: setPoint, deviceId: id)
+                        node.setMatterOccupiedHeatingSetpoint(ohs: Int16(setPoint*100), deviceId: id)
                         self.currentLevel = Int(setPoint)
                         DispatchQueue.main.async {
                             self.slider.setValue(Float(self.currentLevel), animated: true)
@@ -161,7 +169,7 @@ extension ParamSliderTableViewCell {
                     self.paramChipDelegate?.matterAPIResponseReceived()
                     if result {
                         if let node = self.node, let id = self.deviceId {
-                            node.setMatterOccupiedCoolingSetpoint(ocs: setPoint, deviceId: id)
+                            node.setMatterOccupiedCoolingSetpoint(ocs: Int16(setPoint*100), deviceId: id)
                         }
                         self.currentLevel = Int(setPoint)
                         DispatchQueue.main.async {
