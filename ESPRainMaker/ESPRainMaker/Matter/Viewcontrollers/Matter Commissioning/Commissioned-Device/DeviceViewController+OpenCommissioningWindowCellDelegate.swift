@@ -53,6 +53,8 @@ extension DeviceViewController: OpenCommissioningWindowCellDelegate {
                 Utility.showToastMessage(view: self.view,
                                          message: ESPMatterConstants.deviceNotReachableMsg)
             }
+        } else {
+            Utility.showToastMessage(view: self.view, message: ESPMatterConstants.operationFailedMsg)
         }
     }
     

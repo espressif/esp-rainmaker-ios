@@ -12,20 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  LaunchControllerCell.swift
+//  CustomActionCell.swift
 //  ESPRainmaker
 //
 
 import UIKit
 
-protocol LaunchControllerDelegate: AnyObject {
-    func launchController()
+enum CustomAction {
+    case launchController
+    case updateThreadDataset
 }
 
-class LaunchControllerCell: UITableViewCell {
+protocol CustomActionDelegate: AnyObject {
+    func launchController()
+    func updateThreadDataset()
+}
+
+class CustomActionCell: UITableViewCell {
     
-    static let reuseIdentifier = "LaunchControllerCell"
-    weak var delegate: LaunchControllerDelegate?
+    static let reuseIdentifier = "CustomActionCell"
+    weak var delegate: CustomActionDelegate?
+    var workflow: CustomAction = .launchController
+    
+    @IBOutlet weak var headerLabel: UILabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var launchButton: PrimaryButton!
     @IBOutlet weak var container: UIView!
     
@@ -49,7 +59,24 @@ class LaunchControllerCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
+    func setupWorkflow(workflow: CustomAction) {
+        self.workflow = workflow
+        switch workflow {
+        case .launchController:
+            self.headerLabel.text = "Controller"
+            self.descriptionLabel.text = "Update Device List"
+        case .updateThreadDataset:
+            self.headerLabel.text = "Border Router"
+            self.descriptionLabel.text = "Update Thread Dataset"
+        }
+    }
+    
     @IBAction func launchController(_ sender: Any) {
-        self.delegate?.launchController()
+        switch workflow {
+        case .launchController:
+            self.delegate?.launchController()
+        case .updateThreadDataset:
+            self.delegate?.updateThreadDataset()
+        }
     }
 }

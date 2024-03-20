@@ -123,6 +123,7 @@ struct ESPMatterConstants {
     static let occupiedCoolingSetpoint = "occupiedCoolingSetpoint"
     static let controlSequenceOfOperation = "controlSequenceOfOperation"
     static let systemMode = "systemMode"
+    static let borderRouter = "borderRouter"
     
     /// API keys
     static let id = "id"
@@ -297,4 +298,6 @@ struct ESPMatterConstants {
     static let controlSequence = "Control Sequence"
     static let systemModeTxt = "System Mode"
     static let tempDegreesCelsius = "Temperature(°C)"
+    
+    static let threadUpdateFailed = "Failed to update thread dataset!"
 }

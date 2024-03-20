@@ -17,6 +17,7 @@
 //
 
 import MatterSupport
+import UIKit
 
 /// Class is used to handle MatterSupport callbacks
 @available(iOS 16.4, *)
@@ -45,6 +46,15 @@ class RequestHandler: MatterAddDeviceExtensionRequestHandler {
     /// - Parameter threadScanResults: thread scan results
     /// - Returns: default system network
     override func selectThreadNetwork(from threadScanResults: [MatterAddDeviceExtensionRequestHandler.ThreadScanResult]) async throws -> MatterAddDeviceExtensionRequestHandler.ThreadNetworkAssociation {
+        for threadScanResult in threadScanResults {
+            if let borderAgentIdData = ESPMatterExtensionEcoInfo.shared.getBorderAgentIdKey() {
+                let borderAgentId = borderAgentIdData.hexadecimalString
+                let id = threadScanResult.extendedAddress.hexadecimalString
+                if id == borderAgentId {
+                    return .network(extendedPANID: threadScanResult.extendedPANID)
+                }
+            }
+        }
         return .defaultSystemNetwork
     }
     

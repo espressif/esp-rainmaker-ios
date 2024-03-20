@@ -501,7 +501,7 @@
                                 <rect key="frame" x="0.0" y="95" width="393" height="723"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="LaunchControllerCell" id="Vy1-RE-GBQ" customClass="LaunchControllerCell" customModule="ESP_RainMaker" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="CustomActionCell" id="Vy1-RE-GBQ" customClass="CustomActionCell" customModule="ESP_RainMaker" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="50" width="393" height="89"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Vy1-RE-GBQ" id="m8y-hr-9jE">
@@ -570,6 +570,8 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
                                             <outlet property="container" destination="Rug-yk-oGX" id="MDh-zG-n3h"/>
+                                            <outlet property="descriptionLabel" destination="LkC-nl-gx3" id="gQY-Qc-ge6"/>
+                                            <outlet property="headerLabel" destination="PyQ-jo-oVv" id="gEK-t4-LFr"/>
                                             <outlet property="launchButton" destination="7ES-EG-bvL" id="Oej-Z6-sGf"/>
                                         </connections>
                                     </tableViewCell>
