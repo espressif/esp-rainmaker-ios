@@ -27,7 +27,9 @@ extension DeviceViewController: MTRACParamDelegate {
         for index in 0..<self.cellInfo.count {
             let val = self.cellInfo[index]
             if val == ESPMatterConstants.occupiedCoolingSetpoint {
-                self.deviceTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                if let node = self.node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let item = node.getMatterSystemMode(deviceId: deviceId), [ESPMatterConstants.heat, ESPMatterConstants.cool].contains(item) {
+                    self.deviceTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                }
             }
         }
     }

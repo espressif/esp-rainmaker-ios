@@ -98,24 +98,29 @@ extension ESPMTRCommissioner {
     ///   - destinationDeviveId: destination device id
     ///   - completionHandler:completion handler
     func unlinkDevice(endpointClusterId: [String: UInt]?, sourceDeviceId: UInt64, destinationDeviveId: UInt64, completionHandler: @escaping (Bool) -> Void) {
-        self.readACLAttributes(deviceId: destinationDeviveId) { attributes in
-            if let attributes = attributes, let subjects = attributes.subjects as? [NSNumber] {
-                var newSubjects = subjects
-                for i in 0..<subjects.count {
-                    let subject = subjects[i]
-                    if sourceDeviceId == subject.uint64Value {
-                        newSubjects.remove(at: i)
-                        break
-                    }
-                }
-                attributes.subjects = newSubjects
-                self.writeACLAttributes(deviceId: destinationDeviveId, accessControlEntry: attributes) { result in
-                    if result {
-                        self.unbind(endpointClusterId: endpointClusterId, sourceDeviceId: sourceDeviceId, destinationDeviceId: destinationDeviveId, completionHandler: completionHandler)
+        self.unbind(endpointClusterId: endpointClusterId, sourceDeviceId: sourceDeviceId, destinationDeviceId: destinationDeviveId) { unbindResult in
+            if unbindResult {
+                self.readAllACLAttributes(deviceId: destinationDeviveId) { attributes in
+                    if var attributes = attributes, attributes.count > 0 {
+                        if let index = try? attributes.firstIndex(where: { $0.privilege.intValue == 5 }) {
+                            let attribute = attributes[index]
+                            if var subjects = attribute.subjects as? [NSNumber] {
+                                let finalSubjects = subjects.filter {
+                                    return !($0.uint64Value == sourceDeviceId)
+                                }
+                                attribute.subjects = finalSubjects
+                            }
+                            attributes[index] = attribute
+                        }
+                        self.writeAllACLAttributes(deviceId: destinationDeviveId, accessControlEntry: attributes) { writeACLResult in
+                            completionHandler(writeACLResult)
+                        }
                     } else {
                         completionHandler(false)
                     }
                 }
+            } else {
+                completionHandler(false)
             }
         }
     }

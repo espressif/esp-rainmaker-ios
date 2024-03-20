@@ -56,9 +56,16 @@ class CustomInfoCell: UITableViewCell {
     func setupInitialIndoorTempUI() {
         #if ESPRainMakerMatter
         if #available(iOS 16.4, *), let group = self.nodeGroup, let groupId = group.groupID, let deviceId = self.deviceId {
+            if let localTemp = self.node?.getMatterLocalTemperatureValue(deviceId: deviceId) {
+                let final = localTemp/100
+                DispatchQueue.main.async {
+                    self.value.text = "\(final) °C"
+                }
+            }
             ESPMTRCommissioner.shared.readLocalTemperature(groupId: groupId, deviceId: deviceId) { localTemperature in
                 if let localTemperature = localTemperature {
-                    self.value.text = "\(localTemperature) °C"
+                    let final = Int(localTemperature/100)
+                    self.value.text = "\(final) °C"
                     self.node?.setMatterLocalTemperatureValue(temperature: localTemperature, deviceId: deviceId)
                 }
             }
