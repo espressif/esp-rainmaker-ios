@@ -142,8 +142,8 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                 DispatchQueue.main.async {
                     showLight = true
                     self.onOffButton.isHidden = false
-                    if let status = node.isMatterLightOn(deviceId: deviceId) {
-                        if status {
+                    if let lightOnOffStatus = node.isMatterLightOn(deviceId: deviceId) {
+                        if lightOnOffStatus {
                             self.onOffButton.image = UIImage(named: "switch_on")
                         } else {
                             self.onOffButton.image = UIImage(named: "switch_off")
@@ -162,12 +162,25 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                 self.overlay.isHidden = true
                 self.isUserInteractionEnabled = true
                 self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
+                if status != .remote {
+                    self.setToggleStatusFromControllerConfig()
+                }
             } else {
                 if showLight {
                     self.onOffButton.image = UIImage(named: "switch_disabled")
                 }
                 self.isUserInteractionEnabled = true
                 self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
+            }
+        }
+    }
+    
+    func setToggleStatusFromControllerConfig() {
+        if let node = self.rainmakerNode, let controllerNode = node.matterControllerNode, let controllerNodeId = controllerNode.node_id, let matterNodeId = node.matter_node_id, let onOffStatus = MatterControllerParser.shared.getOnOffValue(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if onOffStatus {
+                self.onOffButton.image = UIImage(named: "switch_on")
+            } else {
+                self.onOffButton.image = UIImage(named: "switch_off")
             }
         }
     }
