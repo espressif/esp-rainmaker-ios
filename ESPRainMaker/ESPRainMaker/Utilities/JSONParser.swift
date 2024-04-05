@@ -319,8 +319,9 @@ struct JSONParser {
                     if service.type == Constants.localControlServiceType {
                         for param in service.params ?? [] {
                             if param.type == Constants.localControlParamType {
-                                if let paramValue = param.value as? Int, paramValue == 1 {
+                                if let paramValue = param.value as? Int, (paramValue == 1 || paramValue == 2) {
                                     node.supportsEncryption = true
+                                    node.securityType = paramValue
                                 }
                             }
                             if param.type == Constants.popParamType {

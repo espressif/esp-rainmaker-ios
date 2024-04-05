@@ -143,7 +143,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                                 }
                             }
                         }
-                        completionHandler(nil, nil)
+                        completionHandler(partialList, nil)
                         return
                     case let .failure(error):
                         let nserror = error as NSError
