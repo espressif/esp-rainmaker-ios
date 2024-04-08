@@ -42,6 +42,13 @@ struct ESPSilentNotificationHandler: ESPSilentNotificationProtocol {
                 // Converted data to json object.
                 if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any], let index = User.shared.associatedNodeList?.firstIndex(where: { $0.node_id == nodeID }) {
                     let node = User.shared.associatedNodeList![index]
+                    #if ESPRainMakerMatter
+                    if let nodeId = node.node_id, let controllerNodeId = node.matterControllerNode?.node_id, nodeId == controllerNodeId {
+                        ESPMatterEcosystemInfo.shared.saveControllerNotificationNodeId(nodeId: nodeID)
+                        NotificationCenter.default.post(Notification(name: Notification.Name(Constants.controllerParamUpdate)))
+                        return
+                    }
+                    #endif
                     for key in json.keys {
                         // Get devices for which param update is received.
                         for device in node.devices ?? [] {

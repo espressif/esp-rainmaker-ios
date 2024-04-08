@@ -29,7 +29,8 @@ class ESPMatterEcosystemInfo {
     static let attestationInfoKey: String = "attestation.information.key"
     
     static let borderAgentIdKey = "com.espressif.rainmaker.boder.agent.id"
-    
+    static let controllerNotificationNodeIdKey = "com.espressif.rainmaker.controller.notification.node.id"
+
     /// Save homes data
     /// - Parameter data: homes
     func saveHomesData(data: [String: String]) {
@@ -252,4 +253,27 @@ class ESPMatterEcosystemInfo {
         }
         return nil
     }
+    
+    func saveControllerNotificationNodeId(nodeId: String) {
+        let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
+        if let nodeData = nodeId.data(using: .utf8) {
+            localStorage.saveDataInUserDefault(data: nodeData, key: ESPMatterEcosystemInfo.controllerNotificationNodeIdKey)
+        }
+    }
+    
+    func getControllerNotificationNodeId() -> String? {
+        let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
+        if let data = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.controllerNotificationNodeIdKey), let nodeId = String(data: data, encoding: .utf8) {
+            return nodeId
+        }
+        return nil
+    }
+    
+    func removeControllerNotificationNodeId() {
+        let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
+        if let _ = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.controllerNotificationNodeIdKey) {
+            localStorage.cleanupData(forKey: ESPMatterEcosystemInfo.controllerNotificationNodeIdKey)
+        }
+    }
+
 }

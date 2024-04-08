@@ -146,6 +146,7 @@ struct Constants {
     static let reloadCollectionView = "com.espressif.reloadCollectionView"
     static let reloadParamTableView = "com.espressif.reloadParamTableView"
     static let refreshDeviceList = "com.espressif.refreshDeviceList"
+    static let controllerParamUpdate = "com.espressif.controllerParamUpdate"
 
     // Claim APIs
     static let claimInitPath = Configuration.shared.awsConfiguration.claimURL + "/claim/initiate"

@@ -146,6 +146,9 @@ class DevicesViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(localNetworkUpdate), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadCollectionView), name: Notification.Name(Constants.reloadCollectionView), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshDeviceList), name: Notification.Name(Constants.refreshDeviceList), object: nil)
+        #if ESPRainMakerMatter
+        NotificationCenter.default.addObserver(self, selector: #selector(controllerParamUpdateReceived), name: Notification.Name(Constants.controllerParamUpdate), object: nil)
+        #endif
         tabBarController?.tabBar.isHidden = false
     }
 
@@ -157,6 +160,22 @@ class DevicesViewController: UIViewController {
 
     @objc func reloadCollectionView() {
         collectionView.reloadData()
+    }
+    
+    @objc func controllerParamUpdateReceived() {
+        if let nodeId = ESPMatterEcosystemInfo.shared.getControllerNotificationNodeId() {
+            ESPMatterEcosystemInfo.shared.removeControllerNotificationNodeId()
+            NetworkManager.shared.getNodeInfo(nodeId: nodeId) { node, _ in
+                if let node = node {
+                    if let index = User.shared.associatedNodeList?.firstIndex(where: { $0.node_id == nodeId }) {
+                        User.shared.associatedNodeList![index] = node
+                        DispatchQueue.main.async {
+                            self.collectionView.reloadData()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @objc func appEnterForeground() {

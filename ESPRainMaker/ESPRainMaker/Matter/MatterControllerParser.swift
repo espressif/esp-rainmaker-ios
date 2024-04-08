@@ -160,7 +160,10 @@ class MatterControllerParser {
                             for clusterData in clusters {
                                 if let cluster = clusterData.cluster {
                                     if let onOffValue = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.onOffClusterId, attributeId: ESPControllerAPIKeys.onOffAttributeId) {
-                                        return Bool(onOffValue)
+                                        if onOffValue.lowercased() == "1" {
+                                            return true
+                                        }
+                                        return false
                                     }
                                 }
                             }
