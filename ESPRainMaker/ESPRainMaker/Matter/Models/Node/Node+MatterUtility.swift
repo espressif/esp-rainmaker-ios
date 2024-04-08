@@ -24,7 +24,7 @@ extension Node {
     var isOnOffClientSupported: Bool {
         if let metadata = metadata, let clientsData = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
             for key in clientsData.keys {
-                if let list = clientsData[key], list.count > 0, list.contains(ESPMatterConstants.onOffClusterId) {
+                if let list = clientsData[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
                     return true
                 }
             }
@@ -37,8 +37,8 @@ extension Node {
         var endpointClusters: [String: UInt] = [String: UInt]()
         if let metadata = metadata, let val = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
             for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.onOffClusterId) {
-                    endpointClusters[key] = ESPMatterConstants.onOffClusterId
+                if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
+                    endpointClusters[key] = onOff.clusterId.uintValue
                 }
             }
         }
@@ -50,8 +50,8 @@ extension Node {
         var endpointClusters: [String: UInt] = [String: UInt]()
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.bindingClusterId) {
-                    endpointClusters[key] = ESPMatterConstants.bindingClusterId
+                if let list = val[key], list.count > 0, list.contains(binding.clusterId.uintValue) {
+                    endpointClusters[key] = binding.clusterId.uintValue
                 }
             }
         }
@@ -62,7 +62,7 @@ extension Node {
     var isControllerServerSupported: (Bool, String?) {
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.controllerClusterId) {
+                if let list = val[key], list.count > 0, list.contains(rainmakerController.clusterId.uintValue) {
                     return (true, key)
                 }
             }
@@ -74,7 +74,7 @@ extension Node {
     var isOnOffServerSupported: (Bool, String?) {
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.onOffClusterId) {
+                if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
                     return (true, key)
                 }
             }
@@ -86,7 +86,7 @@ extension Node {
     var isLevelControlServerSupported: (Bool, String?) {
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.levelControlClusterId) {
+                if let list = val[key], list.count > 0, list.contains(levelControl.clusterId.uintValue) {
                     return (true, key)
                 }
             }
@@ -98,7 +98,7 @@ extension Node {
     var isColorControlServerSupported: (Bool, String?) {
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.colorControlClusterId) {
+                if let list = val[key], list.count > 0, list.contains(colorControl.clusterId.uintValue) {
                     return (true, key)
                 }
             }
@@ -110,7 +110,7 @@ extension Node {
     var isOpenCommissioningWindowSupported: (Bool, String?) {
         if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(ESPMatterConstants.commissioningWindowClusterId) {
+                if let list = val[key], list.count > 0, list.contains(commissioningWindow.clusterId.uintValue) {
                     return (true, key)
                 }
             }
@@ -236,7 +236,7 @@ extension Node {
     var isRainmakerControllerSupported: (Bool, String?) {
         if let metadata = metadata, let serversData = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in serversData.keys {
-                if let list = serversData[key], list.count > 0, list.contains(ESPMatterConstants.controllerClusterId) {
+                if let list = serversData[key], list.count > 0, list.contains(rainmakerController.clusterId.uintValue) {
                     return (true, key)
                 }
             }

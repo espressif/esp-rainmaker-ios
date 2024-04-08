@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ESPMTRCommissioner+Subsciber.swift
+//  ESPMTRCommissioner+Subscriber.swift
 //  ESPRainmaker
 //
 
@@ -31,13 +31,21 @@ extension ESPMTRCommissioner {
     ///   - controller: controller
     ///   - completionHandler: completion handler
     func getLevelController(timeout: Float, groupId: String, deviceId: UInt64, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void) {
-        let (_, endpoint) = ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId)
-        if let endpoint = endpoint, let point = UInt16(endpoint), let controller = sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let levelControl = MTRBaseClusterLevelControl(device: device, endpoint: point, queue: ESPMTRCommissioner.shared.matterQueue) {
-                    completionHandler(levelControl)
+        let endpointClusterId = ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId)
+        if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
+            if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
+                if let cluster = MTRBaseClusterLevelControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                    completionHandler(cluster)
                 } else {
                     completionHandler(nil)
+                }
+            } else {
+                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
+                    if let device = device, let cluster = MTRBaseClusterLevelControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                        completionHandler(cluster)
+                    } else {
+                        completionHandler(nil)
+                    }
                 }
             }
         } else {
@@ -52,13 +60,21 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completionHandler: completion
     func getColorCluster(timeout: Float, groupId: String, deviceId: UInt64, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
-        if let controller = ESPMTRCommissioner.shared.sController {
-            let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId)
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let endpoint = endpoint, let point = UInt16(endpoint), let colorControlCluster = MTRBaseClusterColorControl(device: device, endpoint: UInt16(truncating: NSNumber(value: point)), queue: ESPMTRCommissioner.shared.matterQueue) {
-                    completionHandler(colorControlCluster)
+        let endpointClusterId = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId)
+        if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
+            if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
+                if let cluster = MTRBaseClusterColorControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                    completionHandler(cluster)
                 } else {
                     completionHandler(nil)
+                }
+            } else {
+                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
+                    if let device = device, let cluster = MTRBaseClusterColorControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                        completionHandler(cluster)
+                    } else {
+                        completionHandler(nil)
+                    }
                 }
             }
         } else {

@@ -49,6 +49,7 @@ enum rainmaker {
     }
     
     static let clusterId: NSNumber = NSNumber(value: 320601088)
+    static let clusterIdString = "320601088"
 }
 
 /*
@@ -103,6 +104,7 @@ enum rainmakerController {
     }
     
     static let clusterId: NSNumber = NSNumber(value: 320601089)
+    static let clusterIdString = "320601089"
 }
 
 /*
@@ -145,6 +147,7 @@ enum participantData {
     }
     
     static let clusterId: NSNumber = NSNumber(value: 320601091)
+    static let clusterIdString = "320601091"
 }
 
 /*
@@ -173,6 +176,7 @@ enum airConditioner {
     }
     
     static let clusterId: NSNumber = NSNumber(value: 513)
+    static let clusterIdString = "513"
 }
 
 
@@ -214,4 +218,87 @@ enum borderRouter {
     }
     
     static let clusterId: NSNumber = NSNumber(value: 320601090)
+    static let clusterIdString = "320601090"
+}
+
+
+/*
+ // MARK: On Off Cluster
+ */
+enum onOff {
+    
+    enum attributes {
+        case onOff
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .onOff:
+                return NSNumber(value: 0)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 6)
+    static let clusterIdString = "6"
+}
+
+/*
+ // MARK: Level Control Cluster
+ */
+enum levelControl {
+    
+    enum attributes {
+        case currentLevel
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .currentLevel:
+                return NSNumber(value: 0)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 8)
+    static let clusterIdString = "8"
+}
+
+/*
+ // MARK: Color Control Cluster
+ */
+enum colorControl {
+    
+    enum attributes {
+        case currentHue
+        case currentSaturation
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .currentHue:
+                return NSNumber(value: 0)
+            case .currentSaturation:
+                return NSNumber(value: 1)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 768)
+    static let clusterIdString = "768"
+}
+
+/*
+ // MARK: Commissioning window cluster
+ */
+enum commissioningWindow {
+    
+    static let clusterId: NSNumber = NSNumber(value: 60)
+    static let clusterIdString = "60"
+}
+
+/*
+ // MARK: Binding cluster
+ */
+enum binding {
+    
+    static let clusterId: NSNumber = NSNumber(value: 30)
+    static let clusterIdString = "30"
 }
