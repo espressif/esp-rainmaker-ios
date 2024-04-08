@@ -153,7 +153,7 @@ enum participantData {
 /*
  // MARK: Custom Cluster to for air conditioner
  */
-enum airConditioner {
+enum thermostat {
     
     enum attributes {
         case localtemperature
@@ -179,7 +179,25 @@ enum airConditioner {
     static let clusterIdString = "513"
 }
 
-
+/*
+ // MARK: Custom Cluster to for temperature measurement
+ */
+enum temperatureMeasurement {
+    
+    enum attributes {
+        case measuredValue
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .measuredValue:
+                return NSNumber(value: 0)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 1026)
+    static let clusterIdString = "1026"
+}
 
 /*
  // MARK: Custom Rainmaker Cluster Info

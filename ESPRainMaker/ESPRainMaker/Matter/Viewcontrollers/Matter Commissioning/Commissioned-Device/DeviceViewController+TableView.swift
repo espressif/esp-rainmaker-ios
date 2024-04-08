@@ -26,7 +26,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter].contains(value) {
+            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter, ESPMatterConstants.measuredTemperature].contains(value) {
                 return 100.0
             } else if [ESPMatterConstants.delete].contains(value) {
                 return 75.0
@@ -196,20 +196,43 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
-            } else if value == ESPMatterConstants.localTemperature {
+            } else if value == ESPMatterConstants.localTemperature || value == ESPMatterConstants.measuredTemperature {
                 if let cell = tableView.dequeueReusableCell(withIdentifier: CustomInfoCell.reuseIdentifier, for: indexPath) as? CustomInfoCell {
-                    cell.type.text = "Local Temperature"
                     cell.node = self.node
                     cell.deviceId = deviceId
                     cell.nodeGroup = self.group
-                    cell.setupInitialIndoorTempUI()
+                    if value == ESPMatterConstants.localTemperature {
+                        cell.type.text = "Local Temperature"
+                        if self.isDeviceOffline {
+                            cell.setupOfflineLocalTemperatureUI()
+                        } else {
+                            if self.nodeConnectionStatus == .controller {
+                                cell.setupInitialControllerLocalTempUI()
+                            } else {
+                                cell.setupLocalTemperatureUI()
+                            }
+                        }
+                    } else {
+                        cell.type.text = "Measured Temperature"
+                        if self.isDeviceOffline {
+                            cell.setupOfflineMeasuredTemperatureUI()
+                        } else {
+                            if self.nodeConnectionStatus == .controller {
+                                cell.setupInitialControllerMeasuredTempUI()
+                            } else {
+                                cell.setupMeasuredTemperatureUI()
+                            }
+                        }
+                    }
                     self.setAutoresizingMask(cell)
+                    cell.isUserInteractionEnabled = !self.isDeviceOffline
                     return cell
                 }
             } else if value == ESPMatterConstants.occupiedCoolingSetpoint {
                 let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
                 object_setClass(sliderCell, ParamSliderTableViewCell.self)
                 let cell = sliderCell as! ParamSliderTableViewCell
+                cell.title.text = "Occupied Cooling Setpoint"
                 cell.node = self.node
                 cell.isRainmaker = false
                 cell.sliderParamType = .airConditioner
@@ -219,7 +242,11 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.slider.isHidden = false
                 cell.paramChipDelegate = self
                 self.setAutoresizingMask(cell)
-                cell.setupInitialCoolingSetpointValues()
+                if self.nodeConnectionStatus == .controller {
+                    cell.setupInitialControllerOCSValues(isDeviceOffline: self.isDeviceOffline)
+                } else {
+                    cell.setupInitialCoolingSetpointValues2(isDeviceOffline: self.isDeviceOffline)
+                }
                 cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             } else if value == ESPMatterConstants.controlSequenceOfOperation {
@@ -237,6 +264,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.controlName.text = ESPMatterConstants.controlSequence
                 cell.setInitialControlSequenceOfOperation()
                 cell.acParamDelegate = self
+                cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             } else if value == ESPMatterConstants.systemMode {
                 let dropDownCell = tableView.dequeueReusableCell(withIdentifier: DropDownTableViewCell.reuseIdentifier, for: indexPath) as! DropDownTableViewCell
@@ -255,6 +283,14 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.paramChipDelegate = self
                 cell.acParamDelegate = self
                 cell.setInitialSystemMode()
+                if !self.isDeviceOffline {
+                    if self.nodeConnectionStatus == .controller {
+                        cell.readControllerMode()
+                    } else {
+                        cell.readMode()
+                    }
+                }
+                cell.isUserInteractionEnabled = !self.isDeviceOffline
                 return cell
             }
         }

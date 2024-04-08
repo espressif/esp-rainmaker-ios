@@ -29,13 +29,21 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion (cluster)
     func getThermostatCluster(groupId: String, deviceId: UInt64, completion: @escaping (MTRBaseClusterThermostat?) -> Void) {
-        let endpointClusterId = ESPMatterClusterUtil.shared.isAirConditionerSupported(groupId: groupId, deviceId: deviceId)
+        let endpointClusterId = ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId)
         if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let cluster = MTRBaseClusterThermostat(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+            if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
+                if let cluster = MTRBaseClusterThermostat(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
                     completion(cluster)
                 } else {
                     completion(nil)
+                }
+            } else {
+                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
+                    if let device = device, let cluster = MTRBaseClusterThermostat(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                        completion(cluster)
+                    } else {
+                        completion(nil)
+                    }
                 }
             }
         } else {
@@ -73,7 +81,7 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion
-    func subscribeLocalTemperature(groupId: String, deviceId: UInt64, completion: @escaping (NSNumber?) -> Void) {
+    func subscribeLocalTemperature(groupId: String, deviceId: UInt64, completion: @escaping (Int16?) -> Void) {
         self.getThermostatCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 cluster.subscribeAttributeLocalTemperature(withMinInterval: 1.0,
@@ -81,7 +89,11 @@ extension ESPMTRCommissioner {
                                                            params: nil,
                                                            subscriptionEstablished: nil) { value, error in
                     guard let _ = error else {
-                        completion(value)
+                        if let value = value {
+                            completion(value.int16Value/100)
+                        } else {
+                            completion(nil)
+                        }
                         return
                     }
                     completion(nil)
@@ -232,12 +244,16 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion
-    func readOccupiedCoolingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (NSNumber?) -> Void) {
+    func readOccupiedCoolingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (Int16?) -> Void) {
         self.getThermostatCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 cluster.readAttributeOccupiedCoolingSetpoint { value, error in
                     guard let _ = error else {
-                        completion(value)
+                        if let value = value {
+                            completion(value.int16Value/100)
+                        } else {
+                            completion(nil)
+                        }
                         return
                     }
                     completion(nil)
@@ -275,7 +291,7 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion
-    func subscribeToOccupiedCoolingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (NSNumber?) -> Void) {
+    func subscribeToOccupiedCoolingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (Int16?) -> Void) {
         self.getThermostatCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 cluster.subscribeAttributeOccupiedCoolingSetpoint(withMinInterval: 1.0, 
@@ -283,7 +299,11 @@ extension ESPMTRCommissioner {
                                                                   params: nil,
                                                                   subscriptionEstablished: nil) { val, error in
                     guard let _ = error else {
-                        completion(val)
+                        if let val = val {
+                            completion(val.int16Value/100)
+                        } else {
+                            completion(nil)
+                        }
                         return
                     }
                     completion(nil)
@@ -299,12 +319,16 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion
-    func readOccupiedHeatingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (NSNumber?) -> Void) {
+    func readOccupiedHeatingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (Int16?) -> Void) {
         self.getThermostatCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 cluster.readAttributeOccupiedHeatingSetpoint { value, error in
                     guard let _ = error else {
-                        completion(value)
+                        if let value = value {
+                            completion(value.int16Value/100)
+                        } else {
+                            completion(nil)
+                        }
                         return
                     }
                     completion(nil)
@@ -342,7 +366,7 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion
-    func subscribeToOccupiedHeatingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (NSNumber?) -> Void) {
+    func subscribeToOccupiedHeatingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping (Int16?) -> Void) {
         self.getThermostatCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 cluster.subscribeAttributeOccupiedHeatingSetpoint(withMinInterval: 1.0,
@@ -350,7 +374,11 @@ extension ESPMTRCommissioner {
                                                                   params: nil,
                                                                   subscriptionEstablished: nil) { val, error in
                     guard let _ = error else {
-                        completion(val)
+                        if let val = val {
+                            completion(val.int16Value/100)
+                        } else {
+                            completion(nil)
+                        }
                         return
                     }
                     completion(nil)

@@ -25,12 +25,11 @@ extension ESPMTRCommissioner {
     
     /// Get level controller
     /// - Parameters:
-    ///   - timeout: time out
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - controller: controller
     ///   - completionHandler: completion handler
-    func getLevelController(timeout: Float, groupId: String, deviceId: UInt64, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void) {
+    func getLevelController(groupId: String, deviceId: UInt64, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void) {
         let endpointClusterId = ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId)
         if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
             if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
@@ -55,11 +54,10 @@ extension ESPMTRCommissioner {
     
     /// Get color controller
     /// - Parameters:
-    ///   - timeout: timeput
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completionHandler: completion
-    func getColorCluster(timeout: Float, groupId: String, deviceId: UInt64, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
+    func getColorCluster(groupId: String, deviceId: UInt64, completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
         let endpointClusterId = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId)
         if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
             if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
@@ -109,7 +107,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion
     func subscribeToLevelValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
-        ESPMTRCommissioner.shared.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId) { cluster in
+        ESPMTRCommissioner.shared.getLevelController(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
                 params.minInterval = NSNumber(value: 1.0)
@@ -129,7 +127,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion with hue value
     func subscribeToHueValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
-        ESPMTRCommissioner.shared.getColorCluster(timeout: 10.0, groupId: groupId, deviceId: deviceId) { cluster in
+        ESPMTRCommissioner.shared.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
                 params.minInterval = NSNumber(value: 1.0)
@@ -149,7 +147,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion with saturation value
     func subscribeToSaturationValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
-        ESPMTRCommissioner.shared.getColorCluster(timeout: 10.0, groupId: groupId, deviceId: deviceId) { cluster in
+        ESPMTRCommissioner.shared.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
                 params.minInterval = NSNumber(value: 1.0)

@@ -28,7 +28,10 @@ extension DeviceViewController: MTRACParamDelegate {
             let val = self.cellInfo[index]
             if val == ESPMatterConstants.occupiedCoolingSetpoint {
                 if let node = self.node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let item = node.getMatterSystemMode(deviceId: deviceId), [ESPMatterConstants.heat, ESPMatterConstants.cool].contains(item) {
-                    self.deviceTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                    DispatchQueue.main.async {
+                        self.deviceTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                    }
+                    break
                 }
             }
         }

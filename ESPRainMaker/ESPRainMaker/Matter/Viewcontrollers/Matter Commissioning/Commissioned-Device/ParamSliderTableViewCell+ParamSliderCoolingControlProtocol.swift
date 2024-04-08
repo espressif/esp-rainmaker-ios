@@ -27,9 +27,8 @@ extension ParamSliderTableViewCell {
     func readOHS(groupId: String, deviceId: UInt64) {
         ESPMTRCommissioner.shared.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
             if let value = value {
-                let val = value.intValue
-                self.currentLevel = val/100
-                self.node?.setMatterOccupiedHeatingSetpoint(ohs: Int16(val), deviceId: deviceId)
+                self.currentLevel = Int(value)
+                self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: deviceId)
                 DispatchQueue.main.async {
                     self.slider.setValue(Float(self.currentLevel), animated: true)
                 }
@@ -40,11 +39,90 @@ extension ParamSliderTableViewCell {
     func readOCS(groupId: String, deviceId: UInt64) {
         ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
             if let value = value {
-                let val = value.intValue
-                self.currentLevel = val/100
-                self.node?.setMatterOccupiedCoolingSetpoint(ocs: Int16(val), deviceId: deviceId)
+                self.currentLevel = Int(value)
+                self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: deviceId)
                 DispatchQueue.main.async {
                     self.slider.setValue(Float(self.currentLevel), animated: true)
+                }
+            }
+        }
+    }
+    
+    func setupInitialControllerOCSValues(isDeviceOffline: Bool) {
+        DispatchQueue.main.async {
+            self.minLabel.text = "7"
+            self.maxLabel.text = "30"
+            self.slider.minimumValue = 7.0
+            self.slider.maximumValue = 30.0
+            self.slider.setValue(20.0, animated: true)
+        }
+        if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let deviceId = self.deviceId {
+            if let status = node.getMatterSystemMode(deviceId: deviceId) {
+                if status == ESPMatterConstants.heat {
+                    if let ocs = MatterControllerParser.shared.getCurrentOccupiedCoolingSetpoint(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                        node.setMatterOccupiedCoolingSetpoint(ocs: Int16(ocs), deviceId: deviceId)
+                        self.currentLevel = ocs
+                        DispatchQueue.main.async {
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        }
+                    }
+                } else {
+                    self.currentLevel = 20
+                    if let ohs = MatterControllerParser.shared.getCurrentOccupiedHeatingSetpoint(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                        node.setMatterOccupiedHeatingSetpoint(ohs: Int16(ohs), deviceId: deviceId)
+                        self.currentLevel = ohs
+                    }
+                    DispatchQueue.main.async {
+                        self.minLabel.text = "16"
+                        self.maxLabel.text = "32"
+                        self.slider.minimumValue = 16.0
+                        self.slider.maximumValue = 32.0
+                        self.slider.setValue(Float(self.currentLevel), animated: true)
+                    }
+                }
+            }
+        }
+    }
+    
+    //MARK: Occupied cooling/heating setpoint
+    /// Setup initial level values
+    func setupInitialCoolingSetpointValues2(isDeviceOffline: Bool) {
+        DispatchQueue.main.async {
+            self.minLabel.text = "7"
+            self.maxLabel.text = "30"
+            self.slider.minimumValue = 7.0
+            self.slider.maximumValue = 30.0
+            self.slider.setValue(20.0, animated: true)
+        }
+        if let grpId = self.nodeGroup?.groupID, let node = self.node, let id = self.deviceId {
+            if let status = node.getMatterSystemMode(deviceId: id) {
+                if status == "Heat" {
+                    if let levelValue = node.getMatterOccupiedHeatingSetpoint(deviceId: id) {
+                        self.currentLevel = Int(levelValue)
+                        DispatchQueue.main.async {
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        }
+                    }
+                    if !isDeviceOffline {
+                        self.subscribeToOccupiedHeatingSetpoint()
+                    }
+                } else if status != "Heat" {
+                    DispatchQueue.main.async {
+                        self.minLabel.text = "16"
+                        self.maxLabel.text = "32"
+                        self.slider.minimumValue = 16.0
+                        self.slider.maximumValue = 32.0
+                        self.slider.setValue(20.0, animated: true)
+                    }
+                    if let levelValue = node.getMatterOccupiedCoolingSetpoint(deviceId: id) {
+                        self.currentLevel = Int(levelValue)
+                        DispatchQueue.main.async {
+                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        }
+                    }
+                    if !isDeviceOffline {
+                        self.subscribeToOccupiedCoolingSetpoint()
+                    }
                 }
             }
         }
@@ -89,7 +167,7 @@ extension ParamSliderTableViewCell {
             if let status = status {
                 if status == "Heat" {
                     if let levelValue = node.getMatterOccupiedHeatingSetpoint(deviceId: id) {
-                        self.currentLevel = Int(levelValue)/100
+                        self.currentLevel = Int(levelValue)
                         DispatchQueue.main.async {
                             self.slider.setValue(Float(self.currentLevel), animated: true)
                         }
@@ -117,11 +195,10 @@ extension ParamSliderTableViewCell {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
             ESPMTRCommissioner.shared.subscribeToOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
                 if let value = value {
-                    let val = value.intValue/100
-                    self.currentLevel = val
-                    self.node?.setMatterOccupiedCoolingSetpoint(ocs: Int16(val), deviceId: id)
+                    self.currentLevel = Int(value)
+                    self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: id)
                     DispatchQueue.main.async {
-                        self.slider.setValue(Float(val), animated: true)
+                        self.slider.setValue(Float(value), animated: true)
                     }
                 }
             }
@@ -133,11 +210,10 @@ extension ParamSliderTableViewCell {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
             ESPMTRCommissioner.shared.subscribeToOccupiedHeatingSetpoint(groupId: grpId, deviceId: id) { value in
                 if let value = value {
-                    let val = value.intValue/100
-                    self.currentLevel = val
-                    self.node?.setMatterOccupiedHeatingSetpoint(ohs: Int16(val), deviceId: id)
+                    self.currentLevel = Int(value)
+                    self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: id)
                     DispatchQueue.main.async {
-                        self.slider.setValue(Float(val), animated: true)
+                        self.slider.setValue(Float(value), animated: true)
                     }
                 }
             }

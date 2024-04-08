@@ -24,7 +24,7 @@ import UIKit
 @available(iOS 16.4, *)
 protocol ParamSliderLevelControlProtocol {
     func setupInitialLevelValues()
-    func getLevelController(timeout: Float, groupId: String, deviceId: UInt64, controller: MTRDeviceController, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void)
+    func getLevelController(groupId: String, deviceId: UInt64, controller: MTRDeviceController, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void)
     func getMinLevelValue(levelControl: MTRBaseClusterLevelControl, completionHandler: @escaping (NSNumber?, Error?) -> Void)
     func getMaxLevelValue(levelControl: MTRBaseClusterLevelControl, completionHandler: @escaping (NSNumber?, Error?) -> Void)
     func getCurrentLevelValue(levelControl: MTRBaseClusterLevelControl, completionHandler: @escaping (NSNumber?, Error?) -> Void)
@@ -74,7 +74,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
         self.setupInitialLevelValues()
         if self.nodeConnectionStatus == .local {
             if let controller = ESPMTRCommissioner.shared.sController {
-                self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: controller) { levelControl in
+                self.getLevelController(groupId: groupId, deviceId: deviceId, controller: controller) { levelControl in
                     if let levelControl = levelControl {
                         self.getMinLevelValue(levelControl: levelControl) { min, _ in
                             self.getCurrentLevelValue(levelControl: levelControl) { current, _ in
@@ -116,7 +116,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
     ///   - deviceId: device id
     ///   - controller: controller
     ///   - completionHandler: completion handler
-    func getLevelController(timeout: Float, groupId: String, deviceId: UInt64, controller: MTRDeviceController, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void) {
+    func getLevelController(groupId: String, deviceId: UInt64, controller: MTRDeviceController, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void) {
         let (_, endpoint) = ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId)
         if let endpoint = endpoint, let point = UInt16(endpoint) {
             controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
@@ -168,7 +168,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
         let finalValue = Int(val*2.54)
         if nodeConnectionStatus == .local {
             if let cont = ESPMTRCommissioner.shared.sController {
-                self.getLevelController(timeout: 10.0, groupId: groupId, deviceId: deviceId, controller: cont) { controller in
+                self.getLevelController(groupId: groupId, deviceId: deviceId, controller: cont) { controller in
                     if let controller = controller {
                         let levelParams = MTRLevelControlClusterMoveToLevelWithOnOffParams()
                         levelParams.level = NSNumber(value: finalValue)
