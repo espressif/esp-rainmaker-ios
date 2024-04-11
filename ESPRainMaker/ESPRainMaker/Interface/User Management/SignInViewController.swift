@@ -29,8 +29,9 @@ protocol RainmakerControllerFlowDelegate: AnyObject {
 }
 #endif
 
-protocol FlowCancelledDelegate: AnyObject {
+protocol AgreementViewDisplayDelegate: AnyObject {
     func flowCancelled()
+    func passwordResetSuccess()
 }
 
 class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextViewDelegate {
@@ -447,7 +448,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
                 let alertController = UIAlertController(title: "Missing Required Fields",
                                                         message: "Username / Password are required for registration.",
                                                         preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                 alertController.addAction(okAction)
                 present(alertController, animated: true, completion: nil)
                 return
@@ -457,7 +458,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
                 let alertController = UIAlertController(title: "Mismatch",
                                                         message: "Re-entered password do not match.",
                                                         preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                 alertController.addAction(okAction)
                 present(alertController, animated: true, completion: nil)
                 return
@@ -467,7 +468,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
                 let alertController = UIAlertController(title: "Error!!",
                                                         message: "To proceed, please agree to privacy policy and terms of use.",
                                                         preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                 alertController.addAction(okAction)
                 present(alertController, animated: true, completion: nil)
                 return
@@ -576,7 +577,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
             let alertController = UIAlertController(title: "Error!!",
                                                     message: "To proceed, please agree to privacy policy and terms of use.",
                                                     preferredStyle: .alert)
-            let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
             alertController.addAction(okAction)
             present(alertController, animated: true, completion: nil)
             return
@@ -799,7 +800,11 @@ extension SignInViewController: ESPIdProviderLoginPresenter {
     }
 }
 
-extension SignInViewController: FlowCancelledDelegate {
+extension SignInViewController: AgreementViewDisplayDelegate {
+    
+    func passwordResetSuccess() {
+        showAgreementView = false
+    }
     
     func flowCancelled() {
         showAgreementView = false

@@ -26,7 +26,7 @@ class ResetPasswordViewController: UIViewController {
     @IBOutlet var infoLabel: UILabel!
     
     var userName: String!
-    weak var forgotPasswordDelegate: FlowCancelledDelegate?
+    weak var forgotPasswordDelegate: AgreementViewDisplayDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,7 +82,7 @@ class ResetPasswordViewController: UIViewController {
         let alertController = UIAlertController(title: title,
                                                 message: message,
                                                 preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
         alertController.addAction(okAction)
 
         present(alertController, animated: true, completion: nil)
@@ -118,9 +118,12 @@ extension ResetPasswordViewController: ESPForgotPasswordPresentationLogic {
         DispatchQueue.main.async { [self] in
             Utility.hideLoader(view: self.view)
             if let _ = error {
-                self.handleError(error: error, buttonTitle: "Ok")
+                self.handleError(error: error, buttonTitle: "OK")
             } else {
-                self.navigationController?.popToRootViewController(animated: true)
+                self.forgotPasswordDelegate?.passwordResetSuccess()
+                self.alertUser(title: "Success", message: "Password successfully changed!", buttonTitle: "OK") {
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
             }
         }
     }

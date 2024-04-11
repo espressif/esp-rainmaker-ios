@@ -22,7 +22,7 @@ class ForgotPasswordViewController: UIViewController {
     
     @IBOutlet var username: UITextField!
     var sender: AnyObject!
-    weak var forgotPasswordDelegate: FlowCancelledDelegate?
+    weak var forgotPasswordDelegate: AgreementViewDisplayDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +53,7 @@ class ForgotPasswordViewController: UIViewController {
             let alertController = UIAlertController(title: "Missing UserName",
                                                     message: "Please enter a valid user name.",
                                                     preferredStyle: .alert)
-            let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
             alertController.addAction(okAction)
 
             present(alertController, animated: true, completion: nil)
@@ -81,8 +81,8 @@ extension ForgotPasswordViewController: ESPForgotPasswordPresentationLogic {
     func requestedForgotPassword(withError error: ESPAPIError?) {
         DispatchQueue.main.async { [self] in
             Utility.hideLoader(view: self.view)
-            if let err = error {
-                self.handleError(error: error, buttonTitle: "Ok")
+            if let _ = error {
+                self.handleError(error: error, buttonTitle: "OK")
             } else {
                 if let sender = self.sender {
                     self.performSegue(withIdentifier: "confirmForgotPasswordSegue", sender: sender)
@@ -95,7 +95,12 @@ extension ForgotPasswordViewController: ESPForgotPasswordPresentationLogic {
     
 }
 
-extension ForgotPasswordViewController: FlowCancelledDelegate {
+extension ForgotPasswordViewController: AgreementViewDisplayDelegate {
+    
+    func passwordResetSuccess() {
+        self.forgotPasswordDelegate?.passwordResetSuccess()
+    }
+    
     
     func flowCancelled() {
         self.forgotPasswordDelegate?.flowCancelled()
