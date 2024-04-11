@@ -48,6 +48,7 @@ class Node: Codable {
     var matter_node_id: String?
     var metadata: [String: Any]?
     var node_type: String?
+    var securityType: Int?
 
     enum CodingKeys: String, CodingKey {
         case node_id = "id"
@@ -70,6 +71,7 @@ class Node: Codable {
         case matter_node_id
         case metadata
         case node_type
+        case securityType
     }
 
     func encode(to encoder: Encoder) throws {
@@ -112,6 +114,9 @@ class Node: Codable {
         }
         if let node_type = node_type {
             try container.encode(node_type, forKey: .node_type)
+        }
+        if let securityType = securityType {
+            try container.encode(securityType, forKey: .securityType)
         }
     }
 
@@ -177,6 +182,9 @@ class Node: Codable {
         }
         if let timestamp = try? container.decode(Int.self, forKey: .timestamp) {
             self.timestamp = timestamp
+        }
+        if let securityType = try? container.decodeIfPresent(Int?.self, forKey: .securityType) {
+            self.securityType = securityType
         }
         fromLocalStorage = true
     }

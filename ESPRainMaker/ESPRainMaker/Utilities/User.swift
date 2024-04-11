@@ -121,7 +121,11 @@ class User {
     private func setEncryptionOnLocalControl(node: Node) {
         if let service = localServices[node.node_id ?? ""] {
             if node.supportsEncryption {
-                service.espLocalDevice = ESPLocalDevice(name: "esp", security: .secure, transport: .softap, proofOfPossession: node.pop, softAPPassword: nil, advertisementData: nil)
+                var userName: String?
+                if let securityType = node.securityType, securityType == 2 {
+                    userName = Configuration.shared.espProvSetting.sec2Username
+                }
+                service.espLocalDevice = ESPLocalDevice(name: "esp", security: .secure, transport: .softap, proofOfPossession: node.pop, username: userName, softAPPassword: nil, advertisementData: nil)
                 service.espLocalDevice.espSoftApTransport = ESPSoftAPTransport(baseUrl: service.hostname)
             }
             service.espLocalDevice.hostname = service.hostname
