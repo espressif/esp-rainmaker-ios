@@ -39,4 +39,7 @@ struct ESPNotificationKeys {
     static let acceptKey = "accept"
     static let connectivityKey = "connectivity"
     static let connectedKey = "connected"
+    static let sharedFrom = "shared_from"
+    static let groupName = "group_name"
+    static let groups = "groups"
 }

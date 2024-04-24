@@ -23,6 +23,7 @@ import UIKit
 enum UserNavigationHandler {
     case homeScreen
     case notificationViewController
+    case groupSharing
     
     func navigateToPage() {
         // Gets top view controller currently visible on app.
@@ -53,7 +54,7 @@ enum UserNavigationHandler {
             }
             navigateToHomeScreen()
         case .notificationViewController:
-            // Checks if current screen is Notfication screen.
+            // Checks if current screen is Notification screen.
             if top?.isKind(of: NotificationsViewController.self) ?? false {
                 if let notificationVC = top as? NotificationsViewController {
                     notificationVC.refreshData()
@@ -61,6 +62,15 @@ enum UserNavigationHandler {
                 }
             }
             navigateToNotificationVC()
+        case .groupSharing:
+            // Checks if current screen is Notification screen.
+            if top?.isKind(of: NodeGroupSharingRequestsViewController.self) ?? false {
+                if let nodeGroupSharingVC = top as? NodeGroupSharingRequestsViewController {
+                    nodeGroupSharingVC.refreshSharingData()
+                    return
+                }
+            }
+            navigateToGroupSharingVC()
         }
     }
     
@@ -93,6 +103,24 @@ enum UserNavigationHandler {
                         let navigationVC = viewController as? DevicesNavigationController
                         User.shared.updateDeviceList = true
                         navigationVC?.popToRootViewController(animated: false)
+                    }
+                }
+            }
+        }
+    }
+    
+    // Method to redirect user to group sharing screen.
+    private func navigateToGroupSharingVC() {
+        if let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
+            if let viewControllers = tabBarController.viewControllers {
+                for viewController in viewControllers {
+                    if viewController.isKind(of: UserNavigationController.self) {
+                        tabBarController.selectedViewController = viewController
+                        tabBarController.tabBar.isHidden = true
+                        let settingsPageViewController = (viewController as! UINavigationController).viewControllers.first
+                        let userStoryBoard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
+                        let nodeGroupSharingVC = userStoryBoard.instantiateViewController(withIdentifier: NodeGroupSharingRequestsViewController.storyboardId) as! NodeGroupSharingRequestsViewController
+                        settingsPageViewController?.navigationController?.pushViewController(nodeGroupSharingVC, animated: true)
                     }
                 }
             }

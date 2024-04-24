@@ -21,7 +21,7 @@ import Foundation
 extension ESPNotificationHandler {
     
     // Method to update node connection status with notification payload.
-    func updateData() {
+    mutating func updateData() {
         switch eventType {
         case .nodeConnected, .nodeDisconnected:
             // Gets node id from the event data.
@@ -39,6 +39,10 @@ extension ESPNotificationHandler {
         case .nodeDissassociated:
             // Triggered local notification to update device list.
             NotificationCenter.default.post(Notification(name: Notification.Name(Constants.refreshDeviceList)))
+        case .nodeGroupAdded:
+            if let groups = eventData[ESPNotificationKeys.groups] as? [String:Any], let groupName = groups[ESPNotificationKeys.groupName] as? String {
+                self.notification.body = "New group(s) [\(groupName)] added."
+            }
         default:
             return
         }

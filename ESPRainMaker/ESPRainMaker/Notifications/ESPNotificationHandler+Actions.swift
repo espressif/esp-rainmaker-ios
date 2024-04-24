@@ -26,10 +26,17 @@ extension ESPNotificationHandler {
     func handleEvent(_ category: ESPNotificationCategory?, _ action: String) {
         switch category {
         case .addSharing:
-            ESPNodeSharingAddEvent(eventData,notification).handleAction(action)
+            switch eventType {
+            case .groupSharingAdd:
+                ESPNodeGroupSharingAddEvent(eventData,notification).handleAction(action)
+            default:
+                ESPNodeSharingAddEvent(eventData,notification).handleAction(action)
+            }
         default:
             var navigationHandler: UserNavigationHandler?
             switch eventType {
+            case .groupSharingRemoved, .nodeGroupAdded:
+                navigationHandler = .groupSharing
             case .nodeAssociated, .nodeDissassociated, .nodeConnected, .nodeDisconnected:
                 navigationHandler = .homeScreen
             default:

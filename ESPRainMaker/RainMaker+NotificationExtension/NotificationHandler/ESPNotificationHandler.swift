@@ -27,6 +27,9 @@ enum ESPNotificationEvents: String {
     case nodeSharingAdd = "rmaker.event.user_node_sharing_add"
     case nodeAlert = "rmaker.event.alert"
     case automationTrigger = "rmaker.event.node_automation_trigger"
+    case groupSharingAdd = "rmaker.event.user_node_group_sharing_add"
+    case groupSharingRemoved = "rmaker.event.user_node_group_removed"
+    case nodeGroupAdded = "rmaker.event.user_node_group_added"
 }
 
 // Struct to handle all type of notification events.
@@ -68,6 +71,17 @@ struct ESPNotificationHandler: ESPNotificationProtocol {
             modifiedNotification = ESPNodeConnectedEvent(eventData, notification).modifiedContent()
         case .nodeDisconnected:
             modifiedNotification = ESPNodeDisconnectedEvent(eventData, notification).modifiedContent()
+        case .groupSharingAdd:
+            if let accept = eventData[ESPNotificationKeys.acceptKey] as? Bool {
+                if accept {
+                    modifiedNotification = ESPNodeGroupSharingAcceptedEvent(eventData, notification).modifiedContent()
+                    break
+                } else {
+                    modifiedNotification = ESPNodeGroupSharingDeclinedEvent(eventData, notification).modifiedContent()
+                    break
+                }
+            }
+            modifiedNotification = ESPNodeGroupSharingAddEvent(eventData, notification).modifiedContent()
         case .nodeSharingAdd:
             if let accept = eventData[ESPNotificationKeys.acceptKey] as? Bool {
                 if accept {
