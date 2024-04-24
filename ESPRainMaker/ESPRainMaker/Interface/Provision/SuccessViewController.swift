@@ -28,6 +28,10 @@ class SuccessViewController: UIViewController {
     var sessionInit = true
     var ssid: String!
     var passphrase: String!
+    var isThread: Bool = false
+    var shouldScanThreadNetworks: Bool = false
+    var threadOperationalDataset: Data?
+    var espthreadNetwork: ESPThreadNetwork?
     var addDeviceStatusTimeout: Timer?
     var step1Failed = false
     var count: Int = 0
@@ -74,7 +78,7 @@ class SuccessViewController: UIViewController {
         step1Indicator.isHidden = false
         step1Indicator.startAnimating()
 
-        espDevice.provision(ssid: ssid, passPhrase: passphrase) { status in
+        self.provision { status in
             switch status {
             case .success:
                 self.step3SendRequestToAddDevice()
@@ -91,6 +95,18 @@ class SuccessViewController: UIViewController {
                 }
             case .configApplied:
                 self.step2applyConfigurations()
+            }
+        }
+    }
+    
+    func provision(completionHandler: @escaping (ESPProvisionStatus) -> Void) {
+        if let threadOperationalDataset = self.threadOperationalDataset {
+            espDevice.provision(ssid: nil, passPhrase: nil, threadOperationalDataset: threadOperationalDataset) { status in
+                completionHandler(status)
+            }
+        } else {
+            espDevice.provision(ssid: ssid, passPhrase: passphrase, threadOperationalDataset: nil) { status in
+                completionHandler(status)
             }
         }
     }

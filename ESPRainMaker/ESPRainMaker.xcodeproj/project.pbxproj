@@ -114,12 +114,21 @@
 		0CA16E5A2B355B25006AC005 /* CustomInfoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0CA16E592B355B25006AC005 /* CustomInfoCell.xib */; };
 		0CA382CF275D3BC800EB3417 /* SceneListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA382CE275D3BC800EB3417 /* SceneListViewController.swift */; };
 		0CA382D1275D49A100EB3417 /* SceneListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA382D0275D49A100EB3417 /* SceneListCell.swift */; };
+		0CAC43D22C466A770047B1DB /* ThreadSuccessViewController+SendThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43CC2C466A770047B1DB /* ThreadSuccessViewController+SendThread.swift */; };
+		0CAC43D32C466A770047B1DB /* ThreadSuccessViewController+NodeAssocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43CA2C466A770047B1DB /* ThreadSuccessViewController+NodeAssocation.swift */; };
+		0CAC43D42C466A770047B1DB /* ThreadNetworkSelectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43CF2C466A770047B1DB /* ThreadNetworkSelectionVC.swift */; };
+		0CAC43D52C466A770047B1DB /* ThreadSuccessViewController+RequestToAddDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43CB2C466A770047B1DB /* ThreadSuccessViewController+RequestToAddDevice.swift */; };
+		0CAC43D62C466A770047B1DB /* ThreadSuccessViewController+SetupNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43CD2C466A770047B1DB /* ThreadSuccessViewController+SetupNode.swift */; };
+		0CAC43D72C466A770047B1DB /* ThreadSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43C92C466A770047B1DB /* ThreadSuccessViewController.swift */; };
+		0CAC43D82C466A770047B1DB /* UIViewController+ThreadProvManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43D02C466A770047B1DB /* UIViewController+ThreadProvManagerProtocol.swift */; };
+		0CAC43DA2C466AA60047B1DB /* ESPScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43D92C466AA60047B1DB /* ESPScannerViewController.swift */; };
+		0CAC43DC2C466B530047B1DB /* ESPScanConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43DB2C466B530047B1DB /* ESPScanConstants.swift */; };
+		0CAC43DE2C466B620047B1DB /* ScannerViewController+WifiProvManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAC43DD2C466B620047B1DB /* ScannerViewController+WifiProvManagerProtocol.swift */; };
 		0CADAB812A3B3F6F0017CB07 /* ESPUpdateNodeGroupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CADAB802A3B3F6F0017CB07 /* ESPUpdateNodeGroupService.swift */; };
 		0CAE76F42A728BE10011D144 /* ESPMTRCommissioner+OpCreds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAE76F32A728BE10011D144 /* ESPMTRCommissioner+OpCreds.swift */; };
 		0CB234E92705751A000D0663 /* AppDelegate+UserManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */; };
 		0CB34FEE283E31D300DD1813 /* ESPQRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34FED283E31D300DD1813 /* ESPQRScannerView.swift */; };
 		0CB34FF0283E325A00DD1813 /* Scanner.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CB34FEF283E325900DD1813 /* Scanner.storyboard */; };
-		0CB34FF2283E35D800DD1813 /* ESPScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34FF1283E35D800DD1813 /* ESPScannerViewController.swift */; };
 		0CB4A0652A86548B00908AE0 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB4A0642A86548B00908AE0 /* Matter.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		0CBAC3C5278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBAC3C4278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift */; };
 		0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */; };
@@ -745,12 +754,21 @@
 		0CA16E592B355B25006AC005 /* CustomInfoCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomInfoCell.xib; sourceTree = "<group>"; };
 		0CA382CE275D3BC800EB3417 /* SceneListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneListViewController.swift; sourceTree = "<group>"; };
 		0CA382D0275D49A100EB3417 /* SceneListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneListCell.swift; sourceTree = "<group>"; };
+		0CAC43C92C466A770047B1DB /* ThreadSuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSuccessViewController.swift; sourceTree = "<group>"; };
+		0CAC43CA2C466A770047B1DB /* ThreadSuccessViewController+NodeAssocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThreadSuccessViewController+NodeAssocation.swift"; sourceTree = "<group>"; };
+		0CAC43CB2C466A770047B1DB /* ThreadSuccessViewController+RequestToAddDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThreadSuccessViewController+RequestToAddDevice.swift"; sourceTree = "<group>"; };
+		0CAC43CC2C466A770047B1DB /* ThreadSuccessViewController+SendThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThreadSuccessViewController+SendThread.swift"; sourceTree = "<group>"; };
+		0CAC43CD2C466A770047B1DB /* ThreadSuccessViewController+SetupNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThreadSuccessViewController+SetupNode.swift"; sourceTree = "<group>"; };
+		0CAC43CF2C466A770047B1DB /* ThreadNetworkSelectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadNetworkSelectionVC.swift; sourceTree = "<group>"; };
+		0CAC43D02C466A770047B1DB /* UIViewController+ThreadProvManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+ThreadProvManagerProtocol.swift"; sourceTree = "<group>"; };
+		0CAC43D92C466AA60047B1DB /* ESPScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScannerViewController.swift; sourceTree = "<group>"; };
+		0CAC43DB2C466B530047B1DB /* ESPScanConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScanConstants.swift; sourceTree = "<group>"; };
+		0CAC43DD2C466B620047B1DB /* ScannerViewController+WifiProvManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScannerViewController+WifiProvManagerProtocol.swift"; sourceTree = "<group>"; };
 		0CADAB802A3B3F6F0017CB07 /* ESPUpdateNodeGroupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPUpdateNodeGroupService.swift; sourceTree = "<group>"; };
 		0CAE76F32A728BE10011D144 /* ESPMTRCommissioner+OpCreds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPMTRCommissioner+OpCreds.swift"; sourceTree = "<group>"; };
 		0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "AppDelegate+UserManagement.swift"; path = "ESPRainMaker/AppDelegate+UserManagement.swift"; sourceTree = SOURCE_ROOT; };
 		0CB34FED283E31D300DD1813 /* ESPQRScannerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPQRScannerView.swift; sourceTree = "<group>"; };
 		0CB34FEF283E325900DD1813 /* Scanner.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Scanner.storyboard; sourceTree = "<group>"; };
-		0CB34FF1283E35D800DD1813 /* ESPScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPScannerViewController.swift; sourceTree = "<group>"; };
 		0CB4A0642A86548B00908AE0 /* Matter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Matter.framework; path = System/Library/Frameworks/Matter.framework; sourceTree = SDKROOT; };
 		0CBAC3C4278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDeviceActionCellDelegate.swift; sourceTree = "<group>"; };
 		0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSceneActionAllowedProtocol.swift; sourceTree = "<group>"; };
@@ -1473,6 +1491,7 @@
 		0C9850F02C2A91AD00D0E2B8 /* ScannerViewController */ = {
 			isa = PBXGroup;
 			children = (
+				0CAC43DD2C466B620047B1DB /* ScannerViewController+WifiProvManagerProtocol.swift */,
 				F13F273D238CF6170003AABB /* ScannerViewController.swift */,
 				0C9850F12C2A91BF00D0E2B8 /* ScannerViewController+ESPCBManagerProtocol.swift */,
 			);
@@ -1488,6 +1507,28 @@
 				0C1C7C81276162CC0062867A /* SceneSelectDevicesVC.swift */,
 			);
 			path = Interface;
+			sourceTree = "<group>";
+		};
+		0CAC43CE2C466A770047B1DB /* ThreadSuccessViewController */ = {
+			isa = PBXGroup;
+			children = (
+				0CAC43C92C466A770047B1DB /* ThreadSuccessViewController.swift */,
+				0CAC43CA2C466A770047B1DB /* ThreadSuccessViewController+NodeAssocation.swift */,
+				0CAC43CB2C466A770047B1DB /* ThreadSuccessViewController+RequestToAddDevice.swift */,
+				0CAC43CC2C466A770047B1DB /* ThreadSuccessViewController+SendThread.swift */,
+				0CAC43CD2C466A770047B1DB /* ThreadSuccessViewController+SetupNode.swift */,
+			);
+			path = ThreadSuccessViewController;
+			sourceTree = "<group>";
+		};
+		0CAC43D12C466A770047B1DB /* Thread */ = {
+			isa = PBXGroup;
+			children = (
+				0CAC43CE2C466A770047B1DB /* ThreadSuccessViewController */,
+				0CAC43CF2C466A770047B1DB /* ThreadNetworkSelectionVC.swift */,
+				0CAC43D02C466A770047B1DB /* UIViewController+ThreadProvManagerProtocol.swift */,
+			);
+			path = Thread;
 			sourceTree = "<group>";
 		};
 		0CB4A0632A83C8A500908AE0 /* Custom Clusters */ = {
@@ -1841,7 +1882,6 @@
 				0CB234E82705751A000D0663 /* AppDelegate+UserManagement.swift */,
 				0C5110012A25F712002414FD /* ESPMatter.storyboard */,
 				F1390F2B27D86C7200F80DFB /* DeviceAutomation.storyboard */,
-				0CB34FF1283E35D800DD1813 /* ESPScannerViewController.swift */,
 				0CB34FEF283E325900DD1813 /* Scanner.storyboard */,
 				F10C2B2925EB82D800B60696 /* Settings.storyboard */,
 				F1012F61251110B300839F06 /* Schedule.storyboard */,
@@ -1926,6 +1966,7 @@
 		F1072BBB256F9B2C00D7CE2C /* Provision */ = {
 			isa = PBXGroup;
 			children = (
+				0CAC43DB2C466B530047B1DB /* ESPScanConstants.swift */,
 				0C9850F02C2A91AD00D0E2B8 /* ScannerViewController */,
 				F191CD452511231C00BDCEF1 /* ClaimViewController.swift */,
 				F191CD442511231C00BDCEF1 /* ConnectViewController.swift */,
@@ -1933,8 +1974,9 @@
 				F1CA4BC0260FE7EC00F12D14 /* JoinNetworkViewController.swift */,
 				144149432126AE09002AD5E1 /* SuccessViewController.swift */,
 				F151FF1D24827343006F514E /* WifiListTableViewCell.swift */,
-				F1072BC2256F9BA800D7CE2C /* SoftAP */,
 				F1072BBE256F9B3D00D7CE2C /* BLE */,
+				F1072BC2256F9BA800D7CE2C /* SoftAP */,
+				0CAC43D12C466A770047B1DB /* Thread */,
 			);
 			path = Provision;
 			sourceTree = "<group>";
@@ -2607,6 +2649,7 @@
 				F133494025DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.swift */,
 				F133494125DE94BB00CCB308 /* DeviceGroupEmptyDeviceCollectionViewCell.xib */,
 				F1B1012A26AF4790004B5537 /* DevicesNavigationController.swift */,
+				0CAC43D92C466AA60047B1DB /* ESPScannerViewController.swift */,
 			);
 			path = Devices;
 			sourceTree = "<group>";
@@ -3104,6 +3147,7 @@
 				F16A9F5329CC66D30009F839 /* Date+Seconds.swift in Sources */,
 				0C31C3062BB3F565009ABB22 /* ClusterSelectionViewController.swift in Sources */,
 				F1C352D026DBC40900A88893 /* ESPLocalDevice.swift in Sources */,
+				0CAC43DA2C466AA60047B1DB /* ESPScannerViewController.swift in Sources */,
 				F1CC12542780FC640007634C /* ESPYAxisGenerator.swift in Sources */,
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
 				F195745925B5AD09005F6601 /* MembersInfoTableViewCell.swift in Sources */,
@@ -3269,6 +3313,7 @@
 				F1CC3C1B295D866D0000D6DC /* ESPOTAUpdateStatus.swift in Sources */,
 				0C387F7A2A2ECC5700C5EFA4 /* RequestAcceptedCell.swift in Sources */,
 				F1124F64268D099300FA0B9E /* ESPNodeSharingAcceptedEvent.swift in Sources */,
+				0CAC43DE2C466B620047B1DB /* ScannerViewController+WifiProvManagerProtocol.swift in Sources */,
 				0C80AA3326FDBD4B00480C53 /* ESPNoRefreshTokenLogic.swift in Sources */,
 				F10B076E25D11CCD00723254 /* NodeGroupTableViewCell.swift in Sources */,
 				F1DF2E32268ADB8300D3C8D6 /* ESPNodeDisconnectedEvent.swift in Sources */,
@@ -3364,6 +3409,7 @@
 				F1E132B52680C34700ED7E03 /* AppDelegate+Notifications.swift in Sources */,
 				F1C76D592687D463009E217D /* ESPNotificationHandler.swift in Sources */,
 				0C66B2242AF90BDF00BEA3C3 /* ESPMTRCommissioner+ParticipantData.swift in Sources */,
+				0CAC43DC2C466B530047B1DB /* ESPScanConstants.swift in Sources */,
 				0C50EC8B2A39E2A70065DAB2 /* DeviceViewController+OnOffDelegate.swift in Sources */,
 				F18BADCE24CAC1EE00A696AE /* ESPSchedule.swift in Sources */,
 				F191CD492511235700BDCEF1 /* esp_rmaker_claim.pb.swift in Sources */,
@@ -3371,6 +3417,13 @@
 				F1124F59268CEA3000FA0B9E /* ESPNotificationCategory.swift in Sources */,
 				F1A057AE278DF8E400485C23 /* UIView+DropShadow.swift in Sources */,
 				F191CD41251122D300BDCEF1 /* AssistedClaiming.swift in Sources */,
+				0CAC43D22C466A770047B1DB /* ThreadSuccessViewController+SendThread.swift in Sources */,
+				0CAC43D32C466A770047B1DB /* ThreadSuccessViewController+NodeAssocation.swift in Sources */,
+				0CAC43D42C466A770047B1DB /* ThreadNetworkSelectionVC.swift in Sources */,
+				0CAC43D52C466A770047B1DB /* ThreadSuccessViewController+RequestToAddDevice.swift in Sources */,
+				0CAC43D62C466A770047B1DB /* ThreadSuccessViewController+SetupNode.swift in Sources */,
+				0CAC43D72C466A770047B1DB /* ThreadSuccessViewController.swift in Sources */,
+				0CAC43D82C466A770047B1DB /* UIViewController+ThreadProvManagerProtocol.swift in Sources */,
 				F1390F2827D86C5E00F80DFB /* ESPAutomationAPIWorker.swift in Sources */,
 				F1FFC90725D4872C00DD26C6 /* SelectNodeFooterCollectionReusableView.swift in Sources */,
 				F1CC3C22295D866D0000D6DC /* ESPCheckOTAUpdateService.swift in Sources */,
@@ -3419,7 +3472,6 @@
 				0CF69242270A34140098F515 /* AppDelegate+ESPAlexa.swift in Sources */,
 				F1AC6D7E27A447B20051F6E7 /* TriggerTableViewCell.swift in Sources */,
 				F1A866A527EBC4E200A9858B /* AutomationEventTableViewCell.swift in Sources */,
-				0CB34FF2283E35D800DD1813 /* ESPScannerViewController.swift in Sources */,
 				F1C76D66268875A7009E217D /* ESPLocalStorageNodes.swift in Sources */,
 				0CD3591B2A2D25E30081017C /* ESPAddNodeToFabricResponse.swift in Sources */,
 				0C387F6D2A2E779000C5EFA4 /* ESPGetUserNOCService.swift in Sources */,
@@ -3791,7 +3843,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.2.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D ESPRainMakerMatter";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
@@ -4128,7 +4180,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.2.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;

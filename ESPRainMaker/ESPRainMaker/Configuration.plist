@@ -32,6 +32,8 @@
             <true/>
             <key>Enable Local Control</key>
             <true/>
+            <key>Local Control Security 2 Username</key>
+            <string>wifiprov</string>
             <key>Enable Sharing</key>
             <true/>
             <key>Enable Scene</key>
@@ -67,6 +69,8 @@
             <true/>
             <key>Security 2 Username</key>
             <string>wifiprov</string>
+            <key>Security 2 Username Thread</key>
+            <string>threadprov</string>
         </dict>
         <key>App Group</key>
         <string>group.com.espressif.rainmaker.softap</string>

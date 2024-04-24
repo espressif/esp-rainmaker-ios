@@ -45,6 +45,24 @@ extension String {
 
 extension Data {
     
+    init?(hexStr: String) {
+        // Ensure the hex string is even length
+        let len = hexStr.count / 2
+        guard hexStr.count % 2 == 0 else { return nil }
+        
+        var data = Data(capacity: len)
+        var index = hexStr.startIndex
+        for _ in 0..<len {
+            let nextIndex = hexStr.index(index, offsetBy: 2)
+            guard nextIndex <= hexStr.endIndex else { return nil }
+            let byteString = hexStr[index..<nextIndex]
+            guard let num = UInt8(byteString, radix: 16) else { return nil }
+            data.append(num)
+            index = nextIndex
+        }
+        self = data
+    }
+    
     var hexadecimalString: String {
         return map { String(format: "%02hhx", $0) }.joined()
     }

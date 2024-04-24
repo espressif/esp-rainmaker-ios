@@ -87,5 +87,27 @@ extension ESPMTRCommissioner {
             }
         }
     }
+    
+    /// Get matter device type list
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completionHandler: device type
+    func getAllDeviceTypeList(deviceId: UInt64, completionHandler: @escaping ([MTRDescriptorClusterDeviceTypeStruct]?) -> Void) {
+        getDescriptor(deviceId: deviceId, endPoint: 1) { desc in
+            if let desc = desc {
+                desc.readAttributeDeviceTypeList { values, error in
+                    guard let _ = error else {
+                        if let values = values as? [MTRDescriptorClusterDeviceTypeStruct], values.count > 0 {
+                            completionHandler(values)
+                        } else {
+                            completionHandler(nil)
+                        }
+                        return
+                    }
+                    completionHandler(nil)
+                }
+            }
+        }
+    }
 }
 #endif

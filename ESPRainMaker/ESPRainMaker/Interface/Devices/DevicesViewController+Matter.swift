@@ -134,7 +134,7 @@ extension DevicesViewController: ESPGetNodeGroupsPresentationLogic {
                         updateCATService.updateCATId {
                             DispatchQueue.main.async {
                                 self.stopMatterDiscovery()
-                                self.searchForMatterDevicesOnLocalNetwork()
+                                self.searchForMatterDevicesOnLocalNetwork() {}
                             }
                         }
                     }

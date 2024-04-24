@@ -24,21 +24,29 @@ import SystemConfiguration.CaptiveNetwork
 import UIKit
 
 class ProvisionViewController: UIViewController {
-    @IBOutlet var passphraseTextfield: UITextField!
-    @IBOutlet var currentSSIDLabel: UILabel!
     @IBOutlet var provisionButton: UIButton!
-    @IBOutlet var savePasswordButton: UIButton!
-    @IBOutlet var passwordButton: UIButton!
     @IBOutlet var bottomSpaceConstraint: NSLayoutConstraint!
     @IBOutlet var wifiListView: UIView!
     @IBOutlet var passphraseView: UIView!
     @IBOutlet var tableView: UITableView!
     @IBOutlet var signalImageView: UIImageView!
     @IBOutlet var authenticationImageView: UIImageView!
+    
+    //For thread:
+    @IBOutlet weak var selectNetworkHeader: BarTitle!
+    @IBOutlet var currentNetworkLabel: UILabel!
+    @IBOutlet var passphraseTextfield: UITextField!
+    @IBOutlet var savePasswordButton: UIButton!
+    @IBOutlet var passwordButton: UIButton!
+    
+    var provisionCompletionHandler: (() -> Void)?
+    var selectedThreadNetwork: ESPThreadNetwork!
 
     var savedPasswords = UserDefaults.standard.value(forKey: Constants.wifiPassword) as? [String: String] ?? [:]
+    var savedNetworkKeys = UserDefaults.standard.value(forKey: Constants.wifiPassword) as? [String: String] ?? [:]
     var activityView: UIActivityIndicatorView?
     var wifiDetailList: [ESPWifiNetwork] = []
+    var threadDetailList: [ESPThreadNetwork] = []
     var shouldSavePassword = true
     var device: ESPDevice!
     var passphrase = ""
@@ -55,13 +63,21 @@ class ProvisionViewController: UIViewController {
         view.addGestureRecognizer(tapGestureRecognizer)
         tapGestureRecognizer.cancelsTouchesInView = false
 
-        getCurrentSSID()
+        if threadDetailList.count == 0 {
+            getCurrentSSID()
+        } else {
+            updateUIForThread()
+        }
 
         // Added observers for Keyboard hide/unhide event.
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
-        scanDeviceForWiFiList()
+        if threadDetailList.count == 0 {
+            scanDeviceForWiFiList()
+        } else {
+            scanDeviceForThreadList()
+        }
         tableView.tableFooterView = UIView()
     }
 
@@ -90,7 +106,7 @@ class ProvisionViewController: UIViewController {
     }
 
     private func networkSelected(wifiNetwork: ESPWifiNetwork) {
-        currentSSIDLabel.text = wifiNetwork.ssid
+        currentNetworkLabel.text = wifiNetwork.ssid
         currentSSID = wifiNetwork.ssid
         provisionButton.isHidden = false
         if wifiNetwork.auth == .open {
@@ -107,6 +123,19 @@ class ProvisionViewController: UIViewController {
         }
         setWifiIconImageFor(wifiSignalImageView: signalImageView, wifiSecurityImageView: authenticationImageView, network: wifiNetwork)
     }
+    
+    private func threadNetworkSelected(threadNetwork: ESPThreadNetwork) {
+        currentNetworkLabel.text = threadNetwork.networkName
+        self.selectedThreadNetwork = threadNetwork
+        provisionButton.isHidden = false
+        passphraseView.isHidden = false
+        savePasswordButton.isHidden = false
+        if let networkKey = savedNetworkKeys[threadNetwork.networkName] {
+            passphraseTextfield.text = networkKey
+        } else {
+            passphraseTextfield.text = ""
+        }
+    }
 
     // Get ssid of currently connected Wi-Fi.
     private func getCurrentSSID() {
@@ -119,6 +148,11 @@ class ProvisionViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    private func updateUIForThread() {
+        self.selectNetworkHeader.text = "Select Thread Network"
+        self.passphraseTextfield.placeholder = "Network Key"
     }
 
     private func showBusy(isBusy: Bool) {
@@ -138,6 +172,14 @@ class ProvisionViewController: UIViewController {
     private func provisionDevice(ssid _: String, passphrase: String) {
         Utility.showLoader(message: "Sending association data", view: view)
         self.passphrase = passphrase
+        User.shared.associateNodeWithUser(device: device, delegate: self)
+    }
+    
+    @available(iOS 15.0, *)
+    private func provisionDeviceWithMultipleNetworks(device: ESPDevice, completion: @escaping () -> Void) {
+        Utility.showLoader(message: "Sending association data", view: view)
+        self.provisionCompletionHandler = completion
+        self.device = device
         User.shared.associateNodeWithUser(device: device, delegate: self)
     }
 
@@ -180,13 +222,29 @@ class ProvisionViewController: UIViewController {
                 self.present(alertController, animated: true, completion: nil)
                 return
             }
-            if shouldSavePassword {
-                savedPasswords[currentSSID] = passphrase
+            if self.threadDetailList.count > 0 {
+                if shouldSavePassword {
+                    savedNetworkKeys[self.selectedThreadNetwork.networkName] = passphrase
+                } else {
+                    savedNetworkKeys.removeValue(forKey: self.selectedThreadNetwork.networkName)
+                }
+                UserDefaults.standard.setValue(savedNetworkKeys, forKey: Constants.threadNetworkKey)
+                if #available(iOS 15.0, *) {
+                    self.provisionDeviceWithMultipleNetworks(device: self.device) {
+                        self.showStatusScreenForThreadNetwork(threadNetwork: self.selectedThreadNetwork)
+                    }
+                } else {
+                    // Fallback on earlier versions
+                }
             } else {
-                savedPasswords.removeValue(forKey: currentSSID)
+                if shouldSavePassword {
+                    savedPasswords[currentSSID] = passphrase
+                } else {
+                    savedPasswords.removeValue(forKey: currentSSID)
+                }
+                UserDefaults.standard.setValue(savedPasswords, forKey: Constants.wifiPassword)
+                provisionDevice(ssid: currentSSID, passphrase: passphrase)
             }
-            UserDefaults.standard.setValue(savedPasswords, forKey: Constants.wifiPassword)
-            provisionDevice(ssid: currentSSID, passphrase: passphrase)
         } else {
             provisionDevice(ssid: currentSSID, passphrase: "")
         }
@@ -194,7 +252,9 @@ class ProvisionViewController: UIViewController {
 
     // Scanned ESP device to get list of available Wi-Fi
     func scanDeviceForWiFiList() {
-        Utility.showLoader(message: "Scanning for Wi-Fi", view: view)
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Scanning for Wi-Fi", view: self.view)
+        }
         device.scanWifiList { wifiList, _ in
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
@@ -209,6 +269,15 @@ class ProvisionViewController: UIViewController {
                     self.tableView.reloadData()
                 }
             }
+        }
+    }
+    
+    // Scanned ESP device to get list of available Wi-Fi
+    func scanDeviceForThreadList() {
+        let list = self.threadDetailList
+        self.threadDetailList = list.sorted { $0.rssi > $1.rssi }
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
         }
     }
 
@@ -242,6 +311,33 @@ class ProvisionViewController: UIViewController {
             self.navigationController?.pushViewController(successVC, animated: true)
         }
     }
+    
+    func showStatusScreenForThreadNetwork(step1Failed: Bool = false, threadNetwork: ESPThreadNetwork) {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+        }
+        let successVC = self.storyboard?.instantiateViewController(withIdentifier: "successViewController") as! SuccessViewController
+        successVC.espthreadNetwork = threadNetwork
+        let threadOpDataset = self.getThreadOpeartionalDataset(threadNetwork: threadNetwork)
+        print("THREAD OP DATASET: \(threadOpDataset)")
+        let threadOperationalDataset = Data(hex: threadOpDataset)
+        successVC.threadOperationalDataset = threadOperationalDataset
+        successVC.step1Failed = step1Failed
+        successVC.espDevice = self.device
+        self.navigationController?.pushViewController(successVC, animated: true)
+    }
+    
+    func getThreadOpeartionalDataset(threadNetwork: ESPThreadNetwork) -> String {
+        var threadOperationalDatasetHexString = "00030000"
+        threadOperationalDatasetHexString += String(format: "%02x", threadNetwork.channel)
+        threadOperationalDatasetHexString += "0208"
+        threadOperationalDatasetHexString +=  threadNetwork.extPanID.hexadecimalString
+        threadOperationalDatasetHexString += "0510"
+        threadOperationalDatasetHexString += passphraseTextfield.text ?? ""
+        threadOperationalDatasetHexString += "0102"
+        threadOperationalDatasetHexString += String(format: "%04x", threadNetwork.panID)
+        return threadOperationalDatasetHexString
+    }
 
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if segue.identifier == "joinNetwork" {
@@ -258,16 +354,26 @@ extension ProvisionViewController: UITableViewDelegate {
             passphraseView.isHidden = true
             savePasswordButton.isHidden = true
             tableView.isHidden = true
-            currentSSIDLabel.text = "Select Wi-Fi Network"
+            if threadDetailList.count > 0 {
+                currentNetworkLabel.text = "Select Thread Network"
+            } else {
+                currentNetworkLabel.text = "Select Wi-Fi Network"
+            }
             passphraseTextfield.text = ""
             provisionButton.isHidden = true
             signalImageView.isHidden = true
             authenticationImageView.isHidden = true
             return
         }
-        let selectedNetwork = wifiDetailList[indexPath.row - 1]
-        networkSelected(wifiNetwork: selectedNetwork)
-        tableView.isHidden = true
+        if threadDetailList.count > 0, indexPath.row - 1 < threadDetailList.count {
+            let threadNetwork = threadDetailList[indexPath.row - 1]
+            threadNetworkSelected(threadNetwork: threadNetwork)
+            tableView.isHidden = true
+        } else {
+            let selectedNetwork = wifiDetailList[indexPath.row - 1]
+            networkSelected(wifiNetwork: selectedNetwork)
+            tableView.isHidden = true
+        }
     }
 
     func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
@@ -277,24 +383,37 @@ extension ProvisionViewController: UITableViewDelegate {
 
 extension ProvisionViewController: UITableViewDataSource {
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        if threadDetailList.count > 0 {
+            return threadDetailList.count + 1
+        }
         return wifiDetailList.count + 1
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "wifiListCell", for: indexPath) as! WifiListTableViewCell
         if indexPath.row == 0 {
-            cell.ssidLabel.text = "Select Wi-Fi Network"
+            if threadDetailList.count > 0 {
+                cell.ssidLabel.text = "Select Thread Network"
+            } else {
+                cell.ssidLabel.text = "Select Wi-Fi Network"
+            }
             cell.signalImageView.isHidden = true
             cell.authenticationImageView.isHidden = true
         } else {
-            let wifiNetwork = wifiDetailList[indexPath.row - 1]
-            if wifiNetwork.ssid == currentSSIDLabel.text {
-                cell.backgroundColor = UIColor(hexString: "#8265E3").withAlphaComponent(0.6)
-            } else {
+            if threadDetailList.count > 0 {
+                let threadNetwork = threadDetailList[indexPath.row - 1]
                 cell.backgroundColor = .white
+                cell.ssidLabel.text = threadDetailList[indexPath.row - 1].networkName
+            } else {
+                let wifiNetwork = wifiDetailList[indexPath.row - 1]
+                if wifiNetwork.ssid == currentNetworkLabel.text {
+                    cell.backgroundColor = UIColor(hexString: "#8265E3").withAlphaComponent(0.6)
+                } else {
+                    cell.backgroundColor = .white
+                }
+                cell.ssidLabel.text = wifiDetailList[indexPath.row - 1].ssid
+                setWifiIconImageFor(wifiSignalImageView: cell.signalImageView, wifiSecurityImageView: cell.authenticationImageView, network: wifiNetwork)
             }
-            cell.ssidLabel.text = wifiDetailList[indexPath.row - 1].ssid
-            setWifiIconImageFor(wifiSignalImageView: cell.signalImageView, wifiSecurityImageView: cell.authenticationImageView, network: wifiNetwork)
         }
         return cell
     }
@@ -308,6 +427,10 @@ extension ProvisionViewController: DeviceAssociationProtocol {
             if success {
                 if let deviceSecret = nodeID {
                     User.shared.currentAssociationInfo!.nodeID = deviceSecret
+                }
+                if let completion = self.provisionCompletionHandler {
+                    completion()
+                    return
                 }
                 self.showStatusScreen()
             } else {

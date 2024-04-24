@@ -129,6 +129,7 @@ struct ESPMatterConstants {
     static let controlSequenceOfOperation = "controlSequenceOfOperation"
     static let systemMode = "systemMode"
     static let borderRouter = "borderRouter"
+    static let updateMetadata = "updateMetadata"
     
     static let onOffCluster = "OnOff Cluster"
     static let tempMeasurementCluster = "Termperature Measurement Cluster"
@@ -198,6 +199,10 @@ struct ESPMatterConstants {
     
     
     /// Messages
+    static let noThreadBRHeader = "No Thread Border Router"
+    static let noThreadBRDescription = "Please ensure that you have added a Thread Border Router to your Apple Id."
+    static let noMatchingThreadDescription = "The preferred credentials on the app don't match any of the scanned thread networks. Please ensure your Thread Border Router is powered on and connected."
+    static let noThreadScanResult = "Device could not find any thread networks to join."
     static let copyCodeMsg = "Copy code"
     static let shareNodeMsg = "Share Node"
     static let operationFailedMsg = "Operation failed"

@@ -101,6 +101,7 @@ struct Constants {
     static let appBGKey = Constants.bundleIdentifier + ".appbg"
     static let ignoreVersionKey = Constants.bundleIdentifier + ".ignoreVersions"
     static let wifiPassword = Constants.bundleIdentifier + ".wifiPassword"
+    static let threadNetworkKey = Constants.bundleIdentifier + ".threadNetworkKey"
 
     // Device param keys
     static let deviceNameParam = "esp.param.name"
@@ -218,4 +219,5 @@ struct Constants {
     
     static let blePermissionReqdMsg = "Please ensure that your bluetooth is powered ON and has the requisite permission."
     static let turnBLEOnMsg = "Please ensure that your bluetooth is powered on and restart the provisioning."
+    static let upgradeOSVersionMsg = "You must upgrade to iOS 16.4 or above in order to avail this feature."
 }

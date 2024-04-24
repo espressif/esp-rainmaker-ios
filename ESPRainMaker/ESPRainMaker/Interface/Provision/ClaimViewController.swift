@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  DocumentViewController.swift
-//  ESPRainMaker
-//
 //  ClaimViewController.swift
 //  ESPRainMaker
 //
 
 import ESPProvision
 import UIKit
+import ThreadNetwork
 
 class ClaimViewController: UIViewController {
     @IBOutlet var progressIndicator: UILabel!
@@ -32,6 +30,8 @@ class ClaimViewController: UIViewController {
 
     var device: ESPDevice!
     var count = 0
+    var threadOperationalDataset: Data!
+    var provisionCompletionHandler: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,6 +51,15 @@ class ClaimViewController: UIViewController {
         super.viewWillDisappear(animated)
         centralIcon.layer.removeAllAnimations()
     }
+    
+    @available(iOS 15.0, *)
+    func provisionDeviceWithThreadNetwork(device: ESPDevice, completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Sending association data", view: self.view)
+        }
+        self.provisionCompletionHandler = completion
+        User.shared.associateNodeWithUser(device: device, delegate: self)
+    }
 
     func startAssistedClaiming() {
         let assistedClaiming = AssistedClaiming(espDevice: device)
@@ -58,7 +67,17 @@ class ClaimViewController: UIViewController {
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
                 if result {
-                    self.goToProvision()
+                    if let network = self.device.network {
+                        switch network {
+                        case .wifi:
+                            self.goToProvision()
+                        case .thread:
+                            
+                            break
+                        default:
+                            self.goToProvision()
+                        }
+                    }
                 } else {
                     self.centralIcon.layer.removeAllAnimations()
                     self.progressIndicator.text = "Claiming failed with error:"
@@ -90,5 +109,56 @@ class ClaimViewController: UIViewController {
     @IBAction func cancelPressed(_: Any) {
         device.disconnect()
         navigationController?.popToRootViewController(animated: true)
+    }
+    
+    private func provisionDevice(device: ESPDevice, threadOperationalDataset: Data) {
+        Utility.showLoader(message: "Sending association data", view: view)
+        self.device = device
+        self.threadOperationalDataset = threadOperationalDataset
+        User.shared.associateNodeWithUser(device: device, delegate: self)
+    }
+    
+    @available(iOS 15.0, *)
+    private func provisionDeviceWithMultipleNetworks(device: ESPDevice, completion: @escaping () -> Void) {
+        Utility.showLoader(message: "Sending association data", view: view)
+        self.provisionCompletionHandler = completion
+        self.device = device
+        User.shared.associateNodeWithUser(device: device, delegate: self)
+    }
+    
+    private func showStatusScreenForThread(step1Failed: Bool = false, device: ESPDevice, threadOperationalDataset: Data?) {
+        let successVC = self.storyboard?.instantiateViewController(withIdentifier: "successViewController") as! SuccessViewController
+        successVC.step1Failed = step1Failed
+        successVC.espDevice = device
+        successVC.threadOperationalDataset = threadOperationalDataset
+        navigationController?.pushViewController(successVC, animated: true)
+    }
+}
+
+extension ClaimViewController: DeviceAssociationProtocol {
+    
+    func deviceAssociationFinishedWith(success: Bool, nodeID: String?, error: AssociationError?) {
+        User.shared.currentAssociationInfo!.associationInfoDelievered = success
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            if success {
+                if let deviceSecret = nodeID {
+                    User.shared.currentAssociationInfo!.nodeID = deviceSecret
+                }
+                if let completion = self.provisionCompletionHandler {
+                    completion()
+                } else {
+                    self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: true, device: self.device)
+                }
+            } else {
+                
+                let alertController = UIAlertController(title: "Error", message: error?.description, preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .default) { _ in
+                    self.navigationController?.popToRootViewController(animated: false)
+                }
+                alertController.addAction(action)
+                self.present(alertController, animated: true, completion: nil)
+            }
+        }
     }
 }
