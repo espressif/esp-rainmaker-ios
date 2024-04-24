@@ -20,9 +20,16 @@ import Foundation
 
 extension Node {
     
+    var matterMetadata: [String: Any]? {
+        if let metadata = metadata, let value = metadata[ESPMatterConstants.matter] as? [String: Any] {
+            return value
+        }
+        return nil
+    }
+    
     /// Is on off client supported
     var isOnOffClientSupported: Bool {
-        if let metadata = metadata, let clientsData = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let clientsData = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
             for key in clientsData.keys {
                 if let list = clientsData[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
                     return true
@@ -35,7 +42,7 @@ extension Node {
     /// On off clients
     var onOffClients: [String: UInt] {
         var endpointClusters: [String: UInt] = [String: UInt]()
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
             for key in val.keys {
                 if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
                     endpointClusters[key] = onOff.clusterId.uintValue
@@ -48,7 +55,7 @@ extension Node {
     /// Binding servers
     var bindingServers: [String: UInt] {
         var endpointClusters: [String: UInt] = [String: UInt]()
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
                 if let list = val[key], list.count > 0, list.contains(binding.clusterId.uintValue) {
                     endpointClusters[key] = binding.clusterId.uintValue
@@ -60,7 +67,7 @@ extension Node {
     
     /// Is controllerserver supported
     var isControllerServerSupported: (Bool, String?) {
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
                 if let list = val[key], list.count > 0, list.contains(rainmakerController.clusterId.uintValue) {
                     return (true, key)
@@ -72,7 +79,7 @@ extension Node {
     
     /// Is on off server supported
     var isOnOffServerSupported: (Bool, String?) {
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
                 if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
                     return (true, key)
@@ -84,7 +91,7 @@ extension Node {
     
     /// Is level control server supported
     var isLevelControlServerSupported: (Bool, String?) {
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
                 if let list = val[key], list.count > 0, list.contains(levelControl.clusterId.uintValue) {
                     return (true, key)
@@ -96,7 +103,7 @@ extension Node {
     
     /// Is color control server supported
     var isColorControlServerSupported: (Bool, String?) {
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
                 if let list = val[key], list.count > 0, list.contains(colorControl.clusterId.uintValue) {
                     return (true, key)
@@ -108,7 +115,7 @@ extension Node {
     
     /// Is open commissioning window supported
     var isOpenCommissioningWindowSupported: (Bool, String?) {
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in val.keys {
                 if let list = val[key], list.count > 0, list.contains(commissioningWindow.clusterId.uintValue) {
                     return (true, key)
@@ -125,14 +132,14 @@ extension Node {
                 return true
             }
         }
-        if let metadata = metadata, let val = metadata[ESPMatterConstants.isRainmaker] as? Bool {
+        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.isRainmaker] as? Bool {
             return val
         }
         return false
     }
     
     var userDefinaedName: String? {
-        if let metadata = metadata, let matterDeviceName = metadata[ESPMatterConstants.deviceName] as? String {
+        if let metadata = matterMetadata, let matterDeviceName = metadata[ESPMatterConstants.deviceName] as? String {
             return matterDeviceName
         }
         return nil
@@ -146,7 +153,7 @@ extension Node {
         if let deviceName = self.rainmakerDeviceName {
             return deviceName
         }
-        if let metadata = metadata, let matterDeviceName = metadata[ESPMatterConstants.deviceName] as? String {
+        if let metadata = matterMetadata, let matterDeviceName = metadata[ESPMatterConstants.deviceName] as? String {
             return matterDeviceName
         }
         return nil
@@ -162,7 +169,7 @@ extension Node {
     
     /// IPK string
     var ipkString: String? {
-        if let metadata = metadata, let ipkString = metadata[ESPMatterConstants.ipk] as? String {
+        if let metadata = matterMetadata, let ipkString = metadata[ESPMatterConstants.ipk] as? String {
             return ipkString
         }
         return nil
@@ -170,7 +177,7 @@ extension Node {
     
     /// Vendor Id
     var vendorId: Int? {
-        if let metadata = metadata, let vid = metadata[ESPMatterConstants.vendorId] as? Int {
+        if let metadata = matterMetadata, let vid = metadata[ESPMatterConstants.vendorId] as? Int {
             return vid
         }
         return nil
@@ -178,7 +185,7 @@ extension Node {
     
     /// Product Id
     var productId: Int? {
-        if let metadata = metadata, let pid = metadata[ESPMatterConstants.productId] as? Int {
+        if let metadata = matterMetadata, let pid = metadata[ESPMatterConstants.productId] as? Int {
             return pid
         }
         return nil
@@ -186,7 +193,7 @@ extension Node {
     
     /// Software version
     var swVersion: Int? {
-        if let metadata = metadata, let sw = metadata[ESPMatterConstants.softwareVersion] as? Int {
+        if let metadata = matterMetadata, let sw = metadata[ESPMatterConstants.softwareVersion] as? Int {
             return sw
         }
         return nil
@@ -194,7 +201,7 @@ extension Node {
     
     /// Software version string
     var swVersionString: Int? {
-        if let metadata = metadata, let swString = metadata[ESPMatterConstants.softwareVersionString] as? Int {
+        if let metadata = matterMetadata, let swString = metadata[ESPMatterConstants.softwareVersionString] as? Int {
             return swString
         }
         return nil
@@ -202,7 +209,7 @@ extension Node {
     
     /// Software version
     var serialNumber: Int? {
-        if let metadata = metadata, let serialNumber = metadata[ESPMatterConstants.serialNumber] as? Int {
+        if let metadata = matterMetadata, let serialNumber = metadata[ESPMatterConstants.serialNumber] as? Int {
             return serialNumber
         }
         return nil
@@ -210,7 +217,7 @@ extension Node {
     
     /// Software version
     var manufacturerName: String? {
-        if let metadata = metadata, let manufacturerName = metadata[ESPMatterConstants.manufacturerName] as? String {
+        if let metadata = matterMetadata, let manufacturerName = metadata[ESPMatterConstants.manufacturerName] as? String {
             return manufacturerName
         }
         return nil
@@ -218,7 +225,7 @@ extension Node {
     
     /// Software version
     var productName: String? {
-        if let metadata = metadata, let productName = metadata[ESPMatterConstants.productName] as? String {
+        if let metadata = matterMetadata, let productName = metadata[ESPMatterConstants.productName] as? String {
             return productName
         }
         return nil
@@ -226,7 +233,7 @@ extension Node {
     
     /// group Id
     var groupId: String? {
-        if let metadata = metadata, let id = metadata[ESPMatterConstants.groupId] as? String {
+        if let metadata = matterMetadata, let id = metadata[ESPMatterConstants.groupId] as? String {
             return id
         }
         return nil
@@ -234,7 +241,7 @@ extension Node {
     
     /// Is on off client supported
     var isRainmakerControllerSupported: (Bool, String?) {
-        if let metadata = metadata, let serversData = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+        if let metadata = matterMetadata, let serversData = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
             for key in serversData.keys {
                 if let list = serversData[key], list.count > 0, list.contains(rainmakerController.clusterId.uintValue) {
                     return (true, key)
@@ -245,7 +252,7 @@ extension Node {
     }
     
     var deviceType: Int? {
-        if let metadata = metadata, let type = metadata[ESPMatterConstants.deviceType] as? Int {
+        if let metadata = matterMetadata, let type = metadata[ESPMatterConstants.deviceType] as? Int {
             return type
         }
         return nil

@@ -58,7 +58,7 @@ extension ParamSliderTableViewCell {
         }
         if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let deviceId = self.deviceId {
             if let status = node.getMatterSystemMode(deviceId: deviceId) {
-                if status == ESPMatterConstants.heat {
+                if status == ESPMatterConstants.cool {
                     if let ocs = MatterControllerParser.shared.getCurrentOccupiedCoolingSetpoint(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
                         node.setMatterOccupiedCoolingSetpoint(ocs: Int16(ocs), deviceId: deviceId)
                         self.currentLevel = ocs

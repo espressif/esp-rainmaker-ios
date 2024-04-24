@@ -320,3 +320,23 @@ enum binding {
     static let clusterId: NSNumber = NSNumber(value: 30)
     static let clusterIdString = "30"
 }
+
+/*
+ // MARK: Color Control Cluster
+ */
+enum basicInfomation {
+    
+    enum attributes {
+        case nodeLabel
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .nodeLabel:
+                return NSNumber(value: 5)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 40)
+    static let clusterIdString = "40"
+}

@@ -30,27 +30,32 @@ extension ESPMTRCommissioner {
     ///   - completionHandler: completion
     func getMatterAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([String: [UInt]]) -> Void) {
         self.attributesData = [String: [UInt]]()
-        self.getOnOffAttributes(groupID: groupID, deviceId: deviceId) { onOffVal in
-            if let onOffVal = onOffVal {
-                self.attributesData[onOff.clusterIdString] = onOffVal
+        self.getBasicInformationAttributes(groupID: groupID, deviceId: deviceId) { basicVal in
+            if let basicVal = basicVal {
+                self.attributesData[basicInfomation.clusterIdString] = basicVal
             }
-            self.getLevelAttributes(groupID: groupID, deviceId: deviceId) { level in
-                if let level = level {
-                    self.attributesData[levelControl.clusterIdString] = level
+            self.getOnOffAttributes(groupID: groupID, deviceId: deviceId) { onOffVal in
+                if let onOffVal = onOffVal {
+                    self.attributesData[onOff.clusterIdString] = onOffVal
                 }
-                self.getColorAttributes(groupID: groupID, deviceId: deviceId) { color in
-                    if let color = color {
-                        self.attributesData[colorControl.clusterIdString] = color
+                self.getLevelAttributes(groupID: groupID, deviceId: deviceId) { level in
+                    if let level = level {
+                        self.attributesData[levelControl.clusterIdString] = level
                     }
-                    self.getTherostatAttributes(groupID: groupID, deviceId: deviceId) { thermostatAttrs in
-                        if let thermostatAttrs = thermostatAttrs {
-                            self.attributesData[thermostat.clusterIdString] = thermostatAttrs
+                    self.getColorAttributes(groupID: groupID, deviceId: deviceId) { color in
+                        if let color = color {
+                            self.attributesData[colorControl.clusterIdString] = color
                         }
-                        self.getTemperatureMeasurementAttributes(groupID: groupID, deviceId: deviceId) { tempMeasurementAttrs in
-                            if let tempMeasurementAttrs = tempMeasurementAttrs {
-                                self.attributesData[temperatureMeasurement.clusterIdString] = tempMeasurementAttrs
+                        self.getThermostatAttributes(groupID: groupID, deviceId: deviceId) { thermostatAttrs in
+                            if let thermostatAttrs = thermostatAttrs {
+                                self.attributesData[thermostat.clusterIdString] = thermostatAttrs
                             }
-                            completionHandler(self.attributesData)
+                            self.getTemperatureMeasurementAttributes(groupID: groupID, deviceId: deviceId) { tempMeasurementAttrs in
+                                if let tempMeasurementAttrs = tempMeasurementAttrs {
+                                    self.attributesData[temperatureMeasurement.clusterIdString] = tempMeasurementAttrs
+                                }
+                                completionHandler(self.attributesData)
+                            }
                         }
                     }
                 }
@@ -126,7 +131,7 @@ extension ESPMTRCommissioner {
     ///   - groupID: group id
     ///   - deviceId: device id
     ///   - completionHadnler: completion
-    func getTherostatAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
+    func getThermostatAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
         self.getThermostatCluster(groupId: groupID, deviceId: deviceId) { thermostat in
             if let thermostat = thermostat {
                 thermostat.readAttributeAttributeList { attributesList, _ in
@@ -151,6 +156,27 @@ extension ESPMTRCommissioner {
         self.getTempMeasurementCluster(groupId: groupID, deviceId: deviceId) { tempMeasurement in
             if let tempMeasurement = tempMeasurement {
                 tempMeasurement.readAttributeAttributeList { attributesList, _ in
+                    if let attributesList = attributesList as? [UInt] {
+                        completionHandler(attributesList)
+                    } else {
+                        completionHandler(nil)
+                    }
+                }
+            } else {
+                completionHandler(nil)
+            }
+        }
+    }
+    
+    /// Get basic information attributes
+    /// - Parameters:
+    ///   - groupID: group id
+    ///   - deviceId: device id
+    ///   - completionHadnler: completion
+    func getBasicInformationAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
+        self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
+            if let clutser = cluster {
+                clutser.readAttributeAttributeList { attributesList, _ in
                     if let attributesList = attributesList as? [UInt] {
                         completionHandler(attributesList)
                     } else {

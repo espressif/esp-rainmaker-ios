@@ -199,6 +199,15 @@ public class ESPMatterClusterUtil {
         return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: temperatureMeasurement.clusterIdString, attributeId: temperatureMeasurement.attributes.measuredValue.attributeId.uintValue)
     }
     
+    /// Is node label attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is node label attribute supported
+    public func isNodeLabelAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: basicInfomation.clusterIdString, attributeId: basicInfomation.attributes.nodeLabel.attributeId.uintValue)
+    }
+    
     /// Is server cluster for a cluster id is supported
     /// - Parameters:
     ///   - groupId: group id
