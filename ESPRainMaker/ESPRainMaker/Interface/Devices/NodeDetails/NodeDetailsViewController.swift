@@ -52,7 +52,7 @@ class NodeDetailsViewController: UIViewController {
     var node: ESPNodeDetails?
     var allNodes: [ESPNodeDetails]?
     var switchIndex: Int?
-    var endpointClusterId: [String: UInt]?
+    var bindingEndpointClusterId: [String: UInt]?
     var sourceNode: ESPNodeDetails?
 
     // MARK: - Overriden Methods
@@ -168,7 +168,7 @@ class NodeDetailsViewController: UIViewController {
         cell.nodeDetailActionLabel.text = "Device Bindings"
         cell.addMemberButtonAction = {
             if #available(iOS 16.4, *) {
-                self.openBindingWindow()
+                self.openClusterSelection()
             } else {
                 self.alertUser(title: ESPMatterConstants.emptyString,
                                message: ESPMatterConstants.upgradeOSVersionMsg, buttonTitle: ESPMatterConstants.okTxt, callback: {})
@@ -177,18 +177,17 @@ class NodeDetailsViewController: UIViewController {
         return cell
     }
     
-    /// Open Binding Window
     @available(iOS 16.4, *)
-    func openBindingWindow() {
+    func openClusterSelection() {
         if let node = self.currentNode {
             let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
-            let devicesBindingVC = storyboard.instantiateViewController(withIdentifier: DevicesBindingViewController.storyboardId) as! DevicesBindingViewController
-            devicesBindingVC.group = self.group
-            devicesBindingVC.nodes = self.allNodes
-            devicesBindingVC.sourceNode = self.sourceNode
-            devicesBindingVC.endpointClusterId = self.endpointClusterId
-            devicesBindingVC.switchIndex = self.switchIndex
-            self.navigationController?.pushViewController(devicesBindingVC, animated: true)
+            let clusterSelectionVC = storyboard.instantiateViewController(withIdentifier: ClusterSelectionViewController.storyboardId) as! ClusterSelectionViewController
+            clusterSelectionVC.group = self.group
+            clusterSelectionVC.allNodes = self.allNodes
+            clusterSelectionVC.sourceNode = self.sourceNode
+            clusterSelectionVC.bindingEndpointClusterId = self.bindingEndpointClusterId
+            clusterSelectionVC.switchIndex = self.switchIndex
+            self.navigationController?.pushViewController(clusterSelectionVC, animated: true)
         }
     }
     #endif
@@ -355,13 +354,11 @@ class NodeDetailsViewController: UIViewController {
                 dataSource[index].append(enablePairingMode)
                 collapsed.append(false)
             }
-            if node.isOnOffClientSupported {
-                if node.bindingServers.count > 0 {
-                    index += 1
-                    dataSource.append([])
-                    dataSource[index].append(bindingAction)
-                    collapsed.append(false)
-                }
+            if node.bindingServers.count > 0 {
+                index += 1
+                dataSource.append([])
+                dataSource[index].append(bindingAction)
+                collapsed.append(false)
             }
         }
         #endif

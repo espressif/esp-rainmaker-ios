@@ -227,6 +227,16 @@ class ESPMatterFabricDetails {
         return nil
     }
     
+    /// Get binding data from group metadata
+    /// - Parameter groupId: group id
+    /// - Returns: binding data
+    func getGroupBindingMetadata(groupId: String) -> [String: Any]? {
+        if let groupMetadata = getGroupMetadata(groupId: groupId), let bindingData = groupMetadata[ESPMatterConstants.bindings] as? [String: Any] {
+            return bindingData
+        }
+        return nil
+    }
+    
     /// Remove metadata
     /// - Parameter groupId: group id
     func removeGroupMetadata(groupId: String) {

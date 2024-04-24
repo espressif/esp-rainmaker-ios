@@ -36,7 +36,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     var node: ESPNodeDetails?
     var group: ESPNodeGroup?
     var rainmakerNode: Node?
-    var endpointClusterId: [String: Any]?
+    var bindingEndpointClusterId: [String: Any]?
     var connectionStatus: NodeConnectionStatus = .local
     
     var session: Session!

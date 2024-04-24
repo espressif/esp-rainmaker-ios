@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -947,11 +947,139 @@
             </objects>
             <point key="canvasLocation" x="2462" y="4"/>
         </scene>
+        <!--Cluster Selection View Controller-->
+        <scene sceneID="lwR-XM-TM6">
+            <objects>
+                <viewController storyboardIdentifier="ClusterSelectionViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="VLc-bS-y8m" customClass="ClusterSelectionViewController" customModule="ESP_RainMaker" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="DBi-kD-tKK">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mCi-hk-bXN" customClass="TopBarView" customModule="ESP_RainMaker" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="91"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WHA-0w-TYf" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="16" y="42.333333333333343" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="n9J-mO-5Z7"/>
+                                            <constraint firstAttribute="width" constant="50" id="xT2-K2-E8J"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="Back">
+                                            <color key="titleColor" red="0.50980392159999999" green="0.39607843139999999" blue="0.89019607840000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="backButtonPressed:" destination="VLc-bS-y8m" eventType="touchUpInside" id="OPQ-v0-eF3"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Clusters" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DWF-hE-qMH" customClass="BarTitle" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="165" y="57.666666666666664" width="63.333333333333343" height="19.333333333333336"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="F17-2x-6vc" customClass="BarButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="317" y="47.333333333333343" width="60" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="9wG-gm-FYB"/>
+                                            <constraint firstAttribute="height" constant="40" id="fR0-uJ-9he"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal">
+                                            <color key="titleColor" red="0.50980392159999999" green="0.39607843139999999" blue="0.89019607840000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="DWF-hE-qMH" firstAttribute="centerY" secondItem="WHA-0w-TYf" secondAttribute="centerY" id="Dct-5Y-eVm"/>
+                                    <constraint firstItem="WHA-0w-TYf" firstAttribute="leading" secondItem="mCi-hk-bXN" secondAttribute="leading" constant="16" id="I8c-ii-EVZ"/>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="96" id="KEG-jn-gD2"/>
+                                    <constraint firstItem="F17-2x-6vc" firstAttribute="centerY" secondItem="DWF-hE-qMH" secondAttribute="centerY" id="Scu-4Y-Gyd"/>
+                                    <constraint firstItem="DWF-hE-qMH" firstAttribute="centerX" secondItem="mCi-hk-bXN" secondAttribute="centerX" id="WnN-GN-jcI"/>
+                                    <constraint firstAttribute="trailing" secondItem="F17-2x-6vc" secondAttribute="trailing" constant="16" id="b8C-Fr-Blh"/>
+                                    <constraint firstAttribute="bottom" secondItem="DWF-hE-qMH" secondAttribute="bottom" constant="14" id="ctV-3u-fcZ"/>
+                                </constraints>
+                            </view>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="BZe-tY-Oor">
+                                <rect key="frame" x="0.0" y="91" width="393" height="761"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="ClusterSelectionCell" id="ImF-PG-rEb" customClass="ClusterSelectionCell" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="55.333332061767578" width="393" height="41"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ImF-PG-rEb" id="ufO-rA-68g">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="41"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wf8-tX-cjF">
+                                                    <rect key="frame" x="10" y="5" width="373" height="31"/>
+                                                    <subviews>
+                                                        <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0qK-eH-lLe">
+                                                            <rect key="frame" x="20" y="5" width="42" height="21"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                    <constraints>
+                                                        <constraint firstItem="0qK-eH-lLe" firstAttribute="leading" secondItem="Wf8-tX-cjF" secondAttribute="leading" constant="20" id="6az-Gs-or4"/>
+                                                        <constraint firstItem="0qK-eH-lLe" firstAttribute="top" secondItem="Wf8-tX-cjF" secondAttribute="top" constant="5" id="g2D-ss-u1q"/>
+                                                        <constraint firstItem="0qK-eH-lLe" firstAttribute="centerY" secondItem="Wf8-tX-cjF" secondAttribute="centerY" id="jFT-1P-gdc"/>
+                                                    </constraints>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                            <integer key="value" value="5"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="Wf8-tX-cjF" secondAttribute="bottom" constant="5" id="CT7-Mz-JtK"/>
+                                                <constraint firstItem="Wf8-tX-cjF" firstAttribute="top" secondItem="ufO-rA-68g" secondAttribute="top" constant="5" id="TTY-MD-jME"/>
+                                                <constraint firstItem="Wf8-tX-cjF" firstAttribute="leading" secondItem="ufO-rA-68g" secondAttribute="leading" constant="10" id="eyP-Ou-FXj"/>
+                                                <constraint firstAttribute="trailing" secondItem="Wf8-tX-cjF" secondAttribute="trailing" constant="10" id="hw3-tE-15l"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="cluster" destination="0qK-eH-lLe" id="ELa-yw-NJt"/>
+                                            <outlet property="container" destination="Wf8-tX-cjF" id="Ky2-K7-hBw"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="VLc-bS-y8m" id="aaT-CA-o33"/>
+                                    <outlet property="delegate" destination="VLc-bS-y8m" id="mrb-Uk-JdY"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="jbl-mj-kt5"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="mCi-hk-bXN" firstAttribute="leading" secondItem="DBi-kD-tKK" secondAttribute="leading" id="3d3-Do-F1t"/>
+                            <constraint firstItem="BZe-tY-Oor" firstAttribute="top" secondItem="mCi-hk-bXN" secondAttribute="bottom" id="6LG-as-I2c"/>
+                            <constraint firstItem="BZe-tY-Oor" firstAttribute="leading" secondItem="DBi-kD-tKK" secondAttribute="leading" id="8WZ-AD-S53"/>
+                            <constraint firstAttribute="bottom" secondItem="BZe-tY-Oor" secondAttribute="bottom" id="9RT-df-Ufk"/>
+                            <constraint firstItem="mCi-hk-bXN" firstAttribute="height" secondItem="DBi-kD-tKK" secondAttribute="height" multiplier="0.106808" id="HLF-1G-rJz"/>
+                            <constraint firstAttribute="trailing" secondItem="BZe-tY-Oor" secondAttribute="trailing" id="YKC-Tb-vvu"/>
+                            <constraint firstItem="mCi-hk-bXN" firstAttribute="top" secondItem="DBi-kD-tKK" secondAttribute="top" id="gZm-tU-q6u"/>
+                            <constraint firstAttribute="trailing" secondItem="mCi-hk-bXN" secondAttribute="trailing" id="kqe-ZL-Xke"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="clusterSelectionTableView" destination="BZe-tY-Oor" id="0dd-4R-NpJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Qnw-U1-LsN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3289" y="4"/>
+        </scene>
     </scenes>
     <resources>
         <image name="background_image" width="375" height="812"/>
         <image name="bell_icon" width="42.666667938232422" height="42.666667938232422"/>
-        <image name="bin.xmark" catalog="system" width="128" height="92"/>
+        <image name="bin.xmark" catalog="system" width="32" height="32"/>
         <image name="binding" width="13.333333015441895" height="13.666666984558105"/>
         <image name="info_icon" width="22" height="22"/>
         <image name="matter" width="213.33332824707031" height="120"/>

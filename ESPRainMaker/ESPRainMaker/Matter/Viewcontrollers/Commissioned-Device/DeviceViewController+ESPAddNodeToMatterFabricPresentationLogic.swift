@@ -43,7 +43,7 @@ extension DeviceViewController: ESPAddNodeToMatterFabricPresentationLogic {
         }
         if status {
             if let group = self.group, let groupId = group.groupID, let node = self.node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal {
-                self.fabricDetails.removeLinkedDevice(groupId: groupId, deviceId: deviceId, endpointClusterId: endpointClusterId)
+                self.fabricDetails.removeLinkedDevice(groupId: groupId, deviceId: deviceId, endpointClusterId: self.bindingEndpointClusterId)
             }
             DispatchQueue.main.async {
                 User.shared.updateDeviceList = true

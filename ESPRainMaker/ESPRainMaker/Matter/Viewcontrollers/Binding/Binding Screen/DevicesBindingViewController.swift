@@ -38,30 +38,27 @@ class DevicesBindingViewController: UIViewController {
     var sourceNode: ESPNodeDetails?
     var linkedNodes: [ESPNodeDetails] = [ESPNodeDetails]()
     var unlinkedNodes: [ESPNodeDetails] = [ESPNodeDetails]()
-    var endpointClusterId: [String: UInt]?
+    var bindingEndpointClusterId: [String: UInt]?
     var isUserActionAllowed: Bool = true
     var service: ESPNodeGroupMetadataService?
     let apiWorker = ESPAPIWorker()
     var switchIndex: Int?
     let fabricDetails = ESPMatterFabricDetails.shared
+    var cluster: String = ESPMatterConstants.onOffCluster
+    var clusterId: UInt? {
+        return cluster.clusterId
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.addCustomBottomLine(color: .lightGray, height: 0.5)
-        if let group = group, let groupId = group.groupID, let sourceNode = sourceNode, let matterNodeId = sourceNode.matterNodeID, let sourceDeviceid = matterNodeId.hexToDecimal {
-            if let linkedNodes = self.fabricDetails.getLinkedDevices(groupId: groupId, deviceId: sourceDeviceid, endpointClusterId: self.endpointClusterId) {
-                self.linkedNodes = linkedNodes
-            }
-            if let unlinkedNodes = self.fabricDetails.getUnlinkedDevices(groupId: groupId, deviceId: sourceDeviceid, endpointClusterId: self.endpointClusterId) {
-                self.unlinkedNodes = unlinkedNodes
-            }
-            self.setupUI()
-            self.editDevices()
-            if !isUserActionAllowed {
-                self.view.isUserInteractionEnabled = false
-                return
-            }
-            self.checkingLinkingStatusAndSetupUI()
+        self.getLinkedNodes()
+        self.getUnLinkedNodes()
+        self.setupUI()
+        self.editDevices()
+        self.bindingTable.reloadData()
+        if !isUserActionAllowed {
+            self.view.isUserInteractionEnabled = false
         }
     }
     
@@ -124,7 +121,7 @@ class DevicesBindingViewController: UIViewController {
         self.checkNodesLinkingStatus() {
             Utility.hideLoader(view: self.view)
             if let group = self.group, let groupId = group.groupID, let node = self.sourceNode, let matterNodeId = node.matterNodeID, let sourceDeviceId = matterNodeId.hexToDecimal {
-                self.fabricDetails.saveBindingData(groupId: groupId, deviceId: sourceDeviceId, linkedNodes: self.linkedNodes, unlinkedNodes: self.unlinkedNodes, endpointClusterId: self.endpointClusterId)
+                self.fabricDetails.saveBindingData(groupId: groupId, deviceId: sourceDeviceId, linkedNodes: self.linkedNodes, unlinkedNodes: self.unlinkedNodes, endpointClusterId: self.bindingEndpointClusterId)
                 self.setupUI()
                 self.editDevices()
             }
@@ -159,7 +156,7 @@ class DevicesBindingViewController: UIViewController {
                         return
                     }
                 }
-                if let sourceId = sourceNode.nodeID, let node = User.shared.getNode(id: sourceId), let dId = destinationNode.nodeID, let groupId = node.groupId, let metadata = self.fabricDetails.getGroupMetadata(groupId: groupId), let linked = metadata[sourceId] as? String, linked.contains(dId) {
+                if let sourceId = sourceNode.nodeID, let node = User.shared.getNode(id: sourceId), let dId = destinationNode.nodeID, let groupId = node.groupId, let metadata = self.fabricDetails.getGroupBindingMetadata(groupId: groupId), let linked = metadata[sourceId] as? String, linked.contains(dId) {
                     if let index = self.switchIndex {
                         if linked.contains("\(dId).\(index)") {
                             self.linkedNodes.append(destinationNode)
@@ -218,7 +215,7 @@ class DevicesBindingViewController: UIViewController {
     /// Reload linked and unlinked data sources
     func reloadDataSource() {
         if let group = self.group, let groupId = group.groupID, let sourceNode = self.sourceNode, let matterId = sourceNode.matterNodeID, let deviceId = matterId.hexToDecimal {
-            self.fabricDetails.saveBindingData(groupId: groupId, deviceId: deviceId, linkedNodes: self.linkedNodes, unlinkedNodes: self.unlinkedNodes, endpointClusterId: self.endpointClusterId)
+            self.fabricDetails.saveBindingData(groupId: groupId, deviceId: deviceId, linkedNodes: self.linkedNodes, unlinkedNodes: self.unlinkedNodes, endpointClusterId: self.bindingEndpointClusterId)
             self.bindingTable.reloadData()
         }
     }
@@ -340,7 +337,7 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
             }
             if action == .add {
                 Utility.showLoader(message: ESPMatterConstants.linkingDevicesMeg, view: self.view)
-                ESPMTRCommissioner.shared.linkDevice(endpointClusterId: self.endpointClusterId, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
+                ESPMTRCommissioner.shared.linkDevice(bindingEndpointClusterId: self.bindingEndpointClusterId, cluster: self.cluster, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
                     DispatchQueue.main.async {
                         Utility.hideLoader(view: self.view)
                         if result {
@@ -355,17 +352,15 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
                             if let node = rainmakerNode {
                                 Utility.showLoader(message: ESPMatterConstants.linkingDevicesMeg, view: self.view)
                                 self.service = ESPNodeGroupMetadataService(switchIndex: self.switchIndex)
-                                self.service?.bindDevice(node: node, destinationNodeId: destinationNodeId) { result in
-                                    for index in 0..<self.unlinkedNodes.count {
-                                        let dest = self.unlinkedNodes[index]
-                                        if let id = destinationNode.matterNodeID, dest.matterNodeID == id {
-                                            self.linkedNodes.append(dest)
-                                            self.unlinkedNodes.remove(at: index)
-                                            break
-                                        }
+                                self.service?.bindDevice(node: node, cluster: self.cluster, destinationNodeId: destinationNodeId) { result in
+                                    if result {
+                                        self.getLinkedNodes()
+                                        self.getUnLinkedNodes()
                                     }
-                                    Utility.hideLoader(view: self.view)
-                                    self.reloadDataSource()
+                                    DispatchQueue.main.async {
+                                        Utility.hideLoader(view: self.view)
+                                        self.bindingTable.reloadData()
+                                    }
                                 }
                             }
                         } else {
@@ -375,7 +370,7 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
                 }
             } else {
                 Utility.showLoader(message: ESPMatterConstants.unlinkingDevicesMsg, view: self.view)
-                ESPMTRCommissioner.shared.unlinkDevice(endpointClusterId: self.endpointClusterId, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
+                ESPMTRCommissioner.shared.unlinkDevice(bindingEndpointClusterId: self.bindingEndpointClusterId, cluster: self.cluster, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
                     DispatchQueue.main.async {
                         Utility.hideLoader(view: self.view)
                         if result {
@@ -390,17 +385,15 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
                             if let node = rainmakerNode {
                                 Utility.showLoader(message: ESPMatterConstants.unlinkingDevicesMsg, view: self.view)
                                 self.service = ESPNodeGroupMetadataService(switchIndex: self.switchIndex)
-                                self.service?.unbindDevice(node: node, destinationNodeId: destinationNodeId) { result in
-                                    for index in 0..<self.linkedNodes.count {
-                                        let dest = self.linkedNodes[index]
-                                        if let id = destinationNode.matterNodeID, dest.matterNodeID == id {
-                                            self.unlinkedNodes.append(dest)
-                                            self.linkedNodes.remove(at: index)
-                                            break
-                                        }
+                                self.service?.unbindDevice(node: node, cluster: self.cluster, destinationNodeId: destinationNodeId) { result in
+                                    if result {
+                                        self.getLinkedNodes()
+                                        self.getUnLinkedNodes()
                                     }
-                                    Utility.hideLoader(view: self.view)
-                                    self.reloadDataSource()
+                                    DispatchQueue.main.async {
+                                        Utility.hideLoader(view: self.view)
+                                        self.bindingTable.reloadData()
+                                    }
                                 }
                             }
                         } else {
@@ -409,6 +402,19 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
                     }
                 }
             }
+        }
+    }
+    
+    
+    func getUnLinkedNodes() {
+        if let group = self.group, let groupId = group.groupID, let clustedId = self.cluster.clusterId, let node = self.sourceNode, let rmNode = node.getRainmakerNode() {
+            self.unlinkedNodes = ESPNodeGroupWorker.shared.getNodeDetails(groupId: groupId, switchIndex: self.switchIndex, clusterId: clustedId, node: rmNode, withNodeLinkingStatus: .unlinked)
+        }
+    }
+    
+    func getLinkedNodes() {
+        if let group = self.group, let groupId = group.groupID, let clustedId = self.cluster.clusterId, let node = self.sourceNode, let rmNode = node.getRainmakerNode() {
+            self.linkedNodes = ESPNodeGroupWorker.shared.getNodeDetails(groupId: groupId, switchIndex: self.switchIndex, clusterId: clustedId, node: rmNode, withNodeLinkingStatus: .linked)
         }
     }
 }

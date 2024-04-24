@@ -130,6 +130,9 @@ struct ESPMatterConstants {
     static let systemMode = "systemMode"
     static let borderRouter = "borderRouter"
     
+    static let onOffCluster = "OnOff Cluster"
+    static let tempMeasurementCluster = "Termperature Measurement Cluster"
+    
     /// API keys
     static let id = "id"
     static let csr = "csr"
@@ -297,4 +300,17 @@ struct ESPMatterConstants {
     static let tempDegreesCelsius = "Temperature(°C)"
     
     static let threadUpdateFailed = "Failed to update thread dataset!"
+}
+
+extension String {
+    
+    var clusterId: UInt? {
+        if self == ESPMatterConstants.onOffCluster {
+            return 6
+        }
+        if self == ESPMatterConstants.tempMeasurementCluster {
+            return 1026
+        }
+        return nil
+    }
 }

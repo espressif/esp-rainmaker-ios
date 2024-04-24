@@ -215,7 +215,7 @@ struct JSONParser {
                                     if i == index {
                                         let key = sortedKeys[i]
                                         if let value = clients[key] {
-                                            newDevice.endpointClusterId = [key: value]
+                                            newDevice.bindingEndpointClusterId = [key: value]
                                         }
                                         break
                                     }
@@ -238,7 +238,7 @@ struct JSONParser {
                             let key = sortedKeys[i]
                             let device = Device(name: node.matterDeviceName ?? "", type: nil, node: node, deviceName: node.matterDeviceName ?? "")
                             if let value = clients[key] {
-                                device.endpointClusterId = [key: value]
+                                device.bindingEndpointClusterId = [key: value]
                             }
                             device.isMatter = true
                             result.append(device)

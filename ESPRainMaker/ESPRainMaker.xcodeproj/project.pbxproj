@@ -16,6 +16,8 @@
 		0C2426DF2BF4A5B6004BDF49 /* ESPNodeGroupSharingDeclinedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2426DD2BF4A5B6004BDF49 /* ESPNodeGroupSharingDeclinedEvent.swift */; };
 		0C2A3D432A39989E0097D16D /* ESPUpdateCATIdService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2A3D422A39989E0097D16D /* ESPUpdateCATIdService.swift */; };
 		0C2A3D452A39A2390097D16D /* DevicesViewController+Matter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2A3D442A39A2390097D16D /* DevicesViewController+Matter.swift */; };
+		0C31C3062BB3F565009ABB22 /* ClusterSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31C3052BB3F565009ABB22 /* ClusterSelectionViewController.swift */; };
+		0C31C30A2BB3F615009ABB22 /* ClusterSelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31C3092BB3F615009ABB22 /* ClusterSelectionCell.swift */; };
 		0C359CA72A40CDD300AE6C87 /* ESPMTRCommissioner+BasicInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C359CA62A40CDD300AE6C87 /* ESPMTRCommissioner+BasicInformation.swift */; };
 		0C37EEFF2A38830E001562BC /* ESPMatterLightUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C37EEFE2A38830E001562BC /* ESPMatterLightUIService.swift */; };
 		0C387F6B2A2E672C00C5EFA4 /* ESPMatterNodeDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C387F6A2A2E672C00C5EFA4 /* ESPMatterNodeDetailsService.swift */; };
@@ -139,7 +141,6 @@
 		0CD359222A2D25E30081017C /* ESPNodeDetailsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD3590E2A2D25E20081017C /* ESPNodeDetailsResponse.swift */; };
 		0CD359232A2D25E30081017C /* ESPDeleteMatterFabricResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD3590F2A2D25E20081017C /* ESPDeleteMatterFabricResponse.swift */; };
 		0CD359242A2D25E30081017C /* ESPGetNodeGroupsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD359122A2D25E20081017C /* ESPGetNodeGroupsService.swift */; };
-		0CD359252A2D25E30081017C /* ESPNodeMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD359132A2D25E20081017C /* ESPNodeMetadataService.swift */; };
 		0CD359262A2D25E30081017C /* ESPIssueUserNOCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD359142A2D25E20081017C /* ESPIssueUserNOCService.swift */; };
 		0CD359272A2D25E30081017C /* ESPDeleteNodeGroupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD359152A2D25E20081017C /* ESPDeleteNodeGroupService.swift */; };
 		0CD359282A2D25E30081017C /* ESPCreateMatterFabricService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD359162A2D25E20081017C /* ESPCreateMatterFabricService.swift */; };
@@ -642,6 +643,8 @@
 		0C2426DD2BF4A5B6004BDF49 /* ESPNodeGroupSharingDeclinedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNodeGroupSharingDeclinedEvent.swift; sourceTree = "<group>"; };
 		0C2A3D422A39989E0097D16D /* ESPUpdateCATIdService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPUpdateCATIdService.swift; sourceTree = "<group>"; };
 		0C2A3D442A39A2390097D16D /* DevicesViewController+Matter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DevicesViewController+Matter.swift"; sourceTree = "<group>"; };
+		0C31C3052BB3F565009ABB22 /* ClusterSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterSelectionViewController.swift; sourceTree = "<group>"; };
+		0C31C3092BB3F615009ABB22 /* ClusterSelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterSelectionCell.swift; sourceTree = "<group>"; };
 		0C359CA62A40CDD300AE6C87 /* ESPMTRCommissioner+BasicInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPMTRCommissioner+BasicInformation.swift"; sourceTree = "<group>"; };
 		0C37EEFE2A38830E001562BC /* ESPMatterLightUIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMatterLightUIService.swift; sourceTree = "<group>"; };
 		0C387F6A2A2E672C00C5EFA4 /* ESPMatterNodeDetailsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMatterNodeDetailsService.swift; sourceTree = "<group>"; };
@@ -770,7 +773,6 @@
 		0CD3590E2A2D25E20081017C /* ESPNodeDetailsResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPNodeDetailsResponse.swift; sourceTree = "<group>"; };
 		0CD3590F2A2D25E20081017C /* ESPDeleteMatterFabricResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPDeleteMatterFabricResponse.swift; sourceTree = "<group>"; };
 		0CD359122A2D25E20081017C /* ESPGetNodeGroupsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPGetNodeGroupsService.swift; sourceTree = "<group>"; };
-		0CD359132A2D25E20081017C /* ESPNodeMetadataService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPNodeMetadataService.swift; sourceTree = "<group>"; };
 		0CD359142A2D25E20081017C /* ESPIssueUserNOCService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPIssueUserNOCService.swift; sourceTree = "<group>"; };
 		0CD359152A2D25E20081017C /* ESPDeleteNodeGroupService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPDeleteNodeGroupService.swift; sourceTree = "<group>"; };
 		0CD359162A2D25E20081017C /* ESPCreateMatterFabricService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPCreateMatterFabricService.swift; sourceTree = "<group>"; };
@@ -1226,6 +1228,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C31C3042BB3F52B009ABB22 /* Binding */ = {
+			isa = PBXGroup;
+			children = (
+				0C31C3082BB3F5F2009ABB22 /* Cluster Selection */,
+				0C31C3072BB3F5DF009ABB22 /* Binding Screen */,
+			);
+			path = Binding;
+			sourceTree = "<group>";
+		};
+		0C31C3072BB3F5DF009ABB22 /* Binding Screen */ = {
+			isa = PBXGroup;
+			children = (
+				0C75B2522A30739500BB4661 /* BindingTableViewCell.swift */,
+				0C75B2482A30739500BB4661 /* DevicesBindingViewController.swift */,
+			);
+			path = "Binding Screen";
+			sourceTree = "<group>";
+		};
+		0C31C3082BB3F5F2009ABB22 /* Cluster Selection */ = {
+			isa = PBXGroup;
+			children = (
+				0C31C3052BB3F565009ABB22 /* ClusterSelectionViewController.swift */,
+				0C31C3092BB3F615009ABB22 /* ClusterSelectionCell.swift */,
+			);
+			path = "Cluster Selection";
+			sourceTree = "<group>";
+		};
 		0C387F692A2E670F00C5EFA4 /* Details */ = {
 			isa = PBXGroup;
 			children = (
@@ -1294,9 +1323,7 @@
 		0C75B2472A30739500BB4661 /* Clusters */ = {
 			isa = PBXGroup;
 			children = (
-				0C75B2482A30739500BB4661 /* DevicesBindingViewController.swift */,
 				0C75B2492A30739500BB4661 /* Cells */,
-				0C75B2522A30739500BB4661 /* BindingTableViewCell.swift */,
 			);
 			path = Clusters;
 			sourceTree = "<group>";
@@ -1562,7 +1589,6 @@
 			isa = PBXGroup;
 			children = (
 				0CD359122A2D25E20081017C /* ESPGetNodeGroupsService.swift */,
-				0CD359132A2D25E20081017C /* ESPNodeMetadataService.swift */,
 				0CD359142A2D25E20081017C /* ESPIssueUserNOCService.swift */,
 				0CD359152A2D25E20081017C /* ESPDeleteNodeGroupService.swift */,
 				0CD359162A2D25E20081017C /* ESPCreateMatterFabricService.swift */,
@@ -1648,19 +1674,12 @@
 		0CD3597A2A2D27610081017C /* Viewcontrollers */ = {
 			isa = PBXGroup;
 			children = (
-				0CD3597F2A2D293C0081017C /* Matter Commissioning */,
-			);
-			path = Viewcontrollers;
-			sourceTree = "<group>";
-		};
-		0CD3597F2A2D293C0081017C /* Matter Commissioning */ = {
-			isa = PBXGroup;
-			children = (
-				0C75B2442A30739500BB4661 /* Commissioned-Device */,
+				0C31C3042BB3F52B009ABB22 /* Binding */,
 				0CD3598C2A2D2DA20081017C /* Fabric Selection */,
+				0C75B2442A30739500BB4661 /* Commissioned-Device */,
 				0CD3598B2A2D2D970081017C /* Commissioning */,
 			);
-			path = "Matter Commissioning";
+			path = Viewcontrollers;
 			sourceTree = "<group>";
 		};
 		0CD3598B2A2D2D970081017C /* Commissioning */ = {
@@ -3073,6 +3092,7 @@
 				F176A41823C4669300F2FCBC /* DeviceCollectionViewLayout.swift in Sources */,
 				F1AC6D8327AA4CB20051F6E7 /* ScheduleTriggerTableViewCell.swift in Sources */,
 				F16A9F5329CC66D30009F839 /* Date+Seconds.swift in Sources */,
+				0C31C3062BB3F565009ABB22 /* ClusterSelectionViewController.swift in Sources */,
 				F1C352D026DBC40900A88893 /* ESPLocalDevice.swift in Sources */,
 				F1CC12542780FC640007634C /* ESPYAxisGenerator.swift in Sources */,
 				F176A41623C3B17D00F2FCBC /* DeviceListCollectionReusableView.swift in Sources */,
@@ -3134,7 +3154,6 @@
 				F1FA24BD2771F7C800447050 /* ESPBarChartViewProvider.swift in Sources */,
 				F172F96927B1344A00E62017 /* Calendar+GMT.swift in Sources */,
 				F1CA4BC1260FE7EC00F12D14 /* JoinNetworkViewController.swift in Sources */,
-				0CD359252A2D25E30081017C /* ESPNodeMetadataService.swift in Sources */,
 				0CDDC34A27E89D50004F9486 /* UILabel+GetViewHeight.swift in Sources */,
 				0C387F6B2A2E672C00C5EFA4 /* ESPMatterNodeDetailsService.swift in Sources */,
 				F1AFB25C2721FEAF00418969 /* AboutViewController.swift in Sources */,
@@ -3227,6 +3246,7 @@
 				0C2A3D432A39989E0097D16D /* ESPUpdateCATIdService.swift in Sources */,
 				0CD3591C2A2D25E30081017C /* ESPIssueUserNOCResponse.swift in Sources */,
 				0CE324B72B90631100D6682E /* DeviceViewController+CustomActionDelegate.swift in Sources */,
+				0C31C30A2BB3F615009ABB22 /* ClusterSelectionCell.swift in Sources */,
 				F1A866A327EBC45300A9858B /* AutomationNameTableViewCell.swift in Sources */,
 				0CD3591A2A2D25E30081017C /* NodeGroupSharingManager.swift in Sources */,
 				0CF69237270A308B0098F515 /* ESPAlexaAPIEndpoint.swift in Sources */,

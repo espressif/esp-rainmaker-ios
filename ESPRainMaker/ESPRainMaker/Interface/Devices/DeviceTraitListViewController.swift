@@ -45,7 +45,7 @@ class DeviceTraitListViewController: UIViewController {
     var dataSource: [Param] = []
     var foundCentralParam = false
     var isSwitch: Bool = false
-    var endpointClusterId: [String: UInt]?
+    var bindingEndpointClusterId: [String: UInt]?
     var switchIndex: Int?
     var matterNodeId: String?
 
@@ -109,7 +109,7 @@ class DeviceTraitListViewController: UIViewController {
             devicesBindingVC.group = self.group
             devicesBindingVC.nodes = self.allNodes
             devicesBindingVC.sourceNode = node
-            devicesBindingVC.endpointClusterId = self.endpointClusterId
+            devicesBindingVC.bindingEndpointClusterId = self.bindingEndpointClusterId
             self.navigationController?.pushViewController(devicesBindingVC, animated: true)
         }
     }
@@ -307,7 +307,7 @@ class DeviceTraitListViewController: UIViewController {
         destination.currentNode = node
         destination.group = self.group
         destination.allNodes = self.allNodes
-        destination.endpointClusterId = endpointClusterId
+        destination.bindingEndpointClusterId = self.bindingEndpointClusterId
         destination.switchIndex = self.switchIndex
         destination.sourceNode = self.node
         navigationController?.pushViewController(destination, animated: true)

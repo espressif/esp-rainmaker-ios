@@ -35,7 +35,7 @@ extension DeviceViewController: BindingDelegate {
             devicesBindingVC.group = self.group
             devicesBindingVC.nodes = self.allNodes
             devicesBindingVC.sourceNode = node
-            devicesBindingVC.endpointClusterId = endpointClusterId
+            devicesBindingVC.bindingEndpointClusterId = endpointClusterId
             devicesBindingVC.switchIndex = self.switchIndex
             DispatchQueue.main.async {
                 self.navigationController?.pushViewController(devicesBindingVC, animated: true)
