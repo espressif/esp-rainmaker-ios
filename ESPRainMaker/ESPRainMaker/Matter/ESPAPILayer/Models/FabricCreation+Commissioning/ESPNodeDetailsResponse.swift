@@ -322,3 +322,109 @@ class ESPFabricDetails: Codable {
         case ipk
     }
 }
+
+enum NodeLinkingStatus {
+    case linked
+    case unlinked
+}
+
+class ESPNodeGroupWorker {
+    
+    static let shared = ESPNodeGroupWorker()
+    
+    /// Get all devices in a group that support a given cluster
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - cluster: cluster id
+    /// - Returns: devices list
+    func getGroupDevices(groupId: String, clusterId: UInt) -> [ESPNodeDetails]? {
+        var alldDevices: [ESPNodeDetails]?
+        if let nodeGroupDetails = ESPMatterFabricDetails.shared.getNodeGroupDetails(groupId: groupId), let groups = nodeGroupDetails.groups, groups.count > 0 {
+            for group in groups {
+                if let id = group.groupID, id == groupId {
+                    alldDevices = [ESPNodeDetails]()
+                    if let nodeDetails = group.nodeDetails {
+                        for nodeDetail in nodeDetails {
+                            if let deviceId = nodeDetail.deviceId {
+                                if ESPMatterClusterUtil.shared.isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: clusterId).0 {
+                                    alldDevices?.append(nodeDetail)
+                                }
+                            }
+                        }
+                    }
+                    break
+                }
+            }
+        }
+        return alldDevices
+    }
+    
+    /// Get node ids linked to a given source
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - switchIndex: switch index
+    ///   - cluster: cluster
+    ///   - node: source node
+    ///   - destinationNodeId: destination node
+    /// - Returns: linked node ids
+    func getLinkedNodeIds(groupId: String, switchIndex: Int?, clusterId: UInt, node: Node) -> [String]? {
+        if let metadata = ESPMatterFabricDetails.shared.getGroupBindingMetadata(groupId: groupId), let sourceNodeId = node.node_id {
+            if let bindingEndpoint = node.getBindingEndpoint(switchIndex: switchIndex) {
+                if metadata.count > 0 {
+                    if let endpointsData = metadata[sourceNodeId] as? [String: Any] {
+                        if let clusterData = endpointsData["\(bindingEndpoint)"] as? [String: Any] {
+                            if let destinations = clusterData["\(clusterId)"] as? [String], destinations.count > 0 {
+                                return destinations
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
+    /// Get node details with given linking status
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - switchIndex: switch index
+    ///   - cluster: cluster
+    ///   - node: source node
+    ///   - destinationNodeId: destination node id
+    ///   - nodeLinkingStatus: node linking status
+    /// - Returns: node details with a given linking status
+    func getNodeDetails(groupId: String, switchIndex: Int?, clusterId: UInt, node: Node, withNodeLinkingStatus nodeLinkingStatus: NodeLinkingStatus) -> [ESPNodeDetails] {
+        var nodeDetails = [ESPNodeDetails]()
+        if let allNodes = self.getGroupDevices(groupId: groupId, clusterId: clusterId) {
+            if let destinationNodeIds = self.getLinkedNodeIds(groupId: groupId, switchIndex: switchIndex, clusterId: clusterId, node: node), destinationNodeIds.count > 0 {
+                for singleNode in allNodes {
+                    if let nodeID = singleNode.nodeID {
+                        switch nodeLinkingStatus {
+                        case .linked:
+                            if destinationNodeIds.contains(nodeID) {
+                                nodeDetails.append(singleNode)
+                            }
+                        case .unlinked:
+                            if !destinationNodeIds.contains(nodeID) {
+                                nodeDetails.append(singleNode)
+                            }
+                        }
+                    }
+                }
+                return nodeDetails
+            } else {
+                switch nodeLinkingStatus {
+                case .linked:
+                    return []
+                case .unlinked:
+                    for node in allNodes {
+                        if let deviceId = node.deviceId, ESPMatterClusterUtil.shared.isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: clusterId).0 {
+                            nodeDetails.append(node)
+                        }
+                    }
+                }
+            }
+        }
+        return nodeDetails
+    }
+}

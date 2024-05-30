@@ -339,4 +339,52 @@ extension Node {
         }
         return "Matter-Controller-Data"
     }
+    
+    func getBindingEndpoint(switchIndex: Int?) -> UInt? {
+        let bindingServers = self.bindingServers
+        if let index = switchIndex {
+            let sortedKeys = bindingServers.keys.sorted { $0 < $1 }
+            if index < sortedKeys.count {
+                let key = sortedKeys[index]
+                if let endpoint = UInt(key) {
+                    return endpoint
+                }
+            }
+        } else {
+            let sortedKeys = bindingServers.keys.sorted { $0 < $1 }
+            if sortedKeys.count == 1, let key = sortedKeys.first { 
+                if let endpoint = UInt(key) {
+                    return endpoint
+                }
+            }
+        }
+        return nil
+    }
+    
+    func getAllFabricDevices() -> [Node] {
+        var fabricNodes: [Node] = [Node]()
+        if let groupId = self.groupId {
+            if let nodes = User.shared.associatedNodeList {
+                for node in nodes {
+                    if let grpId = node.groupId, grpId == groupId {
+                        fabricNodes.append(node)
+                    }
+                }
+            }
+        }
+        return fabricNodes
+    }
+    
+    func getOnOffDevices() -> [Node] {
+        var onOffNodes: [Node] = [Node]()
+        let fabricNodes = self.getAllFabricDevices()
+        if fabricNodes.count > 0 {
+            for node in fabricNodes {
+                if node.isOnOffServerSupported.0 {
+                    onOffNodes.append(node)
+                }
+            }
+        }
+        return onOffNodes
+    }
 }

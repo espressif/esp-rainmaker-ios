@@ -23,20 +23,36 @@ public class ESPMatterClusterUtil {
     public static let shared = ESPMatterClusterUtil()
     private let fabricDetails = ESPMatterFabricDetails.shared
     
+    /// Is a given client cluster supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - clusterId: cluster id
+    /// - Returns: is client cluster supported
+    public func isClientClusterSupported(groupId: String, deviceId: UInt64, clusterId: UInt) -> (Bool, String?) {
+        let val = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
+        for key in val.keys {
+            if let list = val[key], list.count > 0, list.contains(clusterId) {
+                return (true, key)
+            }
+        }
+        return (false, nil)
+    }
+    
     /// Matter utility methods
     /// Is on/off client supported
     /// - Parameters:
     ///   - groupId: group id
     ///   - deviceId: device id
     /// - Returns: flag
-    public func isOnOffClientSupported(groupId: String, deviceId: UInt64) -> Bool {
+    public func isOnOffClientSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
         let val = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
         for key in val.keys {
             if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
-                return true
+                return (true, key)
             }
         }
-        return false
+        return (false, nil)
     }
     
     /// fetch binding servers
@@ -214,7 +230,7 @@ public class ESPMatterClusterUtil {
     ///   - deviceId: device id
     ///   - clusterId: cluster id
     /// - Returns: (is cluster supported, endpoint id)
-    private func isServerClusterSupported(groupId: String, deviceId: UInt64, clusterId: UInt) -> (Bool, String?) {
+    public func isServerClusterSupported(groupId: String, deviceId: UInt64, clusterId: UInt) -> (Bool, String?) {
         let val = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
         for key in val.keys {
             if let list = val[key], list.count > 0, list.contains(clusterId) {

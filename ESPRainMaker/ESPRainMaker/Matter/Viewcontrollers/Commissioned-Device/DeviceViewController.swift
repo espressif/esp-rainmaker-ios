@@ -43,7 +43,7 @@ class DeviceViewController: UIViewController {
     var cellInfo: [String] = [String]()
     var endPoint: UInt16 = 1
     var sharingTextField: UITextField?
-    var endpointClusterId: [String: UInt]?
+    var bindingEndpointClusterId: [String: UInt]?
     var rainmakerNodes: [Node]?
     var rainmakerNode: Node?
     var deviceName: String?
@@ -171,7 +171,7 @@ class DeviceViewController: UIViewController {
             devicesBindingVC.nodes = self.allNodes
             devicesBindingVC.sourceNode = node
             devicesBindingVC.switchIndex = self.switchIndex
-            devicesBindingVC.endpointClusterId = self.endpointClusterId
+            devicesBindingVC.bindingEndpointClusterId = self.bindingEndpointClusterId
             self.navigationController?.pushViewController(devicesBindingVC, animated: true)
         }
     }
@@ -183,7 +183,7 @@ class DeviceViewController: UIViewController {
         destination.currentNode = self.rainmakerNode
         destination.group = self.group
         destination.allNodes = self.allNodes
-        destination.endpointClusterId = endpointClusterId
+        destination.bindingEndpointClusterId = bindingEndpointClusterId
         destination.switchIndex = self.switchIndex
         destination.sourceNode = self.node
         navigationController?.pushViewController(destination, animated: true)

@@ -47,27 +47,27 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
     ///   - deviceId: device id
     ///   - indexPath: index path
     func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath, rNode: Node? = nil, nodeConnectionStatus: NodeConnectionStatus) {
-        let result = ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId)
+        let result = ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0
         let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
-        var endpointClusterId: [String: UInt]?
+        var bindingEndpointClusterId: [String: UInt]?
         var switchIndex: Int?
         if isSingleDeviceNode, result, clients.count == 1 {
-            endpointClusterId = clients
+            bindingEndpointClusterId = clients
         } else if !isSingleDeviceNode, result, indexPath.item < clients.count {
             let sortedKeys = clients.keys.sorted { $0 < $1 }
             let key = sortedKeys[indexPath.item]
             switchIndex = indexPath.item
             if let value = clients[key] {
-                endpointClusterId = [key: value]
+                bindingEndpointClusterId = [key: value]
             }
         }
         if let nodeId = node.nodeID, let rainmakerNode = User.shared.getNode(id: nodeId), !rainmakerNode.isRainmaker {
-            self.showMatterDeviceVCWithNode(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath, switchIndex: switchIndex, nodeConnectionStatus: nodeConnectionStatus)
+            self.showMatterDeviceVCWithNode(node: node, group: group, bindingEndpointClusterId: bindingEndpointClusterId, indexPath: indexPath, switchIndex: switchIndex, nodeConnectionStatus: nodeConnectionStatus)
         } else {
             if let rNode = rNode, let matterNodeId = rNode.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
-                self.showMatterDeviceVCWithNode(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath, switchIndex: switchIndex, nodeConnectionStatus: nodeConnectionStatus)
+                self.showMatterDeviceVCWithNode(node: node, group: group, bindingEndpointClusterId: bindingEndpointClusterId, indexPath: indexPath, switchIndex: switchIndex, nodeConnectionStatus: nodeConnectionStatus)
             } else {
-                self.showDeviceTraitListVC(node: node, group: group, endpointClusterId: endpointClusterId, indexPath: indexPath)
+                self.showDeviceTraitListVC(node: node, group: group, endpointClusterId: bindingEndpointClusterId, indexPath: indexPath)
             }
         }
     }
@@ -78,13 +78,13 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
     ///   - group: ESPNodeGroup
     ///   - endpointClusterId: endpoint cluster id
     ///   - indexPath: indexpath
-    func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?, nodeConnectionStatus: NodeConnectionStatus) {
+    func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, bindingEndpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?, nodeConnectionStatus: NodeConnectionStatus) {
         #if ESPRainMakerMatter
         if #available(iOS 16.4, *) {
             let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
             if let deviceScreen = storyboard.instantiateViewController(withIdentifier: DeviceViewController.storyboardId) as? DeviceViewController {
                 deviceScreen.switchIndex = switchIndex
-                deviceScreen.endpointClusterId = endpointClusterId
+                deviceScreen.bindingEndpointClusterId = bindingEndpointClusterId
                 deviceScreen.group = group
                 deviceScreen.node = node
                 deviceScreen.matterNodeId = node.matterNodeID
@@ -98,7 +98,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                         deviceScreen.allNodes = allNodes
                     }
                     let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
-                    if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 1 {
+                    if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0, clients.count > 1 {
                         deviceScreen.deviceName = "\(deviceName).\(indexPath.item)"
                     } else {
                         deviceScreen.deviceName = deviceName
@@ -135,13 +135,13 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                             deviceTraitList.allNodes = allNodes
                         }
                         let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
-                        if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 0 {
+                        if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0, clients.count > 0 {
                             if !ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
                                 deviceTraitList.isSwitch = true
                             }
-                            deviceTraitList.endpointClusterId = endpointClusterId
+                            deviceTraitList.bindingEndpointClusterId = endpointClusterId
                         }
-                        if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 1 {
+                        if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0, clients.count > 1 {
                             deviceTraitList.deviceName = "\(deviceName).\(indexPath.item)"
                             deviceTraitList.switchIndex = indexPath.item
                         } else {
@@ -177,7 +177,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                 deviceScreen.rainmakerNodes = User.shared.associatedNodeList
                 deviceScreen.rainmakerNode = rainmakerNode
                 if let groupId = group.groupID, let node = node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal {
-                    let result = ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId)
+                    let result = ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0
                     let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
                     var endpointClusterId: [String: UInt]?
                     var switchIndex: Int?
@@ -191,7 +191,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                             endpointClusterId = [key: value]
                         }
                     }
-                    deviceScreen.endpointClusterId = endpointClusterId
+                    deviceScreen.bindingEndpointClusterId = endpointClusterId
                     deviceScreen.switchIndex = switchIndex
                     deviceScreen.matterNodeId = matterNodeId
                 }
@@ -201,7 +201,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                         deviceScreen.allNodes = allNodes
                     }
                     let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
-                    if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId), clients.count > 1 {
+                    if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0, clients.count > 1 {
                         deviceScreen.deviceName = "\(deviceName).\(indexPath.item)"
                     } else {
                         deviceScreen.deviceName = deviceName

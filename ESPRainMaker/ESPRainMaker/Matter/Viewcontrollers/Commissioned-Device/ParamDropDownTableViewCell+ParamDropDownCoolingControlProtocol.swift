@@ -87,6 +87,28 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
                     self.controlValueLabel.text = systemMode
                 }
             }
+            self.readAndSubscribeToSystemMode(groupId: grpId, deviceId: id)
+        }
+    }
+    
+    func readAndSubscribeToSystemMode(groupId: String, deviceId: UInt64) {
+        ESPMTRCommissioner.shared.readSystemMode(groupId: groupId, deviceId: deviceId) { value in
+            if let value = value {
+                let val = value.intValue
+                var systemMode = ESPMatterConstants.off
+                if val == 0 {
+                    systemMode = ESPMatterConstants.off
+                } else if val == 3 {
+                    systemMode = ESPMatterConstants.cool
+                } else if val == 4 {
+                    systemMode = ESPMatterConstants.heat
+                }
+                self.matterNode?.setMatterSystemMode(systemMode: systemMode, deviceId: deviceId)
+                DispatchQueue.main.async {
+                    self.controlValueLabel.text = systemMode
+                }
+                self.acParamDelegate?.acSystemModeSet()
+            }
         }
     }
     

@@ -87,6 +87,7 @@ extension ESPMatterFabricDetails {
     /// - Parameters:
     ///   - groupId: group id
     ///   - deviceId: device id
+    ///   - endpointClusterId: endpoint cluster id
     /// - Returns: linked nodes
     func getLinkedDevices(groupId: String, deviceId: UInt64, endpointClusterId: [String: Any]?) -> [ESPNodeDetails]? {
         var str = ""

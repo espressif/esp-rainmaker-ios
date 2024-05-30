@@ -22,7 +22,7 @@ protocol DeviceGroupCollectionViewCellDelegate {
     func didSelectDevice(device: Device)
     func didSelectNode(node: Node)
     func launchDeviceScreen(isSingleDeviceNode: Bool, groupId: String, group: ESPNodeGroup, node: ESPNodeDetails, matterNodeId: String, deviceId: UInt64, indexPath: IndexPath, rNode: Node?, nodeConnectionStatus: NodeConnectionStatus)
-    func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?, nodeConnectionStatus: NodeConnectionStatus)
+    func showMatterDeviceVCWithNode(node: ESPNodeDetails, group: ESPNodeGroup, bindingEndpointClusterId: [String: UInt]?, indexPath: IndexPath, switchIndex: Int?, nodeConnectionStatus: NodeConnectionStatus)
     func showDeviceTraitListVC(node: ESPNodeDetails, group: ESPNodeGroup, endpointClusterId: [String: UInt]?, indexPath: IndexPath)
     func showDeleteDeviceVC(node: ESPNodeDetails?, group: ESPNodeGroup, rainmakerNode: Node?, indexPath: IndexPath)
 }
@@ -354,14 +354,14 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         if result {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.lightDevice)
             cell.onOffButton.isHidden = false
-        } else if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId) {
+        } else if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0 {
             if isSingleDeviceNode {
-                cell.endpointClusterId = endPointClusterId
+                cell.bindingEndpointClusterId = endPointClusterId
             } else {
                 let sortedKeys = endPointClusterId.keys.sorted { $0 < $1 }
                 if indexPath.item < sortedKeys.count {
                     let key = sortedKeys[indexPath.item]
-                    cell.endpointClusterId = [key: [endPointClusterId[key]]]
+                    cell.bindingEndpointClusterId = [key: [endPointClusterId[key]]]
                 }
             }
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.switchDevice)

@@ -371,7 +371,7 @@ extension ESPMatterFabricDetails {
     ///   - matterNodeId: matter node id
     func saveMetadata(details: [String: Any], groupId: String, matterNodeId: String) {
         var metadata = details
-        if let data = details[ESPMatterConstants.metadata] as? [String: Any], let finalData = data[ESPMatterConstants.matter] as? [String: Any] {
+        if let finalData = details[ESPMatterConstants.matter] as? [String: Any] {
             metadata = finalData
         }
         if let deviceId = matterNodeId.hexToDecimal {

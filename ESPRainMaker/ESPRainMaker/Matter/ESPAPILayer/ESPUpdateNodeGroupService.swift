@@ -37,11 +37,9 @@ class ESPNodeGroupMetadataService {
     ///   - node: source node
     ///   - destinationNodeId: destination node id
     ///   - completion: completion
-    func bindDevice(node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
-        if let groupId = node.groupId {
-            self.addDeviceToGroupMetadata(groupId: groupId, node: node, destinationNodeId: destinationNodeId) { result in
-                completion(result)
-            }
+    func bindDevice(node: Node, cluster: String, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
+        if let groupId = node.groupId, let clusterId = cluster.clusterId {
+            self.appendDeviceGroupMetadata(groupId: groupId, clusterId: clusterId, node: node, destinationNodeId: destinationNodeId, completion: completion)
         } else {
             completion(false)
         }
@@ -52,11 +50,9 @@ class ESPNodeGroupMetadataService {
     ///   - node: source node
     ///   - destinationNodeId: detination node id
     ///   - completion: completion
-    func unbindDevice(node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
-        if let groupId = node.groupId {
-            self.removeDeviceFromGroupMetadata(groupId: groupId, node: node, destinationNodeId: destinationNodeId) { result in
-                completion(result)
-            }
+    func unbindDevice(node: Node, cluster: String, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
+        if let groupId = node.groupId, let clusterId = cluster.clusterId {
+            self.removeDeviceGroupMetadata(groupId: groupId, clusterId: clusterId, node: node, destinationNodeId: destinationNodeId, completion: completion)
         } else {
             completion(false)
         }
@@ -79,96 +75,98 @@ class ESPNodeGroupMetadataService {
         return finalStr
     }
     
-    /// Add device binding to group metadagta
+    /// Add device binding to group metadaga
     /// - Parameters:
     ///   - groupId: grouip id
     ///   - node: node
     ///   - destinationNodeId: destination node id
-    func addDeviceToGroupMetadata(groupId: String, node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
-        var finalMetadata: [String: Any]?
-        if let sourceNodeId = node.node_id, var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
-            let keys = metadata.keys
-            if keys.contains(sourceNodeId), let value = metadata[sourceNodeId] as? String {
-                if !value.contains(destinationNodeId) {
-                    if let index = self.switchIndex {
-                        metadata[sourceNodeId] = value+",\(destinationNodeId).\(index)" as Any
+    ///   - cluster: cluster id
+    ///   - completion: completion
+    func appendDeviceGroupMetadata(groupId: String, clusterId: UInt, node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
+        var metadata = [String: Any]()
+        if let savedMetadata = self.fabricDetails.getGroupBindingMetadata(groupId: groupId) {
+            metadata = savedMetadata
+        }
+        if let sourceNodeId = node.node_id {
+            if let bindingEndpoint = node.getBindingEndpoint(switchIndex: self.switchIndex) {
+                if metadata.count > 0 {
+                    if var endpointsData = metadata[sourceNodeId] as? [String: Any] {
+                        if var clusterData = endpointsData["\(bindingEndpoint)"] as? [String: Any] {
+                            if var destinations = clusterData["\(clusterId)"] as? [String], destinations.count > 0 {
+                                if !destinations.contains(destinationNodeId) {
+                                    destinations.append(destinationNodeId)
+                                    clusterData["\(clusterId)"] = destinations
+                                    endpointsData["\(bindingEndpoint)"] = clusterData
+                                    metadata[sourceNodeId] = endpointsData
+                                }
+                            } else {
+                                clusterData["\(clusterId)"] = [destinationNodeId]
+                                endpointsData["\(bindingEndpoint)"] = clusterData
+                                metadata[sourceNodeId] = endpointsData
+                            }
+                        } else {
+                            endpointsData["\(bindingEndpoint)"] = ["\(clusterId)" : [destinationNodeId]]
+                            metadata[sourceNodeId] = endpointsData
+                        }
                     } else {
-                        metadata[sourceNodeId] = value+",\(destinationNodeId)" as Any
+                        metadata[sourceNodeId] = ["\(bindingEndpoint)": ["\(clusterId)" : [destinationNodeId]]]
                     }
-                }
-            } else {
-                if let index = self.switchIndex {
-                    metadata[sourceNodeId] = "\(destinationNodeId).\(index)" as Any
                 } else {
-                    metadata[sourceNodeId] = destinationNodeId as Any
+                    metadata = [sourceNodeId: ["\(bindingEndpoint)": ["\(clusterId)" : [destinationNodeId]]]]
                 }
-            }
-            finalMetadata = metadata
-        } else if let sourceNodeId = node.node_id {
-            finalMetadata = [String: Any]()
-            if let index = self.switchIndex {
-                finalMetadata?[sourceNodeId] = "\(destinationNodeId).\(index)" as Any
-            } else {
-                finalMetadata?[sourceNodeId] = destinationNodeId as Any
             }
         }
-        if let data = finalMetadata {
-            self.updateGroupMetadata(groupId: groupId, groupMetadata: data) { result in
-                if result {
-                    if data.isEmpty {
-                        self.fabricDetails.removeGroupMetadata(groupId: groupId)
-                    } else {
-                        self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: data)
-                    }
+        self.updateGroupMetadata(groupId: groupId, groupMetadata: metadata) { result, finalPayload  in
+            if result {
+                if metadata.isEmpty {
+                    self.fabricDetails.removeGroupMetadata(groupId: groupId)
+                } else if let finalPayload = finalPayload {
+                    self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: finalPayload)
                 }
-                completion(result)
             }
-        } else {
-            completion(false)
+            completion(result)
         }
     }
     
-    /// Remove device from group metadata
+    /// Remove device group metadata
     /// - Parameters:
     ///   - groupId: group id
+    ///   - cluster: cluster
     ///   - node: source node
-    ///   - destinationNodeId: destination node id
+    ///   - destinationNodeId: destionation node id
     ///   - completion: completion
-    func removeDeviceFromGroupMetadata(groupId: String, node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
-        if let sourceNodeId = node.node_id, var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
-            let keys = metadata.keys
-            if keys.contains(sourceNodeId), let value = metadata[sourceNodeId] as? String {
-                var finalIds = [String]()
-                let ids = value.components(separatedBy: ",")
-                for id in ids {
-                    if let index = self.switchIndex, id == "\(destinationNodeId).\(index)" {
-                        continue
-                    } else if id == destinationNodeId {
-                        continue
-                    }
-                    finalIds.append(id)
-                }
-                if finalIds.count == 0 {
-                    metadata = [:]
-                } else {
-                    let finalValue = self.getBindingValue(ids: finalIds)
-                    metadata[sourceNodeId] = finalValue
-                }
-                self.updateGroupMetadata(groupId: groupId, groupMetadata: metadata) { result in
-                    if result {
-                        if metadata.isEmpty {
-                            self.fabricDetails.removeGroupMetadata(groupId: groupId)
-                        } else {
-                            self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: metadata)
+    func removeDeviceGroupMetadata(groupId: String, clusterId: UInt, node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
+        var metadata = [String: Any]()
+        if let savedMetadata = self.fabricDetails.getGroupBindingMetadata(groupId: groupId) {
+            metadata = savedMetadata
+        }
+        if let sourceNodeId = node.node_id {
+            if let bindingEndpoint = node.getBindingEndpoint(switchIndex: self.switchIndex) {
+                if metadata.count > 0 {
+                    if var endpointsData = metadata[sourceNodeId] as? [String: Any] {
+                        if var clusterData = endpointsData["\(bindingEndpoint)"] as? [String: Any] {
+                            if var destinations = clusterData["\(clusterId)"] as? [String], destinations.count > 0 {
+                                destinations = destinations.filter {
+                                    return $0 != destinationNodeId
+                                }
+                                clusterData["\(clusterId)"] = destinations
+                                endpointsData["\(bindingEndpoint)"] = clusterData
+                                metadata[sourceNodeId] = endpointsData
+                            }
                         }
                     }
-                    completion(result)
                 }
-            } else {
-                completion(true)
             }
-        } else {
-            completion(false)
+        }
+        self.updateGroupMetadata(groupId: groupId, groupMetadata: metadata) { result, finalPayload  in
+            if result {
+                if metadata.isEmpty {
+                    self.fabricDetails.removeGroupMetadata(groupId: groupId)
+                } else if let finalPayload = finalPayload {
+                    self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: finalPayload)
+                }
+            }
+            completion(result)
         }
     }
     
@@ -178,7 +176,7 @@ class ESPNodeGroupMetadataService {
     ///   - node: node to be removed
     ///   - completion: completion
     func removeSourceNodeFromGroupMetadata(groupId: String, node: Node, completion: @escaping (Bool) -> Void) {
-        if let sourceNodeId = node.node_id, var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
+        if let sourceNodeId = node.node_id, var metadata = self.fabricDetails.getGroupBindingMetadata(groupId: groupId) {
             if let _ = metadata[sourceNodeId] {
                 metadata[sourceNodeId] = nil
             }
@@ -194,7 +192,7 @@ class ESPNodeGroupMetadataService {
     ///   - destinationNodeId: destination node id
     ///   - completion: completion
     func removeDestinationNodeFromGroupMetadata(groupId: String, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
-        if var metadata = self.fabricDetails.getGroupMetadata(groupId: groupId) {
+        if var metadata = self.fabricDetails.getGroupBindingMetadata(groupId: groupId) {
             for key in metadata.keys {
                 if let val = metadata[key] as? String {
                     let fields = val.components(separatedBy: ",")
@@ -221,12 +219,12 @@ class ESPNodeGroupMetadataService {
     ///   - groupMetadata: group metadata
     ///   - completion: completion
     func updateMetadata(groupId: String, groupMetadata: [String: Any], completion: @escaping (Bool) -> Void) {
-        self.updateGroupMetadata(groupId: groupId, groupMetadata: groupMetadata) { result in
+        self.updateGroupMetadata(groupId: groupId, groupMetadata: groupMetadata) { result, finalPayload in
             if result {
                 if groupMetadata.isEmpty {
                     self.fabricDetails.removeGroupMetadata(groupId: groupId)
-                } else {
-                    self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: groupMetadata)
+                } else if let finalPayload = finalPayload {
+                    self.fabricDetails.saveGroupMetadata(groupId: groupId, groupMetadata: finalPayload)
                 }
             }
             completion(result)
@@ -238,7 +236,7 @@ class ESPNodeGroupMetadataService {
     ///   - groupId: group id
     ///   - groupMetadata: group metadata
     ///   - completion: completion
-    func updateGroupMetadata(groupId: String, groupMetadata: [String: Any], completion: @escaping (Bool) -> Void) {
+    func updateGroupMetadata(groupId: String, groupMetadata: [String: Any], completion: @escaping (Bool, [String: Any]?) -> Void) {
         if let group = self.fabricDetails.getGroupData(groupId: groupId), let groupName = group.groupName {
             let sessionWorker = ESPExtendUserSessionWorker()
             sessionWorker.checkUserSession { token, _ in
@@ -246,17 +244,26 @@ class ESPNodeGroupMetadataService {
                     let updateURL = self.groupURL + "?group_id=\(groupId)"
                     let headers: HTTPHeaders = [ESPMatterConstants.contentType: ESPMatterConstants.applicationJSON,
                                                 ESPMatterConstants.authorization: token]
-                    let params = [ESPMatterConstants.groupName: groupName,
-                                  ESPMatterConstants.groupMetadata: groupMetadata as Any]
-                    self.apiWorker.callDataAPI(url: updateURL, method: .put, parameters: params, headers: headers, apiDescription: "Update Group Metadata") { data, _ in
+                    var finalParams: [String: Any] = [ESPMatterConstants.bindings: groupMetadata]
+                    var finalPayload = [String: Any]()
+                    if var final = ESPMatterFabricDetails.shared.getGroupMetadata(groupId: groupId) {
+                        final[ESPMatterConstants.bindings] = groupMetadata
+                        finalPayload = [ESPMatterConstants.groupName: groupName,
+                                        ESPMatterConstants.groupMetadata: final as Any]
+                        finalParams = final
+                    } else {
+                        finalPayload = [ESPMatterConstants.groupName: groupName,
+                                        ESPMatterConstants.groupMetadata: finalParams as Any]
+                    }
+                    self.apiWorker.callDataAPI(url: updateURL, method: .put, parameters: finalPayload, headers: headers, apiDescription: "Update Group Metadata") { data, _ in
                         guard let data = data, let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = json[ESPMatterConstants.status] as? String, status.lowercased() == ESPMatterConstants.success else {
-                            completion(false)
+                            completion(false, nil)
                             return
                         }
-                        completion(true)
+                        completion(true, finalParams)
                     }
                 } else {
-                    completion(false)
+                    completion(false, nil)
                 }
             }
         }
