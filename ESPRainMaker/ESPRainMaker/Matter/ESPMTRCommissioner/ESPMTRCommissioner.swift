@@ -145,9 +145,8 @@ extension ESPMTRCommissioner: MTROperationalCertificateIssuer {
                 let nodeGroupURL = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion
                 let service = ESPAddNodeToMatterFabricService(presenter: self)
                 let finalCSR = "-----BEGIN CERTIFICATE REQUEST-----\n\(csrString)\n-----END CERTIFICATE REQUEST-----"
-                print("FINAL CSR: \(finalCSR)")
                 if let metadata = metadata, metadata.count > 0 {
-                    service.addNodeToMatterFabric(url: nodeGroupURL, groupId: groupId, operation: "add", csr: finalCSR, metadata: metadata)
+                    service.addNodeToMatterFabric(url: nodeGroupURL, groupId: groupId, operation: "add", csr: finalCSR, metadata: [ESPMatterConstants.matter: metadata])
                 } else {
                     service.addNodeToMatterFabric(url: nodeGroupURL, groupId: groupId, operation: "add", csr: finalCSR, metadata: nil)
                 }

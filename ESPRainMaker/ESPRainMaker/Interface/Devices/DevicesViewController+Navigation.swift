@@ -173,6 +173,7 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                 deviceScreen.group = group
                 deviceScreen.node = node
                 deviceScreen.isDeviceOffline = true
+                deviceScreen.nodeConnectionStatus = .offline
                 deviceScreen.rainmakerNodes = User.shared.associatedNodeList
                 deviceScreen.rainmakerNode = rainmakerNode
                 if let groupId = group.groupID, let node = node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal {

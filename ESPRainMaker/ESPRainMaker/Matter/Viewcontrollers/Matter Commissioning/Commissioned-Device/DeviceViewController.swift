@@ -49,6 +49,7 @@ class DeviceViewController: UIViewController {
     var deviceName: String?
     var switchIndex: Int?
     var isDeviceOffline: Bool = false
+    var showDefaultUI: Bool = true
     let fabricDetails = ESPMatterFabricDetails.shared
 
     //badge
@@ -113,6 +114,7 @@ class DeviceViewController: UIViewController {
         }
         ESPMTRCommissioner.shared.shutDownController()
         self.restartMatterController()
+        self.showDefaultUI = false
         DispatchQueue.main.async {
             self.deviceTableView.reloadData()
             DispatchQueue.main.asyncAfter(deadline: .now()+2.0) {
@@ -187,8 +189,6 @@ class DeviceViewController: UIViewController {
         navigationController?.pushViewController(destination, animated: true)
     }
     
-    
-    
     /// show binding button in right bar button item
     func showRightBarButtons(showInfo: Bool) {
         if showInfo {
@@ -209,118 +209,71 @@ class DeviceViewController: UIViewController {
         self.generateCells()
     }
     
-    func formatUI() {
-        if !isDeviceOffline, let groupId = self.group?.groupID, let deviceId = self.matterNodeId?.hexToDecimal {
-            self.setupAC(groupId: groupId, deviceId: deviceId) {
-                self.generateCells()
-            }
+    /// Setup node label balue for matter only device
+    /// - Parameters:
+    ///   - isNodeLabelAttributeSupported: is node label attribute supported
+    ///   - groupId: groupId
+    ///   - deviceId: device Id
+    ///   - completion: completion
+    func readNodeLabelValue(isNodeLabelAttributeSupported: Bool, groupId: String, deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+        if !isNodeLabelAttributeSupported {
+            completion(false)
+        }
+        if let _ = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+            completion(false)
         } else {
-            self.generateCells()
-        }
-    }
-    
-    func setupAC(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
-        DispatchQueue.main.async {
-            Utility.showLoader(message: "Fetching System Mode...", view: self.view)
-        }
-        self.readSystemMode(groupId: groupId, deviceId: deviceId) {
-            DispatchQueue.main.async {
-                Utility.hideLoader(view: self.view)
-                Utility.showLoader(message: "Fetching local temperature...", view: self.view)
-            }
-            self.readLocalTemperature(groupId: groupId, deviceId: deviceId) {
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                    Utility.showLoader(message: "Fetching cooling setpoint...", view: self.view)
-                }
-                self.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) {
-                    DispatchQueue.main.async {
-                        Utility.hideLoader(view: self.view)
-                        Utility.showLoader(message: "Fetching heating setpoint...", view: self.view)
-                    }
-                    self.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) {
-                        DispatchQueue.main.async {
-                            Utility.hideLoader(view: self.view)
+            switch self.nodeConnectionStatus {
+            case .local:
+                ESPMTRCommissioner.shared.getNodeLabel(deviceId: deviceId) { nodeLabel in
+                    if let nodeLabel = nodeLabel {
+                        self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
+                        completion(true)
+                    } else if let node = self.rainmakerNode, let deviceName = node.matterDeviceName {
+                        ESPMTRCommissioner.shared.setNodeLabel(deviceId: deviceId, nodeLabel: deviceName) { result in
+                            if result {
+                                self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: deviceName)
+                            }
+                            completion(result)
                         }
-                       completion()
                     }
                 }
+            default:
+                completion(false)
             }
         }
     }
     
-    func readSystemMode(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
-        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
-            ESPMTRCommissioner.shared.readSystemMode(groupId: groupId, deviceId: deviceId) { value in
-                if let value = value {
-                    let mode = value.intValue
-                    var systemMode = ESPMatterConstants.off
-                    switch mode {
-                    case 3:
-                        systemMode = ESPMatterConstants.cool
-                    case 4:
-                        systemMode = ESPMatterConstants.heat
-                    default:
-                        break
+    /// Read participant
+    /// - Parameters:
+    ///   - isParticipantDataSupported: is participant data supported
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - completion: completion
+    func readParticipantData(isParticipantDataSupported: (Bool, String?), groupId: String, deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+        if !isParticipantDataSupported.0 {
+            completion(false)
+        }
+        if let _ = self.fabricDetails.fetchParticipantData(groupId: groupId, deviceId: deviceId) {
+            completion(false)
+        } else {
+            switch self.nodeConnectionStatus {
+            case .local:
+                if let key = isParticipantDataSupported.1, let endpoint = UInt16(key) {
+                    ESPMTRCommissioner.shared.readParticipantData(deviceId: deviceId, endpoint: endpoint) { data in
+                        if let data = data {
+                            self.fabricDetails.saveParticipantData(groupId: groupId, deviceId: deviceId, participantData: data)
+                        } else {
+                            let details = ESPParticipantData(eventName: "CSA MM Nov '23")
+                            self.fabricDetails.saveParticipantData(groupId: groupId, deviceId: deviceId, participantData: details)
+                        }
+                        completion(true)
                     }
-                    self.node?.setMatterSystemMode(systemMode: systemMode, deviceId: deviceId)
+                } else {
+                    completion(false)
                 }
-                completion()
+            default:
+                completion(false)
             }
-        } else {
-            completion()
-        }
-    }
-    
-    func readLocalTemperature(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
-        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
-            ESPMTRCommissioner.shared.readLocalTemperature(groupId: groupId, deviceId: deviceId) { localTemperature in
-                if let localTemperature = localTemperature {
-                    self.node?.setMatterLocalTemperatureValue(temperature: localTemperature, deviceId: deviceId)
-                }
-                completion()
-            }
-        } else {
-            completion()
-        }
-    }
-    
-    func readOccupiedCoolingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
-        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
-            ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
-                if let value = value {
-                    self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: deviceId)
-                }
-                completion()
-            }
-        } else {
-            completion()
-        }
-    }
-    
-    func readOccupiedHeatingSetpoint(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
-        if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
-            ESPMTRCommissioner.shared.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
-                if let value = value {
-                    self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: deviceId)
-                }
-                completion()
-            }
-        } else {
-            completion()
-        }
-    }
-    
-    func readMeasuredTemoerature(groupId: String, deviceId: UInt64, completion: @escaping () -> Void) {
-        if ESPMatterClusterUtil.shared.isTempMeasurementSupported(groupId: groupId, deviceId: deviceId).0 {
-            ESPMTRCommissioner.shared.readMeasuredTemperatureValue(groupId: groupId, deviceId: deviceId) { measuredTemperature in
-                if let measuredTemperature = measuredTemperature {
-                    self.node?.setMeasuredTemperatureValue(temperature: measuredTemperature, deviceId: deviceId)
-                }
-                completion()
-            }
-        } else {
-            completion()
         }
     }
     
@@ -329,81 +282,40 @@ class DeviceViewController: UIViewController {
         self.cellInfo.removeAll()
         if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
             if let node = self.rainmakerNode, let _ = node.rainmakerDeviceName, node.isRainmaker {
+                //Setup UI for a rainmaker+matter node
                 self.cellInfo.append(ESPMatterConstants.deviceName)
                 self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                self.setupTableUI()
+                self.setupTableUI(showDefaultUI: false)
             } else {
-                if let _ = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                //Setup UI for a matter node
+                let isNodeLabelAttributeSupported = ESPMatterClusterUtil.shared.isNodeLabelAttributeSupported(groupId: groupId, deviceId: deviceId)
+                if isNodeLabelAttributeSupported {
                     self.cellInfo.append(ESPMatterConstants.nodeLabel)
-                    let badgeFlag = ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId)
-                    if badgeFlag.0 {
-                        if let _ = self.fabricDetails.fetchParticipantData(groupId: groupId, deviceId: deviceId) {
-                            self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                            self.setupTableUI()
-                        } else {
-                            if let key = badgeFlag.1, let endpoint = UInt16(key) {
-                                if self.isDeviceOffline {
-                                    self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                                    self.setupTableUI()
-                                } else {
-                                    DispatchQueue.main.async {
-                                        Utility.showLoader(message: "", view: self.view)
-                                    }
-                                    ESPMTRCommissioner.shared.readParticipantData(deviceId: deviceId, endpoint: endpoint) { data in
-                                        DispatchQueue.main.async {
-                                            Utility.hideLoader(view: self.view)
-                                        }
-                                        if let data = data {
-                                            self.fabricDetails.saveParticipantData(groupId: groupId, deviceId: deviceId, participantData: data)
-                                        } else {
-                                            let details = ESPParticipantData(eventName: "CSA MM Nov '23")
-                                            self.fabricDetails.saveParticipantData(groupId: groupId, deviceId: deviceId, participantData: details)
-                                        }
-                                        self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                                        self.setupTableUI()
-                                    }
-                                }
-                            } else {
-                                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                                self.setupTableUI()
+                }
+                let isBadgeSupported = ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId)
+                if isBadgeSupported.0 {
+                    self.cellInfo.append(ESPMatterConstants.participantData)
+                }
+                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                DispatchQueue.main.async {
+                    self.setupTableUI(showDefaultUI: true)
+                    Utility.showLoader(message: "", view: self.view)
+                }
+                self.readNodeLabelValue(isNodeLabelAttributeSupported: isNodeLabelAttributeSupported, groupId: groupId, deviceId: deviceId) { isNodeLabelUpdateRequired in
+                    self.readParticipantData(isParticipantDataSupported: isBadgeSupported, groupId: groupId, deviceId: deviceId) { isBadgeUpdateRequired in
+                        DispatchQueue.main.async {
+                            Utility.hideLoader(view: self.view)
+                            if isNodeLabelUpdateRequired || isBadgeUpdateRequired {
+                                self.setupTableUI(showDefaultUI: false)
                             }
                         }
-                    } else {
-                        self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                        self.setupTableUI()
                     }
-                } else if !self.isDeviceOffline {
-                    ESPMTRCommissioner.shared.shutDownController()
-                    switch self.nodeConnectionStatus {
-                    case .local:
-                        if let _ = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
-                            self.cellInfo.append(ESPMatterConstants.nodeLabel)
-                            self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                            self.setupTableUI()
-                        } else {
-                            self.restartMatterController()
-                            ESPMTRCommissioner.shared.getNodeLabel(deviceId: deviceId) { nodeLabel in
-                                if let nodeLabel = nodeLabel {
-                                    ESPMatterFabricDetails.shared.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
-                                    self.cellInfo.append(ESPMatterConstants.nodeLabel)
-                                }
-                                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                                self.setupTableUI()
-                            }
-                        }
-                    case .controller:
-                        self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                        self.setupTableUI()
-                    default:
-                        break
-                    }
-                } else {
-                    self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
-                    self.setupTableUI()
                 }
             }
         } else {
-            self.setupTableUI()
+            DispatchQueue.main.async {
+                self.setupTableUI(showDefaultUI: false)
+            }
         }
     }
     
@@ -433,9 +345,6 @@ class DeviceViewController: UIViewController {
         if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.rainmakerController)
         }
-        if ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId).0 {
-            cellInfo.append(ESPMatterConstants.participantData)
-        }
         if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.systemMode)
             if ESPMatterClusterUtil.shared.isLocalTemperatureAttributeSupported(groupId: groupId, deviceId: deviceId) {
@@ -454,7 +363,8 @@ class DeviceViewController: UIViewController {
     }
     
     /// Setup tableview UI
-    func setupTableUI() {
+    func setupTableUI(showDefaultUI: Bool) {
+        self.showDefaultUI = showDefaultUI
         DispatchQueue.main.async {
             self.setupOfflineUI()
             self.deviceTableView.reloadData()
@@ -467,62 +377,6 @@ class DeviceViewController: UIViewController {
             self.offlineView.isHidden = !self.isDeviceOffline
             self.offlineViewHeight.constant = self.isDeviceOffline ? 17.0 : 0.0
         }
-    }
-    
-    
-    /// Check matter connection
-    func checkMatterConnection() {
-        if let group = group, let id = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
-            Utility.showLoader(message: ESPMatterConstants.fetchingRainmakerDataMsg, view: self.view)
-            ESPMTRCommissioner.shared.isConnectedToMatter(timeout: 10.0, deviceId: deviceId) { result in
-                Utility.hideLoader(view: self.view)
-                if result {
-                    self.fetchDeviceDetails(groupId: id, deviceId: deviceId)
-                }
-            }
-        }
-    }
-    
-    /// Fetch device details
-    /// - Parameters:
-    ///   - groupId: group id
-    ///   - deviceId: device id
-    func fetchDeviceDetails(groupId: String, deviceId: UInt64) {
-        let serversData = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        let clientsData = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
-        let endpointsData = self.fabricDetails.fetchEndpointsData(groupId: groupId, deviceId: deviceId)
-        if serversData.count == 0, clientsData.count == 0, endpointsData.count == 0 {
-            Utility.showLoader(message: ESPMatterConstants.fetchingEndpointsMsg, view: self.view)
-            ESPMTRCommissioner.shared.addDeviceDetails(groupId: groupId, deviceId: deviceId) {
-                Utility.hideLoader(view: self.view)
-                self.registerCells()
-            }
-        }
-    }
-    
-    /// Fetch endpoint cluster ids
-    /// - Parameters:
-    ///   - groupId: group id
-    ///   - deviceId: device id
-    ///   - value: value
-    /// - Returns: [endpoint id: cluster id]
-    func fetchEndpointClusterIds(groupId: String, deviceId: UInt64, value: String) -> (String, [String: UInt]?)? {
-        let clients = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
-        let keys = clients.keys.sorted {
-            return $0 < $1
-        }
-        let indexStr = value.replacingOccurrences(of: ESPMatterConstants.binding, with: "")
-        if let index = Int(indexStr), index < keys.count {
-            let key = keys[index]
-            if let clientCluster = clients[key] {
-                if clients.count > 1 {
-                    return ("\(ESPMatterConstants.deviceBindingTxt) (\(ESPMatterConstants.switchTxt)\(index))", [key: clientCluster])
-                } else {
-                    return (ESPMatterConstants.deviceBindingTxt, [key: clientCluster])
-                }
-            }
-        }
-        return (ESPMatterConstants.deviceBindingTxt, nil)
     }
 }
 

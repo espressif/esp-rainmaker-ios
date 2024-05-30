@@ -371,8 +371,8 @@ extension ESPMatterFabricDetails {
     ///   - matterNodeId: matter node id
     func saveMetadata(details: [String: Any], groupId: String, matterNodeId: String) {
         var metadata = details
-        if let data = details[ESPMatterConstants.metadata] as? [String: Any] {
-            metadata = data
+        if let data = details[ESPMatterConstants.metadata] as? [String: Any], let finalData = data[ESPMatterConstants.matter] as? [String: Any] {
+            metadata = finalData
         }
         if let deviceId = matterNodeId.hexToDecimal {
             if let endpointsData = metadata[ESPMatterConstants.endpointsData] as? [UInt] {
@@ -394,6 +394,9 @@ extension ESPMatterFabricDetails {
             }
             if let deviceName = metadata[ESPMatterConstants.deviceName] as? String {
                 self.saveDeviceName(groupId: groupId, matterNodeId: matterNodeId, deviceName: deviceName)
+            }
+            if let deviceType = metadata[ESPMatterConstants.deviceType] as? Int64 {
+                self.saveDeviceType(groupId: groupId, deviceId: deviceId, type: deviceType)
             }
         }
     }

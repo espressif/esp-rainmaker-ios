@@ -28,8 +28,6 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
             let value = cellInfo[indexPath.row]
             if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter, ESPMatterConstants.measuredTemperature].contains(value) {
                 return 100.0
-            } else if [ESPMatterConstants.delete].contains(value) {
-                return 75.0
             } else if [ESPMatterConstants.levelControl, ESPMatterConstants.colorControl, ESPMatterConstants.saturationControl, ESPMatterConstants.occupiedCoolingSetpoint].contains(value) {
                 return 126.0
             } else if value == ESPMatterConstants.participantData {
@@ -50,248 +48,44 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if cellInfo.count == 1, indexPath.row < cellInfo.count {
-            let value = cellInfo[indexPath.row]
-            if value == ESPMatterConstants.delete, let cell = tableView.dequeueReusableCell(withIdentifier: RemoveDeviceCell.reuseIdentifier, for: indexPath) as? RemoveDeviceCell {
-                cell.delegate = self
-                self.setAutoresizingMask(cell)
-                cell.isUserInteractionEnabled = !self.isDeviceOffline
-                return cell
-            }
-        }
         if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let _ = matterNodeId.hexToDecimal, let deviceId = matterNodeId.hexToDecimal, indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
             if value == ESPMatterConstants.deviceName || value == ESPMatterConstants.nodeLabel {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: DeviceInfoCell.reuseIdentifier, for: indexPath) as? DeviceInfoCell {
-                    cell.delegate = self
-                    cell.rainmakerNode = self.rainmakerNode
-                    if let node = self.rainmakerNode, node.isRainmaker, let name = node.rainmakerDeviceName {
-                        cell.deviceInfo = .deviceName
-                        cell.deviceName.text = name
-                    } else {
-                        cell.deviceInfo = .nodeLabel
-                        cell.propertyName.text = "Name"
-                        if let name = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
-                            cell.deviceName.text = name
-                        }
-                    }
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
+                if let deviceNameCell = getDeviceNameCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId) {
+                    return deviceNameCell
                 }
             } else if value == ESPMatterConstants.onOff {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: DeviceOnOffCell.reuseIdentifier, for: indexPath) as? DeviceOnOffCell {
-                    cell.nodeConnectionStatus = self.nodeConnectionStatus
-                    cell.node = self.node
-                    cell.deviceId = deviceId
-                    cell.delegate = self
-                    cell.group = self.group
-                    self.setAutoresizingMask(cell)
-                    if self.isDeviceOffline {
-                        cell.setupOfflineUI(deviceId: deviceId)
-                    } else {
-                        cell.setupInitialUI()
-                    }
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
+                if let onOffCell = getOnOffCell(tableView, indexPath: indexPath, deviceId: deviceId) {
+                    return onOffCell
                 }
             } else if value == ESPMatterConstants.levelControl {
-                let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
-                object_setClass(sliderCell, ParamSliderTableViewCell.self)
-                let cell = sliderCell as! ParamSliderTableViewCell
-                cell.nodeConnectionStatus = self.nodeConnectionStatus
-                cell.node = self.node
-                cell.isRainmaker = false
-                cell.sliderParamType = .brightness
-                cell.nodeGroup = self.group
-                cell.deviceId = deviceId
-                cell.hueSlider.isHidden = true
-                cell.slider.isHidden = false
-                cell.paramChipDelegate = self
-                self.setAutoresizingMask(cell)
-                if self.isDeviceOffline {
-                    cell.setupOfflineUI()
-                } else {
-                    cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
-                }
-                cell.isUserInteractionEnabled = !self.isDeviceOffline
-                return cell
+                return getLevelControlCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId)
             } else if value == ESPMatterConstants.colorControl {
-                let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
-                object_setClass(sliderCell, ParamSliderTableViewCell.self)
-                let cell = sliderCell as! ParamSliderTableViewCell
-                cell.nodeConnectionStatus = self.nodeConnectionStatus
-                cell.node = self.node
-                cell.isRainmaker = false
-                cell.nodeGroup = self.group
-                cell.deviceId = deviceId
-                cell.slider.isHidden = true
-                cell.hueSlider.isHidden = false
-                cell.hueSlider.thumbColor = UIColor(hue: 0.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                cell.paramChipDelegate = self
-                self.setAutoresizingMask(cell)
-                cell.setupInitialHueValues()
-                if !self.isDeviceOffline {
-                    cell.subscribeToHueAttribute()
-                }
-                cell.isUserInteractionEnabled = !self.isDeviceOffline
-                return cell
+                return getColorControlCell(tableView, indexPath: indexPath, deviceId: deviceId)
             } else if value == ESPMatterConstants.saturationControl {
-                let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
-                object_setClass(sliderCell, ParamSliderTableViewCell.self)
-                let cell = sliderCell as! ParamSliderTableViewCell
-                cell.nodeConnectionStatus = self.nodeConnectionStatus
-                cell.node = self.node
-                cell.isRainmaker = false
-                cell.sliderParamType = .saturation
-                cell.nodeGroup = self.group
-                cell.deviceId = deviceId
-                cell.hueSlider.isHidden = true
-                cell.slider.isHidden = false
-                cell.paramChipDelegate = self
-                self.setAutoresizingMask(cell)
-                if self.isDeviceOffline {
-                    cell.setupOfflineUI()
-                } else {
-                    cell.getCurrentSaturationValue(groupId: groupId, deviceId: deviceId)
-                }
-                cell.isUserInteractionEnabled = !self.isDeviceOffline
-                return cell
-            } else if value == ESPMatterConstants.delete {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: RemoveDeviceCell.reuseIdentifier, for: indexPath) as? RemoveDeviceCell {
-                    cell.delegate = self
-                    self.setAutoresizingMask(cell)
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
-                }
-            } else if value == ESPMatterConstants.openCW {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: OpenCommissioningWindowCell.reuseIdentifier, for: indexPath) as? OpenCommissioningWindowCell {
-                    cell.delegate = self
-                    self.setAutoresizingMask(cell)
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
-                }
+                return getSaturationControlCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId)
             } else if value == ESPMatterConstants.rainmakerController {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier, for: indexPath) as? CustomActionCell {
-                    cell.delegate = self
-                    cell.setupWorkflow(workflow: .launchController)
-                    self.setAutoresizingMask(cell)
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
+                if let controllerCell = getControllerCell(tableView, indexPath: indexPath) {
+                    return controllerCell
                 }
             } else if value == ESPMatterConstants.borderRouter {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier, for: indexPath) as? CustomActionCell {
-                    cell.delegate = self
-                    cell.setupWorkflow(workflow: .updateThreadDataset)
-                    self.setAutoresizingMask(cell)
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
+                if let borderRouterCell = getBorderRouterCell(tableView, indexPath: indexPath) {
+                    return borderRouterCell
                 }
             } else if value == ESPMatterConstants.participantData {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantDataCell.reuseIdentifier, for: indexPath) as? ParticipantDataCell {
-                    cell.delegate = self
-                    if let data = self.fabricDetails.fetchParticipantData(groupId: groupId, deviceId: deviceId) {
-                        cell.setupUI(data: data)
-                    }
-                    self.setAutoresizingMask(cell)
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
+                if let participantCell = getParticipantDataCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId) {
+                    return participantCell
                 }
             } else if value == ESPMatterConstants.localTemperature || value == ESPMatterConstants.measuredTemperature {
-                if let cell = tableView.dequeueReusableCell(withIdentifier: CustomInfoCell.reuseIdentifier, for: indexPath) as? CustomInfoCell {
-                    cell.node = self.node
-                    cell.deviceId = deviceId
-                    cell.nodeGroup = self.group
-                    if value == ESPMatterConstants.localTemperature {
-                        cell.type.text = "Local Temperature"
-                        if self.isDeviceOffline {
-                            cell.setupOfflineLocalTemperatureUI()
-                        } else {
-                            if self.nodeConnectionStatus == .controller {
-                                cell.setupInitialControllerLocalTempUI()
-                            } else {
-                                cell.setupLocalTemperatureUI()
-                            }
-                        }
-                    } else {
-                        cell.type.text = "Measured Temperature"
-                        if self.isDeviceOffline {
-                            cell.setupOfflineMeasuredTemperatureUI()
-                        } else {
-                            if self.nodeConnectionStatus == .controller {
-                                cell.setupInitialControllerMeasuredTempUI()
-                            } else {
-                                cell.setupMeasuredTemperatureUI()
-                            }
-                        }
-                    }
-                    self.setAutoresizingMask(cell)
-                    cell.isUserInteractionEnabled = !self.isDeviceOffline
-                    return cell
+                if let temperatureCell = getTemperatureCell(tableView, indexPath: indexPath, value: value, deviceId: deviceId) {
+                    return temperatureCell
                 }
             } else if value == ESPMatterConstants.occupiedCoolingSetpoint {
-                let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
-                object_setClass(sliderCell, ParamSliderTableViewCell.self)
-                let cell = sliderCell as! ParamSliderTableViewCell
-                cell.title.text = "Occupied Cooling Setpoint"
-                cell.node = self.node
-                cell.isRainmaker = false
-                cell.sliderParamType = .airConditioner
-                cell.nodeGroup = self.group
-                cell.deviceId = deviceId
-                cell.hueSlider.isHidden = true
-                cell.slider.isHidden = false
-                cell.paramChipDelegate = self
-                self.setAutoresizingMask(cell)
-                if self.nodeConnectionStatus == .controller {
-                    cell.setupInitialControllerOCSValues(isDeviceOffline: self.isDeviceOffline)
-                } else {
-                    cell.setupInitialCoolingSetpointValues2(isDeviceOffline: self.isDeviceOffline)
-                }
-                cell.isUserInteractionEnabled = !self.isDeviceOffline
-                return cell
+                return getOccupiedSetpointCell(tableView, indexPath: indexPath, deviceId: deviceId)
             } else if value == ESPMatterConstants.controlSequenceOfOperation {
-                let dropDownCell = tableView.dequeueReusableCell(withIdentifier: DropDownTableViewCell.reuseIdentifier, for: indexPath) as! DropDownTableViewCell
-                object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
-                let cell = dropDownCell as! ParamDropDownTableViewCell
-                cell.topViewHeightConstraint.constant = 30.0
-                cell.matterNode = self.node
-                cell.datasource = [ESPMatterConstants.cool]
-                cell.type = .controlSequenceOfOperation
-                cell.isRainmaker = false
-                cell.deviceId = deviceId
-                cell.nodeGroup = self.group
-                cell.paramChipDelegate = self
-                cell.controlName.text = ESPMatterConstants.controlSequence
-                cell.setInitialControlSequenceOfOperation()
-                cell.acParamDelegate = self
-                cell.isUserInteractionEnabled = !self.isDeviceOffline
-                return cell
+                return getControlSequenceOpfOperationCell(tableView, indexPath: indexPath, deviceId: deviceId)
             } else if value == ESPMatterConstants.systemMode {
-                let dropDownCell = tableView.dequeueReusableCell(withIdentifier: DropDownTableViewCell.reuseIdentifier, for: indexPath) as! DropDownTableViewCell
-                object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
-                let cell = dropDownCell as! ParamDropDownTableViewCell
-                cell.topViewHeightConstraint.constant = 30.0
-                cell.matterNode = self.node
-                cell.datasource = [ESPMatterConstants.off, 
-                                   ESPMatterConstants.cool,
-                                   ESPMatterConstants.heat]
-                cell.type = .systemMode
-                cell.isRainmaker = false
-                cell.deviceId = deviceId
-                cell.nodeGroup = self.group
-                cell.controlName.text = ESPMatterConstants.systemModeTxt
-                cell.paramChipDelegate = self
-                cell.acParamDelegate = self
-                cell.setInitialSystemMode()
-                if !self.isDeviceOffline {
-                    if self.nodeConnectionStatus == .controller {
-                        cell.readControllerMode()
-                    } else {
-                        cell.readMode()
-                    }
-                }
-                cell.isUserInteractionEnabled = !self.isDeviceOffline
-                return cell
+                return getSystemModeCell(tableView, indexPath: indexPath, deviceId: deviceId)
             }
         }
         return UITableViewCell()

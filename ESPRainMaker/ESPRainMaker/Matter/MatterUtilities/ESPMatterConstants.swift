@@ -82,6 +82,9 @@ struct ESPMatterConstants {
     static let enterGroupNameTxt = "Enter group name"
     static let requestsReceivedTxt = "Requests received"
     static let enterGroupNameRequestTxt = "Please enter a group name"
+    static let localTemperatureTxt = "Local Temperature"
+    static let measuredTemperatureTxt = "Measured Temperature"
+    static let occupiedCoolingSetpointTxt = "Occupied Cooling Setpoint"
     
     /// UI keys
     static let no = "NO"
