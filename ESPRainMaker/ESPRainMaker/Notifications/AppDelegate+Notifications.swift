@@ -85,7 +85,7 @@ extension AppDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         // Parsed the notification payload to get event type information.
         let userInfo:[String:Any] = notification.request.content.userInfo as? [String:Any] ?? [:]
-        let notificationHandler = ESPNotificationHandler(userInfo)
+        var notificationHandler = ESPNotificationHandler(userInfo)
         // Update data if event is related with node connection.
         notificationHandler.updateData()
         if #available(iOS 14.0, *) {
