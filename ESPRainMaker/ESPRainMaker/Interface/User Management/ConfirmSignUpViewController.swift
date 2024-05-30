@@ -24,7 +24,7 @@ class ConfirmSignUpViewController: UIViewController {
 
     @IBOutlet var sentToLabel: UILabel!
     @IBOutlet var code: UITextField!
-    weak var signupDelegate: FlowCancelledDelegate?
+    weak var signupDelegate: AgreementViewDisplayDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,7 +51,7 @@ class ConfirmSignUpViewController: UIViewController {
             let alertController = UIAlertController(title: "Confirmation code missing.",
                                                     message: "Please enter a valid confirmation code.",
                                                     preferredStyle: .alert)
-            let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
             alertController.addAction(okAction)
 
             present(alertController, animated: true, completion: nil)
@@ -84,12 +84,12 @@ extension ConfirmSignUpViewController: ESPCreateUserPresentationLogic {
         DispatchQueue.main.async {
             Utility.hideLoader(view: self.view)
             if error != nil {
-                self.handleError(error: error, buttonTitle: "Retry")
+                self.handleError(header: "Sign up failed", error: error, buttonTitle: "OK")
             } else {
                 let alertController = UIAlertController(title: "Code Resent",
                                                         message: User.shared.username,
                                                         preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                 alertController.addAction(okAction)
                 self.present(alertController, animated: true, completion: nil)
             }
@@ -103,10 +103,14 @@ extension ConfirmSignUpViewController: ESPCreateUserPresentationLogic {
         if error == nil {
             if self.confirmExistingUser {
                 self.confirmExistingUser = false
-                let alertController = UIAlertController(title: "Success",
-                                                        message: "User has been confirmed. Please enter your credentials in login page to sign in with this user.",
+                var message = "User has been confirmed. Please enter your credentials in login page to sign in with this user."
+                if let sentTo = self.sentTo {
+                    message = "\(sentTo) has been confirmed!"
+                }
+                let alertController = UIAlertController(title: "Success!",
+                                                        message: message,
                                                         preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
+                let okAction = UIAlertAction(title: "OK", style: .default) { _ in
                     self.navigationController?.popToRootViewController(animated: true)
                 }
                 alertController.addAction(okAction)
@@ -116,7 +120,7 @@ extension ConfirmSignUpViewController: ESPCreateUserPresentationLogic {
                 _ = self.navigationController?.popToRootViewController(animated: true)
             }
         } else {
-            self.handleError(error: error, buttonTitle: "Ok")
+            self.handleError(error: error, buttonTitle: "OK")
         }
     }
 }

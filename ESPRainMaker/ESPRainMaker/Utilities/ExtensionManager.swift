@@ -547,9 +547,12 @@ extension UIViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    func handleError(error: ESPAPIError?, buttonTitle: String) {
+    func handleError(header: String? = nil, error: ESPAPIError?, buttonTitle: String) {
         if let err = error {
             var title = "Error"
+            if let header = header {
+                title = header
+            }
             var message = ""
             switch err {
             case .serverError(let serverError):
