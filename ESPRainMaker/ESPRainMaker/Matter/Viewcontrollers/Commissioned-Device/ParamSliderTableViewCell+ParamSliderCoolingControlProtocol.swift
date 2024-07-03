@@ -138,6 +138,8 @@ extension ParamSliderTableViewCell {
             self.maxImage.image = nil
             self.currentLevel = 20
             DispatchQueue.main.async {
+                self.backViewTopSpaceConstraint.constant = 10.0
+                self.backViewBottomSpaceConstraint.constant = 10.0
                 self.minLabel.text = "16"
                 self.maxLabel.text = "32"
                 self.slider.minimumValue = 16.0
@@ -148,6 +150,8 @@ extension ParamSliderTableViewCell {
                 status = val
                 if val == "Heat" {
                     DispatchQueue.main.async {
+                        self.backViewTopSpaceConstraint.constant = 10.0
+                        self.backViewBottomSpaceConstraint.constant = 10.0
                         self.minLabel.text = "7"
                         self.maxLabel.text = "30"
                         self.slider.minimumValue = 7.0
@@ -156,6 +160,8 @@ extension ParamSliderTableViewCell {
                     }
                 } else {
                     DispatchQueue.main.async {
+                        self.backViewTopSpaceConstraint.constant = 10.0
+                        self.backViewBottomSpaceConstraint.constant = 10.0
                         self.minLabel.text = "16"
                         self.maxLabel.text = "32"
                         self.slider.minimumValue = 16.0

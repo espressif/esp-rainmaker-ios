@@ -50,7 +50,10 @@ class SliderTableViewCell: UITableViewCell {
     @IBOutlet var trailingSpaceConstraint: NSLayoutConstraint!
     @IBOutlet var minImage: UIImageView!
     @IBOutlet var maxImage: UIImageView!
-
+    
+    @IBOutlet weak var backViewTopSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var backViewBottomSpaceConstraint: NSLayoutConstraint!
+    
     // Stored properties
     var device: Device!
     var param: Param!

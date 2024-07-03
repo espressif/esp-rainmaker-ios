@@ -48,9 +48,13 @@ struct JSONParser {
                 if let nodeId = node.node_id, let matterNodeId = fabricDetails.getMatterNodeId(nodeId: nodeId) {
                     node.matter_node_id = matterNodeId
                 } else {
-                    continue
+                    if let nodeType = node_details["node_type"] as? String, nodeType.lowercased() == "rainmaker_matter" {
+                        node.isMatter = false
+                    } else {
+                        continue
+                    }
                 }
-                if let metadata = node_details["metadata"] as? [String: Any] {
+                if node.isMatter, let metadata = node_details["metadata"] as? [String: Any] {
                     node.metadata = metadata
                 }
             }
@@ -124,7 +128,7 @@ struct JSONParser {
                 }
                 
                 #if ESPRainMakerMatter
-                if let services = config[Constants.services] as? [[String: Any]] {
+                if node.isMatter, let services = config[Constants.services] as? [[String: Any]] {
                     for service in services {
                         if let type = service[Constants.type] as? String, type == Constants.matterControllerServiceType, let serviceName = service[Constants.name] as? String {
                             node.setControllerServiceName(serviceName: serviceName)
@@ -287,7 +291,7 @@ struct JSONParser {
                 }
                 
                 #if ESPRainMakerMatter
-                if #available(iOS 16.4, *) {
+                if node.isMatter, #available(iOS 16.4, *) {
                     if let nodeId = node.node_id {
                         MatterControllerParser.shared.saveMatterControllerData(matterControllerData: paramInfo, nodeId: nodeId)
                     }

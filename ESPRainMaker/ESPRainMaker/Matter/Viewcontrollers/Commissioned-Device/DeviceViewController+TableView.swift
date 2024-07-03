@@ -29,7 +29,7 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
             if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter, ESPMatterConstants.measuredTemperature].contains(value) {
                 return 100.0
             } else if [ESPMatterConstants.levelControl, ESPMatterConstants.colorControl, ESPMatterConstants.saturationControl, ESPMatterConstants.occupiedCoolingSetpoint].contains(value) {
-                return 126.0
+                return 136.0
             } else if value == ESPMatterConstants.participantData {
                 return 278.0
             } else if [ESPMatterConstants.controlSequenceOfOperation, ESPMatterConstants.systemMode].contains(value) {

@@ -31,6 +31,9 @@ class DropDownTableViewCell: UITableViewCell {
     @IBOutlet var checkButton: UIButton!
     @IBOutlet var leadingSpaceConstraint: NSLayoutConstraint!
     @IBOutlet var trailingSpaceConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var backViewTopSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var backViewBottomSpaceConstraint: NSLayoutConstraint!
 
     // Stored properties
     var datasource: [String] = []

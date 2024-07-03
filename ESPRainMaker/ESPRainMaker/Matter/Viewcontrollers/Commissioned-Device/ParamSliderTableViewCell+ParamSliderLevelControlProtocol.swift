@@ -51,6 +51,8 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
     /// Setup initial level values
     func setupInitialLevelValues() {
         DispatchQueue.main.async {
+            self.backViewTopSpaceConstraint.constant = 10.0
+            self.backViewBottomSpaceConstraint.constant = 10.0
             self.title.text = "Brightness"
             self.slider.minimumValue = 0.0
             self.slider.maximumValue = 100.0

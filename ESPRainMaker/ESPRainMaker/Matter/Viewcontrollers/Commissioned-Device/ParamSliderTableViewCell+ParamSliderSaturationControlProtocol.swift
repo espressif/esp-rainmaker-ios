@@ -36,6 +36,8 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     /// Setup initial saturation values
     func setupInitialSaturationValue() {
         DispatchQueue.main.async {
+            self.backViewTopSpaceConstraint.constant = 10.0
+            self.backViewBottomSpaceConstraint.constant = 10.0
             self.title.text = "Saturation"
             self.slider.minimumValue = 0.0
             self.slider.maximumValue = 100.0
