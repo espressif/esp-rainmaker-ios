@@ -212,4 +212,10 @@ struct Constants {
     
     // Override base URL
     static let overriddenBaseURLKey = "overriddenBaseURLKey"
+    
+    static let settings = "Settings"
+    static let settingsStoryboardName = "Settings"
+    
+    static let blePermissionReqdMsg = "Please ensure that your bluetooth is powered ON and has the requisite permission."
+    static let turnBLEOnMsg = "Please ensure that your bluetooth is powered on and restart the provisioning."
 }

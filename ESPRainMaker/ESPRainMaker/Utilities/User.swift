@@ -36,6 +36,10 @@ class User {
     var discoveredNodes: [String] = []
     var discoveredNodesCompletion: (([String]) -> Void)?
     var matterLightOnStatus: [String: Bool] = [String: Bool]()
+    
+    private let esp = "esp"
+    private let prov = "prov"
+    private let secVer = "sec_ver"
 
     lazy var localControl: ESPLocalControl = {
         ESPLocalControl()
@@ -121,11 +125,14 @@ class User {
     private func setEncryptionOnLocalControl(node: Node) {
         if let service = localServices[node.node_id ?? ""] {
             if node.supportsEncryption {
-                var userName: String?
-                if let securityType = node.securityType, securityType == 2 {
-                    userName = Configuration.shared.espProvSetting.sec2Username
+                var secureUserName: String!
+                if let securityType = node.securityType, securityType == ESPSecurity.secure2.rawValue {
+                    secureUserName = Configuration.shared.espProvSetting.sec2Username
+                    service.espLocalDevice = ESPLocalDevice(name: esp, security: .secure2, transport: .softap, proofOfPossession: node.pop, username: secureUserName, softAPPassword: nil, advertisementData: nil)
+                    service.espLocalDevice.versionInfo = [prov: [secVer: securityType]]
+                } else {
+                    service.espLocalDevice = ESPLocalDevice(name: esp, security: .secure, transport: .softap, proofOfPossession: node.pop, username: secureUserName, softAPPassword: nil, advertisementData: nil)
                 }
-                service.espLocalDevice = ESPLocalDevice(name: "esp", security: .secure, transport: .softap, proofOfPossession: node.pop, username: userName, softAPPassword: nil, advertisementData: nil)
                 service.espLocalDevice.espSoftApTransport = ESPSoftAPTransport(baseUrl: service.hostname)
             }
             service.espLocalDevice.hostname = service.hostname

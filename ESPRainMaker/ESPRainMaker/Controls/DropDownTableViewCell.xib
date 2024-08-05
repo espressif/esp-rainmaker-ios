@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23077.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23068.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -91,6 +91,8 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="backView" destination="rYM-co-SZV" id="QFN-Ni-q2F"/>
+                <outlet property="backViewBottomSpaceConstraint" destination="VP8-be-oar" id="oTp-TF-vxn"/>
+                <outlet property="backViewTopSpaceConstraint" destination="MaU-pD-UJi" id="ha0-Nf-mcn"/>
                 <outlet property="checkButton" destination="D4L-nJ-jmn" id="IXU-Qd-0z8"/>
                 <outlet property="controlName" destination="gvP-jP-QFa" id="93a-sj-Ymy"/>
                 <outlet property="controlValueLabel" destination="vrC-eq-6dd" id="jpK-91-2CQ"/>

@@ -80,6 +80,10 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
     
     /// Set initial system mode
     func setInitialSystemMode() {
+        DispatchQueue.main.async {
+            self.backViewTopSpaceConstraint.constant = 10.0
+            self.backViewBottomSpaceConstraint.constant = 10.0
+        }
         self.controlValueLabel.text = "_"
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
             if let systemMode = self.matterNode?.getMatterSystemMode(deviceId: id) {

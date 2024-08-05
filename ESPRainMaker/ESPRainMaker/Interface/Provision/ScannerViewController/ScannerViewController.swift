@@ -25,8 +25,10 @@ import ESPProvision
 import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 import UIKit
+import CoreBluetooth
 
 class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
+    
     let locationManager = CLLocationManager()
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer?
@@ -37,20 +39,18 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     var group: ESPNodeGroup?
     var groupId: String?
     let fabricDetails = ESPMatterFabricDetails.shared
+    var bluetoothManager: CBCentralManager?
+    var bluetoothOnStatusCompletion: ((CBManagerState) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Check for device type to ask for location permission
         // Location permission is needed to get SSID of connected Wi-Fi network.
-        switch Configuration.shared.espProvSetting.transport {
-        case .both, .softAp:
-            getLocationPermission()
-        default:
-            break
+        
+        self.setupScanningScreen()
+        if self.isBluetoothRequired() {
+            self.checkCBAndProceed {}
         }
-        scanQrCode()
-
-        Utility.setActiveSSID()
     }
 
     override func viewDidLayoutSubviews() {
@@ -61,6 +61,40 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    @objc func appEnterForeground() {
+        if self.isBluetoothRequired() {
+            if let bleManager = self.bluetoothManager {
+                let cbStatus = bleManager.state
+                switch cbStatus {
+                case .poweredOff, .unauthorized:
+                    self.handleCBPermissionError(cbStatus: cbStatus)
+                default:
+                    self.setupScanningScreen()
+                }
+            }
+        }
+    }
+    
+    func setupScanningScreen() {
+        DispatchQueue.main.async {
+            self.dismissDisplayedAlert()
+            switch Configuration.shared.espProvSetting.transport {
+            case .both, .softAp:
+                self.getLocationPermission()
+            default:
+                break
+            }
+            self.scanQrCode()
+            
+            Utility.setActiveSSID()
+        }
     }
 
     func scanQrCode() {
@@ -271,15 +305,24 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     
     #if ESPRainMakerMatter
     @available(iOS 16.4, *)
+    /// Check if BLE is on and authorized
+    /// - Parameter onboardingPayload: onboarding payload
     func goToFabricSelection(onboardingPayload: String? =  nil) {
+        self.openFabricSelectionVC(withOnboardingPayload: onboardingPayload)
+    }
+    
+    /// Open Fabric selection screen
+    /// - Parameter onboardingPayload: on boarding poayload
+    @available(iOS 16.4, *)
+    func openFabricSelectionVC(withOnboardingPayload onboardingPayload: String?) {
         let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
         let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as! ESPFabricSelectionVC
         fabricSelectionVC.onboardingPayload = onboardingPayload
-        navigationController?.setNavigationBarHidden(true, animated: false)
-        navigationController?.pushViewController(fabricSelectionVC, animated: true)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigationController?.pushViewController(fabricSelectionVC, animated: true)
     }
     #endif
-
+    
     // Helper method to check whether app supports the scanned device.
     private func isDeviceSupported(device: ESPDevice) -> Bool {
         switch Configuration.shared.espProvSetting.transport {
