@@ -66,6 +66,7 @@ class DevicesViewController: UIViewController {
     var nodeGroups: [NodeGroup]?
     let fabricDetails = ESPMatterFabricDetails.shared
     
+    
     // MARK: - Overriden Methods
 
     override func viewDidLoad() {
@@ -280,16 +281,27 @@ class DevicesViewController: UIViewController {
     }
     
     #if ESPRainMakerMatter
-    func searchForMatterDevicesOnLocalNetwork() {
+    func searchForMatterDevicesOnLocalNetwork(completion: @escaping () -> Void) {
         if #available(iOS 16.4, *) {
             DispatchQueue.main.async {
                 self.stopMatterDiscovery()
                 self.searchForMatterDevices { _ in
                     self.collectionView.reloadData()
+                    completion()
                 }
             }
         }
     }
+    
+    /// Reset matter controller
+    /// - Parameters:
+    ///   - matterFabricData: fabric data
+    ///   - userNOCDetails: user noc data
+    @available(iOS 16.4, *)
+    func resetMatterController(matterFabricData: ESPNodeGroup, userNOCDetails: ESPIssueUserNOCResponse) {
+        ESPMTRCommissioner.shared.group = matterFabricData
+        ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: matterFabricData, userNOCData: userNOCDetails)
+    }    
     #endif
     
     private func discoverDevicesAndFormatUI(error: ESPNetworkError?) {
@@ -489,7 +501,7 @@ class DevicesViewController: UIViewController {
             if #available(iOS 16.4, *) {
                 self.stopMatterDiscovery()
             }
-            self.searchForMatterDevicesOnLocalNetwork()
+            self.searchForMatterDevicesOnLocalNetwork() {}
             #endif
         }
     }

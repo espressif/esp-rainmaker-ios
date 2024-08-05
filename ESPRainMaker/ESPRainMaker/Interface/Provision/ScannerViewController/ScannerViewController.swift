@@ -41,6 +41,10 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     let fabricDetails = ESPMatterFabricDetails.shared
     var bluetoothManager: CBCentralManager?
     var bluetoothOnStatusCompletion: ((CBManagerState) -> Void)?
+    
+    var threadOperationalDataset: Data!
+    var espDevice: ESPDevice!
+    var provisionCompletionHandler: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -202,23 +206,34 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     }
 
     func checkForAssistedClaiming(device: ESPDevice) {
-        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo["rmaker"] as? NSDictionary, let rmaikerCap = rmaikerInfo["cap"] as? [String], rmaikerCap.contains("claim") {
-            if device.transport == .ble {
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                    self.goToClaimVC(device: device)
+        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo[ESPScanConstants.prov] as? NSDictionary, let rainmakerCaps = rmaikerInfo[ESPScanConstants.capabilities] as? [String] {
+            
+            if rainmakerCaps.contains(ESPScanConstants.claim) {
+                if device.transport == .ble {
+                    DispatchQueue.main.async {
+                        self.goToClaimVC(device: device)
+                    }
+                } else {
+                    self.showErrorAlert(title: "", message: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", buttonTitle: "OK") {}
                 }
-            } else {
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                    self.retry(message: "Assisted Claiming not supported for SoftAP. Cannot Proceed.")
+                return
+            } else if rainmakerCaps.contains(ESPScanConstants.threadProv) {
+                let shouldScanThreadNetworks = rainmakerCaps.contains(ESPScanConstants.threadScan)
+                if #available(iOS 16.4, *) {
+                    self.espDevice = device
+                    self.espDevice.network = .thread
+                    self.provisionDeviceWithThreadNetwork(device: self.espDevice) {
+                        DispatchQueue.main.async {
+                            self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: shouldScanThreadNetworks, device: self.espDevice)
+                        }
+                    }
                 }
+                return
             }
-        } else {
-            DispatchQueue.main.async {
-                Utility.hideLoader(view: self.view)
-                self.goToProvision(device: device)
-            }
+        }
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            self.goToProvision(device: device)
         }
     }
 
@@ -285,12 +300,6 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         let claimVC = storyboard?.instantiateViewController(withIdentifier: Constants.claimVCIdentifier) as! ClaimViewController
         claimVC.device = device
         navigationController?.pushViewController(claimVC, animated: true)
-    }
-
-    func goToProvision(device: ESPDevice) {
-        let provisionVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
-        provisionVC.device = device
-        navigationController?.pushViewController(provisionVC, animated: true)
     }
 
     func goToBleProvision() {
@@ -374,10 +383,51 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     }
 }
 
+extension ScannerViewController: DeviceAssociationProtocol {
+    
+    @available(iOS 15.0, *)
+    func provisionDeviceWithThreadNetwork(device: ESPDevice, completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Sending association data", view: self.view)
+        }
+        self.provisionCompletionHandler = completion
+        User.shared.associateNodeWithUser(device: device, delegate: self)
+    }
+    
+    func deviceAssociationFinishedWith(success: Bool, nodeID: String?, error: AssociationError?) {
+        User.shared.currentAssociationInfo!.associationInfoDelievered = success
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            if success {
+                if let deviceSecret = nodeID {
+                    User.shared.currentAssociationInfo!.nodeID = deviceSecret
+                }
+                if let completion = self.provisionCompletionHandler {
+                    completion()
+                } else {
+                    self.showThreadNetworkSelectionVC(device: self.espDevice)
+                }
+            } else {
+                let alertController = UIAlertController(title: "Error", message: error?.description, preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .default) { _ in
+                    self.navigationController?.popToRootViewController(animated: false)
+                }
+                alertController.addAction(action)
+                self.present(alertController, animated: true, completion: nil)
+            }
+        }
+    }
+}
+
+
 extension ScannerViewController: ESPDeviceConnectionDelegate {
     
     func getUsername(forDevice: ESPDevice, completionHandler: @escaping (String?) -> Void) {
-        completionHandler(Configuration.shared.espProvSetting.sec2Username)
+        if let caps = forDevice.capabilities, (caps.contains(ESPScanConstants.threadProv) || caps.contains(ESPScanConstants.threadScan)) {
+            completionHandler(Configuration.shared.espProvSetting.threadSec2Username)
+        } else {
+            completionHandler(Configuration.shared.espProvSetting.wifiSec2Username)
+        }
     }
     
     func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (String) -> Void) {

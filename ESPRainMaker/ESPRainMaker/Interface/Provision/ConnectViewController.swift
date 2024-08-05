@@ -27,6 +27,7 @@ class ConnectViewController: UIViewController {
     var currentDeviceName = ""
     var espDevice: ESPDevice!
     var pop = ""
+    var provisionCompletionHandler: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -87,16 +88,33 @@ class ConnectViewController: UIViewController {
     }
 
     func checkForAssistedClaiming(device: ESPDevice) {
-        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo["rmaker"] as? NSDictionary, let rmaikerCap = rmaikerInfo["cap"] as? [String], rmaikerCap.contains("claim") {
-            if device.transport == .ble {
-                goToClaimVC(device: device)
-            } else {
-                let action = UIAlertAction(title: "Okay", style: .default, handler: nil)
-                showAlert(error: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", action: action)
+        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo[ESPScanConstants.prov] as? NSDictionary, let rainmakerCaps = rmaikerInfo[ESPScanConstants.capabilities] as? [String] {
+            
+            if rainmakerCaps.contains(ESPScanConstants.claim) {
+                if device.transport == .ble {
+                    DispatchQueue.main.async {
+                        self.goToClaimVC(device: device)
+                    }
+                } else {
+                    let action = UIAlertAction(title: "Okay", style: .default, handler: nil)
+                    showAlert(error: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", action: action)
+                }
+                return
+            } else if rainmakerCaps.contains(ESPScanConstants.threadProv) {
+                let shouldScanThreadNetworks = rainmakerCaps.contains(ESPScanConstants.threadScan)
+                if #available(iOS 16.4, *) {
+                    self.espDevice = device
+                    self.espDevice.network = .thread
+                    self.provisionDeviceWithThreadNetwork(device: self.espDevice) {
+                        DispatchQueue.main.async {
+                            self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: shouldScanThreadNetworks, device: self.espDevice)
+                        }
+                    }
+                }
+                return
             }
-        } else {
-            goToProvision()
         }
+        self.goToProvision()
     }
 
     // Show status screen, called when device connection fails.
@@ -134,10 +152,50 @@ class ConnectViewController: UIViewController {
 extension ConnectViewController: ESPDeviceConnectionDelegate {
     
     func getUsername(forDevice: ESPDevice, completionHandler: @escaping (String?) -> Void) {
-        completionHandler(Configuration.shared.espProvSetting.sec2Username)
+        if let caps = forDevice.capabilities, (caps.contains(ESPScanConstants.threadProv) || caps.contains(ESPScanConstants.threadScan)) {
+            completionHandler(Configuration.shared.espProvSetting.threadSec2Username)
+        } else {
+            completionHandler(Configuration.shared.espProvSetting.wifiSec2Username)
+        }
     }
     
     func getProofOfPossesion(forDevice: ESPDevice, completionHandler: @escaping (String) -> Void) {
         completionHandler(pop)
+    }
+}
+
+extension ConnectViewController: DeviceAssociationProtocol {
+    
+    @available(iOS 15.0, *)
+    func provisionDeviceWithThreadNetwork(device: ESPDevice, completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Sending association data", view: self.view)
+        }
+        self.provisionCompletionHandler = completion
+        User.shared.associateNodeWithUser(device: device, delegate: self)
+    }
+    
+    func deviceAssociationFinishedWith(success: Bool, nodeID: String?, error: AssociationError?) {
+        User.shared.currentAssociationInfo!.associationInfoDelievered = success
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+            if success {
+                if let deviceSecret = nodeID {
+                    User.shared.currentAssociationInfo!.nodeID = deviceSecret
+                }
+                if let completion = self.provisionCompletionHandler {
+                    completion()
+                } else {
+                    self.showThreadNetworkSelectionVC(device: self.espDevice)
+                }
+            } else {
+                let alertController = UIAlertController(title: "Error", message: error?.description, preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .default) { _ in
+                    self.navigationController?.popToRootViewController(animated: false)
+                }
+                alertController.addAction(action)
+                self.present(alertController, animated: true, completion: nil)
+            }
+        }
     }
 }

@@ -25,6 +25,11 @@ enum ESPDeviceType: Int {
     case softAp
 }
 
+enum ESPSecurity2Type: String {
+    case wifiprov = "wifiprov"
+    case threadprov = "threadprov"
+}
+
 class Configuration: ESPConfiguration {
     static let shared = Configuration()
     var awsConfiguration: AWSConfiguration!
@@ -107,6 +112,7 @@ struct AWSConfiguration {
 struct AppConfiguration {
     var supportSchedule = true
     var supportLocalControl = true
+    var localControlSec2Username = ESPSecurity2Type.wifiprov.rawValue
     var supportGrouping = true
     var supportSharing = true
     var supportScene = true
@@ -117,14 +123,18 @@ struct AppConfiguration {
     var supportContinuousUpdate = true
     // In milliseconds
     var continuousUpdateInterval:Int64 = 400
+    
+    #if ESPRainMakerMatter
     var matterEcosystemName: String = ESPMatterConstants.espressif
     var matterVendorId: UInt16 = ESPMatterConstants.matterVendorId
-
+    #endif
+    
     init(config: [String: Any]?) {
         if let configDict = config {
             supportSchedule = configDict["Enable Schedule"] as? Bool ?? true
             supportScene = configDict["Enable Scene"] as? Bool ?? true
             supportLocalControl = configDict["Enable Local Control"] as? Bool ?? true
+            localControlSec2Username = configDict["Local Control Security 2 Username"] as? String ?? ESPSecurity2Type.wifiprov.rawValue
             supportGrouping = configDict["Enable Grouping"] as? Bool ?? true
             supportSharing = configDict["Enable Sharing"] as? Bool ?? true
             supportDeviceAutomation = configDict["Enable Device Automation"] as? Bool ?? true
@@ -143,8 +153,10 @@ struct AppConfiguration {
             default:
                 continuousUpdateInterval = 1000
             }
+            #if ESPRainMakerMatter
             matterEcosystemName = configDict["Matter Ecosystem"] as? String ?? ESPMatterConstants.espressif
             matterVendorId = configDict["Matter Vendor Id"] as? UInt16 ?? ESPMatterConstants.matterVendorId
+            #endif
         }
     }
 }
@@ -169,7 +181,8 @@ struct ESPProvSettings {
     var allowPrefixSearch = true
     var scanEnabled = true
     var bleDevicePrefix = ""
-    var sec2Username = ""
+    var wifiSec2Username = ""
+    var threadSec2Username = ""
 
     init(config: [String: Any]?) {
         if let configDict = config {
@@ -189,7 +202,8 @@ struct ESPProvSettings {
                 }
             }
             bleDevicePrefix = configDict["BLE Device Prefix"] as? String ?? ""
-            sec2Username = configDict["Security 2 Username"] as? String ?? ""
+            wifiSec2Username = configDict["Security 2 Username"] as? String ?? ESPSecurity2Type.wifiprov.rawValue
+            threadSec2Username = configDict["Security 2 Username Thread"] as? String ?? ESPSecurity2Type.threadprov.rawValue
         }
     }
 }

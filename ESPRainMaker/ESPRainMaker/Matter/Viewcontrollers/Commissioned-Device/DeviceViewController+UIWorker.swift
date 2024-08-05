@@ -197,7 +197,7 @@ extension DeviceViewController {
         return nil
     }
     
-    /// Get participant data cell
+    /// Get participant darta cell
     /// - Parameters:
     ///   - tableView: table view
     ///   - indexPath: indexpath
@@ -280,17 +280,9 @@ extension DeviceViewController {
         cell.paramChipDelegate = self
         self.setAutoresizingMask(cell)
         if self.nodeConnectionStatus == .controller {
-            if self.showDefaultUI {
-                cell.setupInitialControllerOCSValues(isDeviceOffline: true)
-            } else {
-                cell.setupInitialControllerOCSValues(isDeviceOffline: self.isDeviceOffline)
-            }
+            cell.setupInitialControllerOCSValues(isDeviceOffline: self.isDeviceOffline)
         } else {
-            if self.showDefaultUI {
-                cell.setupInitialCoolingSetpointValues2(isDeviceOffline: true)
-            } else {
-                cell.setupInitialCoolingSetpointValues2(isDeviceOffline: self.isDeviceOffline)
-            }
+            cell.setupInitialCoolingSetpointValues2(isDeviceOffline: self.isDeviceOffline)
         }
         cell.isUserInteractionEnabled = !self.isDeviceOffline
         return cell

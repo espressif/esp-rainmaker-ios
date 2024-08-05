@@ -200,11 +200,15 @@ extension ParamSliderTableViewCell {
     func subscribeToOccupiedCoolingSetpoint() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
             ESPMTRCommissioner.shared.subscribeToOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
-                if let value = value {
-                    self.currentLevel = Int(value)
-                    self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: id)
-                    DispatchQueue.main.async {
-                        self.slider.setValue(Float(value), animated: true)
+                if let mode = self.node?.getMatterSystemMode(deviceId: id) {
+                    if mode == ESPMatterConstants.cool {
+                        if let value = value {
+                            self.currentLevel = Int(value)
+                            self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: id)
+                            DispatchQueue.main.async {
+                                self.slider.setValue(Float(value), animated: true)
+                            }
+                        }
                     }
                 }
             }
@@ -215,11 +219,15 @@ extension ParamSliderTableViewCell {
     func subscribeToOccupiedHeatingSetpoint() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
             ESPMTRCommissioner.shared.subscribeToOccupiedHeatingSetpoint(groupId: grpId, deviceId: id) { value in
-                if let value = value {
-                    self.currentLevel = Int(value)
-                    self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: id)
-                    DispatchQueue.main.async {
-                        self.slider.setValue(Float(value), animated: true)
+                if let mode = self.node?.getMatterSystemMode(deviceId: id) {
+                    if mode == ESPMatterConstants.heat {
+                        if let value = value {
+                            self.currentLevel = Int(value)
+                            self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: id)
+                            DispatchQueue.main.async {
+                                self.slider.setValue(Float(value), animated: true)
+                            }
+                        }
                     }
                 }
             }

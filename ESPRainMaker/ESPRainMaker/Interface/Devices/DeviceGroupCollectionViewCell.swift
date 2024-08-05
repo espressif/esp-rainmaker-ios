@@ -372,7 +372,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         }
         if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.airConditioner)
-        } else if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0, let type = rainmakerNode.deviceType, type == 266 {
+        } else if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0, let type = rainmakerNode.deviceType, type == 266 || type == 267 {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.outletDevice)
         } else if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
             cell.deviceImage.image = UIImage(named: ESPMatterConstants.controller)

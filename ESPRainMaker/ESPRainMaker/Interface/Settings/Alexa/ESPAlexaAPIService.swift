@@ -361,7 +361,7 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
         }
     }
     
-    /// Chedk API response status code for enablement APIs
+    /// Check API response status code for enablement APIs
     /// - Parameters:
     ///   - response: response from alexa enablement APIs
     ///   - enablementStatus: enablement request type
@@ -396,7 +396,7 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
         return true
     }
     
-    /// Chedk API response status code for get alexa token APIs
+    /// Check API response status code for get alexa token APIs
     /// - Parameters:
     ///   - response: response from get alexa  token APIs
     ///   - completionHandler: completionHandler

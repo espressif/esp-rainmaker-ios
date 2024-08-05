@@ -124,6 +124,11 @@ extension ESPMatterFabricDetails {
         return [0]
     }
     
+    func removeEndpointsData(groupId: String, deviceId: UInt64) {
+        let key = ESPMatterFabricKeys.shared.groupEndpointsDataKey(groupId, deviceId)
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+    
     /// Save clients data
     /// - Parameters:
     ///   - deviceId: device id
@@ -146,6 +151,11 @@ extension ESPMatterFabricDetails {
         return [String: [UInt]]()
     }
     
+    func removeClientsData(groupId: String, deviceId: UInt64) {
+        let key = ESPMatterFabricKeys.shared.groupClientsDataKey(groupId, deviceId)
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+    
     /// Save servers data
     /// - Parameters:
     ///   - deviceId: device id
@@ -166,6 +176,11 @@ extension ESPMatterFabricDetails {
             return val
         }
         return [String: [UInt]]()
+    }
+    
+    func removeServerssData(groupId: String, deviceId: UInt64) {
+        let key = ESPMatterFabricKeys.shared.groupServersDataKey(groupId, deviceId)
+        UserDefaults.standard.removeObject(forKey: key)
     }
     
     /// Save attributes data
