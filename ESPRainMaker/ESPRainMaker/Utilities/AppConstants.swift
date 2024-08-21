@@ -24,6 +24,7 @@ import UIKit
 
 class AppConstants {
     let defaultBGColor = "#8265E3"
+    let icpRegistrationId = "沪ICP备2021026420号-7A"
     static let shared = AppConstants()
     var appThemeColor: UIColor?
     var appBGImage: UIImage?

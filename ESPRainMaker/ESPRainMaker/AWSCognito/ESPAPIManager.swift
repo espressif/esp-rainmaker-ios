@@ -26,10 +26,13 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
 
     init() {
         // Validate api calls with server certificate
-        let certificate = [ESPAPIManager.certificate(filename: "amazonRootCA")]
-        let trustManager = ServerTrustManager(evaluators: [
-            Configuration.shared.awsConfiguration.baseURL.getDomain(): PinnedCertificatesTrustEvaluator(certificates: certificate), Configuration.shared.awsConfiguration.authURL.getDomain(): PinnedCertificatesTrustEvaluator(certificates: certificate), Configuration.shared.awsConfiguration.claimURL.getDomain(): PinnedCertificatesTrustEvaluator(certificates: certificate),
-        ])
+        let certificate = ESPAPIManager.certificate(filename: "amazonRootCA")
+        let serverTrustEvaluators = ESPServerTrustEvaluatorsWorker.shared.getEvaluators(
+            authURLDomain: Configuration.shared.awsConfiguration.baseURL.getDomain(),
+            baseURLDomain: Configuration.shared.awsConfiguration.authURL.getDomain(),
+            claimURLDomain: Configuration.shared.awsConfiguration.claimURL.getDomain(),
+            certificates: [certificate])
+        let trustManager: ServerTrustManager = ServerTrustManager(evaluators: serverTrustEvaluators)
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 10
         session = Session(configuration: configuration, serverTrustManager: trustManager)

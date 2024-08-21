@@ -684,7 +684,23 @@ extension DevicesViewController: UICollectionViewDataSource {
         } else {
             let nodeList = NodeGroupManager.shared.nodeGroups[indexPath.item - 1].nodeList
             cell.singleDeviceNodeCount = getSingleDeviceNodeCount(forNodeList: nodeList)
-            cell.datasource = nodeList ?? []
+            if let nodeList = nodeList, nodeList.count > 0 {
+                var finalNodeLst = nodeList
+                for index in 0..<nodeList.count {
+                    let indexNode = nodeList[index]
+                    if let indexNodeId = indexNode.node_id, let nodes = User.shared.associatedNodeList {
+                        for node in nodes {
+                            if let nodeId = node.node_id, indexNodeId == nodeId {
+                                finalNodeLst[index] = node
+                                break
+                            }
+                        }
+                    }
+                }
+                cell.datasource = finalNodeLst
+            } else {
+                cell.datasource = []
+            }
         }
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(cell, action: #selector(refreshDeviceList), for: .valueChanged)

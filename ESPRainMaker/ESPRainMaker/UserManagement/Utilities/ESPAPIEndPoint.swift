@@ -220,4 +220,5 @@ struct ESPAPIKeys {
     static let code = "code"
     static let redirctURI = "redirect_uri"
     static let clientId = "client_id"
+    static let isWeChatToken = "wechat_token_only"
 }

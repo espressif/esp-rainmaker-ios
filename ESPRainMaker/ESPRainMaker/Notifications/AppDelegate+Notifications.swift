@@ -29,6 +29,21 @@ extension AppDelegate {
         requestNotificationAuthorization()
     }
     
+    /// Setup JPUSHService for receiving remote notifications
+    /// - Parameter launchOptions: launchOptions
+    func setupJPushService(launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
+        let entity = JPUSHRegisterEntity()
+        entity.types = Int(JPAuthorizationOptions.alert.rawValue |
+                           JPAuthorizationOptions.badge.rawValue |
+                           JPAuthorizationOptions.sound.rawValue |
+                           JPAuthorizationOptions.providesAppNotificationSettings.rawValue)
+        JPUSHService.register(forRemoteNotificationConfig: entity, delegate: self)
+        JPUSHService.setup(withOption: launchOptions,
+                           appKey: Configuration.shared.jPushServiceConfiguration.appKey,
+                           channel: nil,
+                           apsForProduction: Configuration.shared.jPushServiceConfiguration.apsForProduction)
+    }
+    
     // Method to request notification authorization for type .alert, .badge and .sound.
     private func requestNotificationAuthorization() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { [weak self] granted, _ in
@@ -42,7 +57,15 @@ extension AppDelegate {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             guard settings.authorizationStatus == .authorized else { return }
             DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
+                /// We call the JPushService setup code if region is set to China Mainland
+                /// and JPUSHService app key is configured under JPushService Configuration
+                /// in the Configuration.plist file
+                /// Else we call the default registerForRemoteNotifications API.
+                if ESPLocaleManager.shared.isLocaleChinaWithAuroraConfigured {
+                    self.setupJPushService(launchOptions: self.launchOptions)
+                } else {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
             }
         }
     }
@@ -55,7 +78,7 @@ extension AppDelegate {
     // Method to delete endpoints for current user on logout.
     func disablePlatformApplicationARN(_ completionHandler: @escaping () -> Void) {
         if let deviceToken = self.deviceToken {
-            apiManager.genericAuthorizedJSONRequest(url: Constants.pushNotification + "?mobile_device_token=" + deviceToken, parameter: nil, method: .delete) { response, error in
+            self.espNotificationsAPIWorker.deletePlatformEndpoint(deviceToken: deviceToken) {
                 completionHandler()
             }
         } else {
@@ -67,19 +90,26 @@ extension AppDelegate {
     
     func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         // Retreive device token from deviceToken data.
-        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
-        let token = tokenParts.joined()
-        
-        // Send device token SNS to create a new iOS platform endpoint.
-        apiManager.genericAuthorizedJSONRequest(url: Constants.pushNotification, parameter: ["platform": "APNS", "mobile_device_token": token], method: .post) { response, error in
-            guard let _ = error else {
-                // Save device token to use later while signing out.
-                self.deviceToken = token
+        var token: String?
+        if ESPLocaleManager.shared.isLocaleChinaWithAuroraConfigured {
+            JPUSHService.registerDeviceToken(deviceToken)
+            token = JPUSHService.registrationID()
+            if !self.isJPUSHRegistrationIdCreated(registrationId: token) {
+                self.startJPUSHTimer()
                 return
+            }
+        } else {
+            let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
+            token = tokenParts.joined()
+        }
+        if let token = token {
+            self.espNotificationsAPIWorker.createNewPlatformEndpoint(deviceToken: token) { result in
+                if result {
+                    self.deviceToken = token
+                }
             }
         }
     }
-    
     
     // To display message even when app is in foreground.
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -93,7 +123,6 @@ extension AppDelegate {
         }
         completionHandler([.alert, .badge, .sound])
     }
-
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
@@ -112,5 +141,32 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         ESPSilentNotificationHandler().handleSilentNotification(userInfo)
         fetchCompletionHandler(.newData)
     }
+}
+
+
+extension AppDelegate: JPUSHRegisterDelegate {
     
+    func jpushNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (Int) -> Void) {
+        // Parsed the notification payload to get event type information.
+        let userInfo:[String:Any] = notification.request.content.userInfo as? [String:Any] ?? [:]
+        var notificationHandler = ESPNotificationHandler(userInfo)
+        // Update data if event is related with node connection.
+        notificationHandler.updateData()
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+        completionHandler(Int(JPAuthorizationOptions.alert.rawValue | JPAuthorizationOptions.sound.rawValue | JPAuthorizationOptions.badge.rawValue | JPAuthorizationOptions.providesAppNotificationSettings.rawValue))
+    }
+    
+    func jpushNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo:[String:Any] = response.notification.request.content.userInfo as? [String:Any] ?? [:]
+        let notificationHandler = ESPNotificationHandler(userInfo)
+        // Handled event related with other using notification handler.
+        notificationHandler.handleEvent(ESPNotificationCategory(rawValue: response.notification.request.content.categoryIdentifier), response.actionIdentifier)
+        completionHandler()
+    }
+    
+    func jpushNotificationCenter(_ center: UNUserNotificationCenter, openSettingsFor notification: UNNotification) {}
+    
+    func jpushNotificationAuthorization(_ status: JPAuthorizationStatus, withInfo info: [AnyHashable : Any]?) {}
 }

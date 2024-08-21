@@ -42,6 +42,8 @@ extension ESPNotificationHandler {
         case .nodeGroupAdded:
             if let groups = eventData[ESPNotificationKeys.groups] as? [String:Any], let groupName = groups[ESPNotificationKeys.groupName] as? String {
                 self.notification.body = "New group(s) [\(groupName)] added."
+            } else if let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.first, let groupName = group[ESPNotificationKeys.groupName] as? String {
+                self.notification.body = "New group(s) [\(groupName)] added."
             }
         default:
             return

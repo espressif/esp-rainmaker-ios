@@ -31,6 +31,11 @@ class SettingsPageViewController: UIViewController {
     @IBOutlet weak var groupSharingHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var groupSharingText: UILabel!
     
+    //MARK: China specific
+    @IBOutlet weak var voiceServicesViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var voiceServicesText: UILabel!
+    @IBOutlet weak var voiceServicesView: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -48,6 +53,11 @@ class SettingsPageViewController: UIViewController {
         if !Configuration.shared.appConfiguration.supportSharing {
             pendingActionView.isHidden = true
             pendingActionView.heightAnchor.constraint(equalToConstant: 0.0).isActive = true
+        }
+        
+        if ESPLocaleManager.shared.isLocaleChina {
+            self.voiceServicesView.isHidden = true
+            self.voiceServicesView.heightAnchor.constraint(equalToConstant: 0.0).isActive = true
         }
     }
 
@@ -147,6 +157,12 @@ class SettingsPageViewController: UIViewController {
         self.groupSharingText.text = ""
         self.groupSharingHeightConstraint.constant = 0
         self.groupSharingView.isHidden = true
+    }
+    
+    private func hideVoiceServices() {
+        self.voiceServicesText.text = ""
+        self.voiceServicesViewHeightConstraint.constant = 0
+        self.voiceServicesView.isHidden = true
     }
 
     private func getSharingRequests() {

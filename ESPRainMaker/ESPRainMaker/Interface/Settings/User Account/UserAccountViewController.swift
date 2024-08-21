@@ -25,6 +25,7 @@ class UserAccountViewController: UIViewController, ESPNoRefreshTokenLogic {
     @IBOutlet var changePasswordView: UIView!
     @IBOutlet var changepasswordTopConstraint: NSLayoutConstraint!
     @IBOutlet var changepasswordHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var deleteAccountView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +43,8 @@ class UserAccountViewController: UIViewController, ESPNoRefreshTokenLogic {
             changepasswordHeightConstraint.constant = 50.0
             changepasswordTopConstraint.constant = 20
         }
+        
+        hideDeleteAccountView(isLocaleChina: ESPLocaleManager.shared.isLocaleChina)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -57,6 +60,15 @@ class UserAccountViewController: UIViewController, ESPNoRefreshTokenLogic {
         if segue.identifier == Constants.changePasswordSegueId {
             let vc = segue.destination as! ChangePasswordViewController
             vc.userPasswordUpdatedDelegate = self
+        }
+    }
+    
+    /// Hide delete account view based on China Locale
+    /// - Parameter isLocaleChina:Is locale China
+    func hideDeleteAccountView(isLocaleChina: Bool) {
+        DispatchQueue.main.async {
+            self.deleteAccountView.isHidden = isLocaleChina
+            self.deleteAccountView.isUserInteractionEnabled = !isLocaleChina
         }
     }
 }

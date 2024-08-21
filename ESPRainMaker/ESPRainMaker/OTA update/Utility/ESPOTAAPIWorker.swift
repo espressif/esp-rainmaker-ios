@@ -26,11 +26,12 @@ class ESPOTAAPIWorker {
     init() {
         if let fileName = ESPServerTrustParams.shared.fileName {
             let certificate = ESPOTAAPIWorker.certificate(filename: fileName)
-            let trustManager = ServerTrustManager(evaluators: [
-                ESPServerTrustParams.shared.baseURLDomain: PinnedCertificatesTrustEvaluator(certificates: [certificate]),
-                ESPServerTrustParams.shared.authURLDomain: PinnedCertificatesTrustEvaluator(certificates: [certificate]),
-                ESPServerTrustParams.shared.claimURLDomain: PinnedCertificatesTrustEvaluator(certificates: [certificate]),
-            ])
+            let serverTrustEvaluators = ESPServerTrustEvaluatorsWorker.shared.getEvaluators(
+                authURLDomain: ESPServerTrustParams.shared.authURLDomain,
+                baseURLDomain: ESPServerTrustParams.shared.baseURLDomain,
+                claimURLDomain: ESPServerTrustParams.shared.claimURLDomain,
+                certificates: [certificate])
+            let trustManager: ServerTrustManager = ServerTrustManager(evaluators: serverTrustEvaluators)
             let configuration = URLSessionConfiguration.default
             configuration.timeoutIntervalForRequest = 10
             session = Session(configuration: configuration, serverTrustManager: trustManager)

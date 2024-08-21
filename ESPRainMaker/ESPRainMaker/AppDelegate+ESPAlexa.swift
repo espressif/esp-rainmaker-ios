@@ -22,6 +22,9 @@ import UIKit
 extension AppDelegate {
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        if ESPLocaleManager.shared.isLocaleChina {
+            return WXApi.handleOpenUniversalLink(userActivity, delegate: self)
+        }
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
             if let url = userActivity.webpageURL {
                 var isRainmakerAuthCode = false
@@ -48,6 +51,13 @@ extension AppDelegate {
         return false
     }
     
+    func application(_ application: UIApplication, handleOpen url: URL) -> Bool {
+        return WXApi.handleOpen(url, delegate: self)
+    }
+    
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        return WXApi.handleOpen(url, delegate: self)
+    }
     
     /// Method navigates to ESPAlexaConnectViewController from whatever screen is opened in the screen.
     /// - Parameters:

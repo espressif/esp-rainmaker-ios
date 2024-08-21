@@ -26,8 +26,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var storyboard: UIStoryboard?
     var isInitialized = false
-    let apiManager = ESPAPIManager()
+    let espNotificationsAPIWorker = ESPNotificationsAPIWorker()
     var deviceToken: String?
+    var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    var jPushServiceTimer: Timer?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -52,7 +54,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         UNUserNotificationCenter.current().delegate = self
         
+        if ESPLocaleManager.shared.isLocaleChinaWithWeChatConfigured {
+            self.setupWeChatConfig()
+        }
+        self.launchOptions = launchOptions
+
         return true
+    }
+    
+    private func setupWeChatConfig() {
+        WXApi.registerApp(Configuration.shared.weChatServiceConfiguration.appId,
+                          universalLink: Configuration.shared.weChatServiceConfiguration.universalLink)
     }
     
     // Method to set appearance of Tab Bar

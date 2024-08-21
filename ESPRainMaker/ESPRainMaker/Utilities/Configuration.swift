@@ -32,7 +32,10 @@ enum ESPSecurity2Type: String {
 
 class Configuration: ESPConfiguration {
     static let shared = Configuration()
+    var cnConfiguration: CNConfiguration!
     var awsConfiguration: AWSConfiguration!
+    var jPushServiceConfiguration: JPushServiceConfiguration!
+    var weChatServiceConfiguration: WeChatServiceConfiguration!
     var appConfiguration: AppConfiguration!
     var espAlexaConfiguration: ESPAlexaConfiguration!
     var externalLinks: ExternalLink!
@@ -44,13 +47,25 @@ class Configuration: ESPConfiguration {
         guard let configDictionary = getCustomPlist() else {
             fatalError("Configuration.plist file is not present. Please check the documents for more information.")
         }
+        guard let cnConfig = configDictionary["CN Configuration"] as? [String: Any] else {
+            fatalError("CN Configuration key is not present. Please check the documents for more information.")
+        }
         guard let awsConfig = configDictionary["AWS Configuration"] as? [String: Any] else {
             fatalError("AWS Configuration key is not present. Please check the documents for more information.")
         }
-        awsConfiguration = AWSConfiguration(config: awsConfig)
+        guard let jPushConfig = configDictionary["JPushService Configuration"] as? [String: Any] else {
+            fatalError("JPushService Configuration key is not present. Please check the documents for more information.")
+        }
+        guard let weChatConfig = configDictionary["WeChat Configuration"] as? [String: Any] else {
+            fatalError("WeChat Configuration key is not present. Please check the documents for more information.")
+        }
+        jPushServiceConfiguration = JPushServiceConfiguration(config: jPushConfig)
+        weChatServiceConfiguration = WeChatServiceConfiguration(config: weChatConfig)
+        cnConfiguration = CNConfiguration(config: cnConfig)
+        awsConfiguration = AWSConfiguration(config: awsConfig, cnConfiguration: ESPLocaleManager.shared.isLocaleChina ? cnConfiguration : nil)
         appConfiguration = AppConfiguration(config: configDictionary["App Configuration"] as? [String: Any])
         espAlexaConfiguration = ESPAlexaConfiguration(configPlist: configDictionary["ESP Alexa Configuration"] as? [String: Any])
-        externalLinks = ExternalLink(config: configDictionary["External Links"] as? [String: Any])
+        externalLinks = ExternalLink(config: configDictionary["External Links"] as? [String: Any], isRegionChina: ESPLocaleManager.shared.isLocaleChina)
         espProvSetting = ESPProvSettings(config: configDictionary["Provision Settings"] as? [String: Any])
         appThemeColor = configDictionary["App Theme Color"] as? String ?? "#FFFFFF"
     }
@@ -67,6 +82,39 @@ extension Configuration {
     }
 }
 
+struct CNConfiguration {
+    var appClientId: String!
+    var authURL: String!
+    var baseURL: String!
+    var claimURL: String!
+
+    init(config: [String: Any]) {
+        if ESPLocaleManager.shared.isLocaleChina {
+            guard let clientID = config["App Client ID"] as? String, !clientID.isEmpty else {
+                fatalError("App Client ID is not configured. Configured it on Configuration.plist under the dictionary \"CNConfiguration\" using \"App Client ID\" as key.")
+            }
+            guard let authenticationURL = config["Authentication URL"] as? String, !authenticationURL.isEmpty else {
+                fatalError("Authentication URL is not configured. Configured it on Configuration.plist under the dictionary \"CNConfiguration\" using \"Authentication URL\" as key.")
+            }
+            guard let endpointBaseURL = config["Base URL"] as? String, !endpointBaseURL.isEmpty else {
+                fatalError("Base URL is not configured. Configured it on Configuration.plist under the dictionary \"CNConfiguration\" using \"Base URL\" as key.")
+            }
+            guard let claimBaseURL = config["Claim URL"] as? String, !endpointBaseURL.isEmpty else {
+                fatalError("Base URL is not configured. Configured it on Configuration.plist under the dictionary \"CNConfiguration\" using \"Base URL\" as key.")
+            }
+            appClientId = clientID
+            authURL = authenticationURL
+            baseURL = endpointBaseURL
+            claimURL = claimBaseURL
+        } else {
+            appClientId = config["App Client ID"] as? String ?? ""
+            authURL = config["Authentication URL"] as? String ?? ""
+            baseURL = config["Base URL"] as? String ?? ""
+            claimURL = config["Claim URL"] as? String ?? ""
+        }
+    }
+}
+
 struct AWSConfiguration {
     var appClientId: String!
     var authURL: String!
@@ -74,7 +122,7 @@ struct AWSConfiguration {
     var claimURL: String!
     var redirectURL = ""
 
-    init(config: [String: Any]) {
+    init(config: [String: Any], cnConfiguration: CNConfiguration?) {
         guard let clientID = config["App Client ID"] as? String, !clientID.isEmpty else {
             fatalError("App Client ID is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"App Client ID\" as key.")
         }
@@ -84,14 +132,17 @@ struct AWSConfiguration {
         guard let endpointBaseURL = config["Base URL"] as? String, !endpointBaseURL.isEmpty else {
             fatalError("Base URL is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"Base URL\" as key.")
         }
-        appClientId = clientID
-        authURL = authenticationURL
-        if let value = UserDefaults.standard.value(forKey: Constants.overriddenBaseURLKey) as? String {
-            baseURL = value
+        if let cnConfig = cnConfiguration {
+            appClientId = cnConfig.appClientId
+            authURL = cnConfig.authURL
+            baseURL = UserDefaults.standard.value(forKey: Constants.overriddenBaseURLKey) as? String ?? cnConfig.baseURL
+            claimURL = cnConfig.claimURL
         } else {
-            baseURL = endpointBaseURL
+            appClientId = clientID
+            authURL = authenticationURL
+            baseURL = UserDefaults.standard.value(forKey: Constants.overriddenBaseURLKey) as? String ?? endpointBaseURL
+            claimURL = config["Claim URL"] as? String ?? ""
         }
-        claimURL = config["Claim URL"] as? String ?? ""
         redirectURL = config["Redirect URL"] as? String ?? ""
     }
     
@@ -106,6 +157,29 @@ struct AWSConfiguration {
             fatalError("Base URL is not configured. Configured it on Configuration.plist under the dictionary \"AWSConfiguration\" using \"Base URL\" as key.")
         }
         self.baseURL = endpointBaseURL
+    }
+}
+
+struct JPushServiceConfiguration {
+    var appKey: String!
+    var apsForProduction: Bool = true
+    
+    init(config: [String: Any]) {
+        appKey = config["App Key"] as? String ?? ""
+        apsForProduction = config["APS For Production"] as? Bool ?? false
+    }
+}
+
+struct WeChatServiceConfiguration {
+    var appId: String!
+    var universalLink: String!
+    var scope: String!
+    static let state = "esp_rainmaker_we_chat_prod_state"
+    
+    init(config: [String: Any]) {
+        appId = config["App Id"] as? String ?? ""
+        universalLink = config["Universal Link"] as? String ?? ""
+        scope = config["Scope"] as? String ?? ""
     }
 }
 
@@ -166,10 +240,18 @@ struct ExternalLink {
     var privacyPolicyURL = ""
     var documentationURL = ""
 
-    init(config: [String: Any]?) {
+    init(config: [String: Any]?, isRegionChina: Bool) {
         if let configDict = config {
-            termsOfUseURL = configDict["Terms of Use"] as? String ?? ""
-            privacyPolicyURL = configDict["Privacy Policy"] as? String ?? ""
+            if isRegionChina {
+                termsOfUseURL = configDict["CN Terms of Use"] as? String ?? ""
+            } else {
+                termsOfUseURL = configDict["Terms of Use"] as? String ?? ""
+            }
+            if isRegionChina {
+                privacyPolicyURL = configDict["CN Privacy Policy"] as? String ?? ""
+            } else {
+                privacyPolicyURL = configDict["Privacy Policy"] as? String ?? ""
+            }
             documentationURL = configDict["Documentation"] as? String ?? ""
         }
     }
