@@ -749,3 +749,36 @@ extension ESPNoRefreshTokenLogic {
         }
     }
 }
+
+extension NSDictionary {
+    
+    /// Check device version info to find ouf if assisted claiming is supported
+    /// - Returns: is assisted claiming supported
+    func isAssistedClaimingSupported() -> Bool {
+        if let rmakerInfo = self[ESPScanConstants.rmaker] as? NSDictionary, let rmakerCapabilities = rmakerInfo[ESPScanConstants.capabilities] as? [String], rmakerCapabilities.contains(ESPScanConstants.claim) {
+            return true
+        }
+        return false
+    }
+    
+    /// Check thread prov capabilities
+    /// - Returns: (can prov thread device, should scan thread networks)
+    func checkThreadCapabilities() -> (canProvisionOverThread: Bool, shouldScanThreadNetworks: Bool) {
+        if let deviceInfo = self[ESPScanConstants.prov] as? NSDictionary, let deviceInfoCapabilities = deviceInfo[ESPScanConstants.capabilities] as? [String] {
+            let shouldScanThreadNetworks = deviceInfoCapabilities.contains(ESPScanConstants.threadScan)
+            if (deviceInfoCapabilities.contains(ESPScanConstants.threadProv) || shouldScanThreadNetworks) {
+                return (true, shouldScanThreadNetworks)
+            }
+        }
+        return (false, false)
+    }
+    
+    /// Should scan wifi networks
+    /// - Returns: flag
+    func shouldScanWifiNetwork() -> Bool {
+        if let deviceInfo = self[ESPScanConstants.prov] as? NSDictionary, let deviceInfoCapabilities = deviceInfo[ESPScanConstants.capabilities] as? [String], deviceInfoCapabilities.contains(ESPScanConstants.wiFiScan) {
+            return true
+        }
+        return false
+    }
+}

@@ -30,6 +30,8 @@ class JoinNetworkViewController: UIViewController {
     var passphrase = ""
     var pop = ""
 
+    static let storyboardId = "JoinNetworkViewController"
+    
     @IBOutlet var headerView: UIView!
 
     override func viewDidLoad() {
@@ -95,6 +97,10 @@ class JoinNetworkViewController: UIViewController {
             alertController.addAction(action)
             self.present(alertController, animated: true, completion: nil)
             return
+        }
+        if let password = passphraseTextfield.text,
+           password.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+            passphrase = password
         }
         provisionDevice(ssid: ssid, passphrase: passphrase)
     }

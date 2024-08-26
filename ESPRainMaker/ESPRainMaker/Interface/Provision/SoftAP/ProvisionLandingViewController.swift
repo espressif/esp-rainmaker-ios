@@ -189,33 +189,66 @@ class ProvisionLandingViewController: UIViewController {
         navigationController?.pushViewController(connectVC, animated: true)
     }
 
+    /// Check device for assisted claiming.
+    /// If the version info contains the "rmaker" : ["claim"] capability,
+    /// then we show error to user as SoftAP does not support assisted claiming.
+    /// If the claim flag is absent start the provisioning process for either
+    /// Wifi or Thread based on the capabilities defined under the "prov" key.
+    /// - Parameter device: ESPDevice
     func checkForAssistedClaiming(device: ESPDevice) {
-        if let versionInfo = device.versionInfo, let rmaikerInfo = versionInfo[ESPScanConstants.prov] as? NSDictionary, let rainmakerCaps = rmaikerInfo[ESPScanConstants.capabilities] as? [String] {
+        
+        if let versionInfo = device.versionInfo {
             
-            if rainmakerCaps.contains(ESPScanConstants.claim) {
+            //Check the "rmaker"/"cap" to see if assisted claiming is supported.
+            //If yes show error as assisted claiming is not supported for SoftAP.
+            if versionInfo.isAssistedClaimingSupported() {
                 self.retry(message: "Assisted Claiming not supported for SoftAP. Cannot Proceed.")
                 return
-            } else if rainmakerCaps.contains(ESPScanConstants.threadProv) {
-                let shouldScanThreadNetworks = rainmakerCaps.contains(ESPScanConstants.threadScan)
-                if #available(iOS 16.4, *) {
+            }
+            
+            //Check the "prov"/"cap" to see if wifi/thread is supported.
+            //If Thread is supported navigate to thread network selection screen.
+            //Else navigate user to wifi provisioning screen.
+            let threadCapabilities = versionInfo.checkThreadCapabilities()
+            if threadCapabilities.canProvisionOverThread {
+                if #available(iOS 15.0, *) {
                     self.espDevice = device
                     self.espDevice.network = .thread
                     self.provisionDeviceWithThreadNetwork(device: self.espDevice) {
                         DispatchQueue.main.async {
-                            self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: shouldScanThreadNetworks, device: self.espDevice)
+                            self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: threadCapabilities.shouldScanThreadNetworks, device: self.espDevice)
                         }
                     }
+                } else {
+                    self.alertUser(title: "Notice", message: Constants.upgradeOS15VersionMsg, buttonTitle: "OK") {}
                 }
                 return
             }
+            
+            /// Navigate user to provisioning screen.
+            /// If wifi scan is allowed navigate user to provisioning screen.
+            /// Else navigate user to join network screen.
+            DispatchQueue.main.async {
+                if versionInfo.shouldScanWifiNetwork() {
+                    self.espDevice.network = .wifi
+                    self.goToProvision(device: self.espDevice)
+                } else {
+                    self.goToJoinNetworkVC(device: self.espDevice)
+                }
+            }
         }
-        self.goToProvision(device: self.espDevice)
     }
 
     func goToProvision(device: ESPDevice) {
         let provVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
         provVC.device = device
         navigationController?.pushViewController(provVC, animated: true)
+    }
+    
+    func goToJoinNetworkVC(device: ESPDevice) {
+        let joinNetworkVC = self.storyboard?.instantiateViewController(withIdentifier: JoinNetworkViewController.storyboardId) as! JoinNetworkViewController
+        joinNetworkVC.device = device
+        self.navigationController?.pushViewController(joinNetworkVC, animated: true)
     }
 
     func attributedString(from string: String, nonBoldRange: NSRange?) -> NSAttributedString {

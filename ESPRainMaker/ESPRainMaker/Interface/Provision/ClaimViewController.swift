@@ -67,15 +67,31 @@ class ClaimViewController: UIViewController {
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
                 if result {
-                    if let network = self.device.network {
-                        switch network {
-                        case .wifi:
-                            self.goToProvision()
-                        case .thread:
-                            
-                            break
-                        default:
-                            self.goToProvision()
+                    if let versionInfo = self.device.versionInfo {
+                        let threadCapabilities = versionInfo.checkThreadCapabilities()
+                        if threadCapabilities.canProvisionOverThread {
+                            if #available(iOS 15.0, *) {
+                                self.device.network = .thread
+                                self.provisionDeviceWithThreadNetwork(device: self.device) {
+                                    DispatchQueue.main.async {
+                                        self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: threadCapabilities.shouldScanThreadNetworks, device: self.device)
+                                    }
+                                }
+                            } else {
+                                self.centralIcon.layer.removeAllAnimations()
+                                self.alertUser(title: "Notice", message: Constants.upgradeOS15VersionMsg, buttonTitle: "OK") {
+                                    DispatchQueue.main.async {
+                                        self.navigationController?.popToRootViewController(animated: true)
+                                    }
+                                }
+                            }
+                        } else {
+                            self.device.network = .wifi
+                            if versionInfo.shouldScanWifiNetwork() {
+                                self.goToProvision()
+                            } else {
+                                self.goToJoinNetworkVC()
+                            }
                         }
                     }
                 } else {
@@ -99,6 +115,12 @@ class ClaimViewController: UIViewController {
         let provisionVC = storyboard?.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
         provisionVC.device = device
         navigationController?.pushViewController(provisionVC, animated: true)
+    }
+    
+    func goToJoinNetworkVC() {
+        let joinNetworkVC = storyboard?.instantiateViewController(withIdentifier: JoinNetworkViewController.storyboardId) as! JoinNetworkViewController
+        joinNetworkVC.device = device
+        navigationController?.pushViewController(joinNetworkVC, animated: true)
     }
 
     @IBAction func doneButtonPressed(_: Any) {
