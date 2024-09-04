@@ -219,7 +219,17 @@ extension NodeGroupsViewController: UITableViewDelegate {
         return view
     }
 
-    func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        // Height is adjusted to accommodate large group names
+        if indexPath.section < NodeGroupManager.shared.nodeGroups.count {
+            let nodeGroup = NodeGroupManager.shared.nodeGroups[indexPath.section]
+            if let nodeGroupName = nodeGroup.group_name {
+                let constrainedWith = tableView.frame.width - 68.0
+                let font = UIFont.systemFont(ofSize: 17.0, weight: .semibold)
+                let height = nodeGroupName.getViewHeight(labelWidth: constrainedWith, font: font)
+                return 70.0 - 21.0 + height
+            }
+        }
         return 70.0
     }
 }

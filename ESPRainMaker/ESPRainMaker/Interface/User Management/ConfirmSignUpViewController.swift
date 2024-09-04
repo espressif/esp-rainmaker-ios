@@ -20,8 +20,6 @@ import UIKit
 
 class ConfirmSignUpViewController: UIViewController {
     var sentTo: String?
-    var confirmExistingUser = false
-
     @IBOutlet var sentToLabel: UILabel!
     @IBOutlet var code: UITextField!
     weak var signupDelegate: AgreementViewDisplayDelegate?
@@ -101,23 +99,20 @@ extension ConfirmSignUpViewController: ESPCreateUserPresentationLogic {
             Utility.hideLoader(view: self.view)
         }
         if error == nil {
-            if self.confirmExistingUser {
-                self.confirmExistingUser = false
-                var message = "User has been confirmed. Please enter your credentials in login page to sign in with this user."
-                if let sentTo = self.sentTo {
-                    message = "\(sentTo) has been confirmed!"
-                }
+            var message = "User has been confirmed. Please enter your credentials in login page to sign in with this user."
+            if let sentTo = self.sentTo {
+                message = "\(sentTo) has been confirmed!"
+            }
+            DispatchQueue.main.async {
                 let alertController = UIAlertController(title: "Success!",
                                                         message: message,
                                                         preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "OK", style: .default) { _ in
+                    User.shared.automaticLogin = true
                     self.navigationController?.popToRootViewController(animated: true)
                 }
                 alertController.addAction(okAction)
                 self.present(alertController, animated: true, completion: nil)
-            } else {
-                User.shared.automaticLogin = true
-                _ = self.navigationController?.popToRootViewController(animated: true)
             }
         } else {
             self.handleError(error: error, buttonTitle: "OK")

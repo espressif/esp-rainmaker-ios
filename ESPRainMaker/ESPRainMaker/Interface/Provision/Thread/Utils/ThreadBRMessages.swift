@@ -27,6 +27,7 @@ enum ThreadBRMessages: String {
     case operationNotSupported = "Operation not supported."
     case serviceNotSupported = "Service not supported."
     case espActiveDatasetAlreadyConfigured = "The ESP thread border router already has an active thread dataset."
+    case espActiveDatasetNotConfigured = "The ESP thread border router does not have an active thread dataset configured."
     case addthreadCredsSuccess = "Thread credentials successfully added."
     case addthreadCredsFailure = "Thread credentials could not be added."
     case newThreadActiveDatasetCreated = "Created new thread active dataset for the border router."

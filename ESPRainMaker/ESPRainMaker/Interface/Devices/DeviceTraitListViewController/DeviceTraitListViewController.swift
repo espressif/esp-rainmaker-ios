@@ -34,7 +34,6 @@ class DeviceTraitListViewController: UIViewController {
     @IBOutlet var tableView: UITableView!
     @IBOutlet var offlineLabel: UILabel!
     @IBOutlet var networkIndicator: UIView!
-    @IBOutlet weak var linkingButton: UIButton!
     @IBOutlet weak var betaLabel: UILabel!
     @IBOutlet weak var betaLabelHeightConstraint: NSLayoutConstraint!
     
@@ -103,22 +102,6 @@ class DeviceTraitListViewController: UIViewController {
             }
         }
     }
-    
-    #if ESPRainMakerMatter
-    /// Open binding window
-    @available(iOS 16.4, *)
-    @IBAction func openBindingWindow(_ sender: Any) {
-        if let node = self.node {
-            let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
-            let devicesBindingVC = storyboard.instantiateViewController(withIdentifier: DevicesBindingViewController.storyboardId) as! DevicesBindingViewController
-            devicesBindingVC.group = self.group
-            devicesBindingVC.nodes = self.allNodes
-            devicesBindingVC.sourceNode = node
-            devicesBindingVC.bindingEndpointClusterId = self.bindingEndpointClusterId
-            self.navigationController?.pushViewController(devicesBindingVC, animated: true)
-        }
-    }
-    #endif
     
     // Method to show central param based on UI type
     private func checkForCentralParam() {
@@ -284,12 +267,10 @@ class DeviceTraitListViewController: UIViewController {
             } else {
                 offlineLabel.text = "Reachable on WLAN"
             }
-            offlineLabel.isHidden = false
         } else if device?.node?.isConnected ?? true {
-            offlineLabel.isHidden = true
+            offlineLabel.text = ""
         } else {
             offlineLabel.text = device?.node?.nodeStatus ?? ""
-            offlineLabel.isHidden = false
         }
     }
     
@@ -384,6 +365,13 @@ class DeviceTraitListViewController: UIViewController {
 
             cell.hueSlider.setInitialHSBColor(currentColor, isInteractive: true)
             cell.selectedColor.setSelectedHSBColor(currentColor, isInteractive: true)
+            if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected || node.localNetwork {
+                cell.hueSlider.isEnabled = true
+                cell.hueSlider.alpha = 1.0
+            } else {
+                cell.hueSlider.isEnabled = false
+                cell.hueSlider.alpha = 0.3
+            }
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "centralSwitchTVC", for: indexPath) as! CentralSwitchTableViewCell
@@ -403,16 +391,18 @@ class DeviceTraitListViewController: UIViewController {
         if dynamicAttribute.type == Constants.threadPendingDataset || dynamicAttribute.type == Constants.threadActiveDataset {
             if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
                 cell.delegate = self
+                cell.topSpaceConstraint.constant = 0
+                cell.bottomSpaceConstraint.constant = 0
                 if dynamicAttribute.type == Constants.threadPendingDataset {
                     cell.setupWorkflow(workflow: .mergeThreadDataset)
                 } else {
                     cell.setupWorkflow(workflow: .setActiveThreadDataset)
                 }
                 self.setAutoresizingMask(cell)
-                if let node = device.node, !node.isConnected {
-                    cell.launchButton.isUserInteractionEnabled = false
+                if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected || node.localNetwork {
+                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: false)
                 } else {
-                    cell.launchButton.isUserInteractionEnabled = true
+                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: true)
                 }
                 return cell
             }
@@ -427,6 +417,11 @@ class DeviceTraitListViewController: UIViewController {
                 cell.param = dynamicAttribute
                 if let attributeName = dynamicAttribute.name {
                     cell.paramName = attributeName
+                }
+                if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected {
+                    cell.invokeActionButton.isEnabled = true
+                } else {
+                    cell.invokeActionButton.isEnabled = false
                 }
                 return cell
             }
@@ -541,8 +536,10 @@ class DeviceTraitListViewController: UIViewController {
                 }
                 if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
                     cell.hueSlider.isEnabled = true
+                    cell.hueSlider.alpha = 1.0
                 } else {
                     cell.hueSlider.isEnabled = false
+                    cell.hueSlider.alpha = 0.3
                 }
                 cell.title.text = dynamicAttribute.name ?? ""
                 cell.minImage.image = nil

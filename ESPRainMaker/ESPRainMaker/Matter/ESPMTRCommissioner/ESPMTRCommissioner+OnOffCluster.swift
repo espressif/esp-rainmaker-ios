@@ -92,5 +92,47 @@ extension ESPMTRCommissioner {
             }
         }
     }
+    
+    /// Turn on
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - completion: completion
+    func turnOn(groupId: String, deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+        self.getOnOffCluster(groupId: groupId, deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                cluster.on { error in
+                    guard let _ = error else {
+                        completion(true)
+                        return
+                    }
+                    completion(false)
+                }
+            } else {
+                completion(false)
+            }
+        }
+    }
+        
+    /// Turn off
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - completion: completion
+    func turnOff(groupId: String, deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+        self.getOnOffCluster(groupId: groupId, deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                cluster.off { error in
+                    guard let _ = error else {
+                        completion(true)
+                        return
+                    }
+                    completion(false)
+                }
+            } else {
+                completion(false)
+            }
+        }
+    }
 }
 #endif

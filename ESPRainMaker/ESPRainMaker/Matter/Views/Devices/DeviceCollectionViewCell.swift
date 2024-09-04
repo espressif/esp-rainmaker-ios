@@ -57,24 +57,28 @@ class DeviceCollectionViewCell: UICollectionViewCell {
         if let group = self.group, let groupId = group.groupID, let node = self.node, let deviceId = node.deviceId, let nodeId = node.nodeID {
             if self.connectionStatus == .local {
                 self.restartController()
+                var final = false
                 if let status = node.isMatterLightOn(deviceId: deviceId) {
                     self.setToggleButtonUI(isLightOn: !status)
+                    final = !status
                 } else {
                     node.setMatterLightOnStatus(status: true, deviceId: deviceId)
                     self.setToggleButtonUI(isLightOn: false)
                 }
-                ESPMTRCommissioner.shared.toggleSwitch(groupId: groupId, deviceId: deviceId) { result in
-                    if result {
-                        if let status = node.isMatterLightOn(deviceId: deviceId) {
-                            node.setMatterLightOnStatus(status: !status, deviceId: deviceId)
+                if final {
+                    ESPMTRCommissioner.shared.turnOn(groupId: groupId, deviceId: deviceId) { result in
+                        if result {
+                            node.setMatterLightOnStatus(status: true, deviceId: deviceId)
+                        } else {
+                            self.setToggleButtonUI(isLightOn: false)
                         }
-                        ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { result in
-                            node.setMatterLightOnStatus(status: result, deviceId: deviceId)
-                            self.setToggleButtonUI(isLightOn: result)
-                        }
-                    } else {
-                        if let status = node.isMatterLightOn(deviceId: deviceId) {
-                            self.setToggleButtonUI(isLightOn: status)
+                    }
+                } else {
+                    ESPMTRCommissioner.shared.turnOff(groupId: groupId, deviceId: deviceId) { result in
+                        if result {
+                            node.setMatterLightOnStatus(status: false, deviceId: deviceId)
+                        } else {
+                            self.setToggleButtonUI(isLightOn: true)
                         }
                     }
                 }

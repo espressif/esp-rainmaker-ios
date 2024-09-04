@@ -26,13 +26,13 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.rainmakerController, ESPMatterConstants.nodeLabel, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter, ESPMatterConstants.measuredTemperature, ESPMatterConstants.updateMetadata].contains(value) {
+            if [ESPMatterConstants.rainmakerController, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter, ESPMatterConstants.measuredTemperature, ESPMatterConstants.updateMetadata].contains(value) {
                 return 100.0
             } else if [ESPMatterConstants.levelControl, ESPMatterConstants.colorControl, ESPMatterConstants.saturationControl, ESPMatterConstants.occupiedCoolingSetpoint].contains(value) {
                 return 136.0
             } else if value == ESPMatterConstants.participantData {
                 return 278.0
-            } else if [ESPMatterConstants.controlSequenceOfOperation, ESPMatterConstants.systemMode].contains(value) {
+            } else if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.controlSequenceOfOperation, ESPMatterConstants.systemMode, ESPMatterConstants.nodeLabel].contains(value) {
                 return 90.0
             }
         }
@@ -184,6 +184,7 @@ extension DeviceViewController: DeviceNameDelegate {
             let input = UIAlertController(title: "Name", message: ESPMatterConstants.enterDeviceNameMsg, preferredStyle: .alert)
             input.addTextField { textField in
                 textField.placeholder = "Enter device name"
+                textField.text = node.matterDeviceName
                 self.addHeightConstraint(textField: textField)
             }
             input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
@@ -227,7 +228,9 @@ extension DeviceViewController: DeviceNameDelegate {
                 }
                 self.fabricDetails.removeNodeLabel(groupId: groupId, deviceId: deviceId)
                 self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
-                completion(nodeLabel)
+                ESPNodeMetadataService.shared.setMatterDeviceName(node: node, deviceName: nodeLabel) { _, _ in
+                    completion(nodeLabel)
+                }
             } else {
                 completion(nil)
             }

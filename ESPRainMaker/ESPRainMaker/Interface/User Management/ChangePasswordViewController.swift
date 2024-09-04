@@ -45,34 +45,33 @@ class ChangePasswordViewController: UIViewController {
 
     @IBAction func setPassword(_: Any) {
         guard let oldPassword = oldPasswordTextField.text, !oldPassword.isEmpty else {
-            showAlertWith(title: "Error", message: "Old password is required to change the password")
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error", message: "Old password is required to change the password", buttonTitle: "Retry") {}
+            }
             return
         }
 
         guard let newPassword = newPasswordTextField.text, !newPassword.isEmpty else {
-            showAlertWith(title: "Error", message: "New password is required to change the password")
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error", message: "New password is required to change the password", buttonTitle: "Retry") {}
+            }
             return
         }
 
         guard let confirmPasswordValue = confirmNewPasswordTextField.text, confirmPasswordValue == newPassword else {
-            showAlertWith(title: "Error", message: "Re-entered password do not match.")
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error", message: "Re-entered password do not match.", buttonTitle: "Retry") {}
+            }
             return
         }
-        Utility.showLoader(message: "", view: view)
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
+        }
         let service = ESPChangePasswordService(presenter: self)
         service.changePassword(oldPassword: oldPassword, newPassword: newPassword)
-    }
-
-    func showAlertWith(title: String, message: String) {
-        Utility.hideLoader(view: view)
-        let alertController = UIAlertController(title: title,
-                                                message: message,
-                                                preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-        alertController.addAction(okAction)
-
-        present(alertController, animated: true, completion: nil)
-        return
     }
 
     /*

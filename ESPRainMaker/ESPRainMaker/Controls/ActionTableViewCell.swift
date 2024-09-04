@@ -28,6 +28,7 @@ class ActionTableViewCell: UITableViewCell {
     weak var delegate: ActionTableViewCellDelegate?
     
     @IBOutlet var backView: UIView!
+    @IBOutlet weak var invokeActionButton: PrimaryButton!
     @IBOutlet var controlValueLabel: UILabel!
     
     var param: Param!

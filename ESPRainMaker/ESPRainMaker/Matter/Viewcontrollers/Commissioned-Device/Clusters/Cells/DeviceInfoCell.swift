@@ -35,6 +35,7 @@ class DeviceInfoCell: UITableViewCell {
     @IBOutlet weak var propertyName: UILabel!
     @IBOutlet weak var deviceName: UILabel!
     @IBOutlet weak var container: UIView!
+    @IBOutlet weak var editButton: UIButton!
     weak var delegate: DeviceNameDelegate?
     var rainmakerNode: Node?
     var deviceInfo: DeviceInfo = .deviceName
