@@ -47,11 +47,11 @@
 		<key>Terms of Use</key>
 		<string>https://rainmaker.espressif.com/docs/terms-of-use.html</string>
 		<key>CN Terms of Use</key>
-		<string>https://rainmaker.espressif.com/docs/terms-of-use-cn/</string>
+		<string>https://rainmaker.espressif.com/zh-hans/docs/terms-of-use-cn/</string>
 		<key>Privacy Policy</key>
 		<string>https://rainmaker.espressif.com/docs/privacy-policy.html</string>
 		<key>CN Privacy Policy</key>
-		<string>https://rainmaker.espressif.com/docs/privacy-policy-cn.html</string>
+		<string>https://rainmaker.espressif.com/zh-hans/docs/privacy-policy-cn/</string>
 		<key>Documentation</key>
 		<string>https://rainmaker.espressif.com</string>
 	</dict>
