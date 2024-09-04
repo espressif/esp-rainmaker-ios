@@ -3,7 +3,7 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -501,82 +501,8 @@
                                 <rect key="frame" x="0.0" y="95" width="393" height="723"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="CustomActionCell" id="Vy1-RE-GBQ" customClass="CustomActionCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="393" height="89"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Vy1-RE-GBQ" id="m8y-hr-9jE">
-                                            <rect key="frame" x="0.0" y="0.0" width="393" height="89"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rug-yk-oGX">
-                                                    <rect key="frame" x="15" y="10" width="363" height="69"/>
-                                                    <subviews>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Controller" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PyQ-jo-oVv">
-                                                            <rect key="frame" x="15.000000000000004" y="9.9999999999999982" width="63.333333333333343" height="18.333333333333329"/>
-                                                            <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="14"/>
-                                                            <color key="textColor" red="0.1019607843" green="0.1019607843" blue="0.1019607843" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <nil key="highlightedColor"/>
-                                                        </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Update Device List" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LkC-nl-gx3">
-                                                            <rect key="frame" x="16" y="36" width="159.66666666666666" height="23"/>
-                                                            <fontDescription key="fontDescription" type="system" pointSize="19"/>
-                                                            <nil key="textColor"/>
-                                                            <nil key="highlightedColor"/>
-                                                        </label>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ES-EG-bvL" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                                            <rect key="frame" x="272.66666666666669" y="19" width="74.333333333333314" height="31"/>
-                                                            <color key="tintColor" red="0.0" green="0.3294117647" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <state key="normal" title="Button"/>
-                                                            <buttonConfiguration key="configuration" style="filled" title="Update">
-                                                                <fontDescription key="titleFontDescription" type="boldSystem" pointSize="14"/>
-                                                                <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                            </buttonConfiguration>
-                                                            <userDefinedRuntimeAttributes>
-                                                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                                                    <integer key="value" value="8"/>
-                                                                </userDefinedRuntimeAttribute>
-                                                                <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
-                                                            </userDefinedRuntimeAttributes>
-                                                            <connections>
-                                                                <action selector="launchController:" destination="Vy1-RE-GBQ" eventType="touchUpInside" id="4lv-ph-RpC"/>
-                                                            </connections>
-                                                        </button>
-                                                    </subviews>
-                                                    <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <constraints>
-                                                        <constraint firstItem="PyQ-jo-oVv" firstAttribute="leading" secondItem="Rug-yk-oGX" secondAttribute="leading" constant="15" id="NpT-2Z-xsh"/>
-                                                        <constraint firstItem="7ES-EG-bvL" firstAttribute="centerY" secondItem="Rug-yk-oGX" secondAttribute="centerY" id="WWZ-Xt-fNv"/>
-                                                        <constraint firstItem="7ES-EG-bvL" firstAttribute="height" secondItem="Rug-yk-oGX" secondAttribute="height" multiplier="0.45" id="Z1W-Mo-VJ5"/>
-                                                        <constraint firstItem="LkC-nl-gx3" firstAttribute="leading" secondItem="Rug-yk-oGX" secondAttribute="leading" constant="16" id="bOH-iF-6WY"/>
-                                                        <constraint firstItem="PyQ-jo-oVv" firstAttribute="top" secondItem="Rug-yk-oGX" secondAttribute="top" constant="10" id="bdz-gq-J3u"/>
-                                                        <constraint firstAttribute="bottom" secondItem="LkC-nl-gx3" secondAttribute="bottom" constant="10" id="n2S-IY-xuR"/>
-                                                        <constraint firstAttribute="trailing" secondItem="7ES-EG-bvL" secondAttribute="trailing" constant="16" id="vwB-z3-oVU"/>
-                                                    </constraints>
-                                                    <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                                            <integer key="value" value="10"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                    </userDefinedRuntimeAttributes>
-                                                </view>
-                                            </subviews>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="Rug-yk-oGX" secondAttribute="bottom" constant="10" id="VMn-Yc-t5K"/>
-                                                <constraint firstAttribute="trailing" secondItem="Rug-yk-oGX" secondAttribute="trailing" constant="15" id="Vch-Gy-yaN"/>
-                                                <constraint firstItem="Rug-yk-oGX" firstAttribute="top" secondItem="m8y-hr-9jE" secondAttribute="top" constant="10" id="WtS-Lk-P8I"/>
-                                                <constraint firstItem="Rug-yk-oGX" firstAttribute="leading" secondItem="m8y-hr-9jE" secondAttribute="leading" constant="15" id="gIl-qy-roh"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <connections>
-                                            <outlet property="container" destination="Rug-yk-oGX" id="MDh-zG-n3h"/>
-                                            <outlet property="descriptionLabel" destination="LkC-nl-gx3" id="gQY-Qc-ge6"/>
-                                            <outlet property="headerLabel" destination="PyQ-jo-oVv" id="gEK-t4-LFr"/>
-                                            <outlet property="launchButton" destination="7ES-EG-bvL" id="Oej-Z6-sGf"/>
-                                        </connections>
-                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="OpenCommissioningWindowCell" id="QrA-Se-S6E" customClass="OpenCommissioningWindowCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="139" width="393" height="89"/>
+                                        <rect key="frame" x="0.0" y="50" width="393" height="89"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="QrA-Se-S6E" id="rAg-3V-OEE">
                                             <rect key="frame" x="0.0" y="0.0" width="393" height="89"/>
@@ -647,7 +573,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="RemoveDeviceCell" id="UBB-h7-iaG" customClass="RemoveDeviceCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="228" width="393" height="70"/>
+                                        <rect key="frame" x="0.0" y="139" width="393" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="UBB-h7-iaG" id="sWE-Xo-Tuc">
                                             <rect key="frame" x="0.0" y="0.0" width="393" height="70"/>
@@ -701,7 +627,7 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="DeviceOnOffCell" rowHeight="91" id="8si-YQ-yzm" customClass="DeviceOnOffCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="298" width="393" height="91"/>
+                                        <rect key="frame" x="0.0" y="209" width="393" height="91"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="8si-YQ-yzm" id="A2h-Dj-d0p">
                                             <rect key="frame" x="0.0" y="0.0" width="393" height="91"/>
@@ -1006,17 +932,17 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="ClusterSelectionCell" id="ImF-PG-rEb" customClass="ClusterSelectionCell" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="55.333332061767578" width="393" height="41"/>
+                                        <rect key="frame" x="0.0" y="55.333332061767578" width="393" height="41.333332061767578"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ImF-PG-rEb" id="ufO-rA-68g">
-                                            <rect key="frame" x="0.0" y="0.0" width="393" height="41"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="41.333332061767578"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wf8-tX-cjF">
-                                                    <rect key="frame" x="10" y="5" width="373" height="31"/>
+                                                    <rect key="frame" x="10" y="4.9999999999999982" width="373" height="31.333333333333329"/>
                                                     <subviews>
                                                         <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0qK-eH-lLe">
-                                                            <rect key="frame" x="20" y="5" width="42" height="21"/>
+                                                            <rect key="frame" x="20" y="5" width="42" height="21.333333333333332"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
@@ -1079,7 +1005,7 @@
     <resources>
         <image name="background_image" width="375" height="812"/>
         <image name="bell_icon" width="42.666667938232422" height="42.666667938232422"/>
-        <image name="bin.xmark" catalog="system" width="32" height="32"/>
+        <image name="bin.xmark" catalog="system" width="128" height="92"/>
         <image name="binding" width="13.333333015441895" height="13.666666984558105"/>
         <image name="info_icon" width="22" height="22"/>
         <image name="matter" width="213.33332824707031" height="120"/>
@@ -1088,7 +1014,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGrayColor">
-            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

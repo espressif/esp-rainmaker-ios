@@ -35,6 +35,9 @@ class User {
     var localServices: [String: ESPLocalService] = [:]
     var discoveredNodes: [String] = []
     var discoveredNodesCompletion: (([String]) -> Void)?
+    var discoveredTBRs: [String] = []
+    var discoveredThreadNetworks: [String: String] = [:]
+    var discoveredTBRsCompletion: (([String], [String: String]) -> Void)?
     var matterLightOnStatus: [String: Bool] = [String: Bool]()
     
     private let esp = "esp"
@@ -47,6 +50,10 @@ class User {
     
     lazy var matterConnectionManager: ESPMatterConnectionManager = {
         ESPMatterConnectionManager()
+    }()
+    
+    lazy var tbrConnectionManager: TBRConnectionManager = {
+        TBRConnectionManager()
     }()
 
     private init() {
@@ -108,7 +115,6 @@ class User {
                         }
                         group.leave()
                     }
-                    
                 } else {
                     node.localNetwork = false
                 }
@@ -203,6 +209,26 @@ class User {
         }
         return false
     }
+    
+    /// Scan for TBRs broadcasting on service  "_meshcop._udp"
+    /// - Parameter discoveredTBRs: TBRs discovered
+    func scanThreadBorderRouters(discoveredTBRsCompletion: @escaping ([String], [String: String]) -> Void) {
+        DispatchQueue.main.async {
+            self.discoveredTBRs.removeAll()
+            self.discoveredThreadNetworks.removeAll()
+            self.discoveredTBRsCompletion = discoveredTBRsCompletion
+            self.tbrConnectionManager.delegate = self
+            self.tbrConnectionManager.searchForServicesOfType(type: Constants.threadBRMDNSServiceType, domain: Constants.serviceDomain)
+        }
+    }
+
+    /// Stop matter discovery
+    func stopThreadBRSearch() {
+        DispatchQueue.main.async {
+            self.tbrConnectionManager.stopService()
+            self.tbrConnectionManager.delegate = nil
+        }
+    }
 }
 
 extension User: ESPLocalControlDelegate {
@@ -224,5 +250,13 @@ extension User: ESPMatterNodesDiscoveredDelegate {
     func matterDevicesDiscovered(matterNodes: [String]) {
         self.discoveredNodes = matterNodes
         self.discoveredNodesCompletion?(matterNodes)
+    }
+}
+
+extension User: TBRNodesDiscoveredDelegate {
+    func threadBorderRoutersDiscovered(threadBorderRouters: [String], threadNetworks: [String: String]) {
+        self.discoveredTBRs = threadBorderRouters
+        self.discoveredThreadNetworks = threadNetworks
+        self.discoveredTBRsCompletion?(threadBorderRouters, threadNetworks)
     }
 }

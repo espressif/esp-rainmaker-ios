@@ -18,14 +18,14 @@
 
 import UIKit
 
-protocol OpenCommissioningWindowCellDelegate {
+protocol OpenCommissioningWindowCellDelegate: AnyObject {
     func openCommissioningWindow()
 }
 
 class OpenCommissioningWindowCell: UITableViewCell {
 
     static let reuseIdentifier = "OpenCommissioningWindowCell"
-    var delegate: OpenCommissioningWindowCellDelegate?
+    weak var delegate: OpenCommissioningWindowCellDelegate?
     
     @IBOutlet weak var openCWButton: PrimaryButton!
     

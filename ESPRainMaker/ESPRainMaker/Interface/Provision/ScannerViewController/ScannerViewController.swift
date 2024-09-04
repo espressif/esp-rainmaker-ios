@@ -142,7 +142,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                                     }
                                 } else {
                                     self.alertUser(title: ESPMatterConstants.warning,
-                                                   message: ESPMatterConstants.upgradeOSVersionMsg,
+                                                   message: AppMessages.upgradeOSVersionMsg,
                                                    buttonTitle: ESPMatterConstants.okTxt,
                                                    callback: {
                                         self.navigationController?.popToRootViewController(animated: false)
@@ -243,7 +243,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                         }
                     }
                 } else {
-                    self.alertUser(title: "Notice", message: Constants.upgradeOS15VersionMsg, buttonTitle: "OK") {}
+                    self.alertUser(title: Constants.notice, message: AppMessages.upgradeOS15VersionMsg, buttonTitle: "OK") {}
                 }
                 return
             }
@@ -294,7 +294,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                     }
                 } else {
                     self.alertUser(title: ESPMatterConstants.warning,
-                                   message: ESPMatterConstants.upgradeOSVersionMsg,
+                                   message: AppMessages.upgradeOSVersionMsg,
                                    buttonTitle: ESPMatterConstants.okTxt,
                                    callback: {
                         self.navigationController?.popToRootViewController(animated: false)

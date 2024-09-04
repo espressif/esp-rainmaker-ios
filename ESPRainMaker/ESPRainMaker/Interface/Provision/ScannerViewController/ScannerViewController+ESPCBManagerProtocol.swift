@@ -96,13 +96,13 @@ extension ScannerViewController: ESPCBManagerProtocol {
         switch cbStatus {
         case .poweredOff:
             DispatchQueue.main.async {
-                self.alertUser(title: Constants.settings, message: Constants.turnBLEOnMsg, buttonTitle: "OK") {
+                self.alertUser(title: Constants.settings, message: AppMessages.turnBLEOnMsg, buttonTitle: "OK") {
                     self.navigationController?.popToRootViewController(animated: true)
                 }
             }
         case .unauthorized:
             DispatchQueue.main.async {
-                self.authorizeCBAlert(title: "", message: Constants.blePermissionReqdMsg, buttonTitle: Constants.settings) { shouldGoToSettings in
+                self.authorizeCBAlert(title: "", message: AppMessages.blePermissionReqdMsg, buttonTitle: Constants.settings) { shouldGoToSettings in
                     if shouldGoToSettings {
                         self.openSettingsApp()
                     } else {

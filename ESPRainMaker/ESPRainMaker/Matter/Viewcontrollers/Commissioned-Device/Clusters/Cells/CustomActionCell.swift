@@ -18,14 +18,21 @@
 
 import UIKit
 
+/// Actions supported by the custom action cell
 enum CustomAction {
     case launchController
     case updateThreadDataset
+    case setActiveThreadDataset
+    case mergeThreadDataset
 }
 
+/// This protocol defines the actions that the CustomAction cell supports
 protocol CustomActionDelegate: AnyObject {
+    
     func launchController()
     func updateThreadDataset()
+    func setActiveThreadDataset()
+    func mergeThreadDataset()
 }
 
 class CustomActionCell: UITableViewCell {
@@ -60,23 +67,38 @@ class CustomActionCell: UITableViewCell {
     }
     
     func setupWorkflow(workflow: CustomAction) {
-        self.workflow = workflow
-        switch workflow {
-        case .launchController:
-            self.headerLabel.text = "Controller"
-            self.descriptionLabel.text = "Update Device List"
-        case .updateThreadDataset:
-            self.headerLabel.text = "Border Router"
-            self.descriptionLabel.text = "Update Thread Dataset"
+        DispatchQueue.main.async {
+            self.workflow = workflow
+            switch workflow {
+            case .launchController:
+                self.headerLabel.text = "Controller"
+                self.descriptionLabel.text = "Update Device List"
+            case .updateThreadDataset:
+                self.headerLabel.text = "Border Router"
+                self.descriptionLabel.text = "Update Thread Dataset"
+            case .setActiveThreadDataset:
+                self.headerLabel.text = "Border Router"
+                self.descriptionLabel.text = "Update Thread Dataset"
+            case .mergeThreadDataset:
+                self.headerLabel.text = "Border Router"
+                self.descriptionLabel.text = "Merge With Homepod"
+                self.launchButton.setTitle("Merge", for: .normal)
+            }
         }
     }
     
-    @IBAction func launchController(_ sender: Any) {
+    /// Perform custom launch action
+    /// - Parameter sender: button
+    @IBAction func performCustomAction(_ sender: Any) {
         switch workflow {
         case .launchController:
             self.delegate?.launchController()
         case .updateThreadDataset:
             self.delegate?.updateThreadDataset()
+        case .setActiveThreadDataset:
+            self.delegate?.setActiveThreadDataset()
+        case .mergeThreadDataset:
+            self.delegate?.mergeThreadDataset()
         }
     }
 }

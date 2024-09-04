@@ -19,7 +19,7 @@
 import UIKit
 import ESPProvision
 
-@available(iOS 16.4, *)
+@available(iOS 15.0, *)
 extension ThreadSuccessViewController {
     
     /// Setup node
@@ -98,11 +98,13 @@ extension ThreadSuccessViewController {
     func check5thStepStatus() {
         DispatchQueue.main.async {
             if self.nodeDetailsFetched, self.nodeIsConnected {
-                self.step5Image.image = UIImage(named: "checkbox_checked")
-                self.step5Image.isHidden = false
-                self.activityIndicator5.isHidden = true
-                self.activityIndicator5.stopAnimating()
-                self.provisionFinsihedWithStatus(message: "Device Added Successfully!!")
+                DispatchQueue.main.async {
+                    self.step5Image.image = UIImage(named: "checkbox_checked")
+                    self.step5Image.isHidden = false
+                    self.activityIndicator5.isHidden = true
+                    self.activityIndicator5.stopAnimating()
+                    self.provisionFinsihedWithStatus(message: "Device Added Successfully!!")
+                }
             }
         }
     }

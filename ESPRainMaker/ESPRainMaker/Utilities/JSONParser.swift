@@ -54,12 +54,12 @@ struct JSONParser {
                         continue
                     }
                 }
-                if node.isMatter, let metadata = node_details["metadata"] as? [String: Any] {
-                    node.metadata = metadata
-                }
             }
             #endif
             
+            if let metadata = node_details["metadata"] as? [String: Any] {
+                node.metadata = metadata
+            }
             if let config = node_details["config"] as? [String: Any] {
                 if let services = config[Constants.services] as? [[String: Any]] {
                     var nodeServices: [Service] = []

@@ -61,7 +61,6 @@ struct Constants {
     static let configCharacterstic = "config"
     static let versionCharacterstic = "ver"
     static let associationCharacterstic = "assoc"
-    static let deviceInfoStoryboardID = "versionInfo"
 
     // Device version info
     static let provKey = "prov"
@@ -152,37 +151,39 @@ struct Constants {
     // Claim APIs
     static let claimInitPath = Configuration.shared.awsConfiguration.claimURL + "/claim/initiate"
     static let claimVerifyPath = Configuration.shared.awsConfiguration.claimURL + "/claim/verify"
-
     static let boolTypeValidValues: [String: Bool] = ["true": true, "false": false, "yes": true, "no": false, "0": false, "1": true]
 
-    // Schedule related constants
-    // TODO: Read service/param key from node config.
-    static let scheduleServiceType = "esp.service.schedule"
-    static let scheduleParamType = "esp.param.schedules"
+    // Node config constants
+    static let services = "services"
+    static let type = "type"
+    static let name = "name"
+    static let params = "params"
+    
+    // Local control related constants
     static let localControlServiceType = "esp.service.local_control"
     static let localControlParamType = "esp.param.local_control_type"
     static let popParamType = "esp.param.local_control_pop"
-    static let scheduleKey = "Schedule"
-    static let schedulesKey = "Schedules"
-
     static let serviceType = "_esp_local_ctrl._tcp."
     static let matterCommissionedServiceType = "_matter._tcp"
     static let serviceDomain = "local"
-    
+
+    // Schedule related constants
+    static let scheduleServiceType = "esp.service.schedule"
+    static let scheduleParamType = "esp.param.schedules"
+    static let scheduleKey = "Schedule"
+    static let schedulesKey = "Schedules"
+
+    // Scene related constants
     static let sceneServiceType = "esp.service.scenes"
     static let sceneParamType = "esp.param.scenes"
     static let sceneKey = "Scene"
     static let scenesKey = "Scenes"
     
+    // Controller constants
     static let matterControllerServiceType = "esp.service.matter-controller"
     static let paramMatterDevices = "esp.param.matter-devices"
     static let paramMatterControllerDataVersion = "esp.param.matter-controller-data-version"
     static let paramMatterControllerData = "esp.param.matter-controller-data"
-    
-    static let services = "services"
-    static let type = "type"
-    static let name = "name"
-    static let params = "params"
     
     // APIs JSON keys
     static let contentType = "Content-Type"
@@ -192,8 +193,6 @@ struct Constants {
     static let successKey = "success"
     static let descriptionKey = "description"
     static let statusKey = "status"
-    
-    static let edit = "Edit"
     
     // Data types
     static let boolType = "bool"
@@ -215,10 +214,18 @@ struct Constants {
     static let overriddenBaseURLKey = "overriddenBaseURLKey"
     
     static let settings = "Settings"
-    static let settingsStoryboardName = "Settings"
+    static let notice = "Notice"
+    static let edit = "Edit"
     
-    static let blePermissionReqdMsg = "Please ensure that your bluetooth is powered ON and has the requisite permission."
-    static let turnBLEOnMsg = "Please ensure that your bluetooth is powered on and restart the provisioning."
-    static let upgradeOSVersionMsg = "You must upgrade to iOS 16.4 or above in order to avail this feature."
-    static let upgradeOS15VersionMsg = "You must upgrade to iOS 15.0 or above in order to provision thread devices"
+    // Thread BR related constants
+    static let threadBRMDNSServiceType = "_meshcop._udp"
+    static let threadBRService = "esp.service.thread-br"
+    static let threadBorderAgentId = "esp.param.tbr-border-agent-id"
+    static let threadActiveDataset = "esp.param.tbr-active-dataset"
+    static let threadPendingDataset = "esp.param.tbr-pending-dataset"
+    static let threadDeviceRole = "esp.param.tbr-device-role"
+    static let threadCommand = "esp.param.tbr-cmd"
+    
+    // Storyboard ids:
+    static let settingsStoryboardName = "Settings"
 }

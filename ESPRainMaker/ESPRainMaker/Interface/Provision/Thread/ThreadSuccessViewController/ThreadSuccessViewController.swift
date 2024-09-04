@@ -20,7 +20,7 @@ import ESPProvision
 import Foundation
 import UIKit
 
-@available(iOS 16.4, *)
+@available(iOS 15.0, *)
 class ThreadSuccessViewController: UIViewController {
     
     static let storyboardId = "ThreadSuccessViewController"
