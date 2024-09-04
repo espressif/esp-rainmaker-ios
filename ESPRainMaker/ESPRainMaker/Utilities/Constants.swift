@@ -220,4 +220,5 @@ struct Constants {
     static let blePermissionReqdMsg = "Please ensure that your bluetooth is powered ON and has the requisite permission."
     static let turnBLEOnMsg = "Please ensure that your bluetooth is powered on and restart the provisioning."
     static let upgradeOSVersionMsg = "You must upgrade to iOS 16.4 or above in order to avail this feature."
+    static let upgradeOS15VersionMsg = "You must upgrade to iOS 15.0 or above in order to provision thread devices"
 }

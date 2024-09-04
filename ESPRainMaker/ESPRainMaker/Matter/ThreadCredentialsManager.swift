@@ -20,7 +20,7 @@ import UIKit
 import ThreadNetwork
 import ESPProvision
 
-@available(iOS 16.4, *)
+@available(iOS 15.0, *)
 class ThreadCredentialsManager: NSObject {
     
     static let shared = ThreadCredentialsManager()
@@ -28,6 +28,7 @@ class ThreadCredentialsManager: NSObject {
     
     /// Is thread supported
     /// - Parameter completion: status
+    @available(iOS 16.4, *)
     func isThreadSupported(_ completion: @escaping (Bool) -> Void) {
         self.client.isPreferredNetworkAvailable { result in
             completion(result)

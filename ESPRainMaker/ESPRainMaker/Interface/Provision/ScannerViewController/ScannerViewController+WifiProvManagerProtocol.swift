@@ -39,7 +39,7 @@ extension ScannerViewController: WifiProvManagerProtocol {
     /// Go to join wifi network screen
     /// - Parameter device: esp device
     func goToJoinNetworkVC(device: ESPDevice) {
-        let joinNetworkVC = storyboard?.instantiateViewController(withIdentifier: "JoinNetworkViewController") as! JoinNetworkViewController
+        let joinNetworkVC = storyboard?.instantiateViewController(withIdentifier: JoinNetworkViewController.storyboardId) as! JoinNetworkViewController
         joinNetworkVC.device = device
         navigationController?.pushViewController(joinNetworkVC, animated: true)
     }
