@@ -24,10 +24,15 @@ enum UserNavigationHandler {
     case homeScreen
     case notificationViewController
     case groupSharing
+    case userNodeOTA(eventData: [String: Any])
+    
+    var topVC: UIViewController? {
+        return UIApplication.shared.keyWindow?.rootViewController
+    }
     
     func navigateToPage() {
         // Gets top view controller currently visible on app.
-        var top = UIApplication.shared.keyWindow?.rootViewController
+        var top = topVC
         if let presented = top?.presentedViewController {
             top = presented
         } else if let nav = top as? UINavigationController {
@@ -71,12 +76,14 @@ enum UserNavigationHandler {
                 }
             }
             navigateToGroupSharingVC()
+        case .userNodeOTA(let eventData):
+            self.navigateToUserOTAScreen(eventData: eventData)
         }
     }
     
     // Method to redirect user to Notifications screen.
     private func navigateToNotificationVC() {
-        if let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
+        if let tabBarController = topVC as? UITabBarController {
             if let viewControllers = tabBarController.viewControllers {
                 for viewController in viewControllers {
                     if viewController.isKind(of: UserNavigationController.self) {
@@ -94,7 +101,7 @@ enum UserNavigationHandler {
     
     // Method to redirect user to Home Screen.
     private func navigateToHomeScreen() {
-        if let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
+        if let tabBarController = topVC as? UITabBarController {
             if let viewControllers = tabBarController.viewControllers {
                 for viewController in viewControllers {
                     if viewController.isKind(of: DevicesNavigationController.self) {
@@ -111,7 +118,7 @@ enum UserNavigationHandler {
     
     // Method to redirect user to group sharing screen.
     private func navigateToGroupSharingVC() {
-        if let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
+        if let tabBarController = topVC as? UITabBarController {
             if let viewControllers = tabBarController.viewControllers {
                 for viewController in viewControllers {
                     if viewController.isKind(of: UserNavigationController.self) {
@@ -125,5 +132,33 @@ enum UserNavigationHandler {
                 }
             }
         }
+    }
+    
+    /// Navigate to node OTA Update screen
+    /// - Parameter eventData: event data from notification
+    private func navigateToUserOTAScreen(eventData: [String: Any]) {
+        if let nodeId = eventData["node_id"] as? String, let currentNode = ESPLocalStorageNodes(ESPLocalStorageKeys.suiteName).getNode(nodeID: nodeId) {
+            DispatchQueue.main.async {
+                if let tabBarController = topVC as? UITabBarController {
+                    if let tabNavVCs = tabBarController.viewControllers as? [UINavigationController] {
+                        let navigationController = tabNavVCs[tabBarController.selectedIndex]
+                        self.presentFirmwareUpdateVC(forNode: currentNode, navigationController: navigationController)
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    /// Present firmware update viewcontroller
+    /// - Parameters:
+    ///   - currentNode: current node
+    ///   - navigationController: navigation controller
+    private func presentFirmwareUpdateVC(forNode currentNode: Node, navigationController: UINavigationController) {
+        let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
+        let firmwareUpdateVC = deviceStoryboard.instantiateViewController(withIdentifier: "firmwareUpdate") as! FirmwareUpdateViewController
+        firmwareUpdateVC.currentNode = currentNode
+        firmwareUpdateVC.isFromNotification = true
+        navigationController.present(firmwareUpdateVC, animated: true)
     }
 }

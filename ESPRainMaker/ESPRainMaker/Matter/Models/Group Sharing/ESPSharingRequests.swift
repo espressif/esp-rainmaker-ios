@@ -44,6 +44,7 @@ struct ESPSharingRequest: Codable {
     var requestStatus: String?
     var requestTimestamp: Int?
     var groupIds: [String]?
+    var groupNames: [String]?
     var sharedWith: String?
     var sharedBy: String?
     var metadata: [String: Any]?
@@ -54,6 +55,7 @@ struct ESPSharingRequest: Codable {
         requestStatus = try container.decodeIfPresent(String.self, forKey: .requestStatus)
         requestTimestamp = try container.decodeIfPresent(Int.self, forKey: .requestTimestamp)
         groupIds = try container.decodeIfPresent([String].self, forKey: .groupIds)
+        groupNames = try container.decodeIfPresent([String].self, forKey: .groupNames)
         sharedWith = try container.decodeIfPresent(String.self, forKey: .sharedWith)
         sharedBy = try container.decodeIfPresent(String.self, forKey: .sharedBy)
         if let meta = try? container.decode([String: Any].self, forKey: .metadata) {
@@ -66,6 +68,7 @@ struct ESPSharingRequest: Codable {
         case requestStatus = "request_status"
         case requestTimestamp = "request_timestamp"
         case groupIds = "group_ids"
+        case groupNames = "group_names"
         case sharedWith = "user_name"
         case sharedBy = "primary_user_name"
         case metadata = "metadata"
@@ -77,6 +80,7 @@ struct ESPSharingRequest: Codable {
         try container.encode(requestStatus, forKey: .requestStatus)
         try container.encode(requestTimestamp, forKey: .requestTimestamp)
         try container.encode(groupIds, forKey: .groupIds)
+        try container.encode(groupNames, forKey: .groupNames)
         try container.encode(sharedWith, forKey: .sharedWith)
         try container.encode(sharedBy, forKey: .sharedBy)
         if let metadata = metadata, let data = try? JSONSerialization.data(withJSONObject: metadata, options: []) {

@@ -42,4 +42,6 @@ struct ESPNotificationKeys {
     static let sharedFrom = "shared_from"
     static let groupName = "group_name"
     static let groups = "groups"
+    static let sharedTo = "shared_to"
+    static let selfRemoval = "self_removal"
 }

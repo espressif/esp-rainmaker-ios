@@ -35,6 +35,7 @@ class FirmwareUpdateViewController: UIViewController {
     @IBOutlet var newFirmwareVersionLabel: UILabel!
     @IBOutlet var checkFirmwareUpdateIcon: UIImageView!
     @IBOutlet var otaUpdateAvlDescLabel: UILabel!
+    @IBOutlet weak var backButton: BarButton!
     
     // MARK: - Constants
     let checkAgainConstant = "Check Again"
@@ -57,11 +58,15 @@ class FirmwareUpdateViewController: UIViewController {
     var pushOTAUpdateService: ESPPushOTAUpdateService?
     var currentOTAJob: ESPOTAUpdate?
     var timer: Timer?
+    var isFromNotification: Bool = false
 
     // MARK: - Overriden Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        if isFromNotification {
+            self.backButton.setTitle("Close", for: .normal)
+        }
         getOTAUpdateService = ESPGetOTAUpdateStatusService(presenter: self)
         checkOTAUpdateService = ESPCheckOTAUpdateService(presenter: self)
         pushOTAUpdateService = ESPPushOTAUpdateService(presenter: self)
@@ -70,7 +75,11 @@ class FirmwareUpdateViewController: UIViewController {
     
     // MARK: - IBActions
     @IBAction func backButtonPressed(_: Any) {
-        navigationController?.popViewController(animated: true)
+        if isFromNotification {
+            self.dismiss(animated: true)
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     @IBAction func updateButtonTapped(sender: UIButton) {

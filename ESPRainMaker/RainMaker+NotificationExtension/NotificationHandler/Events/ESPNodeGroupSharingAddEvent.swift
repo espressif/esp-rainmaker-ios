@@ -18,23 +18,17 @@
 
 import Foundation
 
-// Class associated with node sharing add event.
+// Class associated with node group sharing add request event.
 class ESPNodeGroupSharingAddEvent: ESPNotificationEvent {
-    /// Modifies notification content to display message of new device sharing request.
+    /// Modifies notification content to display message of node group sharing add request event.
     ///
     /// - Returns: Modified notification object.
     override func modifiedContent() -> ESPNotifications? {
         var modifiedNotification = notification
         // Gets primary user email that initiated the sharing request.
-        if let primaryUser = eventData[ESPNotificationKeys.sharedFrom] as? String {
+        if let primaryUser = eventData[ESPNotificationKeys.sharedFrom] as? String, let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.last, let groupName = group[ESPNotificationKeys.groupName] as? String {
             // Gets metadata information from the event data.
-            if let metadata = eventData[ESPNotificationKeys.metadataKey] as? [String:Any] {
-                if let groupName = metadata[ESPNotificationKeys.groupName] as? String {
-                    // Gets list of shared devices from metadata.
-                    // Customised message to make it more user friendly.
-                    modifiedNotification.body = "\(primaryUser) wants to share group \(groupName) with you. Tap to accept or decline."
-                }
-            }
+            modifiedNotification.body = "\(primaryUser) is trying to share group \(groupName) with you. Tap to accept or decline."
         }
         // Returns modified notification.
         return modifiedNotification

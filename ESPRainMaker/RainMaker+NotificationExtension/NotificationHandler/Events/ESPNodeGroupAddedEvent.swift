@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ESPNodeGroupSharingDeclinedEvent.swift
+//  ESPNodeGroupAddedEvent.swift
 //  ESPRainMaker
 //
 
 import Foundation
 
-// Class associated with node group sharing request declined event.
-class ESPNodeGroupSharingDeclinedEvent: ESPNotificationEvent {
-    /// Modifies notification content to display message of node group sharing request declined.
+// Class associated with node group added event.
+class ESPNodeGroupAddedEvent: ESPNotificationEvent {
+    /// Modifies notification content to display message of node group added even t
     ///
     /// - Returns: Modified notification object.
     override func modifiedContent() -> ESPNotifications? {
         var modifiedNotification = notification
-        // Gets secondary user email that declined the sharing request.
-        if let secondaryUser = eventData[ESPNotificationKeys.sharedTo] as? String, let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.last, let groupName = group[ESPNotificationKeys.groupName] as? String {
-            modifiedNotification.body = "\(secondaryUser) has declined the request for group \(groupName)."
+        // Get the group name
+        if let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.last, let groupName = group[ESPNotificationKeys.groupName] as? String {
+            modifiedNotification.body = "Group \(groupName) was added."
         }
-        // Saves notification in local storage.
         notificationStore.storeESPNotification(notification: modifiedNotification)
         // Returns modified notification.
         return modifiedNotification

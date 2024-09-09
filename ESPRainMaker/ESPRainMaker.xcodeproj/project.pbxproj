@@ -61,6 +61,12 @@
 		0C69D72526E9ED4500AF6985 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C69D72226E9ED4400AF6985 /* Device.swift */; };
 		0C69D72626E9ED4500AF6985 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C69D72226E9ED4400AF6985 /* Device.swift */; };
 		0C69D72826E9ED9800AF6985 /* NodeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C69D72726E9ED9800AF6985 /* NodeExtension.swift */; };
+		0C6D23E62C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6D23E52C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift */; };
+		0C6D23E72C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6D23E52C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift */; };
+		0C6D23E92C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6D23E82C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift */; };
+		0C6D23EA2C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6D23E82C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift */; };
+		0C6D23EC2C8EC3A7003773FD /* ESPOTAUpdateEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6D23EB2C8EC3A6003773FD /* ESPOTAUpdateEvent.swift */; };
+		0C6D23ED2C8EC3A7003773FD /* ESPOTAUpdateEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6D23EB2C8EC3A6003773FD /* ESPOTAUpdateEvent.swift */; };
 		0C6FE3BB2A6522C800AB3194 /* DevicesViewController+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6FE3BA2A6522C800AB3194 /* DevicesViewController+Navigation.swift */; };
 		0C6FE3BD2A667ACD00AB3194 /* ESPMatterFabricDetails+NodeGroupSharingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6FE3BC2A667ACD00AB3194 /* ESPMatterFabricDetails+NodeGroupSharingData.swift */; };
 		0C71B9D82A360B8000978005 /* Node+MatterUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C71B9D72A360B8000978005 /* Node+MatterUtility.swift */; };
@@ -693,6 +699,9 @@
 		0C69D72126E9ED4400AF6985 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		0C69D72226E9ED4400AF6985 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		0C69D72726E9ED9800AF6985 /* NodeExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeExtension.swift; sourceTree = "<group>"; };
+		0C6D23E52C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPNodeGroupSharingRemovedEvent.swift; sourceTree = "<group>"; };
+		0C6D23E82C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPNodeGroupAddedEvent.swift; sourceTree = "<group>"; };
+		0C6D23EB2C8EC3A6003773FD /* ESPOTAUpdateEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPOTAUpdateEvent.swift; sourceTree = "<group>"; };
 		0C6FE3BA2A6522C800AB3194 /* DevicesViewController+Navigation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DevicesViewController+Navigation.swift"; sourceTree = "<group>"; };
 		0C6FE3BC2A667ACD00AB3194 /* ESPMatterFabricDetails+NodeGroupSharingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPMatterFabricDetails+NodeGroupSharingData.swift"; sourceTree = "<group>"; };
 		0C71B9D72A360B8000978005 /* Node+MatterUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+MatterUtility.swift"; sourceTree = "<group>"; };
@@ -2381,7 +2390,10 @@
 				0C4BC0442BD8F03B00560463 /* ESPNodeGroupSharingAddEvent.swift */,
 				0C2426DA2BF4A597004BDF49 /* ESPNodeGroupSharingAcceptedEvent.swift */,
 				0C2426DD2BF4A5B6004BDF49 /* ESPNodeGroupSharingDeclinedEvent.swift */,
+				0C6D23E52C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift */,
+				0C6D23E82C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift */,
 				F1B2D21827F6D64D00AE143D /* ESPAutomationTriggerEvent.swift */,
+				0C6D23EB2C8EC3A6003773FD /* ESPOTAUpdateEvent.swift */,
 				F1124F69268D0AAA00FA0B9E /* ESPNodeAlertEvent.swift */,
 			);
 			path = Events;
@@ -3120,6 +3132,7 @@
 				F19A9D1B22C0ED4C00A450C3 /* ConfirmSignUpViewController.swift in Sources */,
 				F1CA0C94257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift in Sources */,
 				F117CDEF252C75CD00ADB856 /* ESPLocalControl.swift in Sources */,
+				0C6D23EC2C8EC3A7003773FD /* ESPOTAUpdateEvent.swift in Sources */,
 				0CD3591D2A2D25E30081017C /* ESPUserCertificates.swift in Sources */,
 				0C80AA3126FDBD4B00480C53 /* ESPForgotPasswordService.swift in Sources */,
 				F1CA0C98257A2E270085E19A /* ParamDropDownTableViewCell.swift in Sources */,
@@ -3268,6 +3281,7 @@
 				0CD359522A2D25F30081017C /* ESPMTRCommissioner+GetDeviceDetails.swift in Sources */,
 				0CD359852A2D2AC40081017C /* ESPFabricCell.swift in Sources */,
 				F1EAACA923E2A74300E9A6A8 /* ColorPickerCell.swift in Sources */,
+				0C6D23E62C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift in Sources */,
 				0C2A3D452A39A2390097D16D /* DevicesViewController+Matter.swift in Sources */,
 				0C80AA2626FDBD4B00480C53 /* ESPAPIWorker.swift in Sources */,
 				0C69D72326E9ED4500AF6985 /* Node.swift in Sources */,
@@ -3382,6 +3396,7 @@
 				0CF6923F270A308B0098F515 /* ESPAlexaServiceConstants.swift in Sources */,
 				144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */,
 				0C387F762A2EC80700C5EFA4 /* RequestsReceivedCell.swift in Sources */,
+				0C6D23E92C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift in Sources */,
 				F1BDFED127DCCF92005AF812 /* ESPAutomationParser.swift in Sources */,
 				F164A30825824EC700B879BC /* Configuration.swift in Sources */,
 				0C71B9D82A360B8000978005 /* Node+MatterUtility.swift in Sources */,
@@ -3575,6 +3590,7 @@
 				F1C76D702688AC34009E217D /* Int+ShortDate.swift in Sources */,
 				F1124F68268D0A0900FA0B9E /* ESPNodeSharingDeclinedEvent.swift in Sources */,
 				0CD359A02A2D49E60081017C /* NodeExtension.swift in Sources */,
+				0C6D23EA2C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift in Sources */,
 				F1B1012126A47111004B5537 /* ESPNotificationKeys.swift in Sources */,
 				F1676F88269626F9005C22CB /* ESPNotifications.swift in Sources */,
 				F1C76D6C2688ABE9009E217D /* ESPLocalStorageProtocol.swift in Sources */,
@@ -3586,10 +3602,12 @@
 				F1124F6B268D0AAD00FA0B9E /* ESPNodeAlertEvent.swift in Sources */,
 				0C69D72426E9ED4500AF6985 /* Node.swift in Sources */,
 				F1C76D6D2688ABEE009E217D /* ESPLocalStorage.swift in Sources */,
+				0C6D23E72C8EC38D003773FD /* ESPNodeGroupSharingRemovedEvent.swift in Sources */,
 				F1DF2E36268AF7A400D3C8D6 /* ESPNodeSharingAddEvent.swift in Sources */,
 				F1C352CE26D56CC800A88893 /* ESPLocalStorageNodes+GetNode.swift in Sources */,
 				F1C76D80268986DA009E217D /* ESPNotificationEvent.swift in Sources */,
 				F1676F89269735B4005C22CB /* ESPNotificationsStore.swift in Sources */,
+				0C6D23ED2C8EC3A7003773FD /* ESPOTAUpdateEvent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

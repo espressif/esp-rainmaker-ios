@@ -12,24 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ESPNodeGroupSharingDeclinedEvent.swift
+//  ESPNodeGroupSharingRemovedEvent.swift
 //  ESPRainMaker
 //
 
 import Foundation
 
-// Class associated with node group sharing request declined event.
-class ESPNodeGroupSharingDeclinedEvent: ESPNotificationEvent {
-    /// Modifies notification content to display message of node group sharing request declined.
+// Class associated with node group sharing removed event.
+class ESPNodeGroupSharingRemovedEvent: ESPNotificationEvent {
+    /// Modifies notification content to display message of node group sharing removed
     ///
     /// - Returns: Modified notification object.
     override func modifiedContent() -> ESPNotifications? {
         var modifiedNotification = notification
-        // Gets secondary user email that declined the sharing request.
-        if let secondaryUser = eventData[ESPNotificationKeys.sharedTo] as? String, let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.last, let groupName = group[ESPNotificationKeys.groupName] as? String {
-            modifiedNotification.body = "\(secondaryUser) has declined the request for group \(groupName)."
+        // Get the group name
+        if let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.last, let groupName = group[ESPNotificationKeys.groupName] as? String {
+            // Get the self_removal key value
+            if let selfRemoval = eventData[ESPNotificationKeys.selfRemoval] as? Bool, selfRemoval {
+                modifiedNotification.body = "You have left group \(groupName)."
+            } else if let sharedFrom = eventData[ESPNotificationKeys.sharedFrom] as? String {
+                modifiedNotification.body = "\(sharedFrom) has removed \(groupName) group access from you."
+            }
         }
-        // Saves notification in local storage.
         notificationStore.storeESPNotification(notification: modifiedNotification)
         // Returns modified notification.
         return modifiedNotification

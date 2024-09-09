@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  ESPNodeGroupSharingDeclinedEvent.swift
+//  ESPOTAUpdateEvent.swift
 //  ESPRainMaker
 //
 
 import Foundation
 
-// Class associated with node group sharing request declined event.
-class ESPNodeGroupSharingDeclinedEvent: ESPNotificationEvent {
-    /// Modifies notification content to display message of node group sharing request declined.
+class ESPOTAUpdateEvent: ESPNotificationEvent {
+    /// Modifies notification content to display message of  OTA update event
     ///
     /// - Returns: Modified notification object.
     override func modifiedContent() -> ESPNotifications? {
         var modifiedNotification = notification
-        // Gets secondary user email that declined the sharing request.
-        if let secondaryUser = eventData[ESPNotificationKeys.sharedTo] as? String, let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.last, let groupName = group[ESPNotificationKeys.groupName] as? String {
-            modifiedNotification.body = "\(secondaryUser) has declined the request for group \(groupName)."
+        // Get the node name
+        var body = "A new OTA update is available for some node(s)."
+        if let nodeId = eventData[ESPNotificationKeys.nodeIDKey] as? String, let node = ESPLocalStorageNodes(ESPLocalStorageKeys.suiteName).getNode(nodeID: nodeId), let devices = node.devices, let device = devices.first, device.deviceName.count > 0 {
+            body = "A new OTA update is available for \(device.deviceName)."
         }
-        // Saves notification in local storage.
+        modifiedNotification.body = body
         notificationStore.storeESPNotification(notification: modifiedNotification)
         // Returns modified notification.
         return modifiedNotification
