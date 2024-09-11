@@ -39,6 +39,8 @@ extension ESPNotificationHandler {
                 navigationHandler = .groupSharing
             case .nodeAssociated, .nodeDissassociated, .nodeConnected, .nodeDisconnected:
                 navigationHandler = .homeScreen
+            case .userNodeOTA:
+                navigationHandler = .userNodeOTA(eventData: self.eventData)
             default:
                 navigationHandler =  .notificationViewController
             }

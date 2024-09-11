@@ -30,6 +30,7 @@ enum ESPNotificationEvents: String {
     case groupSharingAdd = "rmaker.event.user_node_group_sharing_add"
     case groupSharingRemoved = "rmaker.event.user_node_group_removed"
     case nodeGroupAdded = "rmaker.event.user_node_group_added"
+    case userNodeOTA = "rmaker.event.user_node_ota"
 }
 
 // Struct to handle all type of notification events.
@@ -101,10 +102,15 @@ struct ESPNotificationHandler: ESPNotificationProtocol {
             modifiedNotification = ESPNodeDisassociatedEvent(eventData, notification).modifiedContent()
         case .automationTrigger:
             modifiedNotification = ESPAutomationTriggerEvent(eventData, notification).modifiedContent()
+        case .groupSharingRemoved:
+            modifiedNotification = ESPNodeGroupSharingRemovedEvent(eventData, notification).modifiedContent()
+        case .nodeGroupAdded:
+            modifiedNotification = ESPNodeGroupAddedEvent(eventData, notification).modifiedContent()
+        case .userNodeOTA:
+            modifiedNotification = ESPOTAUpdateEvent(eventData, notification).modifiedContent()
         default:
             return nil
         }
-        
         return modifiedNotification
     }
 }

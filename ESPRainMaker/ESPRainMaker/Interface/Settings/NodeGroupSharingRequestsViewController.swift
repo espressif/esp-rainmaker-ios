@@ -41,6 +41,7 @@ class NodeGroupSharingRequestsViewController: UIViewController {
         tabBarController?.tabBar.isHidden = true
         title = "Group Sharing"
         self.topBarTitle.text = "Group Sharing"
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.addCustomBottomLine(color: .black, height: 0.5)
         requestsTable.register(UINib(nibName: RequestSentCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: RequestSentCell.reuseIdentifier)
         requestsTable.register(UINib(nibName: RequestsReceivedCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: RequestsReceivedCell.reuseIdentifier)
@@ -231,7 +232,7 @@ extension NodeGroupSharingRequestsViewController {
                         if let metadata = request.metadata, let name = metadata[ESPMatterConstants.groupName] as? String {
                             groupName = name
                         }
-                        let req = ESPNodeGroupSharingRequest(requestId: requestId, requestStatus: request.requestStatus, requestTimestamp: request.requestTimestamp, groupId: request.groupIds?.first, sharedWith: sharedWith, sharedBy: sharedBy, groupName: groupName)
+                        let req = ESPNodeGroupSharingRequest(requestId: requestId, requestStatus: request.requestStatus, requestTimestamp: request.requestTimestamp, groupId: request.groupIds?.first, sharedWith: sharedWith, sharedBy: sharedBy, groupName: request.groupNames?.first ?? groupName)
                         sRequests.append(req)
                     }
                 }

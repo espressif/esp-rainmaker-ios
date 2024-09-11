@@ -211,6 +211,7 @@ class DevicesViewController: UIViewController {
         }
         #endif
         collectionView.isUserInteractionEnabled = false
+        segmentControl.isUserInteractionEnabled = false
         User.shared.updateDeviceList = false
         if Configuration.shared.appConfiguration.supportGrouping {
             self.setupGroupsUI()
@@ -339,6 +340,7 @@ class DevicesViewController: UIViewController {
             Utility.showToastMessage(view: self.view, message: error!.description, duration: 5.0)
         }
         self.setupSegmentControl()
+        segmentControl.isUserInteractionEnabled = true
         self.prepareView()
     }
 
@@ -437,6 +439,7 @@ class DevicesViewController: UIViewController {
 
     private func prepareView() {
         if User.shared.associatedNodeList == nil || User.shared.associatedNodeList?.count == 0 {
+            collectionView.reloadData()
             setViewForNoNodes()
         } else {
             initialView.isHidden = true

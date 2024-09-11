@@ -18,28 +18,17 @@
 
 import Foundation
 
-// Class associated with node sharing accept event.
+// Class associated with node group sharing request accepted event.
 class ESPNodeGroupSharingAcceptedEvent: ESPNotificationEvent {
-    /// Modifies notification content to display message of device sharing accepted.
+    /// Modifies notification content to display message of node group sharing request accepted event.
     ///
     /// - Returns: Modified notification object.
     override func modifiedContent() -> ESPNotifications? {
         var modifiedNotification = notification
         // Gets secondary user email that accepted the sharing request.
-        if let secondaryUser = eventData[ESPNotificationKeys.secondaryUserNameKey] as? String, let nodes = eventData[ESPNotificationKeys.nodesKey] as? [String] {
-            var devices: [String]?
-            // Gets list of devices that's the node is linked with.
-            if let nodeDeviceMapping = ESPLocalStorageNodes(ESPLocalStorageKeys.suiteName).getDeviceListDictionary() {
-                for node in nodes {
-                    if let nodeDevices = nodeDeviceMapping[node] {
-                        devices = (devices ?? []) + nodeDevices
-                    }
-                }
-            }
-            // Customised message to make it more user friendly.
-            modifiedNotification.body = "\(secondaryUser) accepted sharing request for \(devices?.combinedStringForDevices() ?? "device(s)")."
+        if let secondaryUser = eventData[ESPNotificationKeys.sharedTo] as? String, let groups = eventData[ESPNotificationKeys.groups] as? [[String: Any]], let group = groups.last, let groupName = group[ESPNotificationKeys.groupName] as? String {
+            modifiedNotification.body = "\(secondaryUser) has accepted the request for group \(groupName)."
         }
-        // Saves notification in local storage.
         notificationStore.storeESPNotification(notification: modifiedNotification)
         // Returns modified notification.
         return modifiedNotification
