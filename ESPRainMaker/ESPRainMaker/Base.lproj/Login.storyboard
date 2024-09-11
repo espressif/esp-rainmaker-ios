@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -182,8 +182,8 @@
                                             <action selector="signInPressed:" destination="wu1-XV-Nik" eventType="touchUpInside" id="f48-ZJ-hal"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" horizontalCompressionResistancePriority="749" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bAd-85-5HB" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
-                                        <rect key="frame" x="122" y="255.66666666666697" width="170" height="45.666666666666515"/>
+                                    <button opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceRightToLeft" horizontalCompressionResistancePriority="749" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bAd-85-5HB" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                        <rect key="frame" x="212" y="348.33333333333337" width="170" height="45.666666666666686"/>
                                         <color key="backgroundColor" red="0.32549019610000002" green="0.18823529410000001" blue="0.72549019609999998" alpha="1" colorSpace="calibratedRGB"/>
                                         <inset key="imageEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <state key="normal" title="Sign in">
@@ -224,6 +224,64 @@
                                             <segue destination="e5V-DW-UQa" kind="show" id="Amc-de-5FE"/>
                                         </connections>
                                     </button>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceLeftToRight" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QGn-db-mNk">
+                                        <rect key="frame" x="32" y="19.999999999999996" width="350" height="45.666666666666657"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="40" maxY="0.0"/>
+                                        <state key="normal" title="Sign in with Apple">
+                                            <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="0.5"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="chinaLoginToApple:" destination="wu1-XV-Nik" eventType="touchUpInside" id="F0D-Fb-MTe"/>
+                                        </connections>
+                                    </button>
+                                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="apple_icon" translatesAutoresizingMaskIntoConstraints="NO" id="urt-Q0-NDb">
+                                        <rect key="frame" x="42" y="21.999999999999996" width="40" height="41.666666666666657"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="40" id="s8l-HT-bhp"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" semanticContentAttribute="forceLeftToRight" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jyj-vO-HX6">
+                                        <rect key="frame" x="32" y="75.666666666666657" width="350" height="45.333333333333343"/>
+                                        <color key="backgroundColor" red="0.29019607843137252" green="0.8901960784313725" blue="0.40392156862745099" alpha="1" colorSpace="calibratedRGB"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                        <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="40" maxY="0.0"/>
+                                        <state key="normal" title="Sign in with WeChat">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="0.5"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="chinaLoginToWeChhat:" destination="wu1-XV-Nik" eventType="touchUpInside" id="ZNf-Zh-01I"/>
+                                        </connections>
+                                    </button>
+                                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="wechat_icon" translatesAutoresizingMaskIntoConstraints="NO" id="bue-SK-dvz">
+                                        <rect key="frame" x="42" y="77.666666666666657" width="40" height="41.333333333333343"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="40" id="89M-QG-GQE"/>
+                                        </constraints>
+                                    </imageView>
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="xyD-97-MWg">
                                         <rect key="frame" x="20" y="493.66666666666663" width="374" height="50"/>
                                         <subviews>
@@ -286,12 +344,15 @@
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
+                                    <constraint firstItem="Jyj-vO-HX6" firstAttribute="centerX" secondItem="QGn-db-mNk" secondAttribute="centerX" id="1U2-x7-VmX"/>
+                                    <constraint firstItem="bue-SK-dvz" firstAttribute="bottom" secondItem="Jyj-vO-HX6" secondAttribute="bottom" constant="-2" id="2QB-Vr-zLY"/>
                                     <constraint firstItem="Hff-HK-wUA" firstAttribute="trailing" secondItem="QHG-X8-fcl" secondAttribute="trailing" id="52g-hA-qHi"/>
                                     <constraint firstItem="vpi-yr-s7g" firstAttribute="trailing" secondItem="ZaU-GS-EVz" secondAttribute="trailing" id="5ut-dV-yoA"/>
                                     <constraint firstItem="IUq-nW-AIo" firstAttribute="bottom" secondItem="vpi-yr-s7g" secondAttribute="bottom" constant="-2" id="7OJ-HU-CVD"/>
                                     <constraint firstItem="xyD-97-MWg" firstAttribute="leading" secondItem="7TZ-Hp-8Y4" secondAttribute="leading" constant="20" id="8fJ-tV-H0v"/>
                                     <constraint firstItem="duH-RO-LTV" firstAttribute="leading" secondItem="QHG-X8-fcl" secondAttribute="leading" id="8hr-3D-Gk0"/>
                                     <constraint firstItem="iTZ-67-g06" firstAttribute="bottom" secondItem="ZaU-GS-EVz" secondAttribute="bottom" constant="-4" id="8zq-Og-d9T"/>
+                                    <constraint firstAttribute="trailing" secondItem="QGn-db-mNk" secondAttribute="trailing" constant="32" id="96x-jM-3hs"/>
                                     <constraint firstItem="vpi-yr-s7g" firstAttribute="height" secondItem="duH-RO-LTV" secondAttribute="height" id="Apk-U6-rcf"/>
                                     <constraint firstItem="QHG-X8-fcl" firstAttribute="top" secondItem="tYZ-aT-evD" secondAttribute="bottom" constant="10" id="BdE-QT-J8E"/>
                                     <constraint firstItem="A1q-wB-oQH" firstAttribute="centerY" secondItem="tgg-i6-vMl" secondAttribute="centerY" id="GbK-Bh-NwB"/>
@@ -302,11 +363,17 @@
                                     <constraint firstAttribute="trailing" secondItem="xyD-97-MWg" secondAttribute="trailing" constant="20" id="LIV-7R-cs4"/>
                                     <constraint firstItem="bAd-85-5HB" firstAttribute="trailing" secondItem="QHG-X8-fcl" secondAttribute="trailing" id="LTP-tI-Kej"/>
                                     <constraint firstItem="A1q-wB-oQH" firstAttribute="width" secondItem="QHG-X8-fcl" secondAttribute="width" multiplier="0.5" constant="-5" id="MQH-Jf-oa5"/>
+                                    <constraint firstItem="bue-SK-dvz" firstAttribute="top" secondItem="Jyj-vO-HX6" secondAttribute="top" constant="2" id="McW-xa-AjW"/>
                                     <constraint firstItem="4P4-wO-yOr" firstAttribute="bottom" secondItem="duH-RO-LTV" secondAttribute="bottom" id="Mgy-CJ-RsA"/>
+                                    <constraint firstItem="urt-Q0-NDb" firstAttribute="leading" secondItem="QGn-db-mNk" secondAttribute="leading" constant="10" id="N1S-VO-Sac"/>
+                                    <constraint firstItem="urt-Q0-NDb" firstAttribute="bottom" secondItem="QGn-db-mNk" secondAttribute="bottom" constant="-2" id="ONh-CN-lPx"/>
                                     <constraint firstItem="Hff-HK-wUA" firstAttribute="top" secondItem="QHG-X8-fcl" secondAttribute="bottom" constant="4" id="PPo-1K-a8n"/>
+                                    <constraint firstItem="Jyj-vO-HX6" firstAttribute="top" secondItem="QGn-db-mNk" secondAttribute="bottom" constant="10" id="QcM-rP-Lei"/>
                                     <constraint firstItem="iTZ-67-g06" firstAttribute="top" secondItem="ZaU-GS-EVz" secondAttribute="top" constant="4" id="SHI-M6-2Vh"/>
                                     <constraint firstItem="ZaU-GS-EVz" firstAttribute="top" secondItem="vpi-yr-s7g" secondAttribute="bottom" constant="10" id="Szh-V6-HMq"/>
                                     <constraint firstItem="ZaU-GS-EVz" firstAttribute="height" secondItem="duH-RO-LTV" secondAttribute="height" id="TPf-WN-uGZ"/>
+                                    <constraint firstItem="urt-Q0-NDb" firstAttribute="top" secondItem="QGn-db-mNk" secondAttribute="top" constant="2" id="WF2-LM-79V"/>
+                                    <constraint firstItem="Jyj-vO-HX6" firstAttribute="width" secondItem="QGn-db-mNk" secondAttribute="width" id="WJm-jE-Svw"/>
                                     <constraint firstItem="tYZ-aT-evD" firstAttribute="top" secondItem="ZaU-GS-EVz" secondAttribute="bottom" constant="26" id="War-H5-AU9"/>
                                     <constraint firstItem="QHG-X8-fcl" firstAttribute="leading" secondItem="7TZ-Hp-8Y4" secondAttribute="leading" priority="999" constant="32" id="Xtk-iB-Bvs"/>
                                     <constraint firstItem="QHG-X8-fcl" firstAttribute="centerX" secondItem="7TZ-Hp-8Y4" secondAttribute="centerX" id="YvU-Xx-kLM"/>
@@ -314,13 +381,17 @@
                                     <constraint firstItem="bAd-85-5HB" firstAttribute="centerY" secondItem="A1q-wB-oQH" secondAttribute="centerY" id="b4i-3W-uN9"/>
                                     <constraint firstItem="tgg-i6-vMl" firstAttribute="leading" secondItem="QHG-X8-fcl" secondAttribute="leading" id="bNu-qB-4Oi"/>
                                     <constraint firstItem="IUq-nW-AIo" firstAttribute="top" secondItem="vpi-yr-s7g" secondAttribute="top" constant="2" id="bpV-eH-tzV"/>
+                                    <constraint firstItem="bue-SK-dvz" firstAttribute="leading" secondItem="Jyj-vO-HX6" secondAttribute="leading" constant="10" id="cD9-f7-jAC"/>
                                     <constraint firstItem="Hff-HK-wUA" firstAttribute="height" secondItem="QHG-X8-fcl" secondAttribute="height" id="e7X-W2-q6X"/>
+                                    <constraint firstItem="Jyj-vO-HX6" firstAttribute="height" secondItem="QGn-db-mNk" secondAttribute="height" id="gMy-qR-a13"/>
                                     <constraint firstItem="QHG-X8-fcl" firstAttribute="trailing" secondItem="ZaU-GS-EVz" secondAttribute="trailing" id="hAn-rL-eXv"/>
                                     <constraint firstItem="srr-GI-XYU" firstAttribute="centerX" secondItem="7TZ-Hp-8Y4" secondAttribute="centerX" id="jFI-ii-1on"/>
+                                    <constraint firstItem="QGn-db-mNk" firstAttribute="top" secondItem="7TZ-Hp-8Y4" secondAttribute="top" constant="20" id="kVZ-6c-4Cc"/>
                                     <constraint firstItem="tYZ-aT-evD" firstAttribute="centerX" secondItem="7TZ-Hp-8Y4" secondAttribute="centerX" id="lt7-cZ-FtO"/>
                                     <constraint firstItem="Hff-HK-wUA" firstAttribute="leading" secondItem="QHG-X8-fcl" secondAttribute="leading" id="n45-lv-Rim"/>
                                     <constraint firstItem="4P4-wO-yOr" firstAttribute="leading" secondItem="duH-RO-LTV" secondAttribute="leading" constant="10" id="nPV-JK-sXq"/>
                                     <constraint firstItem="tgg-i6-vMl" firstAttribute="top" secondItem="Hff-HK-wUA" secondAttribute="bottom" constant="16" id="ppJ-bA-0Ic"/>
+                                    <constraint firstItem="QGn-db-mNk" firstAttribute="leading" secondItem="7TZ-Hp-8Y4" secondAttribute="leading" constant="32" id="sOe-I6-SxA"/>
                                     <constraint firstItem="bAd-85-5HB" firstAttribute="height" secondItem="A1q-wB-oQH" secondAttribute="height" id="ukZ-pR-TVU"/>
                                     <constraint firstItem="iTZ-67-g06" firstAttribute="leading" secondItem="ZaU-GS-EVz" secondAttribute="leading" constant="10" id="uuy-Vu-YAb"/>
                                     <constraint firstItem="A1q-wB-oQH" firstAttribute="height" secondItem="tgg-i6-vMl" secondAttribute="height" id="vTB-So-hbT"/>
@@ -452,6 +523,12 @@
                                     <constraint firstItem="aAE-Ie-W7M" firstAttribute="trailing" secondItem="knx-CG-y5r" secondAttribute="trailing" constant="-20" id="xgY-cW-qZa"/>
                                 </constraints>
                             </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XnT-gf-OLi">
+                                <rect key="frame" x="207" y="686.66666666666663" width="0.0" height="0.0"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="App Version - v1.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hsH-f0-cFH">
                                 <rect key="frame" x="155.33333333333334" y="701.66666666666663" width="103.33333333333334" height="14.333333333333371"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -527,9 +604,9 @@
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="top" secondItem="dvs-rU-56a" secondAttribute="bottom" constant="32" id="OjA-Kd-Zxp"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="leading" secondItem="dvs-rU-56a" secondAttribute="leading" id="RO0-l6-Hhj"/>
                                     <constraint firstAttribute="trailing" secondItem="RQ2-DX-Lie" secondAttribute="trailing" constant="32" id="Rap-Cr-EZE"/>
+                                    <constraint firstAttribute="bottom" secondItem="RQ2-DX-Lie" secondAttribute="bottom" constant="50" id="a3j-ip-sfG"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="trailing" secondItem="XOm-Cw-Uuq" secondAttribute="trailing" constant="1" id="aIX-cZ-inD"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="leading" secondItem="hLU-MQ-KTc" secondAttribute="leading" constant="32" id="dsQ-6Z-DD6"/>
-                                    <constraint firstAttribute="bottom" secondItem="RQ2-DX-Lie" secondAttribute="bottom" constant="50" id="eWV-fE-YCc"/>
                                     <constraint firstItem="HXE-B4-Np1" firstAttribute="centerX" secondItem="hLU-MQ-KTc" secondAttribute="centerX" id="fMQ-ak-LB5"/>
                                     <constraint firstItem="HXE-B4-Np1" firstAttribute="centerY" secondItem="hLU-MQ-KTc" secondAttribute="centerY" id="xT7-dD-NLS"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="trailing" secondItem="XOm-Cw-Uuq" secondAttribute="trailing" constant="1" id="xk7-mf-f7U"/>
@@ -543,6 +620,7 @@
                             <constraint firstItem="QHG-X8-fcl" firstAttribute="leading" secondItem="0fQ-jr-ubK" secondAttribute="leading" id="7rg-Ne-inh"/>
                             <constraint firstItem="7TZ-Hp-8Y4" firstAttribute="leading" secondItem="Ufh-Vj-2Bp" secondAttribute="leading" id="9Ua-u5-b9f"/>
                             <constraint firstItem="7TZ-Hp-8Y4" firstAttribute="top" secondItem="jxV-mZ-OVJ" secondAttribute="bottom" id="BnB-Va-UPh"/>
+                            <constraint firstItem="hsH-f0-cFH" firstAttribute="top" secondItem="XnT-gf-OLi" secondAttribute="bottom" constant="15" id="CKa-97-ZVZ"/>
                             <constraint firstItem="QHG-X8-fcl" firstAttribute="trailing" secondItem="0fQ-jr-ubK" secondAttribute="trailing" id="CV5-G9-Svk"/>
                             <constraint firstItem="hLU-MQ-KTc" firstAttribute="centerX" secondItem="Zrb-hp-fMq" secondAttribute="centerX" id="D3G-n9-NS4"/>
                             <constraint firstItem="tgg-i6-vMl" firstAttribute="height" secondItem="Zrb-hp-fMq" secondAttribute="height" multiplier="0.062" id="EIy-RS-b8L"/>
@@ -557,6 +635,7 @@
                             <constraint firstItem="hsH-f0-cFH" firstAttribute="centerX" secondItem="Zrb-hp-fMq" secondAttribute="centerX" id="bzb-P2-gC8"/>
                             <constraint firstAttribute="bottom" secondItem="7TZ-Hp-8Y4" secondAttribute="bottom" constant="30" id="fFf-ow-hwe"/>
                             <constraint firstAttribute="bottom" secondItem="hsH-f0-cFH" secondAttribute="bottom" constant="20" id="kMf-q1-hdc"/>
+                            <constraint firstItem="QGn-db-mNk" firstAttribute="height" secondItem="Zrb-hp-fMq" secondAttribute="height" multiplier="0.062" id="l16-05-u8h"/>
                             <constraint firstItem="Bgz-Ln-xlQ" firstAttribute="trailing" secondItem="Ufh-Vj-2Bp" secondAttribute="trailing" id="mLy-qt-dWQ"/>
                             <constraint firstAttribute="bottom" secondItem="Bgz-Ln-xlQ" secondAttribute="bottom" constant="30" id="nig-3b-OEz"/>
                             <constraint firstItem="hLU-MQ-KTc" firstAttribute="height" secondItem="Zrb-hp-fMq" secondAttribute="height" id="pad-vn-KHd"/>
@@ -564,6 +643,7 @@
                             <constraint firstItem="hLU-MQ-KTc" firstAttribute="leading" secondItem="Ufh-Vj-2Bp" secondAttribute="leading" id="upl-2V-ozI"/>
                             <constraint firstItem="hLU-MQ-KTc" firstAttribute="centerY" secondItem="Zrb-hp-fMq" secondAttribute="centerY" id="xQd-Kc-MUg"/>
                             <constraint firstItem="QHG-X8-fcl" firstAttribute="height" secondItem="Zrb-hp-fMq" secondAttribute="height" multiplier="0.067" id="y0F-Ls-dD7"/>
+                            <constraint firstItem="XnT-gf-OLi" firstAttribute="centerX" secondItem="hsH-f0-cFH" secondAttribute="centerX" id="z21-I2-iNP"/>
                             <constraint firstItem="hLU-MQ-KTc" firstAttribute="width" secondItem="Zrb-hp-fMq" secondAttribute="width" id="zKw-9j-jnJ"/>
                         </constraints>
                     </view>
@@ -573,26 +653,37 @@
                         <outlet property="agreementBox" destination="dvs-rU-56a" id="PVp-MG-SaI"/>
                         <outlet property="agreementTextView" destination="XOm-Cw-Uuq" id="d1t-3Q-u6I"/>
                         <outlet property="agreementView" destination="hLU-MQ-KTc" id="tCF-CZ-ub2"/>
+                        <outlet property="appVersionBottomConstraint" destination="kMf-q1-hdc" id="5Yl-hF-2ZL"/>
                         <outlet property="appVersionLabel" destination="hsH-f0-cFH" id="Pyy-rc-LUW"/>
                         <outlet property="appleLoginButton" destination="vpi-yr-s7g" id="tHA-lE-YAO"/>
+                        <outlet property="appleLogo" destination="IUq-nW-AIo" id="dhc-IZ-a7G"/>
                         <outlet property="brandLogo" destination="bSh-Uq-p9g" id="vBi-8W-j2p"/>
                         <outlet property="checkBox" destination="kfM-iD-Fe4" id="KTm-7W-Xou"/>
+                        <outlet property="chinaAppleLogo" destination="urt-Q0-NDb" id="Vl2-ww-ltW"/>
+                        <outlet property="chinaAppleSigninButton" destination="QGn-db-mNk" id="7OW-5H-dVa"/>
+                        <outlet property="chinaWeChatLoginButton" destination="Jyj-vO-HX6" id="sW8-ls-MnB"/>
+                        <outlet property="chinaWeChatLogo" destination="bue-SK-dvz" id="RfI-Wn-jbc"/>
                         <outlet property="closeButton" destination="A1q-wB-oQH" id="ENu-Yw-066"/>
                         <outlet property="confirmPassword" destination="knx-CG-y5r" id="7cY-dp-TOg"/>
                         <outlet property="controllerSigninButton" destination="bAd-85-5HB" id="vd5-JM-5QU"/>
                         <outlet property="email" destination="0fQ-jr-ubK" id="si7-Pi-G5D"/>
+                        <outlet property="forgotPasswordButton" destination="srr-GI-XYU" id="hgT-Hn-ajb"/>
                         <outlet property="githubLoginButton" destination="duH-RO-LTV" id="e2g-Sg-Kgl"/>
+                        <outlet property="githubLogo" destination="4P4-wO-yOr" id="1XT-xp-Gbv"/>
                         <outlet property="googleLoginButton" destination="ZaU-GS-EVz" id="2W3-v3-BaD"/>
+                        <outlet property="googleLogo" destination="iTZ-67-g06" id="HzT-zz-88S"/>
                         <outlet property="password" destination="Hff-HK-wUA" id="wp1-SY-dUj"/>
                         <outlet property="registerPassword" destination="rdI-BY-hAE" id="16R-6z-IwY"/>
+                        <outlet property="registrationLabel" destination="XnT-gf-OLi" id="v8l-fS-mqY"/>
                         <outlet property="segmentControl" destination="9sG-hj-2By" id="SrP-Gp-HWa"/>
-                        <outlet property="signInButton" destination="tgg-i6-vMl" id="GmZ-lm-zpV"/>
+                        <outlet property="signInButton" destination="tgg-i6-vMl" id="p8V-n8-Qzt"/>
                         <outlet property="signInTopSpace" destination="BnB-Va-UPh" id="kKy-dR-RZc"/>
                         <outlet property="signInView" destination="7TZ-Hp-8Y4" id="qpe-bF-5fe"/>
                         <outlet property="signUpButton" destination="K52-V0-ixe" id="Kc2-RM-vVe"/>
                         <outlet property="signUpTopView" destination="GUK-6u-bDO" id="hsL-ad-rnE"/>
                         <outlet property="signUpView" destination="Bgz-Ln-xlQ" id="S2T-kn-E0v"/>
                         <outlet property="signupTextView" destination="aZh-0w-Mb7" id="azn-Ue-KNa"/>
+                        <outlet property="useEmailLabel" destination="tYZ-aT-evD" id="IXY-93-3gI"/>
                         <outlet property="username" destination="QHG-X8-fcl" id="5sV-6x-HEF"/>
                         <segue destination="iUc-7H-19x" kind="show" identifier="confirmSignUpSegue" id="2R7-SN-dHT"/>
                     </connections>
@@ -1116,8 +1207,9 @@
         <image name="checkbox_unchecked" width="24" height="24"/>
         <image name="github_logo" width="42.666667938232422" height="42.666667938232422"/>
         <image name="google_logo" width="42.666667938232422" height="42.666667938232422"/>
+        <image name="wechat_icon" width="24" height="24"/>
         <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

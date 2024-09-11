@@ -71,9 +71,10 @@ struct ESPErrorCodeDescription {
     
     static let emailNotVerifiedKey = "101015"
     static let logOutUserCodes: [String] = ["101025",
-                             "119006",
-                             "100007",
-                             "101017"]
+                                            "119006",
+                                            "100007",
+                                            "101017",
+                                            "101016"]
     
     static let errorDictionary: [String: String] =
         ["100006": "Invalid request body",

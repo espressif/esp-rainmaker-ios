@@ -1,16 +1,13 @@
 
 ## ESP RainMaker iOS App
 
-  
 
 This is the official iOS app for [ESP RainMaker](https://github.com/espressif/esp-rainmaker), an end-to-end solution offered by Espressif to enable remote control and monitoring for ESP32-S2 and ESP32 based products without any configuration required in the Cloud.
 
-  
 
 For more details :
 
 - Please check the ESP RainMaker documentation [here](http://rainmaker.espressif.com/docs/get-started.html) to get started.
-
 - Try out this app in [App Store](https://apps.apple.com/app/esp-rainmaker/id1497491540).
 
   
@@ -21,68 +18,41 @@ For more details :
 
 ### User Management
 
-  
-
 - Signup/Signin using email id.
-
 - Third party login includes Apple login, GitHub and Google.
-
 - Forgot/reset password support.
-
 - Signing out.
 
-  
 
 ### Provisioning
 
-  
-
 - Uses [ESPProvision](https://github.com/espressif/esp-idf-provisioning-ios/) library for provisioning.
-
 - Automatically connects to device using QR code.
-
 - Can choose manual flow if QR code is not present.
-
 - Shows list of available Wi-Fi networks.
-
 - Supports SoftAP based Wi-Fi Provisioning.
-
 - Performs the User-Node association workflow.
-
   
 
 ### Manage
 
-  
-
 - List all devices associated with a user.
-
 - Shows node and device details.
-
 - Capability to remove node of a user.
-
 - Shows online/offline status of nodes.
 
-  
 
 ### Control
 
-  
-
 - Shows all static and configurable parameters of a device.
-
 - Adapt UI according to the parameter type like toggle for power, slider for brightness.
-
 - Allow user to change and monitor parameters of devices.
 
 
 ### Local Control
 
-
 - This feature allows discovering devices on local Wi-Fi network using Bonjour (mDNS) and controlling them using HTTP as per the [ESP Local Control](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/protocols/esp_local_ctrl.html) specifications.
-
 - Local Control ensures your devices are reachable even when your internet connection is poor or there is no internet over connected Wi-Fi.
-
 - Supports both secure and unsecure communication with device over local network.
 
 Local Control feature is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Local Control` key from `App Configuration` to `NO`.
@@ -90,10 +60,7 @@ Local Control feature is optional but enabled by default. It can be disabled fro
 
 ### Personalisation
 
-  
-
 - Change theme colour of App at runtime.
-
 - Change app background during runtime.
 
 ### Scheduling
@@ -224,6 +191,12 @@ OTA update is optional and disabled by default. It can be enabled from the `Conf
 - Users have the option to add Widgets of both medium and small sizes to their Widget screen.
 - Widget will provide essential information regarding device connectivity status and primary parameter values.
 - Users can easily configure which device information is displayed within the Widget, offering a customizable experience.
+
+### Region Based Configurations
+
+- App will support different Sign in methods and different set of Auth URL, Base URL, Claim URL etc. based on the region setting of the iOS device that it is running on.
+For more details on region-specific configuration settings, refer to the [Region Configuration Guide](./RegionConfig.md).
+
 
 ## Custom Matter Fabric
 

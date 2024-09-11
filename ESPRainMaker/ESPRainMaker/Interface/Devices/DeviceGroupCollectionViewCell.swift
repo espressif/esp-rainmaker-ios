@@ -246,6 +246,9 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
                             if value {
                                 cell.switchButton.setBackgroundImage(UIImage(named: "switch_on"), for: .normal)
                                 cell.switchValue = true
+                            } else {
+                                cell.switchButton.setBackgroundImage(UIImage(named: "switch_off"), for: .normal)
+                                cell.switchValue = false
                             }
                         }
                     } else {

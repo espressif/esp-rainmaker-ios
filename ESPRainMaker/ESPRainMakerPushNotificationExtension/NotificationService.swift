@@ -32,8 +32,6 @@ class NotificationService: UNNotificationServiceExtension {
             }
             contentHandler(bestAttemptContent)
         }
-        
-        
     }
 
     override func serviceExtensionTimeWillExpire() {

@@ -20,6 +20,11 @@ import Foundation
 import Alamofire
 import SafariServices
 
+protocol LoaderDelegate {
+    func showLoader()
+    func hideLoader()
+}
+
 protocol ESPIdProviderLoginLogic {
     func loginWith(idProvider: String)
     func requestToken(code: String)
@@ -35,6 +40,7 @@ class ESPIdProviderLoginService: ESPIdProviderLoginLogic {
     var presenter: ESPIdProviderLoginPresenter?
     
     var session: SFAuthenticationSession!
+    var loaderDelegate: LoaderDelegate?
     
     convenience init(presenter: ESPIdProviderLoginPresenter?) {
         self.init(authURL: ESPURLParams.shared.authURL,
@@ -83,7 +89,9 @@ class ESPIdProviderLoginService: ESPIdProviderLoginLogic {
     /// Request access token
     /// - Parameter code: code to retrieve access token
     func requestToken(code: String) {
+        self.loaderDelegate?.showLoader()
         apiWorker.callAPI(endPoint: .requestToken(authURL: self.authURL, redirectURL: self.redirectURL, code: code, appClientId: self.appClientID), encoding: URLEncoding.default) { data, error in
+            self.loaderDelegate?.hideLoader()
             if error == nil {
                 if let jsonData = data {
                     let decoder = JSONDecoder()

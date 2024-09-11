@@ -22,10 +22,19 @@ import UIKit
 class AboutViewController: UIViewController {
     
     @IBOutlet var appVersionLabel: UILabel!
+    @IBOutlet weak var appRegionLabel: UILabel!
+    @IBOutlet weak var icpRegistrationLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         appVersionLabel.text = "v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
+        if ESPLocaleManager.shared.isLocaleChina {
+            self.appRegionLabel.text = " China"
+            self.icpRegistrationLabel.text = AppConstants.shared.icpRegistrationId
+        } else {
+            self.appRegionLabel.text = " Global"
+            self.icpRegistrationLabel.text = ""
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

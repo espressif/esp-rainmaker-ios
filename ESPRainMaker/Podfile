@@ -17,6 +17,9 @@ target 'ESPRainMaker' do
   pod 'DropDown'
   pod 'FlexColorPicker'
   pod 'SwiftCharts', '~> 0.6.5'
+  pod 'JCore'
+  pod 'JPush'
+  pod 'WechatOpenSDK-XCFramework'
 
 end
 

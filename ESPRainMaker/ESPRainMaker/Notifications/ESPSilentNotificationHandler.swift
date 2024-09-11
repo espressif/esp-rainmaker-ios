@@ -28,6 +28,8 @@ struct ESPSilentNotificationHandler: ESPSilentNotificationProtocol {
     
     let dataKey = "data"
     let payloadKey = "payload"
+    let alertKey = "alert"
+    let apsKey = "aps"
     
     /// Method to handle silent notification in the app.
     ///
@@ -35,7 +37,15 @@ struct ESPSilentNotificationHandler: ESPSilentNotificationProtocol {
     ///   - userInfo: Payload information in  form of dictionary.
     func handleSilentNotification(_ userInfo: [AnyHashable : Any]) {
         // Parsed the user information to get payload string.
-        if let data = userInfo[dataKey] as? [String: Any], let eventDataPayload = data[ESPNotificationKeys.eventDataPayloadKey] as? [String: Any], let eventData = eventDataPayload[ESPNotificationKeys.eventDataKey] as? [String: Any], let nodeID = eventData[ESPNotificationKeys.nodeIDKey] as? String, let payload = eventData[payloadKey] as? String {
+        if let data = userInfo[dataKey] as? [String: Any] {
+            self.handleData(data: data)
+        } else if let userInfoAPS = userInfo[apsKey] as? [String: Any], let userData = userInfoAPS[alertKey] as? String, let data = userData.data(using: .utf8), let finalConfig = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            self.handleData(data: finalConfig)
+        }
+    }
+    
+    func handleData(data: [String: Any]) {
+        if let eventDataPayload = data[ESPNotificationKeys.eventDataPayloadKey] as? [String: Any], let eventData = eventDataPayload[ESPNotificationKeys.eventDataKey] as? [String: Any], let nodeID = eventData[ESPNotificationKeys.nodeIDKey] as? String, let payload = eventData[payloadKey] as? String {
             // Converted string into data to allow conversion to json object.
             let data = payload.data(using: .utf8)!
             do {

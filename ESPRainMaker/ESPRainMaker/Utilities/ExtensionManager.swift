@@ -681,6 +681,8 @@ extension ESPNoRefreshTokenLogic {
                             result = false
                         }
                     }
+                } else if espResponse.message?.lowercased() == "unauthorized" {
+                    result = false
                 }
             }
         default:

@@ -44,7 +44,15 @@ struct ESPNotificationHandler: ESPNotificationProtocol {
     init(_ userInfo: [String: Any]) {
         eventData = [:]
         var eventTypeStr = ""
-        if let aps = userInfo[ESPNotificationKeys.apsKey] as? [String:Any], let alert = aps[ESPNotificationKeys.alertkey] as? [String: Any] {
+        var alert = [String: Any]()
+        if let aps = userInfo[ESPNotificationKeys.apsKey] as? [String:Any] {
+            if let alertObject = aps[ESPNotificationKeys.alertkey] as? [String: Any] {
+                
+                alert = alertObject
+            } else if let alertString = aps[ESPNotificationKeys.alertkey] as? String, let alertData = alertString.data(using: .utf8), let alertObject = try? JSONSerialization.jsonObject(with: alertData) as? [String: Any] {
+                
+                alert = alertObject
+            }
             
             notification.title = alert[ESPNotificationKeys.titleKey] as? String ?? ""
             notification.body = alert[ESPNotificationKeys.bodyKey] as? String ?? ""

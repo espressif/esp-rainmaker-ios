@@ -357,6 +357,7 @@ struct ESPSessionResponse: Codable {
     var idToken: String?
     var accessToken: String?
     var refreshToken: String?
+    var message: String?
     
     var gotAccessToken: Bool {
         if let status = status, status.lowercased() == "success", let accessToken = accessToken, accessToken.count > 0 {
@@ -378,6 +379,7 @@ struct ESPSessionResponse: Codable {
         case idToken = "idtoken"
         case accessToken = "accesstoken"
         case refreshToken = "refreshtoken"
+        case message = "message"
     }
 }
 

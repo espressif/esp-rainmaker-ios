@@ -27,9 +27,10 @@ extension ESPNodeGroupSharingAddEvent {
         case .accept:
             if let requestID = eventData[ESPNotificationKeys.requestIDKey] as? String {
                 NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestID, accept: true) { _ in
-                    User.shared.updateDeviceList = true
-                    navigationHandler = .groupSharing
                     DispatchQueue.main.async {
+                        NodeGroupManager.shared.listUpdated = true
+                        User.shared.updateDeviceList = true
+                        navigationHandler = .groupSharing
                         navigationHandler.navigateToPage()
                     }
                 }
@@ -37,6 +38,8 @@ extension ESPNodeGroupSharingAddEvent {
         case .decline:
             if let requestID = eventData[ESPNotificationKeys.requestIDKey] as? String {
                 NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestID, accept: false) { _ in
+                    NodeGroupManager.shared.listUpdated = true
+                    User.shared.updateDeviceList = true
                 }
             }
         case .none:

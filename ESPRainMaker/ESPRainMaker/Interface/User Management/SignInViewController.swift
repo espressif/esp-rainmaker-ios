@@ -36,7 +36,6 @@ protocol AgreementViewDisplayDelegate: AnyObject {
 
 class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextViewDelegate {
     
-    
     @IBOutlet weak var controllerSigninButton: PrimaryButton!
     @IBOutlet weak var closeButton: PrimaryButton!
     @IBOutlet var checkBox: UIButton!
@@ -65,6 +64,20 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     @IBOutlet var email: UITextField!
     @IBOutlet weak var brandLogo: UIImageView!
 
+    //MARK: China specific UI:
+    
+    @IBOutlet weak var forgotPasswordButton: SecondaryButton!
+    @IBOutlet var githubLogo: UIImageView!
+    @IBOutlet var googleLogo: UIImageView!
+    @IBOutlet var appleLogo: UIImageView!
+    @IBOutlet weak var chinaAppleLogo: UIImageView!
+    @IBOutlet weak var chinaAppleSigninButton: UIButton!
+    @IBOutlet weak var chinaWeChatLogo: UIImageView!
+    @IBOutlet weak var chinaWeChatLoginButton: UIButton!
+    @IBOutlet var useEmailLabel: UILabel!
+    @IBOutlet weak var registrationLabel: UILabel!
+    @IBOutlet weak var appVersionBottomConstraint: NSLayoutConstraint!
+    
     var usernameText: String?
     var session: SFAuthenticationSession!
     var checked = false
@@ -85,7 +98,6 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     var matterNodeId: String = ""
     weak var rainmakerControllerDelegate: RainmakerControllerFlowDelegate?
     #endif
-
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -220,6 +232,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         } else {
             self.resetConfig()
         }
+        self.configureLocaleUI()
     }
 
     override func viewDidLayoutSubviews() {
@@ -357,29 +370,35 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     func loginWith(idProvider: String) {
         
         let service = ESPIdProviderLoginService(presenter: self)
+        service.loaderDelegate = self
         service.loginWith(idProvider: idProvider)
     }
-
-    func requestToken(code: String) {
+    
+    /// This API call is to retrieve WeChat Tokens
+    /// - Parameter authCode: WeChat auth code
+    func requestWeChatTokens(authCode: String) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "", view: self.view)
+        }
         let url = Configuration.shared.awsConfiguration.authURL + "/token"
-        let parameters = ["grant_type": "authorization_code", "client_id": Configuration.shared.awsConfiguration.appClientId!, "code": code, "redirect_uri": Configuration.shared.awsConfiguration.redirectURL]
+        let parameters: [String: Any] = [ESPAPIKeys.grantType: ESPAPIKeys.authorizationCode,
+                          ESPAPIKeys.clientId: Configuration.shared.awsConfiguration.appClientId!,
+                          ESPAPIKeys.code: authCode,
+                          ESPAPIKeys.isWeChatToken: true,
+                          ESPAPIKeys.redirctURI: Configuration.shared.awsConfiguration.redirectURL]
         let headers: HTTPHeaders = [Constants.contentType: Constants.applicationFormURLEncoded]
-        NetworkManager.shared.genericRequest(url: url, method: .post, parameters: parameters, encoding: URLEncoding.default,
+        NetworkManager.shared.genericRequest(url: url,
+                                             method: .post,
+                                             parameters: parameters,
+                                             encoding: URLEncoding.default,
                                              headers: headers) { response in
-            if let json = response {
-                if let idToken = json["id_token"] as? String, let refreshToken = json["refresh_token"] as? String, let accessToken = json["access_token"] as? String {
-                    User.shared.updateUserInfo(token: idToken, provider: .other)
-                    User.shared.updateDeviceList = true
-                    let refreshTokenInfo = ["token": refreshToken, "time": Date(), "expire_in": json["expires_in"] as? Int ?? 3600] as [String: Any]
-                    User.shared.accessToken = accessToken
-                    UserDefaults.standard.set(refreshTokenInfo, forKey: Constants.refreshTokenKey)
-                    UserDefaults.standard.set(accessToken, forKey: Constants.accessTokenKey)
-                    DispatchQueue.main.async {
-                        // Configure remote notification.
-                        self.appDelegate?.configureRemoteNotifications()
-                        self.refreshWidgets()
-                        self.dismiss(animated: true, completion: nil)
-                    }
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+            }
+            if let json = response, let jsonData = try? JSONSerialization.data(withJSONObject: json) {
+                let decoder = JSONDecoder()
+                if let requestToken = try? decoder.decode(RequestToken.self, from: jsonData) {
+                    self.loginSuccess(requestToken: requestToken)
                 }
             }
         }
@@ -587,7 +606,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
             }
         }
     }
-    
+
     #if ESPRainMakerMatter
     /// Set rainmaker properties
     /// - Parameters:
@@ -630,7 +649,100 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
             WidgetCenter.shared.reloadAllTimelines()
         }
     }
+    
+    //MARK: China specific actions
+    func configureLocaleUI() {
+        DispatchQueue.main.async {
+            self.setUniversalUI(isLocaleChina: ESPLocaleManager.shared.isLocaleChina)
+            self.setChinaSpecificButtons(isLocaleChina: ESPLocaleManager.shared.isLocaleChina)
+        }
+    }
+    
+    @IBAction func chinaLoginToApple(_ sender: Any) {
+        loginWith(idProvider: "SignInWithApple")
+    }
+    
+    @IBAction func chinaLoginToWeChhat(_ sender: Any) {
+        if WXApi.isWXAppInstalled() {
+            let req = SendAuthReq()
+            req.scope = Configuration.shared.weChatServiceConfiguration.scope
+            req.state = WeChatServiceConfiguration.state
+            if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+                WXApi.sendAuthReq(req, viewController: self, delegate: appDelegate) { result in
+                    if !result {
+                        self.showErrorAlert(title: "Failure", message: "Could not launch Weixin login.", buttonTitle: "OK") {}
+                    }
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.showWeChatInstallOptions()
+            }
+        }
+    }
+    
+    func showWeChatInstallOptions() {
+        let title = "App Required"
+        let message = "This feature requires WeChat to be installed on your device. Please install the app from the App Store to continue."
+        let weChatAppStoreURL = "https://apps.apple.com/us/app/wechat/id414478124"
+        let alertController = UIAlertController(title: title,
+                                                message: message,
+                                                preferredStyle: .alert)
+        let installWeChatOption = UIAlertAction(title: "Install", style: .default) { _ in
+            if let installWeChatURL = URL(string: weChatAppStoreURL), UIApplication.shared.canOpenURL(installWeChatURL) {
+                UIApplication.shared.open(installWeChatURL, options: [:], completionHandler: nil)
+            } else {
+                DispatchQueue.main.async {
+                    Utility.showToastMessage(view: self.view, message: "Cannot open App Store. Please install WeChat application on your device.")
+                }
+            }
+        }
+        let cancelOption = UIAlertAction(title: "Cancel", style: .default)
+        alertController.addAction(cancelOption)
+        alertController.addAction(installWeChatOption)
+        self.present(alertController, animated: false)
+    }
+    
+    
+    /// Set UI for non China locale
+    /// - Parameter isLocaleChina: is locale China
+    func setUniversalUI(isLocaleChina: Bool) {
+        self.githubLogo.isHidden = isLocaleChina
+        self.appleLogo.isHidden = isLocaleChina
+        self.googleLogo.isHidden = isLocaleChina
+        self.username.isHidden = isLocaleChina
+        self.password.isHidden = isLocaleChina
+        self.githubLoginButton.isHidden = isLocaleChina
+        self.googleLoginButton.isHidden = isLocaleChina
+        self.appleLoginButton.isHidden = isLocaleChina
+        self.useEmailLabel.isHidden = isLocaleChina
+        self.forgotPasswordButton.isHidden = isLocaleChina
+        self.signInButton.alpha = isLocaleChina ? 0.0 : 1.0
+        self.signInButton.isUserInteractionEnabled = !isLocaleChina
+        self.segmentControl.alpha = isLocaleChina ? 0.0 : 1.0
+        self.segmentControl.isUserInteractionEnabled = !isLocaleChina
+        self.registrationLabel.text = isLocaleChina ? AppConstants.shared.icpRegistrationId : ""
+    }
+    
+    /// Set China specific UI
+    /// - Parameter isLocaleChina: is locale China
+    func setChinaSpecificButtons(isLocaleChina: Bool) {
+        self.chinaAppleLogo.isHidden = !isLocaleChina
+        self.chinaAppleSigninButton.isHidden = !isLocaleChina
+        self.chinaAppleSigninButton.isUserInteractionEnabled = isLocaleChina
+        if ESPLocaleManager.shared.isLocaleChinaWithWeChatConfigured {
+            self.chinaWeChatLogo.isHidden = !isLocaleChina
+            self.chinaWeChatLoginButton.isHidden = !isLocaleChina
+            self.chinaWeChatLoginButton.isUserInteractionEnabled = isLocaleChina
+        } else {
+            self.chinaWeChatLogo.isHidden = true
+            self.chinaWeChatLoginButton.isHidden = true
+            self.chinaWeChatLoginButton.isUserInteractionEnabled = false
+        }
+    }
 }
+
+
 
 extension SignInViewController: UIAdaptivePresentationControllerDelegate {
     
@@ -808,5 +920,20 @@ extension SignInViewController: AgreementViewDisplayDelegate {
     
     func flowCancelled() {
         showAgreementView = false
+    }
+}
+
+extension SignInViewController: LoaderDelegate {
+    
+    func showLoader() {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Signing in", view: self.view)
+        }
+    }
+    
+    func hideLoader() {
+        DispatchQueue.main.async {
+            Utility.hideLoader(view: self.view)
+        }
     }
 }
