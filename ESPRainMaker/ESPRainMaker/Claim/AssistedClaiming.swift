@@ -161,7 +161,7 @@ class AssistedClaiming {
 
     private func sendCSRToAPI(completionHandler: @escaping (Bool, String?) -> Void) {
         do {
-            let response = try JSONSerialization.jsonObject(with: csrData, options: .allowFragments) as? [String: String] ?? [:]
+            let response = try JSONSerialization.jsonObject(with: csrData, options: .allowFragments) as? [String: Any] ?? [:]
             NetworkManager.shared.genericAuthorizedDataRequest(url: Constants.claimVerifyPath, parameter: response) { data, error in
                 if data == nil {
                     completionHandler(false, "Error while sending CSR to cloud:\(error!.description)")
