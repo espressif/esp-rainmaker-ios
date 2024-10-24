@@ -28,13 +28,12 @@ class DeviceViewController: UIViewController {
     
     @IBOutlet weak var topBarTitle: BarTitle!
     @IBOutlet weak var infoButton: BarButton!
-    @IBOutlet weak var bindingButton: BarButton!
-    
     @IBOutlet weak var offlineView: UIView!
     @IBOutlet weak var offlineViewHeight: NSLayoutConstraint!
     @IBOutlet weak var deviceTableView: UITableView!
     @IBOutlet weak var betaLabel: UILabel!
     @IBOutlet weak var betaLabelHeightConstraint: NSLayoutConstraint!
+    
     var group: ESPNodeGroup?
     var node: ESPNodeDetails?
     var allNodes: [ESPNodeDetails]?
@@ -49,7 +48,7 @@ class DeviceViewController: UIViewController {
     var deviceName: String?
     var switchIndex: Int?
     var isDeviceOffline: Bool = false
-    var showDefaultUI: Bool = true
+    var showDefaultUI: Bool = false
     let fabricDetails = ESPMatterFabricDetails.shared
 
     //badge
@@ -67,12 +66,11 @@ class DeviceViewController: UIViewController {
             self.topBarTitle.text = deviceName
         } else if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.matter_node_id?.hexToDecimal, let name = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
             self.topBarTitle.text = name
-        } else if let deviceName = self.deviceName {
+        } else if let deviceName = self.deviceName, deviceName.count > 0 {
             self.topBarTitle.text = deviceName
         } else {
             self.topBarTitle.text = ESPMatterConstants.deviceTxt
         }
-        
         self.navigationController?.view.backgroundColor = .white
         self.navigationController?.addCustomBottomLine(color: .lightGray, height: 0.5)
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard))
@@ -86,14 +84,14 @@ class DeviceViewController: UIViewController {
         self.deviceTableView.delegate = self
         self.deviceTableView.dataSource = self
         if let rainmakerNodes = self.rainmakerNodes {
-            for rmakeNode in rainmakerNodes {
-                if let node = node, let id = node.nodeID, let nodeId = rmakeNode.node_id, id == nodeId {
-                    self.rainmakerNode = rmakeNode
+            for rMakerNode in rainmakerNodes {
+                if let node = node, let id = node.nodeID, let nodeId = rMakerNode.node_id, id == nodeId {
+                    self.rainmakerNode = rMakerNode
                     break
                 }
             }
         }
-        self.showRightBarButtons(showInfo: true)
+        self.showRightBarButtons()
         self.showBetaLabel()
         self.registerCells()
     }
@@ -162,20 +160,6 @@ class DeviceViewController: UIViewController {
         view.endEditing(true)
     }
     
-    /// Open binding window
-    @objc func openBindingWindow() {
-        if let node = self.node {
-            let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
-            let devicesBindingVC = storyboard.instantiateViewController(withIdentifier: DevicesBindingViewController.storyboardId) as! DevicesBindingViewController
-            devicesBindingVC.group = self.group
-            devicesBindingVC.nodes = self.allNodes
-            devicesBindingVC.sourceNode = node
-            devicesBindingVC.switchIndex = self.switchIndex
-            devicesBindingVC.bindingEndpointClusterId = self.bindingEndpointClusterId
-            self.navigationController?.pushViewController(devicesBindingVC, animated: true)
-        }
-    }
-    
     //TODO: Show node info screen
     @objc func showNodeInfo() {
         let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
@@ -190,13 +174,11 @@ class DeviceViewController: UIViewController {
     }
     
     /// show binding button in right bar button item
-    func showRightBarButtons(showInfo: Bool) {
-        if showInfo {
-            if let infoImage = UIImage(named: "info_icon") {
-                self.infoButton.imageView?.image = infoImage
-            }
-            self.infoButton.addTarget(self, action: #selector(showNodeInfo), for: .touchUpInside)
+    func showRightBarButtons() {
+        if let infoImage = UIImage(named: "info_icon") {
+            self.infoButton.imageView?.image = infoImage
         }
+        self.infoButton.addTarget(self, action: #selector(showNodeInfo), for: .touchUpInside)
     }
     
     /// Register cells

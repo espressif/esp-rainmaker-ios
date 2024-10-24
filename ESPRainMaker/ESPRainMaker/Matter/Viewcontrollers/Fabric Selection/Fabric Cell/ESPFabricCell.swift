@@ -22,7 +22,6 @@ class ESPFabricCell: UITableViewCell {
     
     static let reuseIdentifier = "ESPFabricCell"
     @IBOutlet weak var container: UIView!
-    @IBOutlet weak var deviceImage: UIImageView!
     @IBOutlet weak var deviceName: UILabel!
 
     override func awakeFromNib() {

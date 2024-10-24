@@ -179,7 +179,7 @@ class ESPMatterCommissioningVC: UIViewController {
                     self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
                 }
             } else {
-                if let name = ESPMatterEcosystemInfo.shared.getDeviceName() {
+                if let name = ESPMatterEcosystemInfo.shared.getDeviceName(), ESPMatterClusterUtil.shared.isNodeLabelAttributeSupported(groupId: groupId, deviceId: deviceId) {
                     DispatchQueue.main.async {
                         Utility.showLoader(message: "", view: self.view)
                     }

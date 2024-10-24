@@ -48,13 +48,6 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Check for device type to ask for location permission
-        // Location permission is needed to get SSID of connected Wi-Fi network.
-        
-        self.setupScanningScreen()
-        if self.isBluetoothRequired() {
-            self.checkCBAndProceed {}
-        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -66,13 +59,23 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        self.setupScanningScreen()
+        if self.isBluetoothRequired() {
+            self.checkCBAndProceed {}
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        ESPProvisionManager.shared.stopScan()
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     
     @objc func appEnterForeground() {
+        ESPProvisionManager.shared.stopScan()
+        self.startScanning()
+    }
+    
+    func startScanning() {
         if self.isBluetoothRequired() {
             if let bleManager = self.bluetoothManager {
                 let cbStatus = bleManager.state

@@ -63,7 +63,9 @@ class ESPFabricSelectionVC: UIViewController {
     /// Back button pressed
     /// - Parameter sender: button pressed
     @IBAction func backButtonPressed(_ sender: Any) {
-        self.goBack()
+        DispatchQueue.main.async {
+            self.navigationController?.popToRootViewController(animated: true)
+        }
     }
     
     /// Add group button pressed
@@ -347,6 +349,13 @@ extension ESPFabricSelectionVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if let nodeGroups = self.nodeGroups, indexPath.row < nodeGroups.count {
+            let nodeGroup = nodeGroups[indexPath.row]
+            if let groupName = nodeGroup.group_name {
+                let height = groupName.getViewHeight(labelWidth: tableView.frame.width - 80.0, font: UIFont.systemFont(ofSize: 12.0, weight: .semibold))
+                return (80.0 - 14.3 + height)
+            }
+        }
         return 80.0
     }
     

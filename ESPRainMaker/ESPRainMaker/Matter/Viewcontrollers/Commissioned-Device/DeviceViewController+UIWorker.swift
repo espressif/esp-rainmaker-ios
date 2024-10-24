@@ -47,6 +47,7 @@ extension DeviceViewController {
                 }
             }
             cell.isUserInteractionEnabled = !self.isDeviceOffline
+            cell.editButton.isEnabled = !self.isDeviceOffline
             return cell
         }
         return nil
@@ -71,6 +72,7 @@ extension DeviceViewController {
             } else {
                 cell.setupInitialUI()
             }
+            cell.toggleSwitch.isEnabled = !self.isDeviceOffline
             cell.isUserInteractionEnabled = !self.isDeviceOffline
             return cell
         }
@@ -88,6 +90,8 @@ extension DeviceViewController {
         let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
         object_setClass(sliderCell, ParamSliderTableViewCell.self)
         let cell = sliderCell as! ParamSliderTableViewCell
+        cell.backViewTopSpaceConstraint.constant = 10
+        cell.backViewBottomSpaceConstraint.constant = 10
         cell.nodeConnectionStatus = self.nodeConnectionStatus
         cell.node = self.node
         cell.isRainmaker = false
@@ -104,6 +108,7 @@ extension DeviceViewController {
             cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
         }
         cell.isUserInteractionEnabled = !self.isDeviceOffline
+        cell.slider.isEnabled = !self.isDeviceOffline
         return cell
     }
     
@@ -117,6 +122,8 @@ extension DeviceViewController {
         let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
         object_setClass(sliderCell, ParamSliderTableViewCell.self)
         let cell = sliderCell as! ParamSliderTableViewCell
+        cell.backViewTopSpaceConstraint.constant = 10
+        cell.backViewBottomSpaceConstraint.constant = 10
         cell.nodeConnectionStatus = self.nodeConnectionStatus
         cell.node = self.node
         cell.isRainmaker = false
@@ -132,6 +139,8 @@ extension DeviceViewController {
             cell.subscribeToHueAttribute()
         }
         cell.isUserInteractionEnabled = !self.isDeviceOffline
+        cell.hueSlider.isEnabled = !self.isDeviceOffline
+        cell.hueSlider.alpha = self.isDeviceOffline ? 0.3 : 1.0
         return cell
     }
     
@@ -146,6 +155,8 @@ extension DeviceViewController {
         let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
         object_setClass(sliderCell, ParamSliderTableViewCell.self)
         let cell = sliderCell as! ParamSliderTableViewCell
+        cell.backViewTopSpaceConstraint.constant = 10
+        cell.backViewBottomSpaceConstraint.constant = 10
         cell.nodeConnectionStatus = self.nodeConnectionStatus
         cell.node = self.node
         cell.isRainmaker = false
@@ -162,6 +173,7 @@ extension DeviceViewController {
             cell.getCurrentSaturationValue(groupId: groupId, deviceId: deviceId)
         }
         cell.isUserInteractionEnabled = !self.isDeviceOffline
+        cell.slider.isEnabled = !self.isDeviceOffline
         return cell
     }
     
@@ -175,7 +187,7 @@ extension DeviceViewController {
             cell.delegate = self
             cell.setupWorkflow(workflow: .launchController)
             self.setAutoresizingMask(cell)
-            cell.isUserInteractionEnabled = !self.isDeviceOffline
+            cell.setLaunchButtonConnectedStatus(isDeviceOffline: self.isDeviceOffline)
             return cell
         }
         return nil

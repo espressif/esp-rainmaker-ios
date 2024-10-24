@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22503" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22503"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -20,15 +20,15 @@
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FOX-Vy-N0E">
                         <rect key="frame" x="15" y="10" width="584" height="79"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PLS-Ka-XBh">
-                                <rect key="frame" x="15.000000000000004" y="9.9999999999999982" width="39.333333333333343" height="18.333333333333329"/>
-                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="14"/>
+                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PLS-Ka-XBh">
+                                <rect key="frame" x="15" y="10" width="38" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" red="0.1019607843" green="0.1019607843" blue="0.1019607843" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Device Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i52-t7-PTd">
-                                <rect key="frame" x="15" y="46" width="113" height="23"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i52-t7-PTd">
+                                <rect key="frame" x="15" y="69" width="0.0" height="0.0"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -50,6 +50,11 @@
                             <constraint firstItem="PLS-Ka-XBh" firstAttribute="leading" secondItem="FOX-Vy-N0E" secondAttribute="leading" constant="15" id="d3a-rR-hMf"/>
                             <constraint firstItem="PLS-Ka-XBh" firstAttribute="top" secondItem="FOX-Vy-N0E" secondAttribute="top" constant="10" id="qTJ-bv-vZn"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
                     </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -65,6 +70,7 @@
             <connections>
                 <outlet property="container" destination="FOX-Vy-N0E" id="uN2-qs-Ssp"/>
                 <outlet property="deviceName" destination="i52-t7-PTd" id="pE7-eo-I9C"/>
+                <outlet property="editButton" destination="SRg-0e-TZa" id="Tqq-xq-pP7"/>
                 <outlet property="propertyName" destination="PLS-Ka-XBh" id="meN-BZ-pGn"/>
             </connections>
             <point key="canvasLocation" x="261.06870229007632" y="39.7887323943662"/>

@@ -43,10 +43,6 @@ class ParticipantDataCell: UITableViewCell {
         self.container.layer.shadowRadius = 2
         self.container.layer.shadowColor = UIColor.black.cgColor
         self.container.layer.masksToBounds = false
-        
-        self.updateButton.backgroundColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
-        self.updateButton.tintColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
-        self.updateButton.setTitleColor(UIColor.white, for: .normal)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -27,7 +27,8 @@ extension DeviceTraitListViewController: CustomActionDelegate {
     func setActiveThreadDataset() {
         if #available(iOS 15.0, *) {
             if let node = self.device.node, let nodeId = node.node_id {
-                if let tAD = node.getServiceParam(forServiceType: Constants.threadBRService, andParamType: Constants.threadActiveDataset)?.value as? String, tAD.count == 0 {
+                
+                if !self.isTBRActiveDatasetSet(forNode: node) {
                     
                     /// We first check if the ESP thread BR has an active dataset or not
                     /// If it does not, then we try to set homepod active dataset to it if available
@@ -57,44 +58,50 @@ extension DeviceTraitListViewController: CustomActionDelegate {
     func mergeThreadDataset() {
         if #available(iOS 15.0, *) {
             if let node = self.device.node, let nodeId = node.node_id {
-                if let espActiveDataset = self.getESPThreadConfig() {
+                
+                if self.isTBRActiveDatasetSet(forNode: node) {
                     
-                    /// Fetch thread operational dataset
-                    ThreadCredentialsManager.shared.fetchThreadOperationalDataset { activeOperationalDataSet in
+                    if let espActiveDataset = self.getESPThreadConfig() {
                         
-                        if var homepodActiveDataset = activeOperationalDataSet {
+                        /// Fetch thread operational dataset
+                        ThreadCredentialsManager.shared.fetchThreadOperationalDataset { activeOperationalDataSet in
                             
-                            /// Check if homepod dataset can be merged with ESP thread BR dataset
-                            /// If possible we use write the homepod dataset to the thread BR service
-                            /// using the ["PendingDataset": {homepod dataset}] command
-                            let updateHomepodParams = ThreadBRDatasetWorker.shared.shouldUpdateHomepodDataset(homepodDataset: homepodActiveDataset, espDataset: espActiveDataset)
-                            if updateHomepodParams.shouldUpdate {
+                            if var homepodActiveDataset = activeOperationalDataSet {
                                 
-                                let delayTimer: UInt32 = 60000
-                                ThreadBRDatasetWorker.shared.addDelayTimer(to: &homepodActiveDataset, delay: delayTimer)
-                                /// If homepod active timestamp is greater than esp active timestamp
-                                /// write the homepod data to esp thread dataset
-                                self.updateESPThreadBRData(nodeId: nodeId, homepodActiveDataset: homepodActiveDataset)
+                                /// Check if homepod dataset can be merged with ESP thread BR dataset
+                                /// If possible we use write the homepod dataset to the thread BR service
+                                /// using the ["PendingDataset": {homepod dataset}] command
+                                let updateHomepodParams = ThreadBRDatasetWorker.shared.shouldUpdateHomepodDataset(homepodDataset: homepodActiveDataset, espDataset: espActiveDataset)
+                                if updateHomepodParams.shouldUpdate {
+                                    
+                                    let delayTimer: UInt32 = 60000
+                                    ThreadBRDatasetWorker.shared.addDelayTimer(to: &homepodActiveDataset, delay: delayTimer)
+                                    /// If homepod active timestamp is greater than esp active timestamp
+                                    /// write the homepod data to esp thread dataset
+                                    self.updateESPThreadBRData(nodeId: nodeId, homepodActiveDataset: homepodActiveDataset)
+                                } else {
+                                    
+                                    /// Should increase homepod dataset
+                                    if updateHomepodParams.timestampDifference > 0 {
+                                        ThreadBRDatasetWorker.shared.increaseHomepodActiveTimestamp(in: &homepodActiveDataset, byValue: updateHomepodParams.timestampDifference)
+                                    }
+                                    /// If homepod active timestamp is lower than esp active timestamp
+                                    /// increase the homepod active dataset
+                                    /// write the homepod data to esp thread dataset
+                
+                                    let delayTimer: UInt32 = 60000
+                                    ThreadBRDatasetWorker.shared.addDelayTimer(to: &homepodActiveDataset, delay: delayTimer)
+                                    self.updateESPThreadBRData(nodeId: nodeId, homepodActiveDataset: homepodActiveDataset)
+                                }
                             } else {
                                 
-                                /// Should increase homepod dataset
-                                if updateHomepodParams.timestampDifference > 0 {
-                                    ThreadBRDatasetWorker.shared.increaseHomepodActiveTimestamp(in: &homepodActiveDataset, byValue: updateHomepodParams.timestampDifference)
-                                }
-                                /// If homepod active timestamp is lower than esp active timestamp
-                                /// increase the homepod active dataset
-                                /// write the homepod data to esp thread dataset
-            
-                                let delayTimer: UInt32 = 60000
-                                ThreadBRDatasetWorker.shared.addDelayTimer(to: &homepodActiveDataset, delay: delayTimer)
-                                self.updateESPThreadBRData(nodeId: nodeId, homepodActiveDataset: homepodActiveDataset)
+                                /// Homepod dataset is not available to the user
+                                self.homepodDatasetNotAvailable()
                             }
-                        } else {
-                            
-                            /// Homepod dataset is not available to the user
-                            self.homepodDatasetNotAvailable()
                         }
                     }
+                } else {
+                    self.espTBRNotConfigured()
                 }
             }
         }  else {
@@ -102,6 +109,17 @@ extension DeviceTraitListViewController: CustomActionDelegate {
         }
     }
     
+    private func isTBRActiveDatasetSet(forNode node: Node) -> Bool {
+        if let tAD = node.getServiceParam(forServiceType: Constants.threadBRService, andParamType: Constants.threadActiveDataset)?.value as? String, tAD.count > 0 {
+            return true
+        }
+        return false
+    }
+    
+    /// Update ESP thread border router data
+    /// - Parameters:
+    ///   - nodeId: node id
+    ///   - homepodActiveDataset: homepod active dataset
     private func updateESPThreadBRData(nodeId: String, homepodActiveDataset: Data) {
         
         /// Write the homepod dataset  to Thread BR activedataset param
@@ -248,6 +266,16 @@ extension DeviceTraitListViewController: CustomActionDelegate {
         } else {
             // Fallback on earlier versions
             self.upgradeiOSVersionForThread()
+        }
+    }
+    
+    /// This is invoked if user tries to configure the dataset on a thread BR but,
+    /// the dataset is already configured
+    private func espTBRNotConfigured() {
+        DispatchQueue.main.async {
+            self.alertUser(title: ThreadBRMessages.failure.rawValue,
+                           message: ThreadBRMessages.espActiveDatasetNotConfigured.rawValue,
+                           buttonTitle: ThreadBRMessages.ok.rawValue) {}
         }
     }
     

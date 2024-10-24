@@ -588,6 +588,22 @@
                                             <action selector="proceedClicked:" destination="wu1-XV-Nik" eventType="touchUpInside" id="0DH-gD-bii"/>
                                         </connections>
                                     </button>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5ev-5D-f13">
+                                        <rect key="frame" x="0.0" y="686" width="414" height="50"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VgO-1W-7kA">
+                                                <rect key="frame" x="155" y="17" width="103.33333333333326" height="14.333333333333485"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <color key="textColor" red="0.50588235290000005" green="0.50588235290000005" blue="0.6588235294" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="VgO-1W-7kA" firstAttribute="centerX" secondItem="5ev-5D-f13" secondAttribute="centerX" id="WbS-4W-yzk"/>
+                                            <constraint firstItem="VgO-1W-7kA" firstAttribute="centerY" secondItem="5ev-5D-f13" secondAttribute="centerY" id="kQe-st-krZ"/>
+                                        </constraints>
+                                    </view>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="brand_icon" translatesAutoresizingMaskIntoConstraints="NO" id="HXE-B4-Np1">
                                         <rect key="frame" x="57" y="308" width="300" height="120"/>
                                         <constraints>
@@ -611,13 +627,17 @@
                                 <constraints>
                                     <constraint firstItem="XOm-Cw-Uuq" firstAttribute="leading" secondItem="dvs-rU-56a" secondAttribute="trailing" constant="8" symbolic="YES" id="7uf-wv-mgm"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="top" secondItem="XOm-Cw-Uuq" secondAttribute="bottom" constant="8" symbolic="YES" id="CSi-ye-ZeO"/>
+                                    <constraint firstItem="RQ2-DX-Lie" firstAttribute="bottom" secondItem="5ev-5D-f13" secondAttribute="top" id="EMi-WS-lC6"/>
+                                    <constraint firstAttribute="trailing" secondItem="5ev-5D-f13" secondAttribute="trailing" id="OYD-4a-waV"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="top" secondItem="dvs-rU-56a" secondAttribute="bottom" constant="32" id="OjA-Kd-Zxp"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="leading" secondItem="dvs-rU-56a" secondAttribute="leading" id="RO0-l6-Hhj"/>
                                     <constraint firstAttribute="trailing" secondItem="RQ2-DX-Lie" secondAttribute="trailing" constant="32" id="Rap-Cr-EZE"/>
                                     <constraint firstAttribute="bottom" secondItem="RQ2-DX-Lie" secondAttribute="bottom" constant="50" id="a3j-ip-sfG"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="trailing" secondItem="XOm-Cw-Uuq" secondAttribute="trailing" constant="1" id="aIX-cZ-inD"/>
+                                    <constraint firstAttribute="bottom" secondItem="5ev-5D-f13" secondAttribute="bottom" id="bvl-mV-sAW"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="leading" secondItem="hLU-MQ-KTc" secondAttribute="leading" constant="32" id="dsQ-6Z-DD6"/>
                                     <constraint firstItem="HXE-B4-Np1" firstAttribute="centerX" secondItem="hLU-MQ-KTc" secondAttribute="centerX" id="fMQ-ak-LB5"/>
+                                    <constraint firstItem="5ev-5D-f13" firstAttribute="leading" secondItem="hLU-MQ-KTc" secondAttribute="leading" id="uDT-gX-CU3"/>
                                     <constraint firstItem="HXE-B4-Np1" firstAttribute="centerY" secondItem="hLU-MQ-KTc" secondAttribute="centerY" id="xT7-dD-NLS"/>
                                     <constraint firstItem="RQ2-DX-Lie" firstAttribute="trailing" secondItem="XOm-Cw-Uuq" secondAttribute="trailing" constant="1" id="xk7-mf-f7U"/>
                                 </constraints>
@@ -665,6 +685,7 @@
                         <outlet property="agreementBox" destination="dvs-rU-56a" id="PVp-MG-SaI"/>
                         <outlet property="agreementTextView" destination="XOm-Cw-Uuq" id="d1t-3Q-u6I"/>
                         <outlet property="agreementView" destination="hLU-MQ-KTc" id="tCF-CZ-ub2"/>
+                        <outlet property="agreementViewAppVersionLabel" destination="VgO-1W-7kA" id="PxW-ST-aT4"/>
                         <outlet property="appVersionBottomConstraint" destination="kMf-q1-hdc" id="5Yl-hF-2ZL"/>
                         <outlet property="appVersionLabel" destination="hsH-f0-cFH" id="Pyy-rc-LUW"/>
                         <outlet property="appleLoginButton" destination="vpi-yr-s7g" id="tHA-lE-YAO"/>

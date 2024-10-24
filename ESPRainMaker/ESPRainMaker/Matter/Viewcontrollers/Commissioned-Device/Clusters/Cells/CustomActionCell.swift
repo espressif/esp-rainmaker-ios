@@ -45,17 +45,23 @@ class CustomActionCell: UITableViewCell {
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var launchButton: PrimaryButton!
     @IBOutlet weak var container: UIView!
+    @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var bottomSpaceConstraint: NSLayoutConstraint!
     
     override func awakeFromNib() {
-        super.awakeFromNib()
-        container.layer.shadowOpacity = 0.18
-        container.layer.shadowOffset = CGSize(width: 1, height: 2)
-        container.layer.shadowRadius = 2
-        container.layer.shadowColor = UIColor.black.cgColor
-        container.layer.masksToBounds = false
-        launchButton.backgroundColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
-        launchButton.tintColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
-        launchButton.setTitleColor(UIColor.white, for: .normal)
+        super.layoutSubviews()
+        backgroundColor = UIColor.clear
+
+        container.layer.borderWidth = 1
+        container.layer.cornerRadius = 10
+        container.layer.borderColor = UIColor.clear.cgColor
+        container.layer.masksToBounds = true
+
+        layer.shadowOpacity = 0.18
+        layer.shadowOffset = CGSize(width: 1, height: 2)
+        layer.shadowRadius = 2
+        layer.shadowColor = UIColor.black.cgColor
+        layer.masksToBounds = false
     }
     
     override func layoutSubviews() {
@@ -100,5 +106,12 @@ class CustomActionCell: UITableViewCell {
         case .mergeThreadDataset:
             self.delegate?.mergeThreadDataset()
         }
+    }
+    
+    /// Set launch button connected status
+    /// - Parameter isDeviceOffline: is device online or offline
+    func setLaunchButtonConnectedStatus(isDeviceOffline: Bool) {
+        self.launchButton.isEnabled = !isDeviceOffline
+        self.launchButton.alpha = isDeviceOffline ? 0.35 : 1.0
     }
 }

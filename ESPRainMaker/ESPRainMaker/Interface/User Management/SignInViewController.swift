@@ -57,13 +57,14 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     @IBOutlet weak var agreementTextView: UITextView!
     @IBOutlet weak var agreementView: UIView!
     @IBOutlet weak var agreementBox: UIButton!
+    @IBOutlet weak var agreementViewAppVersionLabel: UILabel!
     var sentTo: String?
 
     @IBOutlet var registerPassword: UITextField!
     @IBOutlet var confirmPassword: UITextField!
     @IBOutlet var email: UITextField!
     @IBOutlet weak var brandLogo: UIImageView!
-
+    
     //MARK: China specific UI:
     
     @IBOutlet weak var forgotPasswordButton: SecondaryButton!
@@ -159,10 +160,10 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         if self.isRainmakerControllerFlow {
             self.showAgreementScreen(showAgreementView: false)
         } else {
-            self.showAgreementScreen(showAgreementView: true)
+            self.showAgreementScreen(showAgreementView: self.showAgreementView)
         }
         #else
-        self.showAgreementScreen(showAgreementView: true)
+        self.showAgreementScreen(showAgreementView: self.showAgreementView)
         #endif
     }
 
@@ -205,7 +206,9 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
             // Fallback on earlier versions
         }
         segmentControl.addUnderlineForSelectedSegment()
-        appVersionLabel.text = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
+        let appVersion = "App Version - v" + Constants.appVersion + " (\(GIT_SHA_VERSION))"
+        appVersionLabel.text = appVersion
+        agreementViewAppVersionLabel.text = appVersion
         agreementTextView.delegate = self
         signupTextView.delegate = self
 
@@ -564,14 +567,6 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
             print("error parsing token")
         }
         User.shared.updateDeviceList = true
-    }
-
-    func goToConfirmUserScreen() {
-        let storyboard = UIStoryboard(name: "Login", bundle: nil)
-        let confirmUserVC = storyboard.instantiateViewController(withIdentifier: "confirmSignUpVC") as! ConfirmSignUpViewController
-        confirmUserVC.confirmExistingUser = true
-        confirmUserVC.sentTo = username.text ?? ""
-        navigationController?.pushViewController(confirmUserVC, animated: true)
     }
 
     func resendConfirmationCode() {

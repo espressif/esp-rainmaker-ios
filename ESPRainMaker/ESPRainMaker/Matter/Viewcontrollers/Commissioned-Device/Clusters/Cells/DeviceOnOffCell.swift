@@ -66,18 +66,25 @@ class DeviceOnOffCell: UITableViewCell {
         self.onOffStatus.text = sender.isOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
         if self.nodeConnectionStatus == .local {
             if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
-                ESPMTRCommissioner.shared.toggleSwitch(groupId: groupId, deviceId: deviceId) { result in
-                    if !result {
+                if !sender.isOn {
+                    ESPMTRCommissioner.shared.turnOff(groupId: groupId, deviceId: deviceId) { result in
                         DispatchQueue.main.async {
-                            self.onOffStatus.text = !sender.isOn ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
-                            self.toggleSwitch.setOn(!sender.isOn, animated: true)
+                            if result {
+                                self.onOffStatus.text = ESPMatterConstants.offTxt
+                                self.node?.setMatterLightOnStatus(status: false, deviceId: deviceId)
+                            } else {
+                                self.toggleSwitch.setOn(true, animated: true)
+                            }
                         }
-                    } else {
-                        if let status = self.node?.isMatterLightOn(deviceId: deviceId) {
-                            self.node?.setMatterLightOnStatus(status: !status, deviceId: deviceId)
-                        } else {
-                            ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
-                                self.node?.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
+                    }
+                } else {
+                    ESPMTRCommissioner.shared.turnOn(groupId: groupId, deviceId: deviceId) { result in
+                        DispatchQueue.main.async {
+                            if result {
+                                self.onOffStatus.text = ESPMatterConstants.onTxt
+                                self.node?.setMatterLightOnStatus(status: true, deviceId: deviceId)
+                            } else {
+                                self.toggleSwitch.setOn(false, animated: true)
                             }
                         }
                     }
