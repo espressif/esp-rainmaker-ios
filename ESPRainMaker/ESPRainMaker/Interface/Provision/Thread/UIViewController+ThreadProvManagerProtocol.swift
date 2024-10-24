@@ -22,24 +22,23 @@ import UIKit
 
 protocol ThreadProvManagerProtocol {
     
-    @available(iOS 16.4, *)
+    @available(iOS 15.0, *)
     func provFetchMultipleThreadNetworks(espDevice: ESPDevice, threadList: [ESPThreadNetwork], _ completion: @escaping (Data?, String) -> Void)
     
-    @available(iOS 16.4, *)
-    func provisionMatchingBorderAgentId(espDevice: ESPDevice, threadList: [ESPThreadNetwork], _ completion: @escaping (Data?) -> Void)
-    
-    @available(iOS 16.4, *)
+    @available(iOS 15.0, *)
     func performActiveThreadNetworkProv(espDevice: ESPDevice, _ completion: @escaping (Data?, String) -> Void)
     
-    @available(iOS 16.4, *)
-    func getThreadOpeartionalDatasetFromTHCredentials(threadNetwork: THCredentials, networkKey: String) -> String
+    func performActiveESPThreadNetworkProv(_ completion: @escaping (Data?, String) -> Void, failureCompletionHandler: @escaping () -> Void)
     
-    func getThreadOpeartionalDataset(threadNetwork: ESPThreadNetwork, networkKey: String) -> String
+    @available(iOS 15.0, *)
+    func getThreadOperationalDatasetFromTHCredentials(threadNetwork: THCredentials, networkKey: String) -> String
     
-    @available(iOS 16.4, *)
+    func getThreadOperationalDataset(threadNetwork: ESPThreadNetwork, networkKey: String) -> String
+    
+    @available(iOS 15.0, *)
     func showThreadNetworkSelectionVC(shouldScanThreadNetworks: Bool, device: ESPDevice)
     
-    @available(iOS 16.4, *)
+    @available(iOS 15.0, *)
     func showStatusScreenForThread(shouldScanThreadNetworks: Bool, device: ESPDevice)
     
     func goToProvision(device: ESPDevice, withThreadNetworks threadNetworks: [ESPThreadNetwork])
@@ -50,18 +49,11 @@ extension UIViewController: ThreadProvManagerProtocol {
     /// Fetch multiple thread networks from iOS.
     /// Iterate and match with scanned list from ESPDevice.
     /// - Parameter threadList: ESPDevice scanned thread list
-    @available(iOS 16.4, *)
+    @available(iOS 15.0, *)
     func provFetchMultipleThreadNetworks(espDevice: ESPDevice, threadList: [ESPThreadNetwork], _ completion: @escaping (Data?, String) -> Void) {
         ThreadCredentialsManager.shared.fetchMultipleThreadCredentials { creds in
-            DispatchQueue.main.async {
-                Utility.hideLoader(view: self.view)
-            }
             guard let creds = creds else {
-                DispatchQueue.main.async {
-                    self.showErrorAlert(title: "Error", message: ESPMatterConstants.noThreadBRDescription, buttonTitle: "OK") {
-                        self.navigationController?.popToRootViewController(animated: true)
-                    }
-                }
+                self.checkAssociatedNodeListForTBR(threadList: threadList, completion: completion)
                 return
             }
             for cred in creds {
@@ -69,9 +61,12 @@ extension UIViewController: ThreadProvManagerProtocol {
                 for thread in threadList {
                     if let networkName = cred.networkName, thread.networkName == networkName, let networkKey = cred.networkKey?.hexadecimalString {
                         shouldBreak = true
-                        let dataset = self.getThreadOpeartionalDataset(threadNetwork: thread, networkKey: networkKey)
+                        let dataset = self.getThreadOperationalDataset(threadNetwork: thread, networkKey: networkKey)
                         let threadOperationalDataset = Data(hex: dataset)
                         completion(threadOperationalDataset, networkName)
+                        DispatchQueue.main.async {
+                            Utility.hideLoader(view: self.view)
+                        }
                         break
                     }
                 }
@@ -79,62 +74,118 @@ extension UIViewController: ThreadProvManagerProtocol {
                     return
                 }
             }
+            self.checkAssociatedNodeListForTBR(threadList: threadList, completion: completion)
+        }
+    }
+    
+    /// We check the associated node list of the user to determine if we have a TBR provisioned.
+    /// If present if it is currently running. If is running and reachable over mDNS we use it's active operational
+    /// dataset in order to provision the thread end device.
+    /// - Parameter threadList: scanned thread list from ESP device.
+    func checkAssociatedNodeListForTBR(threadList: [ESPThreadNetwork], completion: @escaping (Data?, String) -> Void) {
+        User.shared.scanThreadBorderRouters { scannedTBRs, scannedNetworks in
+            User.shared.stopThreadBRSearch()
+            for threadNetwork in threadList {
+                guard scannedTBRs.count > 0 else {
+                    DispatchQueue.main.async {
+                        Utility.hideLoader(view: self.view)
+                        self.showErrorAlert(title: "Error", message: AppMessages.connectTBRMsg, buttonTitle: "OK") {
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
+                    }
+                    return
+                }
+                for scannedTBR in scannedTBRs {
+                    if let tBRNode = User.shared.getNode(id: scannedTBR),  tBRNode.isThreadBorderRouter, let associatedNodeId = tBRNode.node_id, let activeDataset = (tBRNode.getServiceParam(forServiceType: Constants.threadBRService, andParamType: Constants.threadActiveDataset)?.value as? String)?.hexadecimal as? Data, let networkName = scannedNetworks[associatedNodeId], threadNetwork.networkName == networkName {
+                        DispatchQueue.main.async {
+                            Utility.hideLoader(view: self.view)
+                        }
+                        completion(activeDataset, networkName)
+                        return
+                    }
+                }
+            }
             DispatchQueue.main.async {
-                self.showErrorAlert(title: "Error", message: ESPMatterConstants.noMatchingThreadDescription, buttonTitle: "OK") {
+                Utility.hideLoader(view: self.view)
+                completion(nil, "")
+            }
+        }
+    }
+    
+    /// Perform thread provisioning using the active store operational datraset of iOS
+    @available(iOS 15.0, *)
+    func performActiveThreadNetworkProv(espDevice: ESPDevice, _ completion: @escaping (Data?, String) -> Void) {
+        ThreadCredentialsManager.shared.fetchThreadCredentials { cred in
+            if let cred = cred, let networkKey = cred.networkKey, let networkName = cred.networkName {
+                User.shared.scanThreadBorderRouters() { tBRs, scannedNetworks in
+                    User.shared.stopThreadBRSearch()
+                    for tBR in tBRs {
+                        if let scannedNetworkName = scannedNetworks[tBR], scannedNetworkName == networkName {
+                            DispatchQueue.main.async {
+                                Utility.hideLoader(view: self.view)
+                            }
+                            let dataset = self.getThreadOperationalDatasetFromTHCredentials(threadNetwork: cred, networkKey: networkKey.hexadecimalString)
+                            let threadOperationalDataset = Data(hex: dataset)
+                            completion(threadOperationalDataset, networkName)
+                            return
+                        }
+                    }
+                    self.performThreadProvWithESPTBR(completion)
+                }
+            } else {
+                self.performThreadProvWithESPTBR(completion)
+            }
+        }
+    }
+    
+    /// Perform Thread provisioning with ESP Thread Border Router
+    /// Scan for Thread Border Routers
+    /// If one from the list is an ESP node, use that as the TBR for provisioning
+    /// - Parameter completion: A completion handler
+    func performThreadProvWithESPTBR(_ completion: @escaping (Data?, String) -> Void) {
+        self.performActiveESPThreadNetworkProv(completion) {
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error", message: AppMessages.connectTBRMsg, buttonTitle: "OK") {
                     self.navigationController?.popToRootViewController(animated: true)
                 }
             }
         }
     }
     
-    /// Provision using THCredentials fetched using border agent id of scanned thread networks
-    /// - Parameter threadList: scanned thread list
-    @available(iOS 16.4, *)
-    func provisionMatchingBorderAgentId(espDevice: ESPDevice, threadList: [ESPThreadNetwork], _ completion: @escaping (Data?) -> Void) {
-        ThreadCredentialsManager.shared.checkThreadNetwork(threadList: threadList) { creds in
-            DispatchQueue.main.async {
-                Utility.hideLoader(view: self.view)
-            }
-            guard let creds = creds, let nKey = creds.networkKey else {
-                DispatchQueue.main.async {
-                    self.showErrorAlert(title: "Error", message: ESPMatterConstants.noThreadBRDescription, buttonTitle: "OK") {
-                        self.navigationController?.popToRootViewController(animated: true)
-                    }
-                }
-                return
-            }
-            let nKeyStr = nKey.hexadecimalString
-            let dataset = self.getThreadOpeartionalDatasetFromTHCredentials(threadNetwork: creds, networkKey: nKeyStr)
-            let threadOperationalDataset = Data(hex: dataset)
-            completion(threadOperationalDataset)
-        }
-    }
-    
-    /// Perform thread provisioning using the active store operational datraset of iOS
-    @available(iOS 16.4, *)
-    func performActiveThreadNetworkProv(espDevice: ESPDevice, _ completion: @escaping (Data?, String) -> Void) {
-        ThreadCredentialsManager.shared.fetchThreadCredentials { cred in
-            if let cred = cred, let networkKey = cred.networkKey, let networkName = cred.networkName {
-                let dataset = self.getThreadOpeartionalDatasetFromTHCredentials(threadNetwork: cred, networkKey: networkKey.hexadecimalString)
-                let threadOperationalDataset = Data(hex: dataset)
-                completion(threadOperationalDataset, networkName)
-            } else {
-                DispatchQueue.main.async {
-                    self.showErrorAlert(title: "Error", message: ESPMatterConstants.noThreadBRDescription, buttonTitle: "OK") {
-                        self.navigationController?.popToRootViewController(animated: true)
+    /// Perform thread network provisioning using ESP thread network.
+    /// That is the thread network of an ESP thread border router..
+    /// - Parameters:
+    ///   - completion: completion
+    ///   - failureCompletionHandler: invoked if there is no active ESP thread border router
+    func performActiveESPThreadNetworkProv(_ completion: @escaping (Data?, String) -> Void, failureCompletionHandler: @escaping () -> Void) {
+        User.shared.scanThreadBorderRouters() { tBRs, scannedNetworks in
+            User.shared.stopThreadBRSearch()
+            if tBRs.count > 0 {
+                for associatedNode in User.shared.associatedNodeList ?? [] {
+                    if let associatedNodeId = associatedNode.node_id, associatedNode.isThreadBorderRouter, tBRs.contains(associatedNodeId), let networkName = scannedNetworks[associatedNodeId] {
+                        /// If the device is a thread border router
+                        /// Check for if has an active operational dataset.
+                        if let tADParam = associatedNode.getServiceParam(forServiceType: Constants.threadBRService, andParamType: Constants.threadActiveDataset), let tADParamValue = tADParam.value as? String, let tAD_Data = tADParamValue.hexadecimal {
+                            DispatchQueue.main.async {
+                                Utility.hideLoader(view: self.view)
+                            }
+                            completion(tAD_Data, networkName)
+                            return
+                        }
                     }
                 }
             }
+            failureCompletionHandler()
         }
     }
-    
     
     /// Get thread operational dataset from ESPThrad network and network key
     /// - Parameters:
     ///   - threadNetwork: thread network
     ///   - networkKey: network key
     /// - Returns: thread operational dataset to be sent to the device.
-    func getThreadOpeartionalDataset(threadNetwork: ESPThreadNetwork, networkKey: String) -> String {
+    func getThreadOperationalDataset(threadNetwork: ESPThreadNetwork, networkKey: String) -> String {
         var threadOperationalDatasetHexString = "00030000"
         threadOperationalDatasetHexString += String(format: "%02x", threadNetwork.channel)
         threadOperationalDatasetHexString += "0208"
@@ -151,8 +202,8 @@ extension UIViewController: ThreadProvManagerProtocol {
     ///   - threadNetwork: thread network
     ///   - networkKey: network key
     /// - Returns: operational dataset
-    @available(iOS 16.4, *)
-    func getThreadOpeartionalDatasetFromTHCredentials(threadNetwork: THCredentials, networkKey: String) -> String {
+    @available(iOS 15.0, *)
+    func getThreadOperationalDatasetFromTHCredentials(threadNetwork: THCredentials, networkKey: String) -> String {
         if let extendedPANId = threadNetwork.extendedPANID, let panId = threadNetwork.panID {
             var threadOperationalDatasetHexString = "00030000"
             threadOperationalDatasetHexString += String(format: "%02x", threadNetwork.channel)
@@ -172,14 +223,14 @@ extension UIViewController: ThreadProvManagerProtocol {
     ///   - shouldScanThreadNetworks: should scan thread networks
     ///   - device: esp device
     func showThreadNetworkSelectionVC(shouldScanThreadNetworks: Bool = true, device: ESPDevice) {
-        if #available(iOS 16.4, *) {
+        if #available(iOS 15.0, *) {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let threadNetworkSelectionVC = storyboard.instantiateViewController(withIdentifier: ThreadNetworkSelectionVC.storyboardId) as! ThreadNetworkSelectionVC
             threadNetworkSelectionVC.espDevice = device
             threadNetworkSelectionVC.shouldScanThreadNetworks = shouldScanThreadNetworks
             navigationController?.pushViewController(threadNetworkSelectionVC, animated: true)
         } else {
-            self.alertUser(title: "Error", message: Constants.upgradeOSVersionMsg, buttonTitle: "OK") {
+            self.alertUser(title: "Error", message: AppMessages.upgradeOS15VersionMsg, buttonTitle: "OK") {
                 self.navigationController?.popToRootViewController(animated: true)
             }
         }
@@ -189,8 +240,8 @@ extension UIViewController: ThreadProvManagerProtocol {
     /// - Parameters:
     ///   - step1Failed: step1Failed
     ///   - device: esp device
-    ///   - threadOperationalDataset: thread operaitonal dataset
-    @available(iOS 16.4, *)
+    ///   - threadOperationalDataset: thread operational dataset
+    @available(iOS 15.0, *)
     func showStatusScreenForThread(shouldScanThreadNetworks: Bool = true, device: ESPDevice) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let threadSuccessVC = storyboard.instantiateViewController(withIdentifier: ThreadSuccessViewController.storyboardId) as! ThreadSuccessViewController

@@ -82,10 +82,6 @@ class ESPMatterConnectionManager: NSObject {
     ///
     /// - Parameters:
     ///   - service: Service that needs to be removed from the resolved queue.
-    /// Remove resolved service from queue of found services.
-    ///
-    /// - Parameters:
-    ///   - service: Service that needs to be removed from the resolved queue.
     private func removeServiceFromResolveQueue(service: NetService) {
         if let serviceIndex = servicesBeingResolved.firstIndex(of: service) {
             servicesBeingResolved.remove(at: serviceIndex)

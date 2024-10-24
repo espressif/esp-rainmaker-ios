@@ -19,7 +19,7 @@
 import UIKit
 import ESPProvision
 
-@available(iOS 16.4, *)
+@available(iOS 15.0, *)
 extension ThreadSuccessViewController {
     
     /// Update UI for node association confirmation & check device association

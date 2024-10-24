@@ -19,7 +19,7 @@
 import UIKit
 import ESPProvision
 
-@available(iOS 16.4, *)
+@available(iOS 15.0, *)
 extension ThreadSuccessViewController {
     
     /// Send request to add device to rainmaker and update UI

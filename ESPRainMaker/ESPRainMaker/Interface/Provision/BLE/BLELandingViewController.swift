@@ -166,7 +166,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
                         }
                     }
                 } else {
-                    self.alertUser(title: "Notice", message: Constants.upgradeOS15VersionMsg, buttonTitle: "OK") {}
+                    self.alertUser(title: Constants.notice, message: AppMessages.upgradeOS15VersionMsg, buttonTitle: "OK") {}
                 }
                 return
             }

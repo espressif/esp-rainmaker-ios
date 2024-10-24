@@ -25,7 +25,7 @@ public enum OnOffState {
     case toggle
 }
 
-protocol OnOffDelegate {
+protocol OnOffDelegate: AnyObject {
     func actionTaken(dId: UInt64?, endpointId: UInt16?, state: OnOffState)
 }
 
@@ -40,7 +40,7 @@ class DeviceOnOffCell: UITableViewCell {
     var node: ESPNodeDetails?
     var deviceId: UInt64?
     var endpointId: UInt16?
-    var delegate: OnOffDelegate?
+    weak var delegate: OnOffDelegate?
     var nodeConnectionStatus: NodeConnectionStatus = .local
     
     func setGroup(group: ESPNodeGroup?) {

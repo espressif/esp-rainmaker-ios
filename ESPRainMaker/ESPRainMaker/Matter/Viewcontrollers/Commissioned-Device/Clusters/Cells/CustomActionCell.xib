@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="CustomActionCell" id="q3g-Ae-1t9" customClass="CustomActionCell" customModule="ESP_RainMaker" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="89"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="q3g-Ae-1t9" id="lqr-gC-aEJ">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="89"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Azi-fJ-UGc">
+                        <rect key="frame" x="15" y="10" width="363" height="69"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Controller" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4jq-a3-djj">
+                                <rect key="frame" x="15.000000000000004" y="9.9999999999999982" width="63.333333333333343" height="18.333333333333329"/>
+                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="14"/>
+                                <color key="textColor" red="0.1019607843" green="0.1019607843" blue="0.1019607843" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Update Device List" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y3S-3E-toC">
+                                <rect key="frame" x="16" y="36" width="159.66666666666666" height="23"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kgX-BH-u4b" customClass="PrimaryButton" customModule="ESP_RainMaker" customModuleProvider="target">
+                                <rect key="frame" x="272.66666666666669" y="19" width="74.333333333333314" height="31"/>
+                                <color key="tintColor" red="0.0" green="0.3294117647" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Update">
+                                    <fontDescription key="titleFontDescription" type="boldSystem" pointSize="14"/>
+                                    <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </buttonConfiguration>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="performCustomAction:" destination="q3g-Ae-1t9" eventType="touchUpInside" id="kAX-ly-1qS"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.96470588239999999" green="0.96470588239999999" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="kgX-BH-u4b" firstAttribute="centerY" secondItem="Azi-fJ-UGc" secondAttribute="centerY" id="AJ3-4G-KLh"/>
+                            <constraint firstAttribute="trailing" secondItem="kgX-BH-u4b" secondAttribute="trailing" constant="16" id="EV6-Kv-0aW"/>
+                            <constraint firstItem="kgX-BH-u4b" firstAttribute="height" secondItem="Azi-fJ-UGc" secondAttribute="height" multiplier="0.45" id="Epz-9f-Hds"/>
+                            <constraint firstItem="Y3S-3E-toC" firstAttribute="leading" secondItem="Azi-fJ-UGc" secondAttribute="leading" constant="16" id="RgO-DQ-56c"/>
+                            <constraint firstAttribute="bottom" secondItem="Y3S-3E-toC" secondAttribute="bottom" constant="10" id="WvV-Yk-CQ8"/>
+                            <constraint firstItem="4jq-a3-djj" firstAttribute="leading" secondItem="Azi-fJ-UGc" secondAttribute="leading" constant="15" id="YOk-CX-ygz"/>
+                            <constraint firstItem="4jq-a3-djj" firstAttribute="top" secondItem="Azi-fJ-UGc" secondAttribute="top" constant="10" id="ZNh-qk-4ST"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstItem="Azi-fJ-UGc" firstAttribute="top" secondItem="lqr-gC-aEJ" secondAttribute="top" constant="10" id="1V3-Ef-uCF"/>
+                    <constraint firstAttribute="bottom" secondItem="Azi-fJ-UGc" secondAttribute="bottom" constant="10" id="BeM-cR-Cb1"/>
+                    <constraint firstItem="Azi-fJ-UGc" firstAttribute="leading" secondItem="lqr-gC-aEJ" secondAttribute="leading" constant="15" id="CFL-m6-zpt"/>
+                    <constraint firstAttribute="trailing" secondItem="Azi-fJ-UGc" secondAttribute="trailing" constant="15" id="CaK-VI-Jau"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="container" destination="Azi-fJ-UGc" id="iJI-kA-trY"/>
+                <outlet property="descriptionLabel" destination="Y3S-3E-toC" id="gHr-0R-zZo"/>
+                <outlet property="headerLabel" destination="4jq-a3-djj" id="epG-9d-g6l"/>
+                <outlet property="launchButton" destination="kgX-BH-u4b" id="Kg7-ih-Cr1"/>
+            </connections>
+            <point key="canvasLocation" x="-288" y="-3"/>
+        </tableViewCell>
+    </objects>
+</document>

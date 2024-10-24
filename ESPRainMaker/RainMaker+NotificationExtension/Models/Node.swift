@@ -49,6 +49,7 @@ class Node: Codable {
     var metadata: [String: Any]?
     var node_type: String?
     var securityType: Int?
+    let isThreadKey = "is_thread_device"
 
     enum CodingKeys: String, CodingKey {
         case node_id = "id"

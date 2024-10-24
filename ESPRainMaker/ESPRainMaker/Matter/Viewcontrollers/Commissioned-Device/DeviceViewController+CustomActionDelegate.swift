@@ -23,6 +23,9 @@ import UIKit
 @available(iOS 16.4, *)
 extension DeviceViewController: CustomActionDelegate {
     
+    func mergeThreadDataset() {}
+    func setActiveThreadDataset() {}
+    
     //MARK: Custom Action
     /// Launch controller
     func launchController() {

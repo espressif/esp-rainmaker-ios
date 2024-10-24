@@ -18,7 +18,7 @@
 
 import UIKit
 
-protocol RemoveDeviceDelegate {
+protocol RemoveDeviceDelegate: AnyObject {
     func removeDevice()
 }
 
@@ -26,7 +26,7 @@ protocol RemoveDeviceDelegate {
 class RemoveDeviceCell: UITableViewCell {
     
     static let reuseIdentifier = "RemoveDeviceCell"
-    var delegate: RemoveDeviceDelegate?
+    weak var delegate: RemoveDeviceDelegate?
 
     override func awakeFromNib() {
         super.awakeFromNib()

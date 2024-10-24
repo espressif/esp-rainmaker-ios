@@ -48,7 +48,11 @@ class DeviceTraitListViewController: UIViewController {
     var bindingEndpointClusterId: [String: UInt]?
     var switchIndex: Int?
     var matterNodeId: String?
+    var isInitialLoadingComplete: Bool = false
 
+    /// Thread Border Router service
+    let tbrService = ThreadBRUpdateService()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -65,6 +69,7 @@ class DeviceTraitListViewController: UIViewController {
         tableView.register(UINib(nibName: "CentralSwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "centralSwitchTVC")
         tableView.register(UINib(nibName: "RoundHueSliderTableViewCell", bundle: nil), forCellReuseIdentifier: "roundHueSliderTVC")
         tableView.register(UINib(nibName: String(describing: TriggerTableViewCell.self), bundle: nil), forCellReuseIdentifier: TriggerTableViewCell.reuseIdentifier)
+        tableView.register(UINib(nibName: String(describing: CustomActionCell.self), bundle: nil), forCellReuseIdentifier: CustomActionCell.reuseIdentifier)
         tableView.register(ParamSwitchTableViewCell.self, forCellReuseIdentifier: "switchParamTableViewCell")
 
         titleLabel.text = device?.getDeviceName() ?? "Details"
@@ -117,6 +122,7 @@ class DeviceTraitListViewController: UIViewController {
     
     // Method to show central param based on UI type
     private func checkForCentralParam() {
+        isInitialLoadingComplete = true
         dataSource.removeAll()
         foundCentralParam = false
         // Check if UI type is of hue circle. Verify if bounds are in valid region.
@@ -136,6 +142,13 @@ class DeviceTraitListViewController: UIViewController {
                     foundCentralParam = true
                     dataSource.insert(param, at: 0)
                 } else {
+                    dataSource.append(param)
+                }
+            }
+        }
+        if let node = device.node, let service = node.getService(forServiceType: Constants.threadBRService), let params = service.params {
+            for param in params {
+                if let type = param.type, (type == Constants.threadPendingDataset || type == Constants.threadActiveDataset) {
                     dataSource.append(param)
                 }
             }
@@ -173,6 +186,7 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     @objc func appEnterForeground() {
+        isInitialLoadingComplete = true
         pollingTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(fetchNodeInfo), userInfo: nil, repeats: true)
     }
 
@@ -199,11 +213,12 @@ class DeviceTraitListViewController: UIViewController {
             } else {
                 self.networkIndicator.isHidden = false
             }
+            User.shared.startServiceDiscovery()
         }
     }
 
     func refreshDeviceAttributes() {
-        if device?.isReachable() ?? false {
+        if isInitialLoadingComplete, device?.isReachable() ?? false {
             NetworkManager.shared.getDeviceParam(device: device) { error in
                 if error != nil {
                     return
@@ -253,15 +268,16 @@ class DeviceTraitListViewController: UIViewController {
                     }
                 }
             }
+            self.checkForCentralParam()
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
-                self.checkForCentralParam()
-                self.reloadTableView()
+                self.tableView.reloadData()
             }
         }
     }
 
     @objc func checkOfflineStatus() {
+        updateNwChangeDeviceNode()
         if device?.node?.localNetwork ?? false {
             if device.node?.supportsEncryption ?? false {
                 offlineLabel.text = "🔒 Reachable on WLAN"
@@ -274,6 +290,18 @@ class DeviceTraitListViewController: UIViewController {
         } else {
             offlineLabel.text = device?.node?.nodeStatus ?? ""
             offlineLabel.isHidden = false
+        }
+    }
+    
+    /// Update device node on network change
+    func updateNwChangeDeviceNode() {
+        if let nodes = User.shared.associatedNodeList {
+            for node in nodes {
+                if let associatedNodeId = node.node_id, let nodeId = device.node?.node_id, associatedNodeId == nodeId {
+                    device.node = node
+                    break
+                }
+            }
         }
     }
 
@@ -372,7 +400,23 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func getTableViewCellBasedOn(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
-        if dynamicAttribute.uiType == Constants.scanQRCode {
+        if dynamicAttribute.type == Constants.threadPendingDataset || dynamicAttribute.type == Constants.threadActiveDataset {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
+                cell.delegate = self
+                if dynamicAttribute.type == Constants.threadPendingDataset {
+                    cell.setupWorkflow(workflow: .mergeThreadDataset)
+                } else {
+                    cell.setupWorkflow(workflow: .setActiveThreadDataset)
+                }
+                self.setAutoresizingMask(cell)
+                if let node = device.node, !node.isConnected {
+                    cell.launchButton.isUserInteractionEnabled = false
+                } else {
+                    cell.launchButton.isUserInteractionEnabled = true
+                }
+                return cell
+            }
+        } else if dynamicAttribute.uiType == Constants.scanQRCode {
             if let cell = tableView.dequeueReusableCell(withIdentifier: ActionTableViewCell.reuseIdentifier) as? ActionTableViewCell {
                 cell.controlValueLabel.text = "Scanner"
                 if let name = dynamicAttribute.name {

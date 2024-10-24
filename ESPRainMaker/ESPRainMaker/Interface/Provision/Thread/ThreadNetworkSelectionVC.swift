@@ -27,20 +27,18 @@ class ThreadNetworkSelectionVC: UIViewController {
     static let storyboardId = "ThreadNetworkSelectionVC"
     var espDevice: ESPDevice!
     @IBOutlet var nextButton: PrimaryButton!
+    
+    @IBOutlet weak var button: PrimaryButton!
     var threadOperationalDataset: Data!
     @IBOutlet weak var availableThreadNetwork: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.nextButton.isUserInteractionEnabled = false
-        if #available(iOS 16.4, *) {
-            self.getThreadData()
-        } else {
-            self.alertUser(title: "Error", message: Constants.upgradeOSVersionMsg, buttonTitle: "OK") {}
-        }
+        self.getThreadData()
+        self.button.setTitle("Next", for: .normal)
     }
     
-    @available(iOS 16.4, *)
     func getThreadData() {
         if self.shouldScanThreadNetworks {
             DispatchQueue.main.async {
@@ -50,19 +48,25 @@ class ThreadNetworkSelectionVC: UIViewController {
                 guard let threadList = threadList else {
                     DispatchQueue.main.async {
                         Utility.hideLoader(view: self.view)
-                    }
-                    if let threadError = threadError {
-                        let failureMessage = threadError.localizedDescription
-                        self.alertUser(title: "Failure", message: failureMessage, buttonTitle: "OK") {}
+                        self.alertUser(title: "Failure", message: AppMessages.noThreadScanResult, buttonTitle: "OK") {
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
                     }
                     return
                 }
                 self.provFetchMultipleThreadNetworks(espDevice: self.espDevice, threadList: threadList) { threadOperationalDataset, networkName in
                     if let data = threadOperationalDataset {
                         DispatchQueue.main.async {
-                            self.availableThreadNetwork.text = "Available Thread Network:\n\(networkName)\nDo you wish to proceed?"
+                            let title = "Available Thread Network:"
+                            let message = "Do you wish to proceed?"
+                            self.availableThreadNetwork.text = "\(title)\n\(networkName)\n\(message)"
                             self.threadOperationalDataset = data
-                            self.nextButton.alpha = 1.0
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.alertUser(title: "Failure", message: AppMessages.connectTBRMsg, buttonTitle: "OK") {
+                                self.navigationController?.popToRootViewController(animated: true)
+                            }
                         }
                     }
                 }
@@ -71,9 +75,10 @@ class ThreadNetworkSelectionVC: UIViewController {
             self.performActiveThreadNetworkProv(espDevice: self.espDevice) { threadOperationalDataset, networkName in
                 if let data = threadOperationalDataset {
                     DispatchQueue.main.async {
-                        self.availableThreadNetwork.text = "Available Thread Network:\n\(networkName)\nDo you wish to proceed?"
+                        let title = "Available Thread Network:"
+                        let message = "Do you wish to proceed?"
+                        self.availableThreadNetwork.text = "\(title)\n\(networkName)\n\(message)"
                         self.threadOperationalDataset = data
-                        self.nextButton.alpha = 1.0
                     }
                 }
             }
@@ -85,21 +90,13 @@ class ThreadNetworkSelectionVC: UIViewController {
     }
     
     @IBAction func nextButtonPressed(_ sender: Any) {
-        if #available(iOS 16.4, *) {
-            if let tOD = self.threadOperationalDataset {
+        DispatchQueue.main.async {
+            if let _ = self.threadOperationalDataset {
                 self.showSuccessScreenForThread(threadOperationalDataset: self.threadOperationalDataset, device: self.espDevice)
-            }
-        } else {
-            // Fallback on earlier versions
-            self.alertUser(title: "Error", message: Constants.upgradeOSVersionMsg, buttonTitle: "OK") {
-                DispatchQueue.main.async {
-                    self.navigationController?.popToRootViewController(animated: true)
-                }
             }
         }
     }
     
-    @available(iOS 16.4, *)
     func showSuccessScreenForThread(threadOperationalDataset: Data, device: ESPDevice) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let threadSuccessVC = storyboard.instantiateViewController(withIdentifier: ThreadSuccessViewController.storyboardId) as! ThreadSuccessViewController

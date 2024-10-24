@@ -206,6 +206,7 @@ class DeviceViewController: UIViewController {
         self.deviceTableView.register(UINib(nibName: DeviceInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceInfoCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: CustomInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: CustomInfoCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: ParticipantDataCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ParticipantDataCell.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: CustomActionCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: CustomActionCell.reuseIdentifier)
         self.generateCells()
     }
     

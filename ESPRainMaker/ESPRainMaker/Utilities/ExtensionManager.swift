@@ -526,25 +526,29 @@ extension UIViewController {
     }
     
     func alertUser(title: String, message: String, buttonTitle: String, callback: @escaping () -> Void) {
-        let alertController = UIAlertController(title: title,
-                                                message: message,
-                                                preferredStyle: .alert)
-        let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: {_ in
-            callback()
-        })
-        alertController.addAction(dismissAction)
-        self.present(alertController, animated: true, completion: nil)
+        DispatchQueue.main.async {
+            let alertController = UIAlertController(title: title,
+                                                    message: message,
+                                                    preferredStyle: .alert)
+            let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: {_ in
+                callback()
+            })
+            alertController.addAction(dismissAction)
+            self.present(alertController, animated: true, completion: nil)
+        }
     }
     
     func showErrorAlert(title: String, message: String, buttonTitle: String, callback: @escaping () -> Void) {
-        let alertController = UIAlertController(title: title,
-                                                message: message,
-                                                preferredStyle: .alert)
-        let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: {_ in
-            callback()
-        })
-        alertController.addAction(dismissAction)
-        self.present(alertController, animated: true, completion: nil)
+        DispatchQueue.main.async {
+            let alertController = UIAlertController(title: title,
+                                                    message: message,
+                                                    preferredStyle: .alert)
+            let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: {_ in
+                callback()
+            })
+            alertController.addAction(dismissAction)
+            self.present(alertController, animated: true, completion: nil)
+        }
     }
     
     func handleError(header: String? = nil, error: ESPAPIError?, buttonTitle: String) {
@@ -567,12 +571,14 @@ extension UIViewController {
             default:
                 break
             }
-            let alertController = UIAlertController(title: title,
-                                                    message: message,
-                                                    preferredStyle: .alert)
-            let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: nil)
-            alertController.addAction(dismissAction)
-            self.present(alertController, animated: true, completion: nil)
+            DispatchQueue.main.async {
+                let alertController = UIAlertController(title: title,
+                                                        message: message,
+                                                        preferredStyle: .alert)
+                let dismissAction = UIAlertAction(title: buttonTitle, style: .default, handler: nil)
+                alertController.addAction(dismissAction)
+                self.present(alertController, animated: true, completion: nil)
+            }
         }
     }
 }
