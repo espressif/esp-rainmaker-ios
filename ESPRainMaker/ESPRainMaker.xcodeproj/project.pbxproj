@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C04745027CFA36E00FCE611 /* ESPSceneConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C04744F27CFA36E00FCE611 /* ESPSceneConstants.swift */; };
+		0C17D20F2CCF89A200D0FDA7 /* MatterControllerDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C17D20E2CCF89A100D0FDA7 /* MatterControllerDataModels.swift */; };
 		0C1C7C802760BCCC0062867A /* SceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1C7C7F2760BCCC0062867A /* SceneViewController.swift */; };
 		0C1C7C82276162CC0062867A /* SceneSelectDevicesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1C7C81276162CC0062867A /* SceneSelectDevicesVC.swift */; };
 		0C2426DB2BF4A597004BDF49 /* ESPNodeGroupSharingAcceptedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2426DA2BF4A597004BDF49 /* ESPNodeGroupSharingAcceptedEvent.swift */; };
@@ -221,6 +222,7 @@
 		0CD3599F2A2D47B20081017C /* DeviceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD3599D2A2D47B20081017C /* DeviceCollectionViewCell.swift */; };
 		0CD82F5F2864494D0025E631 /* ESPAutomationAddResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14CAF48283B5B75008CBC00 /* ESPAutomationAddResponseParser.swift */; };
 		0CDDC34A27E89D50004F9486 /* UILabel+GetViewHeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDDC34927E89D50004F9486 /* UILabel+GetViewHeight.swift */; };
+		0CDF12EE2CCFB0A7003DE090 /* ESPControllerAPIKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDF12ED2CCFB0A6003DE090 /* ESPControllerAPIKeys.swift */; };
 		0CE324B72B90631100D6682E /* DeviceViewController+CustomActionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE324B42B90631000D6682E /* DeviceViewController+CustomActionDelegate.swift */; };
 		0CE324BB2B90637000D6682E /* CustomActionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE324BA2B90636F00D6682E /* CustomActionCell.swift */; };
 		0CE324DB2B9064EB00D6682E /* ThreadCredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE324DA2B9064EB00D6682E /* ThreadCredentialsManager.swift */; };
@@ -666,6 +668,7 @@
 		0030BB08B79C9179217947A2 /* Pods-ESPRainMakerAll-ESPRainMakerTests.esprainmaker-release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ESPRainMakerAll-ESPRainMakerTests.esprainmaker-release.xcconfig"; path = "Target Support Files/Pods-ESPRainMakerAll-ESPRainMakerTests/Pods-ESPRainMakerAll-ESPRainMakerTests.esprainmaker-release.xcconfig"; sourceTree = "<group>"; };
 		07A32FA757DF690EF6657C35 /* Pods_ESPRainMakerAll_ESPRainMakerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ESPRainMakerAll_ESPRainMakerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C04744F27CFA36E00FCE611 /* ESPSceneConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPSceneConstants.swift; sourceTree = "<group>"; };
+		0C17D20E2CCF89A100D0FDA7 /* MatterControllerDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatterControllerDataModels.swift; sourceTree = "<group>"; };
 		0C1C7C7F2760BCCC0062867A /* SceneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneViewController.swift; sourceTree = "<group>"; };
 		0C1C7C81276162CC0062867A /* SceneSelectDevicesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneSelectDevicesVC.swift; sourceTree = "<group>"; };
 		0C2426DA2BF4A597004BDF49 /* ESPNodeGroupSharingAcceptedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNodeGroupSharingAcceptedEvent.swift; sourceTree = "<group>"; };
@@ -872,6 +875,7 @@
 		0CD3599C2A2D47B20081017C /* DeviceCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DeviceCollectionViewCell.xib; sourceTree = "<group>"; };
 		0CD3599D2A2D47B20081017C /* DeviceCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceCollectionViewCell.swift; sourceTree = "<group>"; };
 		0CDDC34927E89D50004F9486 /* UILabel+GetViewHeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+GetViewHeight.swift"; sourceTree = "<group>"; };
+		0CDF12ED2CCFB0A6003DE090 /* ESPControllerAPIKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPControllerAPIKeys.swift; sourceTree = "<group>"; };
 		0CE324B42B90631000D6682E /* DeviceViewController+CustomActionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DeviceViewController+CustomActionDelegate.swift"; sourceTree = "<group>"; };
 		0CE324BA2B90636F00D6682E /* CustomActionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomActionCell.swift; sourceTree = "<group>"; };
 		0CE324DA2B9064EB00D6682E /* ThreadCredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadCredentialsManager.swift; sourceTree = "<group>"; };
@@ -1500,6 +1504,8 @@
 		0C898D132BBED147009C5416 /* MatterControllerParser */ = {
 			isa = PBXGroup;
 			children = (
+				0CDF12ED2CCFB0A6003DE090 /* ESPControllerAPIKeys.swift */,
+				0C17D20E2CCF89A100D0FDA7 /* MatterControllerDataModels.swift */,
 				0C898D112BBED147009C5416 /* MatterControllerParser.swift */,
 				0C898D122BBED147009C5416 /* MatterControllerParser+Utility.swift */,
 			);
@@ -3165,6 +3171,7 @@
 				F1CE295D2861D015009EFC8E /* Double+TimeString.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
 				F1CE295C2861D015009EFC8E /* Date+DayOfWeek.swift in Sources */,
+				0C17D20F2CCF89A200D0FDA7 /* MatterControllerDataModels.swift in Sources */,
 				F10B077625D286EE00723254 /* SelectGroupNodesViewController.swift in Sources */,
 				0C3A39672C96D3EF00C38E27 /* ThreadBRMessages.swift in Sources */,
 				F1FFC8F925D3231700DD26C6 /* SelectGroupNodeCollectionViewCell.swift in Sources */,
@@ -3332,6 +3339,7 @@
 				F1CC124A277F4B160007634C /* ESPChartSettings.swift in Sources */,
 				0CF6923C270A308B0098F515 /* ESPAlexaAPIService.swift in Sources */,
 				F1A057B62797B00600485C23 /* ESPTimeDurationSegment.swift in Sources */,
+				0CDF12EE2CCFB0A7003DE090 /* ESPControllerAPIKeys.swift in Sources */,
 				0CD359262A2D25E30081017C /* ESPIssueUserNOCService.swift in Sources */,
 				0C80AA2326FDBD4B00480C53 /* ESPProtocol.swift in Sources */,
 				F151FF1E24827343006F514E /* WifiListTableViewCell.swift in Sources */,
