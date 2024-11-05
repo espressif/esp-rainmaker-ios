@@ -27,6 +27,11 @@ extension AppDelegate {
         }
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
             if let url = userActivity.webpageURL {
+                let appLinkFromAlexa = isAppLinkingFromAlexaApp(alexaURL: url)
+                if appLinkFromAlexa.0, let rainmakerURLString = appLinkFromAlexa.1 {
+                    self.launchAlexaApp(rainmakerURLString: rainmakerURLString)
+                    return false
+                }
                 var isRainmakerAuthCode = false
                 if url.absoluteString.contains(ESPAlexaServiceConstants.rainmakerCode) {
                     isRainmakerAuthCode = true
@@ -50,6 +55,65 @@ extension AppDelegate {
         }
         return false
     }
+    
+    /// Check if URL is from alexa app
+    /// - Parameter alexaURL: URL to check
+    /// - Returns: (is URL from Alexa, Alexa URL)
+    func isAppLinkingFromAlexaApp(alexaURL: URL) -> (Bool, String?) {
+        if let components = URLComponents(url: alexaURL, resolvingAgainstBaseURL: false) {
+            if let queryItems = components.queryItems {
+                var redirectURL = ""
+                var state = ""
+                var scope = ""
+                var clientId = ""
+                for queryItem in queryItems {
+                    if let value = queryItem.value {
+                        if queryItem.name == ESPAlexaServiceConstants.redirectURI {
+                            redirectURL = value
+                            continue
+                        }
+                        if queryItem.name == ESPAlexaServiceConstants.scope {
+                            scope = value
+                            continue
+                        }
+                        if queryItem.name == ESPAlexaServiceConstants.state {
+                            state = value
+                            continue
+                        }
+                        if queryItem.name == ESPAlexaServiceConstants.clientId {
+                            clientId = value
+                            continue
+                        }
+                    }
+                }
+                if clientId.count > 0, state.count > 0, redirectURL.count > 0, scope.count > 0, redirectURL.contains(ESPAlexaServiceConstants.alexaRedirectURI) {
+                    let rainmakerURL = "\(Configuration.shared.awsConfiguration.authURL!)/authorize?response_type=code&client_id=\(clientId)&redirect_uri=\(redirectURL)&state=\(state)&scope=\(scope)"
+                    return (true, rainmakerURL)
+                }
+            }
+        }
+        return (false, nil)
+    }
+    
+    /// Launch alexa app
+    /// - Parameter rainmakerURLString: rainmaker URL string
+    func launchAlexaApp(rainmakerURLString: String) {
+        if let rainmakerURL = URL(string: rainmakerURLString) {
+            if User.shared.isUserSessionActive {
+                if let controller = UIApplication.topViewController() {
+                    if let navBar = controller.navigationController, let tabBar = navBar.tabBarController {
+                        if let connectToAlexaVC = ESPEnableAlexaSkillService.getConnectToAlexaVC() {
+                            connectToAlexaVC.isLaunchedFromAlexa = true
+                            self.rainmakerURL = rainmakerURL
+                            connectToAlexaVC.espLinkSkillFromAlexaDelegate = self
+                            tabBar.present(connectToAlexaVC, animated: true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     
     func application(_ application: UIApplication, handleOpen url: URL) -> Bool {
         return WXApi.handleOpen(url, delegate: self)
@@ -97,5 +161,46 @@ extension AppDelegate {
             return vc
         }
         return nil
+    }
+}
+
+extension AppDelegate: ESPLinkSkillFromAlexaDelegate {
+    
+    /// Launch cognito hosted UI in browser
+    func launchCognitoURL() {
+        if UIApplication.shared.canOpenURL(self.rainmakerURL) {
+            UIApplication.shared.open(self.rainmakerURL, options: [.universalLinksOnly: false]) { _ in}
+        }
+    }
+}
+
+extension UIApplication {
+    
+    /// This method returns an instance of the top viewcontroller for currently displayed for the app
+    /// - Parameter base: Base viewcontroller (default: UIApplication.shared.keyWindow?.rootViewController)
+    /// - Returns:instance of the top viewcontroller
+    class func topViewController(base: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
+        /// If the base view controller is a UINavigationController,
+        /// the function calls itself recursively with the currently visible view controller (nav.visibleViewController) as the new base.
+        /// This ensures that it traverses to the top-most view controller on the navigation stack.
+        if let nav = base as? UINavigationController {
+            return topViewController(base: nav.visibleViewController)
+        }
+        /// If the base view controller is a UITabBarController, it checks for the selected view controller
+        ///  and calls itself recursively with the selected view controller (tab.selectedViewController).
+        ///  This ensures it correctly identifies the active tab's view controller.
+        if let tab = base as? UITabBarController {
+            if let selected = tab.selectedViewController {
+                return topViewController(base: selected)
+            }
+        }
+        /// If the base view controller has a presented view controller (base?.presentedViewController),
+        /// it calls itself recursively with that presented view controller.
+        /// This handles modal presentations and ensures the function reaches the top-most presented view controller.
+        if let presented = base?.presentedViewController {
+            return topViewController(base: presented)
+        }
+        /// If none of the conditions apply, it simply returns the base view controller.
+        return base
     }
 }

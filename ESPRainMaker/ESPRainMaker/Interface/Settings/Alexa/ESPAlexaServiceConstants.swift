@@ -45,7 +45,8 @@ class ESPAlexaServiceConstants {
     static let redirectURI = "redirect_uri"
     static let stage = "stage"
     static let state = "state"
-    
+    static let scope = "scope"
+
     static let accountLinkRequest = "accountLinkRequest"
     static let paramRedirectURI = "redirectUri"
     static let paramAuthCode = "authCode"
@@ -59,6 +60,8 @@ class ESPAlexaServiceConstants {
     
     static let alexaState = "com.alexa.url.state"
     static let rainmakerCode = "rainmaker_code"
+    
+    static let alexaRedirectURI = "layla.amazon.com"
 }
 
 
