@@ -24,14 +24,36 @@ import UIKit
 extension DeviceViewController: MTRACParamDelegate {
     
     func acSystemModeSet() {
-        for index in 0..<self.cellInfo.count {
-            let val = self.cellInfo[index]
-            if val == ESPMatterConstants.occupiedCoolingSetpoint {
-                if let node = self.node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let item = node.getMatterSystemMode(deviceId: deviceId), [ESPMatterConstants.heat, ESPMatterConstants.cool].contains(item) {
+        if let node = self.node, let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let item = node.getMatterSystemMode(deviceId: deviceId) {
+            switch item {
+            case ESPMatterConstants.heat, ESPMatterConstants.cool:
+                let isHeatMode = (item == ESPMatterConstants.heat)
+                
+                for (index, val) in self.cellInfo.enumerated() {
                     DispatchQueue.main.async {
+                        switch val {
+                        case ESPMatterConstants.occupiedCoolingSetpoint:
+                            self.hideOCS = !isHeatMode
+                        case ESPMatterConstants.occupiedHeatingSetpoint:
+                            self.hideOHS = isHeatMode
+                        default:
+                            return
+                        }
                         self.deviceTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
                     }
-                    break
+                }
+            default:
+                for (index, val) in self.cellInfo.enumerated() {
+                    if val == ESPMatterConstants.occupiedCoolingSetpoint || val == ESPMatterConstants.occupiedHeatingSetpoint {
+                        DispatchQueue.main.async {
+                            if val == ESPMatterConstants.occupiedCoolingSetpoint {
+                                self.hideOCS = true
+                            } else {
+                                self.hideOHS = true
+                            }
+                            self.deviceTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                        }
+                    }
                 }
             }
         }

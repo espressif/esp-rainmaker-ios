@@ -197,6 +197,15 @@ public class ESPMatterClusterUtil {
         return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: colorControl.clusterIdString, attributeId: colorControl.attributes.currentSaturation.attributeId.uintValue)
     }
     
+    /// Is CCT attribute supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: is supported
+    public func isCCTAttributeSupported(groupId: String, deviceId: UInt64) -> Bool {
+        return isAttributeSupported(groupId: groupId, deviceId: deviceId, clusterId: colorControl.clusterIdString, attributeId: colorControl.attributes.cct.attributeId.uintValue)
+    }
+    
     /// Is local temperature attribute supported
     /// - Parameters:
     ///   - groupId: group id

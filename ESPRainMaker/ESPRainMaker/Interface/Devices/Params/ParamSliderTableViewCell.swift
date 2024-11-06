@@ -56,6 +56,7 @@ class ParamSliderTableViewCell: SliderTableViewCell {
     }
     
     @IBAction override func sliderValueDragged(_ sender: UISlider) {
+        setSliderThumbUI()
         // Skip param update if app does not support continuous updates
         if !Configuration.shared.appConfiguration.supportContinuousUpdate || !self.isRainmaker {
             return
@@ -89,7 +90,9 @@ class ParamSliderTableViewCell: SliderTableViewCell {
                 val = value
             }
             sliderInitialValue = val
-            sender.setValue(val, animated: true)
+            if sender.value != val {
+                sender.setValue(val, animated: true)
+            }
             group.notify(queue: .main) {
                 // Check if final value is already updated
                 if self.finalValue == self.currentFinalValue {
@@ -110,7 +113,9 @@ class ParamSliderTableViewCell: SliderTableViewCell {
                         val = self.finalValue
                     }
                     self.sliderInitialValue = val
-                    sender.setValue(val, animated: true)
+                    if sender.value != val {
+                        sender.setValue(val, animated: true)
+                    }
                 }
             }
         }
@@ -118,6 +123,7 @@ class ParamSliderTableViewCell: SliderTableViewCell {
 
 
     @IBAction override func sliderValueChanged(_ sender: UISlider) {
+        setSliderThumbUI()
         if self.isRainmaker {
             guard let value = getSliderFinalValue(sender, nil, .slider) else {
                 return
@@ -146,6 +152,8 @@ class ParamSliderTableViewCell: SliderTableViewCell {
                     self.changeSaturation(value: val)
                 case .airConditioner:
                     self.changeOccupiedSetpoint(setPoint: Int16(val))
+                case .cct:
+                    self.changeCCT(cct: Int(val))
                 }
             }
             #endif
@@ -224,7 +232,9 @@ class ParamSliderTableViewCell: SliderTableViewCell {
             val = self.finalValue
         }
         self.sliderInitialValue = val
-        sender.setValue(val, animated: true)
+        if sender.value != val {
+            sender.setValue(val, animated: true)
+        }
     }
     
     /// Call update param API with final value.

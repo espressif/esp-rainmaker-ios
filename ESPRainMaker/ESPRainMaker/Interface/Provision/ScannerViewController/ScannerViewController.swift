@@ -436,7 +436,11 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             return
         case .denied, .restricted:
             let alert = UIAlertController(title: "Location Services are disabled", message: "Please enable Location Services in your Settings", preferredStyle: .alert)
-            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            let okAction = UIAlertAction(title: "OK", style: .default) { _ in
+                DispatchQueue.main.async {
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+            }
             alert.addAction(okAction)
             present(alert, animated: true, completion: nil)
         case .authorizedAlways, .authorizedWhenInUse:

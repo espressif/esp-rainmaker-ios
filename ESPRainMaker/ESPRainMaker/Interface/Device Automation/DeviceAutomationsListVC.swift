@@ -215,6 +215,7 @@ extension DeviceAutomationsListVC: ESPGetAutomationPresentationLogic {
             updateView()
             return
         }
+        automationList = []
         Utility.showToastMessage(view: view, message: error.description, duration: 3.0)
         updateView()
     }

@@ -26,13 +26,38 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if [ESPMatterConstants.rainmakerController, ESPMatterConstants.localTemperature, ESPMatterConstants.borderRouter, ESPMatterConstants.measuredTemperature, ESPMatterConstants.updateMetadata].contains(value) {
+            if [ESPMatterConstants.rainmakerController,
+                ESPMatterConstants.borderRouter,
+                ESPMatterConstants.measuredTemperature,
+                ESPMatterConstants.updateMetadata].contains(value) {
+                
                 return 100.0
-            } else if [ESPMatterConstants.levelControl, ESPMatterConstants.colorControl, ESPMatterConstants.saturationControl, ESPMatterConstants.occupiedCoolingSetpoint].contains(value) {
+            } else if [ESPMatterConstants.levelControl,
+                       ESPMatterConstants.colorControl,
+                       ESPMatterConstants.saturationControl,
+                       ESPMatterConstants.occupiedCoolingSetpoint,
+                       ESPMatterConstants.occupiedHeatingSetpoint,
+                       ESPMatterConstants.cctControl].contains(value) {
+                
+                if let node = self.node, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal, let systemMode = node.getMatterSystemMode(deviceId: deviceId) {
+                    
+                    self.hideOCS = (systemMode == ESPMatterConstants.off || systemMode == ESPMatterConstants.heat)
+                    self.hideOHS = (systemMode == ESPMatterConstants.off || systemMode == ESPMatterConstants.cool)
+                    if (value == ESPMatterConstants.occupiedCoolingSetpoint && self.hideOCS) ||
+                       (value == ESPMatterConstants.occupiedHeatingSetpoint && self.hideOHS) {
+                        return 0.0
+                    }
+                }
                 return 136.0
             } else if value == ESPMatterConstants.participantData {
+                
                 return 278.0
-            } else if [ESPMatterConstants.deviceName, ESPMatterConstants.onOff, ESPMatterConstants.controlSequenceOfOperation, ESPMatterConstants.systemMode, ESPMatterConstants.nodeLabel].contains(value) {
+            } else if [ESPMatterConstants.matterDeviceName,
+                       ESPMatterConstants.onOff,
+                       ESPMatterConstants.controlSequenceOfOperation,
+                       ESPMatterConstants.systemMode,
+                       ESPMatterConstants.localTemperature].contains(value) {
+                
                 return 90.0
             }
         }
@@ -50,7 +75,9 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let _ = matterNodeId.hexToDecimal, let deviceId = matterNodeId.hexToDecimal, indexPath.row < cellInfo.count {
             let value = cellInfo[indexPath.row]
-            if value == ESPMatterConstants.deviceName || value == ESPMatterConstants.nodeLabel {
+            if value == ESPMatterConstants.cctControl, let cctCell = getCCTControlCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId) {
+                return cctCell
+            } else if value == ESPMatterConstants.deviceName || value == ESPMatterConstants.matterDeviceName {
                 if let deviceNameCell = getDeviceNameCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId) {
                     return deviceNameCell
                 }
@@ -58,12 +85,12 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 if let onOffCell = getOnOffCell(tableView, indexPath: indexPath, deviceId: deviceId) {
                     return onOffCell
                 }
-            } else if value == ESPMatterConstants.levelControl {
-                return getLevelControlCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId)
+            } else if value == ESPMatterConstants.levelControl, let levelCell = getLevelControlCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId) {
+                return levelCell
             } else if value == ESPMatterConstants.colorControl {
                 return getColorControlCell(tableView, indexPath: indexPath, deviceId: deviceId)
-            } else if value == ESPMatterConstants.saturationControl {
-                return getSaturationControlCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId)
+            } else if value == ESPMatterConstants.saturationControl, let saturationCell = getSaturationControlCell(tableView, indexPath: indexPath, groupId: groupId, deviceId: deviceId) {
+                return saturationCell
             } else if value == ESPMatterConstants.rainmakerController {
                 if let controllerCell = getControllerCell(tableView, indexPath: indexPath) {
                     return controllerCell
@@ -80,12 +107,14 @@ extension DeviceViewController: UITableViewDelegate, UITableViewDataSource {
                 if let temperatureCell = getTemperatureCell(tableView, indexPath: indexPath, value: value, deviceId: deviceId) {
                     return temperatureCell
                 }
-            } else if value == ESPMatterConstants.occupiedCoolingSetpoint {
-                return getOccupiedSetpointCell(tableView, indexPath: indexPath, deviceId: deviceId)
             } else if value == ESPMatterConstants.controlSequenceOfOperation {
                 return getControlSequenceOpfOperationCell(tableView, indexPath: indexPath, deviceId: deviceId)
             } else if value == ESPMatterConstants.systemMode {
                 return getSystemModeCell(tableView, indexPath: indexPath, deviceId: deviceId)
+            } else if value == ESPMatterConstants.occupiedCoolingSetpoint, let ocsCell = getOccupiedCoolingSetpointCell(tableView, indexPath: indexPath, deviceId: deviceId) {
+                return ocsCell
+            } else if value == ESPMatterConstants.occupiedHeatingSetpoint, let ohsCell = getOccupiedHeatingSetpointCell(tableView, indexPath: indexPath, deviceId: deviceId) {
+                return ohsCell
             }
         }
         return UITableViewCell()
@@ -193,7 +222,15 @@ extension DeviceViewController: DeviceNameDelegate {
                     let finalTxt = text.replacingOccurrences(of: " ", with: "")
                     if finalTxt.count > 0 {
                         self.deviceName = valueTextField?.text
-                        self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId, completion: completion)
+                        self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId) { matterDeviceName in
+                            if let param = self.getNameParam(node: rainmakerNode) {
+                                self.updateMTRRainmakerParamName(rainmakerNode: rainmakerNode, param: param) { _, _ in
+                                    completion(matterDeviceName)
+                                }
+                            } else {
+                                completion(matterDeviceName)
+                            }
+                        }
                         return
                     }
                 }
@@ -218,7 +255,7 @@ extension DeviceViewController: DeviceNameDelegate {
         DispatchQueue.main.async {
             Utility.showLoader(message: "", view: self.view)
         }
-        ESPMTRCommissioner.shared.setNodeLabel(deviceId: deviceId, nodeLabel: nodeLabel) { result in
+        ESPNodeMetadataService.shared.setMatterDeviceName(node: node, deviceName: nodeLabel) { result, _ in
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
             }
@@ -226,14 +263,73 @@ extension DeviceViewController: DeviceNameDelegate {
                 DispatchQueue.main.async {
                     self.topBarTitle.text = nodeLabel
                 }
-                self.fabricDetails.removeNodeLabel(groupId: groupId, deviceId: deviceId)
-                self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
-                ESPNodeMetadataService.shared.setMatterDeviceName(node: node, deviceName: nodeLabel) { _, _ in
-                    completion(nodeLabel)
-                }
+                completion(nodeLabel)
             } else {
                 completion(nil)
             }
+        }
+    }
+    
+    /// Edit node label called
+    /// - Parameters:
+    ///   - rainmakerNode: rainmaker node
+    ///   - nodeLabel: node label
+    ///   - completion: completion handler
+    func editMTRDeviceNamePressed(rainmakerNode: Node?, deviceName: String, completion: @escaping (String?) -> Void) {
+        if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.matter_node_id?.hexToDecimal {
+            let input = UIAlertController(title: "Name", message: ESPMatterConstants.enterDeviceNameMsg, preferredStyle: .alert)
+            input.addTextField { textField in
+                textField.placeholder = "Enter device name"
+                textField.text = node.matterDeviceName
+                self.addHeightConstraint(textField: textField)
+            }
+            input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
+                let valueTextField = input?.textFields![0]
+                if let text = valueTextField?.text, text.replacingOccurrences(of: " ", with: "").count > 0, text.count <= 32 {
+                    let finalTxt = text.replacingOccurrences(of: " ", with: "")
+                    if finalTxt.count > 0 {
+                        self.deviceName = valueTextField?.text
+                        self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId) { matterDeviceName in
+                            if let param = self.getNameParam(node: rainmakerNode) {
+                                self.updateMTRRainmakerParamName(rainmakerNode: rainmakerNode, param: param) { _, _ in
+                                    completion(matterDeviceName)
+                                }
+                            } else {
+                                completion(matterDeviceName)
+                            }
+                        }
+                        return
+                    }
+                }
+                self.alertUser(title: ESPMatterConstants.failureTxt,
+                               message: ESPMatterConstants.enterValidDeviceNameMsg,
+                               buttonTitle: ESPMatterConstants.okTxt,
+                               callback: {})
+            }))
+            input.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            self.present(input, animated: true, completion: nil)
+        }
+    }
+    
+    /// Update the rainmaker param name for the matter+rainmaker device
+    /// - Parameters:
+    ///   - rainmakerNode: rainmkaer node
+    ///   - param: rainmaker name param
+    ///   - completion: completion
+    func updateMTRRainmakerParamName(rainmakerNode: Node?, param: Param, completion: @escaping (ESPCloudResponseStatus?, String?) -> Void) {
+        if let node = rainmakerNode, let nodeId = node.node_id, let devices = node.devices, devices.count > 0, let attributeKey = param.name, let name = self.deviceName {
+            var device = devices[0]
+            for dv in devices {
+                if let name = param.value as? String, let deviceName = dv.name, name == deviceName {
+                    device = dv
+                    break
+                }
+            }
+            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: [device.name ?? "" : [attributeKey: name]], delegate: nil) { responseStatus in
+                completion(responseStatus, name)
+            }
+        } else {
+            completion(nil, self.deviceName)
         }
     }
 }

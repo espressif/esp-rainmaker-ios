@@ -160,5 +160,26 @@ extension ESPMTRCommissioner {
             }
         }
     }
+    
+    /// Subscribe to saturation value
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    ///   - completion: completion with saturation value
+    func subscribeToCCTValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
+        ESPMTRCommissioner.shared.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
+            if let cluster = cluster {
+                let params = MTRSubscribeParams()
+                params.minInterval = NSNumber(value: 1.0)
+                params.maxInterval = NSNumber(value: 2.0)
+                cluster.subscribeAttributeColorTemperatureMireds(with: params, subscriptionEstablished: nil) { val, _ in
+                    if let val = val {
+                        let final = 1000000/val.intValue
+                        completion(final)
+                    }
+                }
+            }
+        }
+    }
 }
 #endif

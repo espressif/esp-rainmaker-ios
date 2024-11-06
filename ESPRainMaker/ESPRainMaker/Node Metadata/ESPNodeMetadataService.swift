@@ -50,7 +50,7 @@ class ESPNodeMetadataService {
             let headers: HTTPHeaders = [ESPMatterConstants.contentType: ESPMatterConstants.applicationJSON,
                            ESPMatterConstants.authorization: accessToken]
             let params = [ESPNodeMetadataService.metadataKey: metadata]
-            self.callCloudAPI(url: url, method: .put, headers: headers, parameters: params, completion: completion)
+            self.callCloudAPI(node: node, url: url, method: .put, headers: headers, parameters: params, completion: completion)
         }
     }
     
@@ -60,11 +60,14 @@ class ESPNodeMetadataService {
     ///   - headers: headers
     ///   - parameters: params in the API
     ///   - completion: complletion handler
-    private func callCloudAPI(url: String, method: HTTPMethod, headers: HTTPHeaders, parameters: Parameters?, completion: @escaping (Bool, ESPAPIError?) -> Void) {
+    private func callCloudAPI(node: Node, url: String, method: HTTPMethod, headers: HTTPHeaders, parameters: Parameters?, completion: @escaping (Bool, ESPAPIError?) -> Void) {
         self.apiWorker.callDataAPI(url: url, method: .put, parameters: parameters, headers: headers, apiDescription: "") { data, error in
             guard let error = error else {
                 if let responseData = data, let response = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any] {
                     if let status = response[ESPNodeMetadataService.statusKey] as? String, status.lowercased() == ESPNodeMetadataService.success {
+                        if let params = parameters, let metadata = params[ESPNodeMetadataService.metadataKey] as? [String: Any] {
+                            node.metadata = metadata
+                        }
                         completion(true, nil)
                     } else {
                         if let errorCode = response[ESPNodeMetadataService.errorCodeKey] as? String, let description = response[ESPNodeMetadataService.descriptionKey] as? String {

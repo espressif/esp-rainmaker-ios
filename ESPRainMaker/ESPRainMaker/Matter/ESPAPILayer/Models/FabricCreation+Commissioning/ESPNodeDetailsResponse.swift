@@ -72,6 +72,11 @@ class ESPNodeDetails: Codable {
         return "\(deviceId).matter.saturation.value"
     }
     
+    /// Returns matter light status key
+    var matterCCTValueKey: (UInt64) -> String = { deviceId in
+        return "\(deviceId).matter.cct.value"
+    }
+    
     /// Device id
     var deviceId: UInt64? {
         if let matterNodeID = matterNodeID, let deviceId = matterNodeID.hexToDecimal {
@@ -147,6 +152,24 @@ class ESPNodeDetails: Codable {
     /// - Returns: saturation value
     func getMatterSaturationValue(deviceId: UInt64) -> Int? {
         if let saturation = UserDefaults.standard.value(forKey: matterSaturationValueKey(deviceId)) as? Int {
+            return saturation
+        }
+        return nil
+    }
+    
+    /// Set saturation value
+    /// - Parameters:
+    ///   - level: level value
+    ///   - deviceId: device id
+    func setMatterCCTValue(cct: Int, deviceId: UInt64) {
+        UserDefaults.standard.set(cct, forKey: matterCCTValueKey(deviceId))
+    }
+    
+    /// Get matter saturation value
+    /// - Parameter deviceId: device id
+    /// - Returns: saturation value
+    func getMatterCCTValue(deviceId: UInt64) -> Int? {
+        if let saturation = UserDefaults.standard.value(forKey: matterCCTValueKey(deviceId)) as? Int {
             return saturation
         }
         return nil

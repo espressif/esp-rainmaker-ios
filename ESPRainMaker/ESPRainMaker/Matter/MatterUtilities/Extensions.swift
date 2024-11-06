@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension String {
 
@@ -133,6 +134,15 @@ extension Array where Element == UInt8 {
                 s = "0" + s
             }
             return $0 + s
+        }
+    }
+}
+
+extension UIView {
+    func asImage() -> UIImage {
+        let renderer = UIGraphicsImageRenderer(bounds: bounds)
+        return renderer.image { rendererContext in
+            layer.render(in: rendererContext.cgContext)
         }
     }
 }

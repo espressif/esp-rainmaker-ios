@@ -39,7 +39,7 @@ extension DeviceViewController {
                     cell.deviceInfo = .deviceName
                     cell.deviceName.text = name
                 } else {
-                    cell.deviceInfo = .nodeLabel
+                    cell.deviceInfo = .matterDeviceName
                     cell.propertyName.text = "Name"
                     if let name = node.matterDeviceName {
                         cell.deviceName.text = name
@@ -86,30 +86,30 @@ extension DeviceViewController {
     ///   - groupId: group id
     ///   - deviceId: device id
     /// - Returns: level control cell
-    func getLevelControlCell(_ tableView: UITableView, indexPath: IndexPath, groupId: String, deviceId: UInt64) -> ParamSliderTableViewCell {
-        let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
-        object_setClass(sliderCell, ParamSliderTableViewCell.self)
-        let cell = sliderCell as! ParamSliderTableViewCell
-        cell.backViewTopSpaceConstraint.constant = 10
-        cell.backViewBottomSpaceConstraint.constant = 10
-        cell.nodeConnectionStatus = self.nodeConnectionStatus
-        cell.node = self.node
-        cell.isRainmaker = false
-        cell.sliderParamType = .brightness
-        cell.nodeGroup = self.group
-        cell.deviceId = deviceId
-        cell.hueSlider.isHidden = true
-        cell.slider.isHidden = false
-        cell.paramChipDelegate = self
-        self.setAutoresizingMask(cell)
-        if self.isDeviceOffline || self.showDefaultUI {
-            cell.setupOfflineUI()
-        } else {
-            cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
+    func getLevelControlCell(_ tableView: UITableView, indexPath: IndexPath, groupId: String, deviceId: UInt64) -> ESPMTRLevelSliderTVC? {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: ESPMTRLevelSliderTVC.reuseIdentifier, for: indexPath) as? ESPMTRLevelSliderTVC {
+            cell.backViewTopSpaceConstraint.constant = 10
+            cell.backViewBottomSpaceConstraint.constant = 10
+            cell.nodeConnectionStatus = self.nodeConnectionStatus
+            cell.node = self.node
+            cell.isRainmaker = false
+            cell.sliderParamType = .brightness
+            cell.nodeGroup = self.group
+            cell.deviceId = deviceId
+            cell.hueSlider.isHidden = true
+            cell.slider.isHidden = false
+            cell.paramChipDelegate = self
+            self.setAutoresizingMask(cell)
+            if self.isDeviceOffline || self.showDefaultUI {
+                cell.setupInitialLevelValues()
+            } else {
+                cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
+            }
+            cell.isUserInteractionEnabled = !self.isDeviceOffline
+            cell.slider.isEnabled = !self.isDeviceOffline
+            return cell
         }
-        cell.isUserInteractionEnabled = !self.isDeviceOffline
-        cell.slider.isEnabled = !self.isDeviceOffline
-        return cell
+        return nil
     }
     
     /// Get color control cell
@@ -151,30 +151,30 @@ extension DeviceViewController {
     ///   - groupId: group id
     ///   - deviceId: device id
     /// - Returns: saturation control cell
-    func getSaturationControlCell(_ tableView: UITableView, indexPath: IndexPath, groupId: String, deviceId: UInt64) -> ParamSliderTableViewCell {
-        let sliderCell = tableView.dequeueReusableCell(withIdentifier: SliderTableViewCell.reuseIdentifier, for: indexPath) as! SliderTableViewCell
-        object_setClass(sliderCell, ParamSliderTableViewCell.self)
-        let cell = sliderCell as! ParamSliderTableViewCell
-        cell.backViewTopSpaceConstraint.constant = 10
-        cell.backViewBottomSpaceConstraint.constant = 10
-        cell.nodeConnectionStatus = self.nodeConnectionStatus
-        cell.node = self.node
-        cell.isRainmaker = false
-        cell.sliderParamType = .saturation
-        cell.nodeGroup = self.group
-        cell.deviceId = deviceId
-        cell.hueSlider.isHidden = true
-        cell.slider.isHidden = false
-        cell.paramChipDelegate = self
-        self.setAutoresizingMask(cell)
-        if self.isDeviceOffline || self.showDefaultUI {
-            cell.setupOfflineUI()
-        } else {
-            cell.getCurrentSaturationValue(groupId: groupId, deviceId: deviceId)
+    func getSaturationControlCell(_ tableView: UITableView, indexPath: IndexPath, groupId: String, deviceId: UInt64) -> ESPMTRSaturationSliderTVC? {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: ESPMTRSaturationSliderTVC.reuseIdentifier, for: indexPath) as? ESPMTRSaturationSliderTVC {
+            cell.backViewTopSpaceConstraint.constant = 10
+            cell.backViewBottomSpaceConstraint.constant = 10
+            cell.nodeConnectionStatus = self.nodeConnectionStatus
+            cell.node = self.node
+            cell.isRainmaker = false
+            cell.sliderParamType = .saturation
+            cell.nodeGroup = self.group
+            cell.deviceId = deviceId
+            cell.hueSlider.isHidden = true
+            cell.slider.isHidden = false
+            cell.paramChipDelegate = self
+            self.setAutoresizingMask(cell)
+            if self.isDeviceOffline || self.showDefaultUI {
+                cell.setupInitialSaturationValue()
+            } else {
+                cell.getCurrentSaturationValue(groupId: groupId, deviceId: deviceId)
+            }
+            cell.isUserInteractionEnabled = !self.isDeviceOffline
+            cell.slider.isEnabled = !self.isDeviceOffline
+            return cell
         }
-        cell.isUserInteractionEnabled = !self.isDeviceOffline
-        cell.slider.isEnabled = !self.isDeviceOffline
-        return cell
+        return nil
     }
     
     /// Get controller cell
@@ -236,39 +236,50 @@ extension DeviceViewController {
     ///   - value: va;lue
     ///   - deviceId: device id
     /// - Returns: temp cell
-    func getTemperatureCell(_ tableView: UITableView, indexPath: IndexPath, value: String, deviceId: UInt64) -> CustomInfoCell? {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: CustomInfoCell.reuseIdentifier, for: indexPath) as? CustomInfoCell {
-            cell.node = self.node
-            cell.deviceId = deviceId
-            cell.nodeGroup = self.group
-            if value == ESPMatterConstants.localTemperature {
-                cell.type.text = ESPMatterConstants.localTemperatureTxt
-                if self.isDeviceOffline || self.showDefaultUI {
-                    cell.setupOfflineLocalTemperatureUI()
-                } else {
-                    if self.nodeConnectionStatus == .controller {
-                        cell.setupInitialControllerLocalTempUI()
-                    } else {
-                        cell.setupLocalTemperatureUI()
-                    }
-                }
-            } else {
-                cell.type.text = ESPMatterConstants.measuredTemperatureTxt
-                if self.isDeviceOffline || self.showDefaultUI {
-                    cell.setupOfflineMeasuredTemperatureUI()
-                } else {
-                    if self.nodeConnectionStatus == .controller {
-                        cell.setupInitialControllerMeasuredTempUI()
-                    } else {
-                        cell.setupMeasuredTemperatureUI()
-                    }
+    /// Get temperature cell
+    /// - Parameters:
+    ///   - tableView: table view
+    ///   - indexPath: inde xpath
+    ///   - value: va;lue
+    ///   - deviceId: device id
+    /// - Returns: temp cell
+    func getTemperatureCell(_ tableView: UITableView, indexPath: IndexPath, value: String, deviceId: UInt64) -> GenericControlTableViewCell? {
+        let genericCell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
+        object_setClass(genericCell, GenericParamTableViewCell.self)
+        let cell = genericCell as! GenericParamTableViewCell
+        cell.node = self.node
+        cell.deviceId = deviceId
+        cell.nodeGroup = self.group
+        cell.backViewTopSpaceConstraint.constant = 10.0
+        cell.backViewBottomSpaceConstraint.constant = 10.0
+        cell.checkButton.isHidden = true
+        cell.editButton.isHidden = true
+        cell.controlValueLabel.text = "- °C"
+        if let node = self.rainmakerNode, let devices = node.devices, let device = devices.first {
+            cell.device = device
+            for param in device.params ?? [] {
+                if let paramName = param.name, paramName.lowercased() == ESPMatterConstants.localTemperatureTxt.lowercased() {
+                    cell.param = param
+                    cell.tapButton.setImage(UIImage(named: "chart_icon"), for: .normal)
                 }
             }
-            self.setAutoresizingMask(cell)
-            cell.isUserInteractionEnabled = !self.isDeviceOffline
-            return cell
         }
-        return nil
+        if value == ESPMatterConstants.localTemperature {
+            cell.controlName.text = ESPMatterConstants.localTemperatureTxt
+            if self.isDeviceOffline || self.showDefaultUI {
+                cell.setupOfflineLocalTemperatureUI()
+            } else {
+                cell.setupLocalTemperatureUI()
+            }
+        } else if value == ESPMatterConstants.measuredTemperature {
+            cell.controlName.text = ESPMatterConstants.localTemperatureTxt
+            if self.isDeviceOffline || self.showDefaultUI {
+                cell.setupLocalTemperatureUI()
+            }
+        }
+        self.setAutoresizingMask(cell)
+        cell.isUserInteractionEnabled = !self.isDeviceOffline
+        return cell
     }
     
     /// Get occupied setpoint cell
@@ -298,6 +309,64 @@ extension DeviceViewController {
         }
         cell.isUserInteractionEnabled = !self.isDeviceOffline
         return cell
+    }
+    
+    /// Get occupied cooling setpoint cell
+    /// - Parameters:
+    ///   - tableView: table view
+    ///   - indexPath: index path
+    ///   - deviceId: device id
+    /// - Returns: occupied  setpoint cell
+    func getOccupiedCoolingSetpointCell(_ tableView: UITableView, indexPath: IndexPath, deviceId: UInt64) -> ESPMTROCSSliderTVC? {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: ESPMTROCSSliderTVC.reuseIdentifier, for: indexPath) as? ESPMTROCSSliderTVC {
+            cell.title.text = ESPMatterConstants.occupiedCoolingSetpointTxt
+            cell.node = self.node
+            cell.isRainmaker = false
+            cell.sliderParamType = .airConditioner
+            cell.nodeGroup = self.group
+            cell.deviceId = deviceId
+            cell.hueSlider.isHidden = true
+            cell.slider.isHidden = false
+            cell.paramChipDelegate = self
+            self.setAutoresizingMask(cell)
+            if self.nodeConnectionStatus == .controller {
+                cell.setupInitialControllerOCSValues(isDeviceOffline: self.isDeviceOffline)
+            } else {
+                cell.setupInitialCoolingSetpointValues(isDeviceOffline: self.isDeviceOffline)
+            }
+            cell.isUserInteractionEnabled = !self.isDeviceOffline
+            return cell
+        }
+        return nil
+    }
+    
+    /// Get occupied heating setpoint cell
+    /// - Parameters:
+    ///   - tableView: table view
+    ///   - indexPath: index path
+    ///   - deviceId: device id
+    /// - Returns: occupied  setpoint cell
+    func getOccupiedHeatingSetpointCell(_ tableView: UITableView, indexPath: IndexPath, deviceId: UInt64) -> ESPMTROHSSliderTVC? {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: ESPMTROHSSliderTVC.reuseIdentifier, for: indexPath) as? ESPMTROHSSliderTVC {
+            cell.title.text = ESPMatterConstants.occupiedHeatingSetpointTxt
+            cell.node = self.node
+            cell.isRainmaker = false
+            cell.sliderParamType = .airConditioner
+            cell.nodeGroup = self.group
+            cell.deviceId = deviceId
+            cell.hueSlider.isHidden = true
+            cell.slider.isHidden = false
+            cell.paramChipDelegate = self
+            self.setAutoresizingMask(cell)
+            if self.nodeConnectionStatus == .controller {
+                cell.setupInitialControllerOHSValues(isDeviceOffline: self.isDeviceOffline)
+            } else {
+                cell.setupInitialHeatingSetpointValues(isDeviceOffline: self.isDeviceOffline)
+            }
+            cell.isUserInteractionEnabled = !self.isDeviceOffline
+            return cell
+        }
+        return nil
     }
     
     /// Get control sequence of operation cell
@@ -335,7 +404,6 @@ extension DeviceViewController {
         let dropDownCell = tableView.dequeueReusableCell(withIdentifier: DropDownTableViewCell.reuseIdentifier, for: indexPath) as! DropDownTableViewCell
         object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
         let cell = dropDownCell as! ParamDropDownTableViewCell
-        cell.topViewHeightConstraint.constant = 30.0
         cell.matterNode = self.node
         cell.datasource = [ESPMatterConstants.off,
                            ESPMatterConstants.cool,
@@ -357,6 +425,40 @@ extension DeviceViewController {
         }
         cell.isUserInteractionEnabled = !self.isDeviceOffline
         return cell
+    }
+    
+    /// Get saturation control cell
+    /// - Parameters:
+    ///   - tableView: table view
+    ///   - indexPath: inde xpath
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: saturation control cell
+    func getCCTControlCell(_ tableView: UITableView, indexPath: IndexPath, groupId: String, deviceId: UInt64) -> ESPMTRCCTSliderTVC? {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: ESPMTRCCTSliderTVC.reuseIdentifier, for: indexPath) as? ESPMTRCCTSliderTVC {
+            cell.backViewTopSpaceConstraint.constant = 10
+            cell.backViewBottomSpaceConstraint.constant = 10
+            cell.nodeConnectionStatus = self.nodeConnectionStatus
+            cell.node = self.node
+            cell.isRainmaker = false
+            cell.sliderParamType = .cct
+            cell.nodeGroup = self.group
+            cell.deviceId = deviceId
+            cell.hueSlider.isHidden = true
+            cell.slider.isHidden = false
+            cell.paramChipDelegate = self
+            self.setAutoresizingMask(cell)
+            if self.isDeviceOffline || self.showDefaultUI {
+                cell.setupInitialCCTUI()
+            } else {
+                cell.getCurrentCCTValue(groupId: groupId, deviceId: deviceId)
+            }
+            cell.setSliderThumbUI()
+            cell.isUserInteractionEnabled = !self.isDeviceOffline
+            cell.slider.isEnabled = !self.isDeviceOffline
+            return cell
+        }
+        return nil
     }
 }
 #endif
