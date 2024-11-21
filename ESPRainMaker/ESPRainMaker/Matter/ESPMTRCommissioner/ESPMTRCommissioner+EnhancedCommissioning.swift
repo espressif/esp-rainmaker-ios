@@ -23,65 +23,17 @@ import Matter
 @available(iOS 16.4, *)
 extension ESPMTRCommissioner {
     
-    /// Get disciminator
+    /// Generate random discriminator for enhanced commisssioning mode
     /// - Returns: discriminator
-    func getDiscriminator() -> UInt32 {
-        let lowerLimit: UInt32 = 0000
-        let upperLimit: UInt32 = 4095
-        let discriminator = arc4random_uniform(upperLimit - lowerLimit) + lowerLimit
-        return discriminator
-    }
-    
-    /// Get passcode
-    /// - Returns: setup passcode
-    func getPasscode() -> UInt32 {
-        let invalidPasscodes: [UInt32] = [00000000,
-                                11111111,
-                                22222222,
-                                33333333,
-                                44444444,
-                                55555555,
-                                66666666,
-                                77777777,
-                                88888888,
-                                99999999,
-                                12345678,
-                                87654321]
-        let lowerLimit: UInt32 = 00000001
-        let upperLimit: UInt32 = 99999998
-        let passcode = arc4random_uniform(upperLimit - lowerLimit) + lowerLimit
-        if invalidPasscodes.contains(passcode) {
-            return getPasscode()
-        }
-        return passcode
-    }
-    
-    /// Open commissioning Window
-    func openCommissioningWindow(deviceId: UInt64, completion: @escaping (String?) -> Void) {
-        if let controller = self.sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let commissioningWindowCluster = MTRBaseClusterAdministratorCommissioning(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue), let saltData = ESPDefaultData.threadSaltData.data(using: .utf8), let pakeVerifierData = ESPDefaultData.threadPAKEVerifierData.data(using: .utf8), let pakeVerifier = Data(base64Encoded: pakeVerifierData), let salt = Data(base64Encoded: saltData) {
-                    let params = MTRAdministratorCommissioningClusterOpenCommissioningWindowParams()
-                    params.pakePasscodeVerifier = pakeVerifier
-                    params.salt = salt
-                    params.discriminator = NSNumber(value: 3840)
-                    params.iterations = NSNumber(value: 15000)
-                    params.commissioningTimeout = NSNumber(value: 300)
-                    params.timedInvokeTimeoutMs = NSNumber(value: 60000)
-                    commissioningWindowCluster.openWindow(with: params) { error in
-                        if let _ = error {
-                            completion(nil)
-                        } else {
-                            completion(ESPDefaultData.openCWManualPairingCode)
-                        }
-                    }
-                } else {
-                    completion(nil)
-                }
-            }
-        } else {
-            completion(nil)
-        }
+    func generateRandomDiscriminator() -> NSNumber {
+        // Define the range for valid discriminator values
+        let minValue = 1
+        let maxValue = 0xFFE  // 4094 in decimal
+
+        // Generate a random number within the range
+        let randomDiscriminator = Int.random(in: minValue...maxValue)
+        
+        return NSNumber(value: randomDiscriminator)
     }
     
     /// Is commissioning window open
@@ -108,6 +60,67 @@ extension ESPMTRCommissioner {
             }
         }
         completion(nil, nil)
+    }
+    
+    
+    /// Open commissioning window
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion handler with setup payload and error
+    func openMTRPairingWindow(deviceId: UInt64, completion: @escaping (String?) -> Void) {
+        if let controller = self.sController {
+            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
+                if let device = device {
+                    let passcode = MTRSetupPayload.generateRandomSetupPasscode()
+                    let discriminator = self.generateRandomDiscriminator()
+                    device.openCommissioningWindow(withSetupPasscode: passcode,
+                                                   discriminator: discriminator,
+                                                   duration: NSNumber(value: 300),
+                                                   queue: self.matterQueue) { setup, error in
+                        guard let _ = error else {
+                            if let setup = setup as? MTRSetupPayload {
+                                if let manualPairingCode = setup.manualEntryCode() {
+                                    completion(manualPairingCode)
+                                } else {
+                                    completion(nil)
+                                }
+                            }
+                            return
+                        }
+                        completion(nil)
+                    }
+                } else {
+                    completion(nil)
+                }
+            }
+        } else {
+            completion(nil)
+        }
+    }
+    
+    /// Revoke commissioning window
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - completion: completion handler with success status
+    func revokeCommissioningWindow(deviceId: UInt64, completion: @escaping (Bool) -> Void) {
+        if let controller = self.sController {
+            let device = MTRBaseDevice(nodeID: NSNumber(value: deviceId), controller: controller)
+            if let commissioningCluster = MTRBaseClusterAdministratorCommissioning(device: device, endpointID: NSNumber(value: 0), queue: self.matterQueue) {
+                let params = MTRAdministratorCommissioningClusterRevokeCommissioningParams()
+                commissioningCluster.revokeCommissioning(with: params) { error in
+                    guard let _ = error else {
+                        // Remove stored OCW date when revoking
+                        completion(true)
+                        return
+                    }
+                    completion(false)
+                }
+            } else {
+                completion(false)
+            }
+        } else {
+            completion(false)
+        }
     }
 }
 #endif

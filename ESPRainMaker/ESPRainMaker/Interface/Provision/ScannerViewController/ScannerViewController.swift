@@ -286,15 +286,10 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             actionSheet.addAction(softapAction)
             #if ESPRainMakerMatter
             let mtrCommAction = UIAlertAction(title: "Matter", style: .default) { _ in
-                if #available(iOS 16.4, *) {
-                    NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
-                        if let groups = nodeGroups, groups.count > 0 {
-                            self.goToFabricSelection(onboardingPayload: nil)
-                        } else {
-                            self.onboardingPayload = nil
-                            self.createMatterFabric(groupName: "Home")
-                        }
-                    }
+                if #available(iOS 17.6, *) {
+                    self.showMatterPairingCodeDialog()
+                } else if #available(iOS 16.4, *) {
+                    self.processPairingCode()
                 } else {
                     self.alertUser(title: ESPMatterConstants.warning,
                                    message: AppMessages.upgradeOSVersionMsg,
@@ -311,6 +306,48 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             present(actionSheet, animated: true, completion: nil)
         }
     }
+    
+    #if ESPRainMakerMatter
+    @available(iOS 16.4, *)
+    private func showMatterPairingCodeDialog() {
+        let alert = UIAlertController(title: "Please enter the pairing code for the device.",
+                                      message: nil,
+                                      preferredStyle: .alert)
+        
+        alert.addTextField { textField in
+            textField.keyboardType = .numberPad
+            textField.placeholder = "Enter pairing code"
+        }
+        let submitAction = UIAlertAction(title: "Submit", style: .default) { [weak alert] _ in
+            if let textField = alert?.textFields?.first, let code = textField.text {
+                // Process the pairing code here
+                self.processPairingCode(code: code)
+            }
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
+        
+        alert.addAction(submitAction)
+        alert.addAction(cancelAction)
+        DispatchQueue.main.async {
+            self.present(alert, animated: true)
+        }
+    }
+    
+    @available(iOS 16.4, *)
+    private func processPairingCode(code: String? = nil) {
+        // Process the pairing code here
+        NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
+            if let groups = nodeGroups, groups.count > 0 {
+                DispatchQueue.main.async {
+                    self.goToFabricSelection(onboardingPayload: code)
+                }
+            } else {
+                self.onboardingPayload = code
+                self.createMatterFabric(groupName: "Home")
+            }
+        }
+    }
+    #endif
 
     func retry(message: String) {
         Utility.hideLoader(view: view)

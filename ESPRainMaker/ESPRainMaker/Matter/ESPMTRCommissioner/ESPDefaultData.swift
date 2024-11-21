@@ -25,11 +25,6 @@ class ESPDefaultData {
     static let shared = ESPDefaultData()
     let vendorIdQueue = DispatchQueue(label: "com.espressif.vendorid.queue", attributes: .concurrent)
     
-    /// Thread hard-coded values
-    static let threadSaltData = "Y8T4twDbVKTkppiUS5lpH8xi9qX8HTjkE1yMSL7uwhA="
-    static let threadPAKEVerifierData = "6lws/Pp8n7nm9l3B/vX0bYkRk/KgKM614w4wDeDrRMcELNYqAYSnZ3ewoimHKTbU/obSirNe+L4msaUU09ibgUfWDgvMR7GaLG3BWDqI9BpRgyjPfz0qTt193G7r3oYwbg=="
-    static let openCWManualPairingCode = "35174439122"
-    
     /// Save value for key in keychain
     /// - Parameters:
     ///   - value: value to be saved

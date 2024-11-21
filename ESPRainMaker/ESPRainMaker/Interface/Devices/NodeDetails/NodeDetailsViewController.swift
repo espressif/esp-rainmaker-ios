@@ -91,7 +91,6 @@ class NodeDetailsViewController: UIViewController {
     }
 
     // MARK: - IB Actions
-
     @IBAction func deleteNode(_: Any) {
         // Display message based on number of devices in the nodes.
         let title = "Are you sure?"
@@ -117,6 +116,17 @@ class NodeDetailsViewController: UIViewController {
         present(confirmAction, animated: true, completion: nil)
     }
     
+    @objc func textFieldDidChange(textField: UITextField) {
+        // Enable share button if text is non empty
+        if let text = textField.text, text.count > 0 {
+            shareAction?.isEnabled = true
+        } else {
+            shareAction?.isEnabled = false
+        }
+    }
+    
+    //MARK: Private functions
+    
     #if ESPRainMakerMatter
     @available(iOS 16.4, *)
     private func getTableViewCellForEnablePairingMode(forIndexPath: IndexPath) -> UITableViewCell {
@@ -135,31 +145,100 @@ class NodeDetailsViewController: UIViewController {
     
     /// Open commissioning Window
     @available(iOS 16.4, *)
-    func openCommissioningWindow() {
-        if let node = currentNode, let matterNodeId = node.matter_node_id, let id = matterNodeId.hexToDecimal {
-            ESPMTRCommissioner.shared.openCommissioningWindow(deviceId: id) { setupPasscode in
-                DispatchQueue.main.async {
-                    if let setupPasscode = setupPasscode {
-                        self.showManualPairingCode(setupPasscode: setupPasscode)
-                    } else {
-                        self.alertUser(title: ESPMatterConstants.failureTxt,
-                                       message: ESPMatterConstants.commissioningWindowOpenFailedMsg,
-                                       buttonTitle: ESPMatterConstants.okTxt,
-                                       callback: {})
+    private func openCommissioningWindow() {
+        if let node = currentNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
+            if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+                let status = node.isOpenCommissioningWindowSupported
+                if status.0, let endpoint = status.1, let endpointInt = UInt8(endpoint) {
+                    ESPMTRCommissioner.shared.isCommissioningWindowOpen(deviceId: deviceId, endpoint: endpointInt) { result, _ in
+                        if let result = result, result {
+                            DispatchQueue.main.async {
+                                self.showCWOpenDialog(deviceId: deviceId)
+                            }
+                        } else {
+                            self.startNewPairingWindow(deviceId: deviceId)
+                        }
                     }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    Utility.showToastMessage(view: self.view, message: ESPMatterConstants.deviceNotReachableMsg)
+                }
+            }
+        }
+    }
+    
+    /// Show dialog informing user that the commissioning window is open
+    /// - Parameter deviceId: device id
+    @available(iOS 16.4, *)
+    private func showCWOpenDialog(deviceId: UInt64) {
+        // Show alert asking user if they want to stop current pairing session
+        let alert = UIAlertController(title: "Device in Pairing Mode",
+                                    message: "Device is already in pairing mode. Do you want to stop it to restart a new pairing session?",
+                                    preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        let turnOffAction = UIAlertAction(title: "Turn off pairing mode", style: .default) { _ in
+            self.turnOffPairingMode(deviceId: deviceId)
+        }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(turnOffAction)
+        self.present(alert, animated: true)
+    }
+    
+    /// Start new pairning window
+    /// - Parameter deviceId: device id
+    @available(iOS 16.4, *)
+    private func startNewPairingWindow(deviceId: UInt64) {
+        ESPMTRCommissioner.shared.openMTRPairingWindow(deviceId: deviceId) { setupPasscode in
+            DispatchQueue.main.async {
+                if let setupPasscode = setupPasscode {
+                    self.showManualPairingCode(setupPasscode: setupPasscode)
+                } else {
+                    self.alertUser(title: ESPMatterConstants.failureTxt,
+                                 message: ESPMatterConstants.commissioningWindowOpenFailedMsg,
+                                 buttonTitle: ESPMatterConstants.okTxt,
+                                 callback: {})
+                }
+            }
+        }
+    }
+    
+    /// Turn off pairing mode
+    /// - Parameter deviceId: device id
+    @available(iOS 16.4, *)
+    private func turnOffPairingMode(deviceId: UInt64) {
+        ESPMTRCommissioner.shared.revokeCommissioningWindow(deviceId: deviceId) { success in
+            if success {
+                // If revoke successful, start new pairing window
+                DispatchQueue.main.async {
+                    self.alertUser(title: "Matter",
+                                 message: "Pairing mode turned off successfully!",
+                                 buttonTitle: ESPMatterConstants.okTxt,
+                                 callback: {})
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.alertUser(title: ESPMatterConstants.failureTxt,
+                                 message: "Failed to turn off pairing mode",
+                                 buttonTitle: ESPMatterConstants.okTxt,
+                                 callback: {})
                 }
             }
         }
     }
     
     /// Show manual pairing code
-    func showManualPairingCode(setupPasscode: String) {
+    /// - Parameter setupPasscode: setup passcode
+    private func showManualPairingCode(setupPasscode: String) {
         let dismissAction = UIAlertAction(title: ESPMatterConstants.dismissTxt, style: .default) { _ in}
         let copyMsgAction = UIAlertAction(title: ESPMatterConstants.copyCodeMsg, style: .default) { _ in
             let pasteboard = UIPasteboard.general
             pasteboard.string = setupPasscode
         }
-        self.showAlertWithOptions(title: ESPMatterConstants.pairingModeTitle, message: ESPMatterConstants.pairingModeMessage, actions: [copyMsgAction, dismissAction])
+        self.showAlertWithOptions(title: ESPMatterConstants.pairingModeTitle, message: ESPMatterConstants.pairingModeMessage + setupPasscode, actions: [copyMsgAction, dismissAction])
     }
     
     private func getTableViewCellForBinding(forIndexPath: IndexPath) -> UITableViewCell {
@@ -178,7 +257,7 @@ class NodeDetailsViewController: UIViewController {
     }
     
     @available(iOS 16.4, *)
-    func openClusterSelection() {
+    private func openClusterSelection() {
         if let node = self.currentNode {
             let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
             let clusterSelectionVC = storyboard.instantiateViewController(withIdentifier: ClusterSelectionViewController.storyboardId) as! ClusterSelectionViewController
@@ -439,47 +518,9 @@ class NodeDetailsViewController: UIViewController {
         view.endEditing(true)
         cell.addMemberButtonAction = {
             // Open dialog box for entering email of the secondary user
-            let input = UIAlertController(title: "Add Member", message: "", preferredStyle: .alert)
-            input.addTextField { textField in
-                textField.placeholder = "Enter email"
-                textField.keyboardType = .emailAddress
-                textField.delegate = self
-                textField.addTarget(self, action: #selector(self.textFieldDidChange(textField:)), for: .editingChanged)
+            DispatchQueue.main.async {
+                self.shareNode()
             }
-            input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
-
-            }))
-
-            let shareAction = UIAlertAction(title: "Share", style: .default, handler: { [weak input] _ in
-                let textField = input?.textFields![0]
-                guard let email = textField?.text, !email.trimmingCharacters(in: .whitespaces).isEmpty else {
-                    return
-                }
-                Utility.showLoader(message: "Sharing in progress..", view: self.view)
-                NodeSharingManager.shared.createSharingRequest(userName: email, node: self.currentNode) { request, error in
-                    Utility.hideLoader(view: self.view)
-                    guard let apiError = error else {
-                        DispatchQueue.main.async {
-                            if self.pendingRequests.count < 1 {
-                                self.dataSource[self.sharingIndex].append("Pending for acceptance")
-                            }
-                            self.pendingRequests.append(request!)
-                            self.tableView.reloadSections(IndexSet(arrayLiteral: self.sharingIndex), with: .automatic)
-                        }
-                        return
-                    }
-                    DispatchQueue.main.async {
-                        self.view.makeToast("Failed to share node with error: \(apiError.description)", duration: 5.0, position: ToastManager.shared.position, title: nil, image: nil, style: ToastManager.shared.style, completion: nil)
-                    }
-                }
-            })
-
-            shareAction.isEnabled = false
-            self.shareAction = shareAction
-
-            input.addAction(shareAction)
-
-            self.present(input, animated: true, completion: nil)
         }
         return cell
     }
@@ -490,18 +531,7 @@ class NodeDetailsViewController: UIViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "membersInfoTVC", for: forIndexPath) as! MembersInfoTableViewCell
         cell.removeMemberButton.isHidden = false
         cell.removeButtonAction = {
-            Utility.showLoader(message: "Removing request..", view: self.view)
-            NodeSharingManager.shared.deleteSharingRequest(request: request) { _, error in
-                Utility.hideLoader(view: self.view)
-                guard let apiError = error else {
-                    self.pendingRequests.remove(at: forIndexPath.row + 1 - self.dataSource[self.sharingIndex].count)
-                    self.updateSharingData()
-                    return
-                }
-                DispatchQueue.main.async {
-                    Utility.showToastMessage(view: self.view, message: "Failed to delete node sharing request with error: \(apiError.description)")
-                }
-            }
+            self.deleteSharingRequest(request: request, forIndexPath: forIndexPath)
         }
         cell.secondaryUserLabel.text = request.user_name
         if let timestamp = request.request_timestamp {
@@ -521,14 +551,70 @@ class NodeDetailsViewController: UIViewController {
         }
         return cell
     }
-
-    @objc func textFieldDidChange(textField: UITextField) {
-        // Enable share button if text is non empty
-        if let text = textField.text, text.count > 0 {
-            shareAction?.isEnabled = true
-        } else {
-            shareAction?.isEnabled = false
+    
+    private func createSharingRequest(email: String) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Sharing in progress..", view: self.view)
         }
+        NodeSharingManager.shared.createSharingRequest(userName: email, node: self.currentNode) { request, error in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+            }
+            guard let apiError = error else {
+                DispatchQueue.main.async {
+                    if self.pendingRequests.count < 1 {
+                        self.dataSource[self.sharingIndex].append("Pending for acceptance")
+                    }
+                    self.pendingRequests.append(request!)
+                    self.tableView.reloadSections(IndexSet(arrayLiteral: self.sharingIndex), with: .automatic)
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                self.view.makeToast("Failed to share node with error: \(apiError.description)", duration: 5.0, position: ToastManager.shared.position, title: nil, image: nil, style: ToastManager.shared.style, completion: nil)
+            }
+        }
+    }
+    
+    private func deleteSharingRequest(request: SharingRequest, forIndexPath: IndexPath) {
+        DispatchQueue.main.async {
+            Utility.showLoader(message: "Removing request..", view: self.view)
+        }
+        NodeSharingManager.shared.deleteSharingRequest(request: request) { _, error in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+            }
+            guard let apiError = error else {
+                self.pendingRequests.remove(at: forIndexPath.row + 1 - self.dataSource[self.sharingIndex].count)
+                self.updateSharingData()
+                return
+            }
+            DispatchQueue.main.async {
+                Utility.showToastMessage(view: self.view, message: "Failed to delete node sharing request with error: \(apiError.description)")
+            }
+        }
+    }
+    
+    private func shareNode() {
+        let input = UIAlertController(title: "Add Member", message: "", preferredStyle: .alert)
+        input.addTextField { textField in
+            textField.placeholder = "Enter email"
+            textField.keyboardType = .emailAddress
+            textField.delegate = self
+            textField.addTarget(self, action: #selector(self.textFieldDidChange(textField:)), for: .editingChanged)
+        }
+        input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in }))
+        let shareAction = UIAlertAction(title: "Share", style: .default, handler: { [weak input] _ in
+            let textField = input?.textFields![0]
+            guard let email = textField?.text, !email.trimmingCharacters(in: .whitespaces).isEmpty else {
+                return
+            }
+            self.createSharingRequest(email: email)
+        })
+        shareAction.isEnabled = false
+        self.shareAction = shareAction
+        input.addAction(shareAction)
+        self.present(input, animated: true, completion: nil)
     }
 }
 

@@ -257,7 +257,7 @@ struct ESPMatterConstants {
     static let enterValidDeviceNameMsg = "Please enter a valid device name within a range of 1-32 characters"
     static let upgradeOSVersionMsg = "You must upgrade to iOS 16.4 or above in order to commission matter nodes."
     static let scannErrorMsg: String = "Something went wrong! Please go back and try scanning the QR code again."
-    static let pairingModeMessage = "\"Matter Accessory\" is now in pairing mode. Use the setup code to connect.\n\n Setup Code: 35174439122"
+    static let pairingModeMessage = "\"Matter Accessory\" is now in pairing mode. Use the setup code to connect.\n\n Setup Code: "
     static let deviceNotReachableMsg: String = "Device not reachable! Please ensure that the device is powered on and connected to the same network."
     static let controllerNeedsAccessMsg: String = "Matter Controller needs access to your RainMaker account to fetch all nodes under the account. Proceed?"
     static let scanQRCodeMsg = "Since you are trying to commission a matter device, you will have to scan the QR code again using the scanner that will appear next."
@@ -295,6 +295,7 @@ struct ESPMatterConstants {
     static let enterBadgeUserNameMsg = "Please enter a valid user name. Only spaces are not allowed."
     static let enterBadgeCompanyNameMsg = "Please enter a valid company name. Only spaces are not allowed."
     static let enterBadgeEventNameMsg = "Please enter a valid event name. Only spaces are not allowed."
+    static let commissioningWindowOpenMsg = "Commissioning window is already open. Please try after a few minutes"
     
     //Air conditioner device
     static let cool = "Cool"
@@ -305,6 +306,9 @@ struct ESPMatterConstants {
     static let tempDegreesCelsius = "Temperature(°C)"
     
     static let threadUpdateFailed = "Failed to update thread dataset!"
+    
+    static let ocwKey = "com.espressif.rainmaker.softap.open.commissioning.window"
+    static let ocwDuration: TimeInterval = 300
 }
 
 extension String {

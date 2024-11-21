@@ -108,10 +108,26 @@ class ESPMatterCommissioningVC: UIViewController {
         ESPMatterEcosystemInfo.shared.removeCertDeclaration()
         ESPMatterEcosystemInfo.shared.removeAttestationInfo()
         if let group = self.group, let groupName = group.groupName, let groupId = group.groupID {
-            if let onboardingPayload = self.onboardingPayload, let setupPayload = try? MTRSetupPayload(onboardingPayload: onboardingPayload) {
-                self.startEcosystemCommissioning(matterEcosystemName: Configuration.shared.appConfiguration.matterEcosystemName,
-                                                 groupName: groupName,
-                                                 setupPayload: setupPayload)
+            if let onboardingPayload = self.onboardingPayload {
+                if let setupPayload = try? MTRSetupPayload(onboardingPayload: onboardingPayload) {
+                    self.startEcosystemCommissioning(matterEcosystemName: Configuration.shared.appConfiguration.matterEcosystemName,
+                                                     groupName: groupName,
+                                                     groupId: groupId,
+                                                     showDeviceCriteria: true,
+                                                     setupPayload: setupPayload)
+                } else if #available(iOS 17.6, *), let setupPayload = try? MTRSetupPayload(payload: onboardingPayload) {
+                    self.startEcosystemCommissioning(matterEcosystemName: Configuration.shared.appConfiguration.matterEcosystemName,
+                                                     groupName: groupName,
+                                                     groupId: groupId,
+                                                     showDeviceCriteria: true,
+                                                     setupPayload: setupPayload)
+                } else {
+                    self.startEcosystemCommissioning(matterEcosystemName: Configuration.shared.appConfiguration.matterEcosystemName,
+                                                     groupName: groupName,
+                                                     groupId: groupId,
+                                                     showDeviceCriteria: true,
+                                                     setupPayload: nil)
+                }
             } else {
                 self.startEcosystemCommissioning(matterEcosystemName: Configuration.shared.appConfiguration.matterEcosystemName,
                                                  groupName: groupName,
@@ -208,6 +224,8 @@ extension ESPMatterCommissioningVC {
     /// - Parameter groupName: group name
     func validatePayloadAndStartCommissioning(groupName: String) {
         if let _ = ESPMatterEcosystemInfo.shared.getOnboardingPayload() {
+            self.startCommissioning()
+        } else if let _ = self.onboardingPayload {
             self.startCommissioning()
         } else {
             DispatchQueue.main.async {
