@@ -21,6 +21,22 @@ import Foundation
 @available(iOS 16.4, *)
 extension MatterControllerParser {
     
+    func getControllerFwVersion(controllerNodeId: String) -> String? {
+        if let controller = fetchMatterControllerData(nodeId: controllerNodeId), let dataversion = controller.matterControllerDataVersion {
+            return dataversion
+        }
+        return nil
+    }
+    
+    func isControllerFwVersionUpdated(controllerNodeId: String) -> Bool {
+        if let version = getControllerFwVersion(controllerNodeId: controllerNodeId), version > "1.0.0" {
+            return true
+        }
+        return false
+    }
+    
+    // MARK: Old controller version
+    
     /// Get value for cluster id/attribute id
     /// - Parameters:
     ///   - cluster: cluster
@@ -112,7 +128,7 @@ extension MatterControllerParser {
     /// - Returns: matter endpoints
     func getMatterEndpoints(endpointsData: [String: MatterEndpointsData], endpointId: String) -> [MatterEndpointData]? {
         for eId in endpointsData.keys {
-            if eId == endpointId, let matterEndpointsData = endpointsData[endpointId] as? MatterEndpointsData, let endpoints = matterEndpointsData.endpoints as? [MatterEndpointData] {
+            if eId == endpointId, let matterEndpointsData = endpointsData[endpointId], let endpoints = matterEndpointsData.endpoints {
                 return endpoints
             }
         }
@@ -129,7 +145,7 @@ extension MatterControllerParser {
         if let matterNodesData = self.getMatterNodesData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
             if let endpointsData = self.getMatterEndpointsData(matterNodeId: matterNodeId, matterNodesData: matterNodesData) {
                 for endpointId in endpointsData.keys {
-                    if let matterEndpointsData = endpointsData[endpointId] as? MatterEndpointsData, let endpoints = matterEndpointsData.endpoints as? [MatterEndpointData] {
+                    if let matterEndpointsData = endpointsData[endpointId], let endpoints = matterEndpointsData.endpoints {
                         for endpoint in endpoints {
                             if let clusters = endpoint.clusters {
                                 for clusterData in clusters {
@@ -142,6 +158,61 @@ extension MatterControllerParser {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
+    //MARK: New controller version
+    
+    /// Get data for a given controller node id and matter node id
+    /// - Parameters:
+    ///   - controllerNodeId: controller node id
+    ///   - matterNodeId: matter node id
+    /// - Returns: matter nodes endpoints data
+    func getFinalMatterNodesEndpointsData(controllerNodeId: String, matterNodeId: String) -> [String: MatterEndpointData]? {
+        if let matterNodeData = self.getMatterNodeData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            return matterNodeData.finalEndpointsData
+        }
+        return nil
+    }
+    
+    /// Get endpoint id given the following:
+    /// - Parameters:
+    ///   - controllerNodeId: controller node id of any controller in given fabric
+    ///   - matterNodeId: matter node id
+    ///   - clusterId: cluster id
+    /// - Returns: endpoint id
+    func getFinalMatterEndpointId(controllerNodeId: String, matterNodeId: String, clusterId: String) -> String? {
+        if let finalEndpointsData = self.getFinalMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            for endpoint in finalEndpointsData.keys {
+                if let endpointData = finalEndpointsData[endpoint] as? MatterEndpointData {
+                    if let clustersData = endpointData.clustersData, let _ = clustersData[clusterId] as? MatterClusterData {
+                        return endpoint
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
+    /// Get value of a given attrinbute on a given cluster
+    /// - Parameters:
+    ///   - finalEndpointsData: endpoints data
+    ///   - endpointId: endpoint id
+    ///   - clusterId: cluster id
+    ///   - attributeId: attribute id
+    /// - Returns: value of attribute
+    func getFinalClusterAttributeValue(finalEndpointsData: [String: MatterEndpointData], endpointId: String, clusterId: String, attributeId: String) -> Any? {
+        if let endpointData = finalEndpointsData[endpointId] as? MatterEndpointData, let clustersData = endpointData.clustersData {
+            if let servers = clustersData[clusterId] as? [MatterServersData] {
+                for server in servers {
+                    if let attributes = server.attributes {
+                        if let attributeValue = attributes[attributeId] as? Any {
+                            return attributeValue
                         }
                     }
                 }

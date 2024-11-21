@@ -17,59 +17,115 @@
 //
 
 #if ESPRainMakerMatter
-import Foundation
-
-class ESPControllerAPIKeys {
-    
-    static let matterController = "matter-controller"
-    static let matterControllerDataVersion = "matter-controller-data-version"
-    static let matterControllerData = "matter-controller-data"
-    static let data = "data"
-    static let enabled = "enabled"
-    static let reachable = "reachable"
-    static let matterNodes = "matter-nodes"
-    static let matterNodeId = "matter-node-id"
-    static let endpoints = "endpoints"
-    static let endpointId = "endpoint-id"
-    static let clusters = "clusters"
-    static let clusterId = "cluster-id"
-    static let commands = "commands"
-    static let commandId = "command-id"
-    
-    static let onOffClusterId = "0x6"
-    static let offCommandId = "0x0"
-    static let onCommandId = "0x1"
-    static let toggleCommandId = "0x2"
-    static let onOffAttributeId = "0x0"
-    static let levelControlClusterId = "0x8"
-    static let colorControlClusterId =  "0x300"
-    static let moveToLevelWithOnOffCommandId = "0x0"
-    static let brightnessLevelAttributeId = "0x0"
-    static let moveToSaturationCommandId = "0x3"
-    static let moveToHueCommandId = "0x0"
-    static let currentHueAttributeId = "0x0"
-    static let currentSaturationAttributeId = "0x1"
-    static let thermostatClusterId = "0x201"
-    static let localTemperatureAttributeId = "0x0"
-    static let systemModeAttributeId = "0x1c"
-    static let occupiedCoolingSetpointAttributeId = "0x11"
-    static let occupiedHeatingSetpointAttributeId = "0x12"
-    static let temperatureMeasurementClusterId = "0x402"
-    static let measuredTemperatureAttributeId = "0x0"
-}
-
-
 @available(iOS 16.4, *)
 class MatterControllerParser {
     
     static let shared = MatterControllerParser()
     
+    /// Check the matter controller data version and parse the matter controller data accordingly
+    /// - Parameters:
+    ///   - node: node
+    ///   - matterControllerData: matter controller data
+    /// - Returns: matter controller object
+    func parseMatterControllerData(node: Node, matterControllerData: [String: Any]) -> MatterController? {
+        var controllerData = MatterController()
+        if let matterController = matterControllerData[node.controllerServiceName] as? [String: Any] {
+            if let dataVersion = matterController[node.matterControllerDataVersion] as? String, dataVersion > "1.0.0" {
+                return parseNewMatterControllerData(node: node, matterControllerData: matterControllerData, controllerData: &controllerData)
+            } else {
+                return parseOldMatterControllerData(node: node, matterControllerData: matterControllerData, controllerData: &controllerData)
+            }
+        }
+        return nil
+    }
+    
+    //MARK: new controller version parser
+    
+    /// Parse controller data for newer controller version
+    /// - Parameters:
+    ///   - node: node
+    ///   - matterControllerData: matter controller data
+    ///   - controllerData: controller data reference
+    /// - Returns: MatterController object
+    func parseNewMatterControllerData(node: Node, matterControllerData: [String: Any], controllerData: inout MatterController) -> MatterController? {
+        if let matterController = matterControllerData[node.controllerServiceName] as? [String: Any] {
+            if let dataVersion = matterController[node.matterControllerDataVersion] as? String {
+                controllerData.matterControllerDataVersion = dataVersion
+            }
+            if let data = matterController[node.matterDevicesParamName] as? [String: Any] {
+                controllerData.matterControllerData = self.populateMatterControllerData(data: data)
+            }
+            return controllerData
+        }
+        return nil
+    }
+    
+    func populateMatterControllerData(data: [String: Any]) -> MatterControllerData {
+        var matterControllerData = MatterControllerData()
+        matterControllerData.matterNodesData = [String: MatterNodeData]()
+        for nodeId in data.keys {
+            var matterNodeData = MatterNodeData()
+            matterNodeData.endpointsData = [String: MatterEndpointsData]()
+            if let nodeData = data[nodeId] as? [String: Any] {
+                if let enabled = nodeData[ESPControllerAPIKeys.enabled] as? Bool {
+                    matterNodeData.enabled = enabled
+                }
+                if let reachable = nodeData[ESPControllerAPIKeys.reachable] as? Bool {
+                    matterNodeData.reachable = reachable
+                }
+                self.populateEndpointsData(matterNodeData: &matterNodeData, nodeData: nodeData)
+            }
+            matterControllerData.matterNodesData?[nodeId] = matterNodeData
+        }
+        return matterControllerData
+    }
+    
+    func populateEndpointsData(matterNodeData: inout MatterNodeData, nodeData: [String: Any]) {
+        var endpointsData = MatterEndpointsData()
+        if let endpoints = nodeData[ESPControllerAPIKeys.endpoints] as? [String: Any] {
+            endpointsData.endpoints = [MatterEndpointData]()
+            matterNodeData.finalEndpointsData = [String: MatterEndpointData]()
+            for endpoint in endpoints.keys {
+                var endpointData = MatterEndpointData()
+                endpointData.clustersData = [String: MatterClusterData]()
+                endpointData.clients = [String: [String]]()
+                if let clustersData = endpoints[endpoint] as? [String: Any] {
+                    if let clusters = clustersData[ESPControllerAPIKeys.clusters] as? [String: Any] {
+                        var clusterData = MatterClusterData()
+                        if let clients = clusters[ESPControllerAPIKeys.clients] as? [String] {
+                            endpointData.clients?[endpoint] = clients
+                        }
+                        if let servers = clusters[ESPControllerAPIKeys.servers] as? [String: Any] {
+                            for clusterId in servers.keys {
+                                clusterData.servers = [MatterServersData]()
+                                if let serverData = servers[clusterId] as? [String: Any] {
+                                    var serversData = MatterServersData()
+                                    if let attributes = serverData[ESPControllerAPIKeys.attributes] as? [String: Any] {
+                                        serversData.attributes = attributes
+                                    }
+                                    
+                                    if let events = servers[ESPControllerAPIKeys.events] as? [String: Any] {
+                                        serversData.events = events
+                                    }
+                                    clusterData.servers?.append(serversData)
+                                }
+                                endpointData.clustersData?[clusterId] = clusterData
+                            }
+                        }
+                        matterNodeData.finalEndpointsData?[endpoint] = endpointData
+                    }
+                }
+            }
+        }
+    }
+    
+    //MARK: old controller version parser
+    
     /// Parse matter controller data
     /// - Parameter matterControllerData: matter controller data
     /// - Returns: matter controller object
-    func parseMatterControllerData(node: Node, matterControllerData: [String: Any]) -> MatterController? {
+    func parseOldMatterControllerData(node: Node, matterControllerData: [String: Any], controllerData: inout MatterController) -> MatterController? {
         if let matterController = matterControllerData[node.controllerServiceName] as? [String: Any] {
-            var controllerData = MatterController()
             if let dataVersion = matterController[node.matterControllerDataVersion] as? String, let data = matterController[node.matterDevicesParamName] as? [String: Any] {
                 controllerData.matterControllerDataVersion = dataVersion
                 var matterControllerData = MatterControllerData()
@@ -147,8 +203,10 @@ class MatterControllerParser {
     ///   - controllerNodeId: controller node id
     ///   - matterNodeId: matter node id
     func getOnOffEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
-        if let endpointId = self.getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.onOffClusterId) {
-            return endpointId
+        if isControllerFwVersionUpdated(controllerNodeId: controllerNodeId) {
+            return getFinalMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.onOffClusterId)
+        } else {
+            return getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.onOffClusterId)
         }
         return nil
     }
@@ -159,18 +217,23 @@ class MatterControllerParser {
     ///   - matterNodeId: matter node id
     /// - Returns: on/off status
     func getOnOffValue(controllerNodeId: String, matterNodeId: String) -> Bool? {
-        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            if let eId = self.getOnOffEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+        if isControllerFwVersionUpdated(controllerNodeId: controllerNodeId) {
+            if let finalEndpointsData = getFinalMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let eId = getOnOffEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let value = getFinalClusterAttributeValue(finalEndpointsData: finalEndpointsData, endpointId: eId, clusterId: ESPControllerAPIKeys.onOffClusterId, attributeId: ESPControllerAPIKeys.onOffAttributeId) as? Bool {
+                return value
+            }
+        } else {
+            // Existing implementation for old version
+            if let endpointsData = getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let eId = getOnOffEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
                 for endpoint in endpoints {
                     if let clusters = endpoint.clusters {
                         for clusterData in clusters {
-                            if let cluster = clusterData.cluster {
-                                if let onOffValue = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.onOffClusterId, attributeId: ESPControllerAPIKeys.onOffAttributeId) {
-                                    if onOffValue.lowercased() == "1" {
-                                        return true
-                                    }
-                                    return false
+                            if let cluster = clusterData.cluster,
+                               let onOffValue = getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.onOffClusterId, attributeId: ESPControllerAPIKeys.onOffAttributeId) {
+                                if onOffValue == "1" {
+                                    return true
                                 }
+                                return false
                             }
                         }
                     }
@@ -185,10 +248,11 @@ class MatterControllerParser {
     ///   - controllerNodeId: controller node id
     ///   - matterNodeId: matter node id
     func getBrightnessLevelEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
-        if let endpointId = self.getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.levelControlClusterId) {
-            return endpointId
+        if isControllerFwVersionUpdated(controllerNodeId: controllerNodeId) {
+            return getFinalMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.levelControlClusterId)
+        } else {
+            return getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.levelControlClusterId)
         }
-        return nil
     }
     
     /// Get brightness level
@@ -197,15 +261,23 @@ class MatterControllerParser {
     ///   - matterNodeId: matter node id
     /// - Returns: brightness level
     func getBrightnessLevel(controllerNodeId: String, matterNodeId: String) -> Int? {
-        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            if let eId = self.getBrightnessLevelEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+        if isControllerFwVersionUpdated(controllerNodeId: controllerNodeId) {
+            if let finalEndpointsData = getFinalMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let eId = getBrightnessLevelEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let value = getFinalClusterAttributeValue(finalEndpointsData: finalEndpointsData, endpointId: eId, clusterId: ESPControllerAPIKeys.levelControlClusterId, attributeId: ESPControllerAPIKeys.brightnessLevelAttributeId) as? Int {
+                return value
+            }
+        } else {
+            // Existing implementation for old version
+            if let endpointsData = getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let eId = getBrightnessLevelEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let endpoints = getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
                 for endpoint in endpoints {
                     if let clusters = endpoint.clusters {
                         for clusterData in clusters {
-                            if let cluster = clusterData.cluster {
-                                if let brightnessLevel = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.levelControlClusterId, attributeId: ESPControllerAPIKeys.brightnessLevelAttributeId) {
-                                    return Int(brightnessLevel)
-                                }
+                            if let cluster = clusterData.cluster,
+                               let brightnessLevel = getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.levelControlClusterId, attributeId: ESPControllerAPIKeys.brightnessLevelAttributeId) {
+                                return Int(brightnessLevel)
                             }
                         }
                     }
@@ -220,10 +292,11 @@ class MatterControllerParser {
     ///   - controllerNodeId: controller node id
     ///   - matterNodeId: matter node id
     func getHueEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
-        if let endpointId = self.getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.colorControlClusterId) {
-            return endpointId
+        if isControllerFwVersionUpdated(controllerNodeId: controllerNodeId) {
+            return getFinalMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.colorControlClusterId)
+        } else {
+            return getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.colorControlClusterId)
         }
-        return nil
     }
     
     /// Get brightness level
@@ -232,15 +305,23 @@ class MatterControllerParser {
     ///   - matterNodeId: matter node id
     /// - Returns: brightness level
     func getCurrentHue(controllerNodeId: String, matterNodeId: String) -> Int? {
-        if let endpointsData = self.getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            if let eId = self.getHueEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+        if isControllerFwVersionUpdated(controllerNodeId: controllerNodeId) {
+            if let finalEndpointsData = getFinalMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let eId = getHueEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let value = getFinalClusterAttributeValue(finalEndpointsData: finalEndpointsData, endpointId: eId, clusterId: ESPControllerAPIKeys.colorControlClusterId, attributeId: ESPControllerAPIKeys.currentHueAttributeId) as? Int {
+                return value
+            }
+        } else {
+            // Existing implementation
+            if let endpointsData = getMatterNodesEndpointsData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let eId = getHueEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId),
+               let endpoints = getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
                 for endpoint in endpoints {
                     if let clusters = endpoint.clusters {
                         for clusterData in clusters {
-                            if let cluster = clusterData.cluster {
-                                if let currentHue = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.colorControlClusterId, attributeId: ESPControllerAPIKeys.currentHueAttributeId) {
-                                    return Int(currentHue)
-                                }
+                            if let cluster = clusterData.cluster,
+                               let currentHue = getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.colorControlClusterId, attributeId: ESPControllerAPIKeys.currentHueAttributeId) {
+                                return Int(currentHue)
                             }
                         }
                     }
@@ -435,54 +516,5 @@ class MatterControllerParser {
         return nil
     }
 }
-
-@available(iOS 16.4, *)
-struct MatterController: Codable {
-    
-    var matterControllerDataVersion: String?
-    var matterControllerData: MatterControllerData?
-    
-    enum CodingKeys: String, CodingKey {
-        case matterControllerDataVersion = "matter-controller-data-version"
-        case matterControllerData = "matter-controller-data"
-    }
-}
-
-@available(iOS 16.4, *)
-struct MatterControllerData: Codable {
-    
-    var matterNodesData: [String: MatterNodeData]?
-}
-
-@available(iOS 16.4, *)
-struct MatterNodeData: Codable {
-    
-    var enabled: Bool?
-    var reachable: Bool?
-    var endpointsData: [String: MatterEndpointsData]?
-}
-
-@available(iOS 16.4, *)
-struct MatterEndpointsData: Codable {
-    
-    var endpoints: [MatterEndpointData]?
-}
-
-@available(iOS 16.4, *)
-struct MatterEndpointData: Codable {
-    
-    var clusters: [MatterClusterData]?
-}
-
-@available(iOS 16.4, *)
-struct MatterClusterData: Codable {
-    
-    var cluster: [String: MatterAttributeData]?
-}
-
-@available(iOS 16.4, *)
-struct MatterAttributeData: Codable {
-    
-    var attributes: [String: String]?
-}
 #endif
+
