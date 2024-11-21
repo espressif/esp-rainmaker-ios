@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -32,14 +32,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pyW-qy-a74">
-                                <rect key="frame" x="10" y="0.0" width="48" height="30"/>
+                                <rect key="frame" x="10" y="20" width="48" height="30"/>
                                 <state key="normal" title="Cancel"/>
                                 <connections>
                                     <action selector="cancelClicked:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="27l-gQ-jph"/>
                                 </connections>
                             </button>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SfD-PU-5hC">
-                                <rect key="frame" x="0.0" y="30" width="414" height="706"/>
+                                <rect key="frame" x="0.0" y="50" width="414" height="686"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -155,9 +155,33 @@
                                             <action selector="linkWithAlexa:" destination="r6I-WK-3bh" eventType="touchUpInside" id="fIJ-2a-HAu"/>
                                         </connections>
                                     </button>
+                                    <button hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VaI-11-cT9">
+                                        <rect key="frame" x="57" y="572.33333333333337" width="300" height="50"/>
+                                        <color key="backgroundColor" systemColor="systemRedColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="300" id="7Hr-qQ-MRn"/>
+                                            <constraint firstAttribute="height" constant="50" id="yVN-st-Q9P"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="AmazonEmberDisplay-Regular" family="Amazon Ember Display" pointSize="15"/>
+                                        <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="Deny">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="25"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="denyLinkButtonClicked:" destination="r6I-WK-3bh" eventType="touchUpInside" id="GA0-2Y-PKx"/>
+                                            <action selector="unlinkWithAlexa:" destination="r6I-WK-3bh" eventType="touchUpInside" id="6q5-fi-6V8"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
+                                    <constraint firstItem="VaI-11-cT9" firstAttribute="trailing" secondItem="vry-Bh-FOd" secondAttribute="trailing" id="Kdl-zr-6OS"/>
                                     <constraint firstItem="EmC-gF-S42" firstAttribute="top" secondItem="9ol-pi-hl2" secondAttribute="top" constant="70" id="P4M-L1-7Je"/>
                                     <constraint firstAttribute="trailing" secondItem="uDD-NO-wpO" secondAttribute="trailing" constant="50" id="Pik-NC-jrx"/>
                                     <constraint firstAttribute="bottom" secondItem="vry-Bh-FOd" secondAttribute="bottom" constant="120" id="Pj9-QL-9lC"/>
@@ -165,6 +189,8 @@
                                     <constraint firstItem="EmC-gF-S42" firstAttribute="centerX" secondItem="9ol-pi-hl2" secondAttribute="centerX" id="fGu-40-YV9"/>
                                     <constraint firstItem="uDD-NO-wpO" firstAttribute="top" secondItem="EmC-gF-S42" secondAttribute="bottom" constant="81" id="t6R-lz-zjc"/>
                                     <constraint firstItem="vry-Bh-FOd" firstAttribute="centerX" secondItem="9ol-pi-hl2" secondAttribute="centerX" id="ubN-wb-To9"/>
+                                    <constraint firstItem="VaI-11-cT9" firstAttribute="leading" secondItem="vry-Bh-FOd" secondAttribute="leading" id="uxv-u2-ikh"/>
+                                    <constraint firstItem="VaI-11-cT9" firstAttribute="top" secondItem="vry-Bh-FOd" secondAttribute="bottom" constant="35.000000000000114" id="yAj-Ci-U6V"/>
                                 </constraints>
                             </view>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cUl-7u-Nvw">
@@ -263,7 +289,14 @@
                         <outlet property="alexaControlsLabel" destination="bbC-e4-k9r" id="moy-Hf-ZUy"/>
                         <outlet property="connectToAlexaView" destination="9ol-pi-hl2" id="omd-PJ-DlT"/>
                         <outlet property="connectedToAlexaView" destination="cUl-7u-Nvw" id="eu3-SY-Mbh"/>
+                        <outlet property="denyLinkButton" destination="VaI-11-cT9" id="AHp-mD-gPo"/>
+                        <outlet property="linkButtonBottomSpaceConstraint" destination="0Rj-fU-sgH" id="MKD-0z-gGB"/>
                         <outlet property="linkWithAlexaButton" destination="vry-Bh-FOd" id="fqv-Sm-700"/>
+                        <outlet property="linkWithAmazonButton" destination="Uw5-Fc-qeI" id="I3T-bW-1yO"/>
+                        <outlet property="topBarView" destination="cYE-Aj-WkN" id="Gcl-Qi-6mb"/>
+                        <outlet property="topBarViewBackButton" destination="w5M-Qe-3M9" id="VYG-lz-DRc"/>
+                        <outlet property="topBarViewHeightConstraint" destination="BKe-xu-aA8" id="Ach-5V-6xi"/>
+                        <outlet property="topBarViewTitle" destination="VCk-RD-BIz" id="aO0-tn-oPa"/>
                         <outlet property="unlinkWithAlexaButton" destination="Uw5-Fc-qeI" id="5YB-tX-8gO"/>
                     </connections>
                 </viewController>
@@ -280,6 +313,9 @@
         </systemColor>
         <systemColor name="systemGrayColor">
             <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

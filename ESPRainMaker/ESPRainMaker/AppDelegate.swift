@@ -30,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var deviceToken: String?
     var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     var jPushServiceTimer: Timer?
+    var rainmakerURL: URL!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         

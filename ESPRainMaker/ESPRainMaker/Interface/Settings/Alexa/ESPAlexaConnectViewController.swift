@@ -28,6 +28,10 @@ protocol ESPEnableAlexaSkillPresenter {
     func showDisableSkillAlert()
 }
 
+protocol ESPLinkSkillFromAlexaDelegate: AnyObject {
+    func launchCognitoURL()
+}
+
 /// This viewcontroller is to show screen to allow user to connect to Alexa
 class ESPAlexaConnectViewController: UIViewController {
     
@@ -35,12 +39,29 @@ class ESPAlexaConnectViewController: UIViewController {
     var isAccountConnected: Bool = false
     var service: ESPEnableAlexaSkillService!
     
+    @IBOutlet weak var topBarViewBackButton: BarButton!
+    @IBOutlet weak var topBarView: TopBarView!
+    @IBOutlet weak var topBarViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var topBarViewTitle: BarTitle!
+    @IBOutlet weak var linkButtonBottomSpaceConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var linkWithAmazonButton: UIButton!
+    @IBOutlet weak var denyLinkButton: UIButton!
+    
+    var isLaunchedFromAlexa: Bool = false
+    weak var espLinkSkillFromAlexaDelegate: ESPLinkSkillFromAlexaDelegate?
+    var rainmakerURL: URL!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.service = ESPEnableAlexaSkillService(presenter: self)
         self.connectToAlexaView.isHidden = true
+        if self.isLaunchedFromAlexa {
+            self.performAppLinkingFromAlexaApp()
+            return
+        }
         self.showLoader(message: "")
         ESPAlexaTokenWorker.shared.clearAccessToken()
+        self.service = ESPEnableAlexaSkillService(presenter: self)
         service.isAccountLinked() { status in
             self.hideLoader()
             self.accountLinked(status: status)
@@ -51,7 +72,17 @@ class ESPAlexaConnectViewController: UIViewController {
     @IBOutlet weak var connectToAlexaView: UIView!
     @IBOutlet weak var linkWithAlexaButton: UIButton!
     @IBAction func linkWithAlexa(_ sender: Any) {
-        self.service.initiateEnableSkillFlow()
+        if self.isLaunchedFromAlexa {
+            self.dismiss(animated: true) {
+                self.espLinkSkillFromAlexaDelegate?.launchCognitoURL()
+            }
+        } else {
+            self.service.initiateEnableSkillFlow()
+        }
+    }
+    
+    @IBAction func denyLinkButtonClicked(_ sender: Any) {
+        self.dismiss(animated: true)
     }
     
     // MARK: Back button
@@ -65,6 +96,19 @@ class ESPAlexaConnectViewController: UIViewController {
     @IBOutlet weak var alexaControlsLabel: UILabel!
     @IBAction func unlinkWithAlexa(_ sender: Any) {
         self.showDisableSkillAlert()
+    }
+    
+    func performAppLinkingFromAlexaApp() {
+        DispatchQueue.main.async {
+            self.linkButtonBottomSpaceConstraint.constant = 160.0
+            self.topBarView.isHidden = true
+            self.connectToAlexaView.isHidden = false
+            self.topBarViewBackButton.isHidden = true
+            self.linkWithAmazonButton.setTitle("Allow", for: .normal)
+            self.topBarViewTitle.text = ""
+            self.topBarViewHeightConstraint.constant = 0.0
+            self.denyLinkButton.isHidden = false
+        }
     }
 }
 
