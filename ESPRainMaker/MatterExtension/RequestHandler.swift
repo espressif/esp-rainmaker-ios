@@ -46,11 +46,18 @@ class RequestHandler: MatterAddDeviceExtensionRequestHandler {
     /// - Parameter threadScanResults: thread scan results
     /// - Returns: default system network
     override func selectThreadNetwork(from threadScanResults: [MatterAddDeviceExtensionRequestHandler.ThreadScanResult]) async throws -> MatterAddDeviceExtensionRequestHandler.ThreadNetworkAssociation {
-        for threadScanResult in threadScanResults {
-            if let borderAgentIdData = ESPMatterExtensionEcoInfo.shared.getBorderAgentIdKey() {
-                let borderAgentId = borderAgentIdData.hexadecimalString
-                let id = threadScanResult.extendedAddress.hexadecimalString
-                if id == borderAgentId {
+        if let extendedAddresses = ESPMatterExtensionEcoInfo.shared.getExtendedAddress() {
+            for threadScanResult in threadScanResults {
+                let scanResultId = threadScanResult.extendedAddress.hexadecimalString
+                if extendedAddresses.contains(scanResultId) {
+                    return .network(extendedPANID: threadScanResult.extendedPANID)
+                }
+            }
+        }
+        if let borderAgentIds = ESPMatterExtensionEcoInfo.shared.getBorderAgentIdKey() {
+            for threadScanResult in threadScanResults {
+                let scanResultId = threadScanResult.extendedAddress.hexadecimalString
+                if borderAgentIds.contains(scanResultId) {
                     return .network(extendedPANID: threadScanResult.extendedPANID)
                 }
             }

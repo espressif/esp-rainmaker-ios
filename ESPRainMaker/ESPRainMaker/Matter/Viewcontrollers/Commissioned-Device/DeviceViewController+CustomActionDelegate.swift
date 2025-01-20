@@ -63,60 +63,36 @@ extension DeviceViewController: CustomActionDelegate {
     
     /// Update thread dataset
     func updateThreadDataset() {
-        DispatchQueue.main.async {
-            Utility.showLoader(message: "Sending thread data", view: self.view)
-        }
         if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
-             ThreadCredentialsManager.shared.fetchThreadOperationalDataset { dataset in
-                 if let dataset = dataset {
-                     let datasetStr = dataset.hexadecimalString
-                     ESPMTRCommissioner.shared.updateActiveThreadOperationalDataset(deviceId: deviceId, operationalDataset: datasetStr) { result in
-                         if result {
-                             ESPMTRCommissioner.shared.startThreadNetwork(deviceId: deviceId) { res in
-                                 DispatchQueue.main.async {
-                                     Utility.hideLoader(view: self.view)
-                                     if !res {
-                                         Utility.showToastMessage(view: self.view, message: ESPMatterConstants.operationFailedMsg)
-                                     }
-                                 }
-                             }
-                             return
-                         }
-                         DispatchQueue.main.async {
-                             Utility.hideLoader(view: self.view)
-                             Utility.showToastMessage(view: self.view, message: ESPMatterConstants.operationFailedMsg)
-                         }
-                     }
-                 } else {
-                     if let groupId = self.group?.groupID, let key = ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId).1, let endpoint = UInt16(key) {
-                         ESPMTRCommissioner.shared.readAttributeActiveOpDataset(deviceId: deviceId, endpoint: endpoint) { activeDataset in
-                             if let activeDataset = activeDataset {
-                                 ESPMTRCommissioner.shared.readAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { baId in
-                                     if let baId = baId {
-                                         ESPMatterEcosystemInfo.shared.saveBorderAgentIdKey(borderAgentId: baId)
-                                         ESPMTRCommissioner.shared.startThreadNetwork(deviceId: deviceId) { result in
-                                             if result {
-                                                 ThreadCredentialsManager.shared.saveThreadOperationalCredentials(activeOpsDataset: activeDataset, borderAgentId: baId) { _ in
-                                                     DispatchQueue.main.async {
-                                                         Utility.hideLoader(view: self.view)
-                                                     }
-                                                 }
-                                             } else {
-                                                 DispatchQueue.main.async {
-                                                     Utility.hideLoader(view: self.view)
-                                                 }
-                                             }
-                                         }
-                                     }
-                                 }
-                             }
-                         }
-                     }
-                 }
-             }
-        } else {
+            // Show loader
             DispatchQueue.main.async {
-                Utility.showToastMessage(view: self.view, message: ESPMatterConstants.operationFailedMsg)
+                Utility.showLoader(message: "", view: self.view)
+            }
+            ESPMTRCommissioner.shared.updateThreadDataset(groupId: groupId, deviceId: deviceId) { status, message in
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                    if status {
+                        self.alertUser(title: ThreadBRMessages.success.rawValue,
+                                       message: message ?? ThreadBRMessages.addthreadCredsSuccess.rawValue,
+                                       buttonTitle: ThreadBRMessages.ok.rawValue) {}
+                    } else if let message = message {
+                        if message == ThreadBRMessages.homepodDatasetNotAvailable.rawValue {
+                            ESPMTRCommissioner.shared.updateThreadDataLocally(groupId: groupId, deviceId: deviceId) { result, _ in
+                                DispatchQueue.main.async {
+                                    self.alertUser(title: result ? ThreadBRMessages.success.rawValue : ThreadBRMessages.failure.rawValue,
+                                                   message: result ? ThreadBRMessages.setThreadCredsLocally.rawValue : ThreadBRMessages.failedToSetThreadCredsLocally.rawValue,
+                                                   buttonTitle: "OK") {}
+                                }
+                            }
+                        } else {
+                            if message.count > 0 {
+                                self.alertUser(title: ThreadBRMessages.failure.rawValue,
+                                               message: message,
+                                               buttonTitle: ThreadBRMessages.ok.rawValue) {}
+                            }
+                        }
+                    }
+                }
             }
         }
     }

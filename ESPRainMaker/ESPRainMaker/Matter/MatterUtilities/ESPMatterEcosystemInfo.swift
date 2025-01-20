@@ -29,6 +29,7 @@ class ESPMatterEcosystemInfo {
     static let attestationInfoKey: String = "attestation.information.key"
     
     static let borderAgentIdKey = "com.espressif.rainmaker.boder.agent.id"
+    static let extendedAddressKey = "com.espressif.rainmaker.extended.address"
     static let controllerNotificationNodeIdKey = "com.espressif.rainmaker.controller.notification.node.id"
 
     /// Save homes data
@@ -243,13 +244,86 @@ class ESPMatterEcosystemInfo {
     
     func saveBorderAgentIdKey(borderAgentId: Data) {
         let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
-        localStorage.saveDataInUserDefault(data: borderAgentId, key: ESPMatterEcosystemInfo.borderAgentIdKey)
+        
+        // Convert new border agent ID to hex string
+        let hexString = borderAgentId.hexadecimalString
+        
+        // Get existing border agent IDs
+        var borderAgentIds: [String] = []
+        if let existingData = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.borderAgentIdKey) {
+            // Try to decode as array of strings first (new format)
+            if let existingIds = try? JSONDecoder().decode([String].self, from: existingData) {
+                borderAgentIds = existingIds
+            } else {
+                // Handle legacy format - single Data object
+                borderAgentIds = [existingData.hexadecimalString]
+            }
+        }
+        
+        // Add new ID if not already present
+        if !borderAgentIds.contains(hexString) {
+            borderAgentIds.append(hexString)
+        }
+        
+        // Save updated array
+        if let encodedData = try? JSONEncoder().encode(borderAgentIds) {
+            localStorage.saveDataInUserDefault(data: encodedData, key: ESPMatterEcosystemInfo.borderAgentIdKey)
+        }
     }
     
-    func getBorderAgentIdKey() -> Data? {
+    func getBorderAgentIdKey() -> [String]? {
         let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
-        if let borderAgentIdData = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.borderAgentIdKey) {
-            return borderAgentIdData
+        if let storedData = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.borderAgentIdKey) {
+            // Try to decode as array of strings first (new format)
+            if let borderAgentIds = try? JSONDecoder().decode([String].self, from: storedData) {
+                return borderAgentIds
+            } else {
+                // Handle legacy format - single Data object
+                return [storedData.hexadecimalString]
+            }
+        }
+        return nil
+    }
+    
+    func saveExtendedAddress(extendedAddress: Data) {
+        let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
+        
+        // Convert new border agent ID to hex string
+        let hexString = extendedAddress.hexadecimalString
+        
+        // Get existing border agent IDs
+        var extendedAddresses: [String] = []
+        if let existingData = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.extendedAddressKey) {
+            // Try to decode as array of strings first (new format)
+            if let existingIds = try? JSONDecoder().decode([String].self, from: existingData) {
+                extendedAddresses = existingIds
+            } else {
+                // Handle legacy format - single Data object
+                extendedAddresses = [existingData.hexadecimalString]
+            }
+        }
+        
+        // Add new ID if not already present
+        if !extendedAddresses.contains(hexString) {
+            extendedAddresses.append(hexString)
+        }
+        
+        // Save updated array
+        if let encodedData = try? JSONEncoder().encode(extendedAddresses) {
+            localStorage.saveDataInUserDefault(data: encodedData, key: ESPMatterEcosystemInfo.extendedAddressKey)
+        }
+    }
+    
+    func getExtendedAddress() -> [String]? {
+        let localStorage = ESPLocalStorage(ESPMatterConstants.groupIdKey)
+        if let storedData = localStorage.getDataFromSharedUserDefault(key: ESPMatterEcosystemInfo.extendedAddressKey) {
+            // Try to decode as array of strings first (new format)
+            if let extendedAddresses = try? JSONDecoder().decode([String].self, from: storedData) {
+                return extendedAddresses
+            } else {
+                // Handle legacy format - single Data object
+                return [storedData.hexadecimalString]
+            }
         }
         return nil
     }
@@ -275,5 +349,4 @@ class ESPMatterEcosystemInfo {
             localStorage.cleanupData(forKey: ESPMatterEcosystemInfo.controllerNotificationNodeIdKey)
         }
     }
-
 }

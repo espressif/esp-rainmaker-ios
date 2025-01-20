@@ -31,11 +31,19 @@ extension ESPMatterCommissioningVC {
     ///   - endpoint: endpoint
     ///   - completion: completion
     func readThreadDataFromDevice(deviceId: UInt64, endpoint: UInt16, completion: @escaping (_ activeOpsDataset: Data?, _ borderAgentId: Data?) -> Void) {
+        #if MTR_ENABLE_PROVISIONAL
+        ESPMTRCommissioner.shared.getTBRActiveOperationalDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
+            ESPMTRCommissioner.shared.readTBRAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { borderAgentId in
+                completion(dataset, borderAgentId)
+            }
+        }
+        #else
         ESPMTRCommissioner.shared.readAttributeActiveOpDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
             ESPMTRCommissioner.shared.readAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { bAgentId in
                 completion(dataset, bAgentId)
             }
         }
+        #endif
     }
     
     /// Perform TBR related actions
@@ -43,28 +51,29 @@ extension ESPMatterCommissioningVC {
     ///   - groupId: group id
     ///   - deviceId: device id
     func performThreadOperations(groupId: String, deviceId: UInt64) {
-        let tbrVal = ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId)
-        ThreadCredentialsManager.shared.fetchThreadOperationalDataset { dataset in
-            if let dataset = dataset {
-                let datasetStr = dataset.hexadecimalString
-                ESPMTRCommissioner.shared.updateActiveThreadOperationalDataset(deviceId: deviceId, operationalDataset: datasetStr) { result in
-                    if result {
-                        ESPMTRCommissioner.shared.startThreadNetwork(deviceId: deviceId) { _ in
-                            self.navigateToDevicesScreen()
+        ESPMTRCommissioner.shared.updateThreadDataset(groupId: groupId, deviceId: deviceId) { status, message in
+            guard status else {
+                if let message = message {
+                    if  message == ThreadBRMessages.homepodDatasetNotAvailable.rawValue {
+                        ESPMTRCommissioner.shared.updateThreadDataLocally(groupId: groupId, deviceId: deviceId) { _, _ in
+                            DispatchQueue.main.async {
+                                self.navigateToDevicesScreen()
+                            }
                         }
                     } else {
-                        self.navigateToDevicesScreen()
-                    }
-                }
-            } else if let key = tbrVal.1, let endpoint = UInt16(key) {
-                self.readThreadDataFromDevice(deviceId: deviceId, endpoint: endpoint) { activeOpsDataset, borderAgentId in
-                    if let activeOpsDataset = activeOpsDataset, let borderAgentId = borderAgentId {
-                        ESPMatterEcosystemInfo.shared.saveBorderAgentIdKey(borderAgentId: borderAgentId)
-                        ThreadCredentialsManager.shared.saveThreadOperationalCredentials(activeOpsDataset: activeOpsDataset, borderAgentId: borderAgentId) { result in
-                            self.navigateToDevicesScreen()
+                        DispatchQueue.main.async {
+                            self.alertUser(title: ThreadBRMessages.failure.rawValue,
+                                           message: message,
+                                           buttonTitle: "OK") {
+                                self.navigateToDevicesScreen()
+                            }
                         }
                     }
                 }
+                return
+            }
+            DispatchQueue.main.async {
+                self.navigateToDevicesScreen()
             }
         }
     }
@@ -74,7 +83,7 @@ extension ESPMatterCommissioningVC {
     ///   - groupId: group id
     ///   - deviceId: device id
     func performTBRActionAndNavigate(groupId: String, deviceId: UInt64, hideLoader: Bool = true) {
-        if ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId).0 {
+        if ESPMatterClusterUtil.shared.isTBRMSupported(groupId: groupId, deviceId: deviceId).0 {
             self.performThreadOperations(groupId: groupId, deviceId: deviceId)
         } else {
             self.navigateToDevicesScreen(hideLoader: hideLoader)
