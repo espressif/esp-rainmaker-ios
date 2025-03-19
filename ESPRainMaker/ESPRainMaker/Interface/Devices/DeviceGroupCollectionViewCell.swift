@@ -95,7 +95,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
                     } else if status  == .remote {
                         delegate?.showDeviceTraitListVC(node: nodeDetails, group: group, endpointClusterId: nil, indexPath: indexPath)
                     } else {
-                        if let controller = node.matterControllerNode, controller.connectionStatus == .remote {
+                        if let controller = node.matterControllerNode, controller.connectionStatus == .remote, let controllerNodeId = controller.node_id, let matterNodeData = MatterControllerParser.shared.getMatterNodeData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let enabled = matterNodeData.enabled, let reachable = matterNodeData.reachable, enabled, reachable {
                             if let devices = node.devices {
                                 let isSingleDevice = (devices.count > 1) ? false : true
                                 delegate?.launchDeviceScreen(isSingleDeviceNode: isSingleDevice, groupId: groupId, group: group, node: nodeDetails, matterNodeId: matterNodeId, deviceId: deviceId, indexPath: indexPath, rNode: node, nodeConnectionStatus: .controller)
@@ -336,7 +336,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             if let rMakerDeviceName = rainmakerNode.rainmakerDeviceName {
                 cell.deviceName.text = isSingleDeviceNode ? rMakerDeviceName : rMakerDeviceName+".\(indexPath.item)"
             } else {
-                if let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                if let name = rainmakerNode.matterDeviceName {
                     cell.deviceName.text = isSingleDeviceNode ? name : name+".\(indexPath.item)"
                 } else {
                     cell.deviceName.text = isSingleDeviceNode ? deviceName : deviceName+".\(indexPath.item)"
@@ -346,7 +346,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
             if let rMakerDeviceName = rainmakerNode.rainmakerDeviceName {
                 cell.deviceName.text = isSingleDeviceNode ? rMakerDeviceName : rMakerDeviceName+".\(indexPath.item)"
             } else {
-                if let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+                if let name = rainmakerNode.matterDeviceName {
                     cell.deviceName.text = isSingleDeviceNode ? name : name+".\(indexPath.item)"
                 } else {
                     cell.deviceName.text = isSingleDeviceNode ? matterNodeId : matterNodeId+".\(indexPath.item)"

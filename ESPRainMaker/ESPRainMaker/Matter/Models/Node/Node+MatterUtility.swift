@@ -147,9 +147,6 @@ extension Node {
     
     /// Matter device name
     var matterDeviceName: String? {
-        if let groupId = self.groupId, let matterNodeId = self.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let name = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
-            return name
-        }
         if let metadata = matterMetadata, let matterDeviceName = metadata[ESPMatterConstants.deviceName] as? String {
             return matterDeviceName
         }

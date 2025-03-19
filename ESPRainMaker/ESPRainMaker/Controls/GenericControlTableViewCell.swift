@@ -32,6 +32,14 @@ class GenericControlTableViewCell: UITableViewCell {
     @IBOutlet var trailingSpaceConstraint: NSLayoutConstraint!
     @IBOutlet weak var tapButton: UIButton!
     
+    // Matter related properties
+    @IBOutlet weak var backViewTopSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet weak var backViewBottomSpaceConstraint: NSLayoutConstraint!
+    var deviceId: UInt64?
+    weak var nodeGroup: ESPNodeGroup?
+    var node: ESPNodeDetails?
+    var infoType: InfoType = .indoorTemperature
+    
     // Stored properties
     var scheduleDelegate: ScheduleActionDelegate?
     var indexPath: IndexPath!
@@ -68,4 +76,48 @@ class GenericControlTableViewCell: UITableViewCell {
     @IBAction func editButtonTapped(_: Any) {}
     
     @IBAction func paramTapped(_ sender: Any) {}
+    
+    // MARK: Matter related functions:
+    
+    /// Setup locally stored UI
+    func setupLocallyStoredUI() {
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *), let deviceId = self.deviceId {
+            if let localTemperature = self.node?.getMatterLocalTemperatureValue(deviceId: deviceId) {
+                DispatchQueue.main.async {
+                    self.controlValueLabel.text = "\(localTemperature) °C"
+                }
+            }
+        }
+        #endif
+    }
+    
+    /// Subscribe to temperature measurement
+    func subscribeToLocalTemperature() {
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *), let group = self.nodeGroup, let groupId = group.groupID, let deviceId = self.deviceId {
+            ESPMTRCommissioner.shared.subscribeLocalTemperature(groupId: groupId, deviceId: deviceId) { localTemperature in
+                if let localTemperature = localTemperature {
+                    self.node?.setMatterLocalTemperatureValue(temperature: localTemperature, deviceId: deviceId)
+                    DispatchQueue.main.async {
+                        self.controlValueLabel.text = "\(localTemperature) °C"
+                    }
+                }
+            }
+        }
+        #endif
+    }
+    
+    /// Setup offline indoor temperature UI
+    func setupOfflineLocalTemperatureUI() {
+        self.setupLocallyStoredUI()
+    }
+    
+    /// Set initial indoor temperature UI
+    /// First set stored value as UI
+    /// Subscribe to local temperature
+    func setupLocalTemperatureUI() {
+        self.setupLocallyStoredUI()
+        self.subscribeToLocalTemperature()
+    }
 }

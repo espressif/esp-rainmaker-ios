@@ -44,9 +44,9 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
             self.minLabel.text = "0"
             self.maxLabel.text = "100"
             if let id = self.deviceId, let node = self.node, let saturationValue = node.getMatterSaturationValue(deviceId: id) {
-                self.slider.setValue(Float(saturationValue), animated: true)
+                self.setSaturationSliderValue(finalValue: Float(saturationValue))
             } else {
-                self.slider.setValue(50.0, animated: true)
+                self.setSaturationSliderValue(finalValue: 50.0)
             }
         }
         self.minImage.image = UIImage(named: "saturation_low")
@@ -71,7 +71,7 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
                                         node.setMatterSaturationValue(saturation: saturation, deviceId: id)
                                     }
                                     self.currentLevel = saturation
-                                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                                    self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
                                 }
                             }
                         }
@@ -84,9 +84,44 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
                 if let currentSaturation = MatterControllerParser.shared.getCurrentSaturation(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
                     self.currentLevel = Int(Float(currentSaturation)/2.54)
                     node.setMatterSaturationValue(saturation: currentSaturation, deviceId: matterDeviceId)
-                    DispatchQueue.main.async {
-                        self.slider.setValue(Float(self.currentLevel), animated: true)
+                    self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
+                }
+            }
+        }
+    }
+    
+    /// Get current level value
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    func getCurrentCCTValue(groupId: String, deviceId: UInt64) {
+        self.setupInitialCCTUI()
+        if self.nodeConnectionStatus == .local {
+            if let _ = ESPMTRCommissioner.shared.sController {
+                self.getColorCluster() { cluster in
+                    if let cluster = cluster {
+                        cluster.readAttributeColorTemperatureMireds { val, _ in
+                            if let val = val {
+                                DispatchQueue.main.async {
+                                    let cct = Int(val.intValue)
+                                    if let node = self.node, let id = self.deviceId {
+                                        node.setMatterCCTValue(cct: cct, deviceId: id)
+                                    }
+                                    self.currentLevel = cct
+                                    self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
+                                }
+                            }
+                        }
                     }
+                }
+            }
+            self.subscribeToCCTAttribute()
+        } else if self.nodeConnectionStatus == .controller {
+            if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
+                if let currentCCT = MatterControllerParser.shared.getCurrentCCT(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                    self.currentLevel = currentCCT
+                    node.setMatterCCTValue(cct: currentCCT, deviceId: matterDeviceId)
+                    self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
                 }
             }
         }
@@ -121,20 +156,14 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
                                 node.setMatterSaturationValue(saturation: saturation, deviceId: id)
                             }
                             self.currentLevel = Int(value)
-                            DispatchQueue.main.async {
-                                self.slider.setValue(Float(self.currentLevel), animated: true)
-                            }
+                            self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
                         }
                     } else {
-                        DispatchQueue.main.async {
-                            self.slider.setValue(Float(self.currentLevel), animated: true)
-                        }
+                        self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
                     }
                 }
             } else {
-                DispatchQueue.main.async {
-                    self.slider.setValue(Float(self.currentLevel), animated: true)
-                }
+                self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
             }
         } else if self.nodeConnectionStatus == .controller {
             if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let matterDeviceId = matterNodeId.hexToDecimal {
@@ -153,8 +182,64 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
                         }
                         self.currentLevel = Int(value)
                     } else {
-                        DispatchQueue.main.async {
-                            self.slider.setValue(Float(self.currentLevel), animated: true)
+                        self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Change fan speed
+    /// - Parameter speed: new speed value
+    func changeCCT(cct: Int) {
+        if let id = self.deviceId, let grpId = self.nodeGroup?.groupID {
+            if self.nodeConnectionStatus == .local {
+                if let _ = ESPMTRCommissioner.shared.sController {
+                    self.getColorCluster() { cluster in
+                        if let cluster = cluster {
+                            let cctParams = MTRColorControlClusterMoveToColorTemperatureParams()
+                            let final = Int(1000000/cct)
+                            cctParams.colorTemperatureMireds = NSNumber(value: final)
+                            cctParams.transitionTime = NSNumber(value: 0)
+                            cctParams.optionsMask = NSNumber(value: 0)
+                            cctParams.optionsOverride = NSNumber(value: 0)
+                            cluster.moveToColorTemperature(with: cctParams) { error in
+                                if let _ = error {
+                                    DispatchQueue.main.async {
+                                        self.slider.value = Float(self.currentLevel)
+                                    }
+                                    return
+                                }
+                                if let node = self.node, let id = self.deviceId {
+                                    node.setMatterCCTValue(cct: cct, deviceId: id)
+                                }
+                                self.currentLevel = Int(cct)
+                                self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
+                            }
+                        }
+                    }
+                } else {
+                    self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
+                }
+            } else if self.nodeConnectionStatus == .controller {
+                if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let _ = matterNodeId.hexToDecimal {
+                    var endpoint = "0x1"
+                    if let endpointId = MatterControllerParser.shared.getCCTEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                        endpoint = endpointId
+                    }
+                    let final = Int(1000000/cct)
+                    ESPControllerAPIManager.shared.callCCTAPI(rainmakerNode: rainmakerNode,
+                                                                     controllerNodeId: controllerNodeId,
+                                                                     matterNodeId: matterNodeId,
+                                                                     endpoint: endpoint,
+                                                                     cctLevel: "\(final)") { result in
+                        if result {
+                            if let node = self.node, let id = self.deviceId {
+                                node.setMatterCCTValue(cct: cct, deviceId: id)
+                            }
+                            self.currentLevel = Int(cct)
+                        } else {
+                            self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
                         }
                     }
                 }
@@ -172,8 +257,35 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
                         node.setMatterSaturationValue(saturation: saturation, deviceId: id)
                     }
                     self.currentLevel = finalSaturationValue
-                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                    self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
                 }
+            }
+        }
+    }
+    
+    /// Subscribe to saturation attribute
+    func subscribeToCCTAttribute() {
+        if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
+            ESPMTRCommissioner.shared.subscribeToCCTValue(groupId: grpId, deviceId: deviceId) { cct in
+                DispatchQueue.main.async {
+                    let finalCCTValue = Int(cct)
+                    if let node = self.node, let id = self.deviceId {
+                        node.setMatterCCTValue(cct: cct, deviceId: id)
+                    }
+                    self.currentLevel = finalCCTValue
+                    self.setSaturationSliderValue(finalValue: Float(self.currentLevel))
+                }
+            }
+        }
+    }
+    
+    /// Set saturation slider final value
+    /// - Parameter finalValue: slider final value
+    func setSaturationSliderValue(finalValue: Float) {
+        if self.slider.value != finalValue {
+            DispatchQueue.main.async {
+                self.slider.setValue(finalValue, animated: true)
+                self.setSliderThumbUI()
             }
         }
     }

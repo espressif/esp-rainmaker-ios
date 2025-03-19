@@ -21,12 +21,12 @@ import Foundation
 
 enum DeviceInfo {
     case deviceName
-    case nodeLabel
+    case matterDeviceName
 }
 
 protocol DeviceNameDelegate: NSObject {
     func editNamePressed(rainmakerNode: Node?, completion: @escaping (String?) -> Void)
-    func editNodeLabelPressed(rainmakerNode: Node?, nodeLabel: String, completion: @escaping (String?) -> Void)
+    func editMTRDeviceNamePressed(rainmakerNode: Node?, deviceName: String, completion: @escaping (String?) -> Void)
 }
 
 class DeviceInfoCell: UITableViewCell {
@@ -47,6 +47,7 @@ class DeviceInfoCell: UITableViewCell {
         self.container.layer.shadowRadius = 2
         self.container.layer.shadowColor = UIColor.black.cgColor
         self.container.layer.masksToBounds = false
+        self.setEditButtonTextColor(UIColor(hexString: Constants.customColor))
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -61,9 +62,9 @@ class DeviceInfoCell: UITableViewCell {
                     self.deviceName.text = name
                 }
             }
-        case .nodeLabel:
-            if let node = self.rainmakerNode, let groupId = node.groupId, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let label = ESPMatterFabricDetails.shared.getNodeLabel(groupId: groupId, deviceId: deviceId) {
-                self.delegate?.editNodeLabelPressed(rainmakerNode: self.rainmakerNode, nodeLabel: label) { nodeLabel in
+        case .matterDeviceName:
+            if let node = self.rainmakerNode, let deviceName = node.matterDeviceName {
+                self.delegate?.editMTRDeviceNamePressed(rainmakerNode: self.rainmakerNode, deviceName: deviceName) { nodeLabel in
                     if let nodeLabel = nodeLabel {
                         DispatchQueue.main.async {
                             self.deviceName.text = nodeLabel
@@ -72,5 +73,9 @@ class DeviceInfoCell: UITableViewCell {
                 }
             }
         }
+    }
+    
+    func setEditButtonTextColor(_ color: UIColor) {
+        editButton.setTitleColor(color, for: .normal)
     }
 }

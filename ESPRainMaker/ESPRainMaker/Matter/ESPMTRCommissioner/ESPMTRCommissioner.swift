@@ -51,6 +51,7 @@ class ESPMTRCommissioner: NSObject {
     var isMaterTaskCompleted: Bool = false
     var lightQueue: DispatchQueue = DispatchQueue(label: "com.matter.light.queue")
     let fabricDetails = ESPMatterFabricDetails.shared
+    var rainmakerNodeId: String?
     
     override init() {
         super.init()
@@ -73,6 +74,7 @@ class ESPMTRCommissioner: NSObject {
     ///   - onboardingPayload: onboarding payload
     ///   - deviceId: device id
     func startCommissioningWithUserNOC(onboardingPayload: String, deviceId: UInt64) {
+        self.rainmakerNodeId = nil
         if let controller = sController, let payload = try? MTRSetupPayload(onboardingPayload: onboardingPayload) {
             do {
                 try controller.setupCommissioningSession(with: payload, newNodeID: NSNumber(value: deviceId))

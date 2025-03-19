@@ -46,6 +46,12 @@ class DeviceOnOffCell: UITableViewCell {
     func setGroup(group: ESPNodeGroup?) {
         self.group = group
     }
+    
+    /// Set the ON state color of the UISwitch
+    /// - Parameter color: UIColor to set for the ON state
+    func setToggleSwitchOnStateColor(_ color: UIColor) {
+        toggleSwitch.onTintColor = color
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -54,6 +60,9 @@ class DeviceOnOffCell: UITableViewCell {
         container.layer.shadowRadius = 2
         container.layer.shadowColor = UIColor.black.cgColor
         container.layer.masksToBounds = false
+        
+        // Set default ON state color
+        setToggleSwitchOnStateColor(UIColor(hexString: Constants.customColor))
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

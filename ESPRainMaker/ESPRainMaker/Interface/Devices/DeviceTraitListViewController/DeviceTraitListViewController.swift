@@ -461,7 +461,7 @@ class DeviceTraitListViewController: UIViewController {
                         }
                         cell.title.text = dynamicAttribute.name ?? ""
                         setIconsForSliderCell(cell: cell, param: dynamicAttribute)
-                        
+                        cell.setSliderThumbUI()
                         // Check for continuos update setting from app configuration
                         cell.slider.isContinuous = Configuration.shared.appConfiguration.supportContinuousUpdate
                         return cell

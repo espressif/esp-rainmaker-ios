@@ -228,4 +228,6 @@ struct Constants {
     
     // Storyboard ids:
     static let settingsStoryboardName = "Settings"
+    
+    static let customColor = "#005493"
 }

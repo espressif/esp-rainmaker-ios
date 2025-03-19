@@ -44,6 +44,28 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
             self.setupInitialSaturationValue()
         case .airConditioner:
             self.setupInitialCoolingSetpointValues()
+        case .cct:
+            self.setupInitialCCTUI()
+        }
+    }
+    
+    /// Setup the initial UI for CCT Param
+    func setupInitialCCTUI() {
+        DispatchQueue.main.async {
+            self.backViewTopSpaceConstraint.constant = 10.0
+            self.backViewBottomSpaceConstraint.constant = 10.0
+            self.minImage.image = nil
+            self.maxImage.image = nil
+            self.title.text = "CCT"
+            self.minLabel.text = "2000"
+            self.maxLabel.text = "6536"
+            self.slider.minimumValue = 2000.0
+            self.slider.maximumValue = 6536.0
+            guard let node = self.node, let id = self.deviceId, let levelValue = node.getMatterCCTValue(deviceId: id) else {
+                self.setLevelSliderValue(finalValue: 2500.0)
+                return
+            }
+            self.setLevelSliderValue(finalValue: Float(levelValue))
         }
     }
     
@@ -61,10 +83,11 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
             self.minImage.image = UIImage(named: "brightness_low")
             self.maxImage.image = UIImage(named: "brightness_high")
             guard let node = self.node, let id = self.deviceId, let levelValue = node.getMatterLevelValue(deviceId: id) else {
-                self.slider.setValue(50.0, animated: true)
+                self.setLevelSliderValue(finalValue: 50.0)
                 return
             }
-            self.slider.setValue(Float(levelValue), animated: true)
+            let final = Float(levelValue)/2.54
+            self.setLevelSliderValue(finalValue: Float(final))
         }
     }
     
@@ -88,7 +111,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
                                         self.currentLevel = Int(current.floatValue/2.54)
                                     }
                                     Utility.hideLoader(view: self)
-                                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                                    self.setLevelSliderValue(finalValue: Float(self.currentLevel))
                                 }
                             }
                         }
@@ -102,9 +125,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
                     let finalValue = Float(currentLevel)/2.54
                     self.currentLevel = Int(finalValue)
                     node.setMatterLevelValue(level: currentLevel, deviceId: matterDeviceId)
-                    DispatchQueue.main.async {
-                        self.slider.setValue(Float(self.currentLevel), animated: true)
-                    }
+                    self.setLevelSliderValue(finalValue: Float(self.currentLevel))
                 }
             }
         }
@@ -177,7 +198,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
                         controller.moveToLevelWithOnOff(with: levelParams) { error in
                             DispatchQueue.main.async {
                                 if let _ = error {
-                                    self.slider.setValue(Float(self.currentLevel), animated: true)
+                                    self.setLevelSliderValue(finalValue: Float(self.currentLevel))
                                 } else {
                                     if let node = self.node, let id = self.deviceId {
                                         node.setMatterLevelValue(level: finalValue, deviceId: id)
@@ -191,9 +212,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
                             }
                         }
                     } else {
-                        DispatchQueue.main.async {
-                            self.slider.setValue(Float(self.currentLevel), animated: true)
-                        }
+                        self.setLevelSliderValue(finalValue: Float(self.currentLevel))
                     }
                 }
             }
@@ -214,9 +233,7 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
                         node.setMatterLightOnStatus(status: true, deviceId: matterDeviceId)
                         self.paramChipDelegate?.levelSet()
                     } else {
-                        DispatchQueue.main.async {
-                            self.slider.setValue(Float(self.currentLevel), animated: true)
-                        }
+                        self.setLevelSliderValue(finalValue: Float(self.currentLevel))
                     }
                 }
             }
@@ -232,9 +249,18 @@ extension ParamSliderTableViewCell: ParamSliderLevelControlProtocol {
                     node.setMatterLevelValue(level: level, deviceId: id)
                 }
                 self.currentLevel = Int(finalLevelValue)
-                DispatchQueue.main.async {
-                    self.slider.setValue(finalLevelValue, animated: true)
-                }
+                self.setLevelSliderValue(finalValue: finalLevelValue)
+            }
+        }
+    }
+    
+    /// Set level slider final value
+    /// - Parameter finalValue: slider finalk value
+    func setLevelSliderValue(finalValue: Float) {
+        DispatchQueue.main.async {
+            if self.slider.value != finalValue {
+                self.slider.setValue(finalValue, animated: true)
+                self.setSliderThumbUI()
             }
         }
     }

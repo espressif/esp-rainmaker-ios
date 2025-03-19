@@ -299,6 +299,18 @@ class MatterControllerParser {
         }
     }
     
+    /// Get level cluster endpoint id
+    /// - Parameters:
+    ///   - controllerNodeId: controller node id
+    ///   - matterNodeId: matter node id
+    func getCCTEndpointId(controllerNodeId: String, matterNodeId: String) -> String? {
+        if isControllerFwVersionUpdated(controllerNodeId: controllerNodeId) {
+            return getFinalMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.colorControlClusterId)
+        } else {
+            return getMatterEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId, clusterId: ESPControllerAPIKeys.colorControlClusterId)
+        }
+    }
+    
     /// Get brightness level
     /// - Parameters:
     ///   - controllerNodeId: controller node id
@@ -506,6 +518,32 @@ class MatterControllerParser {
                             if let cluster = clusterData.cluster {
                                 if let ohs = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.thermostatClusterId, attributeId: ESPControllerAPIKeys.occupiedHeatingSetpointAttributeId), let setpoint = Int(ohs) {
                                     return setpoint/100
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
+    /// Get current saturation value
+    /// - Parameters:
+    ///   - controllerNodeId: controller node id
+    ///   - matterNodeId: matter node id
+    /// - Returns: current saturation value
+    func getCurrentCCT(controllerNodeId: String, matterNodeId: String) -> Int? {
+        if let matterNodesData = self.getMatterNodesData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+            if let endpointsData = self.getMatterEndpointsData(matterNodeId: matterNodeId, matterNodesData: matterNodesData) {
+                if let eId = self.getCCTEndpointId(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let endpoints = self.getMatterEndpoints(endpointsData: endpointsData, endpointId: eId) {
+                    for endpoint in endpoints {
+                        if let clusters = endpoint.clusters {
+                            for clusterData in clusters {
+                                if let cluster = clusterData.cluster {
+                                    if let currentCCT = self.getClusterAttributeValue(cluster: cluster, clusterId: ESPControllerAPIKeys.colorControlClusterId, attributeId: ESPControllerAPIKeys.currentCCTAttributeId) {
+                                        return Int(currentCCT)
+                                    }
                                 }
                             }
                         }

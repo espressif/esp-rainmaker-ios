@@ -597,6 +597,16 @@
 		F1FFC90125D44CA400DD26C6 /* AddNodeGroupsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC90025D44CA400DD26C6 /* AddNodeGroupsViewController.swift */; };
 		F1FFC90725D4872C00DD26C6 /* SelectNodeFooterCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC90625D4872B00DD26C6 /* SelectNodeFooterCollectionReusableView.swift */; };
 		F1FFC91125D4A04500DD26C6 /* EditNodeGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FFC91025D4A04500DD26C6 /* EditNodeGroupViewController.swift */; };
+		F84FD8822D78C6D300919407 /* ESPMTRCCTSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD8792D78C6D300919407 /* ESPMTRCCTSliderTVC.swift */; };
+		F84FD8832D78C6D300919407 /* ESPMTRLevelSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD87C2D78C6D300919407 /* ESPMTRLevelSliderTVC.swift */; };
+		F84FD8842D78C6D300919407 /* ESPMTRSaturationSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD87F2D78C6D300919407 /* ESPMTRSaturationSliderTVC.swift */; };
+		F84FD8852D78C6D300919407 /* ESPMTRSaturationSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD8802D78C6D300919407 /* ESPMTRSaturationSliderTVC.xib */; };
+		F84FD8862D78C6D300919407 /* ESPMTRCCTSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD87A2D78C6D300919407 /* ESPMTRCCTSliderTVC.xib */; };
+		F84FD8872D78C6D300919407 /* ESPMTRLevelSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD87D2D78C6D300919407 /* ESPMTRLevelSliderTVC.xib */; };
+		F84FD8982D790B7D00919407 /* ESPMTROHSSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD8952D790B7D00919407 /* ESPMTROHSSliderTVC.swift */; };
+		F84FD89A2D790B7D00919407 /* ESPMTROHSSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD8962D790B7D00919407 /* ESPMTROHSSliderTVC.xib */; };
+		F84FD89F2D790B9C00919407 /* ESPMTROCSSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */; };
+		F84FD8A02D790B9C00919407 /* ESPMTROCSSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1227,6 +1237,16 @@
 		F1FFC90025D44CA400DD26C6 /* AddNodeGroupsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNodeGroupsViewController.swift; sourceTree = "<group>"; };
 		F1FFC90625D4872B00DD26C6 /* SelectNodeFooterCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNodeFooterCollectionReusableView.swift; sourceTree = "<group>"; };
 		F1FFC91025D4A04500DD26C6 /* EditNodeGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNodeGroupViewController.swift; sourceTree = "<group>"; };
+		F84FD8792D78C6D300919407 /* ESPMTRCCTSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRCCTSliderTVC.swift; sourceTree = "<group>"; };
+		F84FD87A2D78C6D300919407 /* ESPMTRCCTSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTRCCTSliderTVC.xib; sourceTree = "<group>"; };
+		F84FD87C2D78C6D300919407 /* ESPMTRLevelSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRLevelSliderTVC.swift; sourceTree = "<group>"; };
+		F84FD87D2D78C6D300919407 /* ESPMTRLevelSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTRLevelSliderTVC.xib; sourceTree = "<group>"; };
+		F84FD87F2D78C6D300919407 /* ESPMTRSaturationSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRSaturationSliderTVC.swift; sourceTree = "<group>"; };
+		F84FD8802D78C6D300919407 /* ESPMTRSaturationSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTRSaturationSliderTVC.xib; sourceTree = "<group>"; };
+		F84FD8952D790B7D00919407 /* ESPMTROHSSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTROHSSliderTVC.swift; sourceTree = "<group>"; };
+		F84FD8962D790B7D00919407 /* ESPMTROHSSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTROHSSliderTVC.xib; sourceTree = "<group>"; };
+		F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTROCSSliderTVC.swift; sourceTree = "<group>"; };
+		F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTROCSSliderTVC.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1385,6 +1405,11 @@
 		0C75B2492A30739500BB4661 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				F84FD89E2D790B9C00919407 /* OCS */,
+				F84FD8972D790B7D00919407 /* OHS */,
+				F84FD87B2D78C6D300919407 /* CCT */,
+				F84FD87E2D78C6D300919407 /* Level */,
+				F84FD8812D78C6D300919407 /* Saturation */,
 				0CE324BA2B90636F00D6682E /* CustomActionCell.swift */,
 				0C2F51042C92BA6A0031B098 /* CustomActionCell.xib */,
 				0CA16E572B355B18006AC005 /* CustomInfoCell.swift */,
@@ -2797,6 +2822,51 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		F84FD87B2D78C6D300919407 /* CCT */ = {
+			isa = PBXGroup;
+			children = (
+				F84FD8792D78C6D300919407 /* ESPMTRCCTSliderTVC.swift */,
+				F84FD87A2D78C6D300919407 /* ESPMTRCCTSliderTVC.xib */,
+			);
+			path = CCT;
+			sourceTree = "<group>";
+		};
+		F84FD87E2D78C6D300919407 /* Level */ = {
+			isa = PBXGroup;
+			children = (
+				F84FD87C2D78C6D300919407 /* ESPMTRLevelSliderTVC.swift */,
+				F84FD87D2D78C6D300919407 /* ESPMTRLevelSliderTVC.xib */,
+			);
+			path = Level;
+			sourceTree = "<group>";
+		};
+		F84FD8812D78C6D300919407 /* Saturation */ = {
+			isa = PBXGroup;
+			children = (
+				F84FD87F2D78C6D300919407 /* ESPMTRSaturationSliderTVC.swift */,
+				F84FD8802D78C6D300919407 /* ESPMTRSaturationSliderTVC.xib */,
+			);
+			path = Saturation;
+			sourceTree = "<group>";
+		};
+		F84FD8972D790B7D00919407 /* OHS */ = {
+			isa = PBXGroup;
+			children = (
+				F84FD8952D790B7D00919407 /* ESPMTROHSSliderTVC.swift */,
+				F84FD8962D790B7D00919407 /* ESPMTROHSSliderTVC.xib */,
+			);
+			path = OHS;
+			sourceTree = "<group>";
+		};
+		F84FD89E2D790B9C00919407 /* OCS */ = {
+			isa = PBXGroup;
+			children = (
+				F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */,
+				F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */,
+			);
+			path = OCS;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3011,6 +3081,7 @@
 				0CB34FF0283E325A00DD1813 /* Scanner.storyboard in Resources */,
 				0C387F732A2EC79900C5EFA4 /* RequestSentCell.xib in Resources */,
 				0C8BE95B275D32050032A8E1 /* Scene.storyboard in Resources */,
+				F84FD89A2D790B7D00919407 /* ESPMTROHSSliderTVC.xib in Resources */,
 				0C5110022A25F712002414FD /* ESPMatter.storyboard in Resources */,
 				0CF6923D270A308B0098F515 /* ESPAlexa.storyboard in Resources */,
 				F15EABFF23E05A51008A766B /* Localizable.strings in Resources */,
@@ -3020,8 +3091,12 @@
 				F190B9CC24C765C4006D136D /* ControlSectionHeaderView.xib in Resources */,
 				F1390F2C27D86C7200F80DFB /* DeviceAutomation.storyboard in Resources */,
 				F15EAC0F23E1994E008A766B /* DeviceDetail.storyboard in Resources */,
+				F84FD8852D78C6D300919407 /* ESPMTRSaturationSliderTVC.xib in Resources */,
+				F84FD8862D78C6D300919407 /* ESPMTRCCTSliderTVC.xib in Resources */,
+				F84FD8872D78C6D300919407 /* ESPMTRLevelSliderTVC.xib in Resources */,
 				0C66B22A2AF9350E00BEA3C3 /* ParticipantDataCell.xib in Resources */,
 				F1C1AD5125EEB58F00EB2917 /* RoundHueSliderTableViewCell.xib in Resources */,
+				F84FD8A02D790B9C00919407 /* ESPMTROCSSliderTVC.xib in Resources */,
 				F190B9CA24C0D892006D136D /* DeviceHeaderView.xib in Resources */,
 				1431462E20DE994C0017E119 /* Assets.xcassets in Resources */,
 				F15FFF8A2402645200E72D01 /* NoInternetConnection.xib in Resources */,
@@ -3481,6 +3556,7 @@
 				F1124F6A268D0AAA00FA0B9E /* ESPNodeAlertEvent.swift in Sources */,
 				F1C76D692688A8D8009E217D /* Int+ShortDate.swift in Sources */,
 				F1A057B427968CFD00485C23 /* Utility+Environment.swift in Sources */,
+				F84FD8982D790B7D00919407 /* ESPMTROHSSliderTVC.swift in Sources */,
 				0C40754B2C89D30F00FCACD8 /* ESPServerTrustEvaluatorsWorker.swift in Sources */,
 				F190B9B824BF5208006D136D /* ScheduleListTableViewCell.swift in Sources */,
 				F190B9BE24C07CB5006D136D /* SelectDaysViewController.swift in Sources */,
@@ -3496,6 +3572,9 @@
 				F1BBD465255C1EE900CB0F42 /* SpinnerView.swift in Sources */,
 				F1FFC90125D44CA400DD26C6 /* AddNodeGroupsViewController.swift in Sources */,
 				0CA16E582B355B18006AC005 /* CustomInfoCell.swift in Sources */,
+				F84FD8822D78C6D300919407 /* ESPMTRCCTSliderTVC.swift in Sources */,
+				F84FD8832D78C6D300919407 /* ESPMTRLevelSliderTVC.swift in Sources */,
+				F84FD8842D78C6D300919407 /* ESPMTRSaturationSliderTVC.swift in Sources */,
 				F1E132B52680C34700ED7E03 /* AppDelegate+Notifications.swift in Sources */,
 				F1C76D592687D463009E217D /* ESPNotificationHandler.swift in Sources */,
 				0C66B2242AF90BDF00BEA3C3 /* ESPMTRCommissioner+ParticipantData.swift in Sources */,
@@ -3520,6 +3599,7 @@
 				F1B1012026A47105004B5537 /* ESPNotificationKeys.swift in Sources */,
 				F17E2F1527F33AE000938A45 /* ESPEnableAutomationService.swift in Sources */,
 				0CD359972A2D3DAC0081017C /* MTRCSRKeys.m in Sources */,
+				F84FD89F2D790B9C00919407 /* ESPMTROCSSliderTVC.swift in Sources */,
 				0C65879C27D5FA9100C5E0DB /* ESPScheduleConstants.swift in Sources */,
 				F19F6FF522F45A1500C70DE3 /* DeviceListTableView.swift in Sources */,
 				0CD359782A2D26010081017C /* ESPMatterConstants.swift in Sources */,

@@ -32,6 +32,7 @@ extension ESPMTRCommissioner {
             let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerServerSupported(groupId: groupId, deviceId: temporaryDeviceId)
             if clusterInfo.0, let endpoint = clusterInfo.1, let point = UInt16(endpoint) {
                 self.readAttributeRainmakerNodeIdFromDevice(deviceId: deviceId, endpoint: point) { rainmakerNodeId in
+                    self.rainmakerNodeId = rainmakerNodeId
                     if let rainmakerNodeId = rainmakerNodeId {
                         self.fabricDetails.saveRainmakerType(groupId: groupId, deviceId: deviceId, val: ESPMatterConstants.trueFlag)
                         self.sendMatterNodeIdToDevice(deviceId: deviceId, endpoint: point, matterNodeId: matterNodeId) { result in

@@ -191,27 +191,71 @@ class ESPMatterCommissioningVC: UIViewController {
                 DispatchQueue.main.async {
                     Utility.showLoader(message: "", view: self.view)
                 }
-                self.updateDeviceName {
+                if let nodeID = ESPMTRCommissioner.shared.rainmakerNodeId {
+                    // First update device timezone
+                    self.updateTimezone(nodeID: nodeID) { _ in
+                        // Update device name
+                        self.updateDeviceName(nodeId: nodeID) {
+                            // Finally perform TBR action and navigate
+                            self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
+                        }
+                    }
+                } else {
                     self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
                 }
             } else {
-                if let name = ESPMatterEcosystemInfo.shared.getDeviceName(), ESPMatterClusterUtil.shared.isNodeLabelAttributeSupported(groupId: groupId, deviceId: deviceId) {
-                    DispatchQueue.main.async {
-                        Utility.showLoader(message: "", view: self.view)
-                    }
-                    ESPMTRCommissioner.shared.setNodeLabel(deviceId: deviceId, nodeLabel: name) { result in
-                        self.fabricDetails.removeNodeLabel(groupId: groupId, deviceId: deviceId)
-                        if result {
-                            self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: name)
-                        }
-                        self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
-                    }
-                } else {
-                    self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId, hideLoader: false)
-                }
+                self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId, hideLoader: false)
             }
         } else {
             self.navigateToDevicesScreen(hideLoader: false)
+        }
+    }
+
+    /// Update timezone for Rainmaker node
+    /// - Parameters:
+    ///   - nodeID: rainmaker node ID
+    ///   - completion: completion handler with rainmaker nodeId
+    private func updateTimezone(nodeID: String, completion: @escaping (String?) -> Void) {
+        // Fetch latest nodes
+        NetworkManager.shared.getNodeInfo(nodeId: nodeID) { node, _ in
+            if let node = node {
+                for service in node.services ?? [] {
+                    if service.type?.lowercased() == Constants.timezoneServiceName {
+                        if let param = service.params?.first(where: { $0.type?.lowercased() == Constants.timezoneServiceParam }) {
+                            let timezone = param.value as? String
+                            if timezone == nil || timezone!.isEmpty {
+                                DeviceControlHelper.shared.updateParam(nodeID: nodeID, parameter: [service.name ?? "Time": [param.name ?? "": TimeZone.current.identifier]], delegate: nil)
+                            }
+                        }
+                    }
+                }
+                completion(nodeID)
+            } else {
+                completion(nil)
+            }
+        }
+    }
+
+    /// Update device name
+    /// - Parameters:
+    ///   - nodeId: rainmaker node ID
+    ///   - completion: completion handler
+    private func updateDeviceName(nodeId: String, completion: @escaping () -> Void) {
+        NetworkManager.shared.getNodeInfo(nodeId: nodeId) { node, _ in
+            if let node = node, let devices = node.devices, devices.count > 0 {
+                for device in devices {
+                    if let params = device.params {
+                        for param in params {
+                            if let type = param.type, type == Constants.deviceNameParam, let paramName = param.name, let deviceName = ESPMatterEcosystemInfo.shared.getDeviceName() {
+                                DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: [device.name ?? "" : [paramName: deviceName]], delegate: nil)
+                            }
+                        }
+                    }
+                }
+                completion()
+            } else {
+                completion()
+            }
         }
     }
 }

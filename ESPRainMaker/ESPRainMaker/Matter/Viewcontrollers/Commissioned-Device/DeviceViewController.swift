@@ -50,6 +50,9 @@ class DeviceViewController: UIViewController {
     var isDeviceOffline: Bool = false
     var showDefaultUI: Bool = false
     let fabricDetails = ESPMatterFabricDetails.shared
+    
+    var hideOCS: Bool = false
+    var hideOHS: Bool = false
 
     //badge
     var nameField: UITextField?
@@ -64,7 +67,9 @@ class DeviceViewController: UIViewController {
         self.restartMatterController()
         if let node = self.rainmakerNode, let deviceName = node.rainmakerDeviceName {
             self.topBarTitle.text = deviceName
-        } else if let node = self.rainmakerNode, let groupId = node.groupId, let deviceId = node.matter_node_id?.hexToDecimal, let name = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
+        } else if let node = self.rainmakerNode, let matterDeviceName = node.matterDeviceName {
+            self.topBarTitle.text = matterDeviceName
+        } else if let node = self.rainmakerNode, let groupId = node.groupId, let matterNodeId = node.matter_node_id, let name = self.fabricDetails.getDeviceName(groupId: groupId, matterNodeId: matterNodeId) {
             self.topBarTitle.text = name
         } else if let deviceName = self.deviceName, deviceName.count > 0 {
             self.topBarTitle.text = deviceName
@@ -78,7 +83,7 @@ class DeviceViewController: UIViewController {
         tapGestureRecognizer.cancelsTouchesInView = false
         self.setNavigationTextAttributes(color: .darkGray)
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: ESPMatterConstants.backTxt, style: .plain, target: self, action: #selector(goBack))
-        self.navigationItem.leftBarButtonItem?.tintColor = .systemBlue
+        self.navigationItem.leftBarButtonItem?.tintColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
         self.view.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin]
         self.deviceTableView.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin]
         self.deviceTableView.delegate = self
@@ -183,47 +188,19 @@ class DeviceViewController: UIViewController {
     
     /// Register cells
     func registerCells() {
+        self.deviceTableView.register(UINib(nibName: "GenericControlTableViewCell", bundle: nil), forCellReuseIdentifier: "genericControlCell")
         self.deviceTableView.register(UINib(nibName: SliderTableViewCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: SliderTableViewCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
+        self.deviceTableView.register(UINib(nibName: ESPMTRLevelSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTRLevelSliderTVC.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: ESPMTRSaturationSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTRSaturationSliderTVC.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: ESPMTRCCTSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTRCCTSliderTVC.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: ESPMTROCSSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTROCSSliderTVC.reuseIdentifier)
+        self.deviceTableView.register(UINib(nibName: ESPMTROHSSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTROHSSliderTVC.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: DeviceInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceInfoCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: CustomInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: CustomInfoCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: ParticipantDataCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ParticipantDataCell.reuseIdentifier)
         self.deviceTableView.register(UINib(nibName: CustomActionCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: CustomActionCell.reuseIdentifier)
         self.generateCells()
-    }
-    
-    /// Setup node label balue for matter only device
-    /// - Parameters:
-    ///   - isNodeLabelAttributeSupported: is node label attribute supported
-    ///   - groupId: groupId
-    ///   - deviceId: device Id
-    ///   - completion: completion
-    func readNodeLabelValue(isNodeLabelAttributeSupported: Bool, groupId: String, deviceId: UInt64, completion: @escaping (Bool) -> Void) {
-        if !isNodeLabelAttributeSupported {
-            completion(false)
-        }
-        if let _ = self.fabricDetails.getNodeLabel(groupId: groupId, deviceId: deviceId) {
-            completion(false)
-        } else {
-            switch self.nodeConnectionStatus {
-            case .local:
-                ESPMTRCommissioner.shared.getNodeLabel(deviceId: deviceId) { nodeLabel in
-                    if let nodeLabel = nodeLabel {
-                        self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: nodeLabel)
-                        completion(true)
-                    } else if let node = self.rainmakerNode, let deviceName = node.matterDeviceName {
-                        ESPMTRCommissioner.shared.setNodeLabel(deviceId: deviceId, nodeLabel: deviceName) { result in
-                            if result {
-                                self.fabricDetails.saveNodeLabel(groupId: groupId, deviceId: deviceId, nodeLabel: deviceName)
-                            }
-                            completion(result)
-                        }
-                    }
-                }
-            default:
-                completion(false)
-            }
-        }
     }
     
     /// Read participant
@@ -264,33 +241,27 @@ class DeviceViewController: UIViewController {
     func generateCells() {
         self.cellInfo.removeAll()
         if let group = group, let groupId = group.groupID, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
+            self.cellInfo.append(ESPMatterConstants.matterDeviceName)
             if let node = self.rainmakerNode, let _ = node.rainmakerDeviceName, node.isRainmaker {
                 //Setup UI for a rainmaker+matter node
-                self.cellInfo.append(ESPMatterConstants.deviceName)
-                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId, forNode: node)
                 self.setupTableUI(showDefaultUI: false)
             } else {
                 //Setup UI for a matter node
-                let isNodeLabelAttributeSupported = ESPMatterClusterUtil.shared.isNodeLabelAttributeSupported(groupId: groupId, deviceId: deviceId)
-                if isNodeLabelAttributeSupported {
-                    self.cellInfo.append(ESPMatterConstants.nodeLabel)
-                }
                 let isBadgeSupported = ESPMatterClusterUtil.shared.isParticipantDataSupported(groupId: groupId, deviceId: deviceId)
                 if isBadgeSupported.0 {
                     self.cellInfo.append(ESPMatterConstants.participantData)
                 }
-                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId)
+                self.addClusterUtilCells(groupId: groupId, deviceId: deviceId, forNode: self.rainmakerNode)
                 DispatchQueue.main.async {
                     self.setupTableUI(showDefaultUI: true)
                     Utility.showLoader(message: "", view: self.view)
                 }
-                self.readNodeLabelValue(isNodeLabelAttributeSupported: isNodeLabelAttributeSupported, groupId: groupId, deviceId: deviceId) { isNodeLabelUpdateRequired in
-                    self.readParticipantData(isParticipantDataSupported: isBadgeSupported, groupId: groupId, deviceId: deviceId) { isBadgeUpdateRequired in
-                        DispatchQueue.main.async {
-                            Utility.hideLoader(view: self.view)
-                            if isNodeLabelUpdateRequired || isBadgeUpdateRequired {
-                                self.setupTableUI(showDefaultUI: false)
-                            }
+                self.readParticipantData(isParticipantDataSupported: isBadgeSupported, groupId: groupId, deviceId: deviceId) { isBadgeUpdateRequired in
+                    DispatchQueue.main.async {
+                        Utility.hideLoader(view: self.view)
+                        if isBadgeUpdateRequired {
+                            self.setupTableUI(showDefaultUI: false)
                         }
                     }
                 }
@@ -306,7 +277,7 @@ class DeviceViewController: UIViewController {
     /// - Parameters:
     ///   - groupId: group id
     ///   - deviceId: device id
-    func addClusterUtilCells(groupId: String, deviceId: UInt64) {
+    func addClusterUtilCells(groupId: String, deviceId: UInt64, forNode node: Node? = nil) {
         if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
             if ESPMatterClusterUtil.shared.isOnOffAttributeSupported(groupId: groupId, deviceId: deviceId) {
                 cellInfo.append(ESPMatterConstants.onOff)
@@ -324,6 +295,9 @@ class DeviceViewController: UIViewController {
             if ESPMatterClusterUtil.shared.isCurrentSaturationAttributeSupported(groupId: groupId, deviceId: deviceId) {
                 cellInfo.append(ESPMatterConstants.saturationControl)
             }
+            if ESPMatterClusterUtil.shared.isCCTAttributeSupported(groupId: groupId, deviceId: deviceId) {
+                cellInfo.append(ESPMatterConstants.cctControl)
+            }
         }
         if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.rainmakerController)
@@ -334,6 +308,7 @@ class DeviceViewController: UIViewController {
                 cellInfo.append(ESPMatterConstants.localTemperature)
             }
             cellInfo.append(ESPMatterConstants.occupiedCoolingSetpoint)
+            cellInfo.append(ESPMatterConstants.occupiedHeatingSetpoint)
         }
         if ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.borderRouter)

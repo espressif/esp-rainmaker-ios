@@ -288,6 +288,7 @@ enum colorControl {
     enum attributes {
         case currentHue
         case currentSaturation
+        case cct
         
         var attributeId: NSNumber {
             switch self {
@@ -295,6 +296,8 @@ enum colorControl {
                 return NSNumber(value: 0)
             case .currentSaturation:
                 return NSNumber(value: 1)
+            case .cct:
+                return NSNumber(value: 7)
             }
         }
     }

@@ -1,4 +1,4 @@
-// Copyright 2020 Espressif Systems
+// Copyright 2025 Espressif Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,33 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  SliderTableViewCell.swift
+//  ESPMTROCSSliderTVC.swift
 //  ESPRainMaker
 //
 
+#if ESPRainMakerMatter
+import Matter
 import MBProgressHUD
 import UIKit
 
-enum SliderParamType {
-    case brightness
-    case saturation
-    case airConditioner
-    case cct
-}
-
-enum SliderType {
-    case slider
-    case hueSlider
-}
-
-protocol StepSliderProtocol {
-    func setupParam(_ param: Param, _ type: SliderType)
-    func getSliderFinalValue(_ slider: UISlider?, _ gradientSlider: GradientSlider?, _ type: SliderType) -> Float?
-    func getSliderValue(value: Float, step: Float, type: SliderType) -> Float
-}
-
-class SliderTableViewCell: UITableViewCell {
-    static let reuseIdentifier: String = "SliderTableViewCell"
+@available(iOS 16.4, *)
+class ESPMTROCSSliderTVC: UITableViewCell {
+    static let reuseIdentifier: String = "ESPMTROCSSliderTVC"
     // IB outlets
     @IBOutlet var slider: UISlider!
     @IBOutlet var minLabel: UILabel!
@@ -83,10 +68,12 @@ class SliderTableViewCell: UITableViewCell {
     var deviceId: UInt64?
     weak var nodeGroup: ESPNodeGroup?
     var isRainmaker: Bool = true
+    
     //Matter Level Control
     var minLevel: Int = 0
     var maxLevel: Int = 100
     var currentLevel: Int = 0
+    
     //Matter Hue Control
     var minHue: Int = 0
     var maxHue: Int = 100
@@ -94,6 +81,7 @@ class SliderTableViewCell: UITableViewCell {
     var sliderParamType: SliderParamType = .brightness
     var isWindowCovering: Bool = false
     var nodeConnectionStatus: NodeConnectionStatus = .local
+    var node: ESPNodeDetails?
     
     var thumbLabel: UILabel?
 
@@ -110,6 +98,28 @@ class SliderTableViewCell: UITableViewCell {
         // Additional options if needed:
         slider.layer.masksToBounds = true
         backView.layer.masksToBounds = true
+    }
+    
+    override func layoutSubviews() {
+        // Customise slider element for param screen
+        // Hide row selection button
+        super.layoutSubviews()
+        checkButton.isHidden = true
+        leadingSpaceConstraint.constant = 15.0
+        trailingSpaceConstraint.constant = 15.0
+
+        backgroundColor = UIColor.clear
+
+        backView.layer.borderWidth = 1
+        backView.layer.cornerRadius = 10
+        backView.layer.borderColor = UIColor.clear.cgColor
+        backView.layer.masksToBounds = true
+
+        layer.shadowOpacity = 0.18
+        layer.shadowOffset = CGSize(width: 1, height: 2)
+        layer.shadowRadius = 2
+        layer.shadowColor = UIColor.black.cgColor
+        layer.masksToBounds = false
     }
 
     func setSliderThumbUI(backgroundColor: UIColor = UIColor(hexString: Constants.customColor)) {
@@ -150,6 +160,9 @@ class SliderTableViewCell: UITableViewCell {
     // IB Actions
     @IBAction func sliderValueChanged(_ sender: UISlider) {
         setSliderThumbUI()
+        if let grouoId = nodeGroup?.groupID, let deviceId = deviceId, let val = Int16(sender.value) as? Int16 {
+            self.changeOccupiedCoolingSetpoint(setPoint: val)
+        }
     }
     
     @IBAction func sliderValueDragged(_ sender: UISlider) {
@@ -164,7 +177,8 @@ class SliderTableViewCell: UITableViewCell {
 
 }
 
-extension SliderTableViewCell: StepSliderProtocol {
+@available(iOS 16.4, *)
+extension ESPMTROCSSliderTVC: StepSliderProtocol {
     /// Setup slider min/max and step values
     /// - Parameters:
     ///   - param: device param
@@ -269,4 +283,112 @@ extension SliderTableViewCell: StepSliderProtocol {
         }
         return initialValue
     }
+    
+    //MARK: Occupied cooling/heating setpoint
+    /// Setup initial level values
+    func setupInitialCoolingSetpointValues(isDeviceOffline: Bool) {
+        if let grpId = self.nodeGroup?.groupID, let node = self.node, let id = self.deviceId {
+            DispatchQueue.main.async {
+                self.title.text = "Temperature(°C)"
+                self.minImage.image = nil
+                self.maxImage.image = nil
+                self.backViewTopSpaceConstraint.constant = 10.0
+                self.backViewBottomSpaceConstraint.constant = 10.0
+                self.minLabel.text = "16"
+                self.maxLabel.text = "32"
+                self.slider.minimumValue = 16.0
+                self.slider.maximumValue = 32.0
+                if let levelValue = node.getMatterOccupiedCoolingSetpoint(deviceId: id) {
+                    self.currentLevel = Int(levelValue)
+                } else {
+                    self.currentLevel = 20
+                }
+                self.setOccupiedSetpointSliderValue(finalValue: Float(self.currentLevel))
+                if !isDeviceOffline {
+                    self.readOCS(groupId: grpId, deviceId: id)
+                    self.subscribeToOccupiedCoolingSetpoint()
+                }
+            }
+        }
+    }
+    
+    func setupInitialControllerOCSValues(isDeviceOffline: Bool) {
+        self.currentLevel = 20
+        DispatchQueue.main.async {
+            self.minLabel.text = "16"
+            self.maxLabel.text = "32"
+            self.slider.minimumValue = 16.0
+            self.slider.maximumValue = 32.0
+            if let node = self.node, let id = self.deviceId,  let levelValue = node.getMatterOccupiedCoolingSetpoint(deviceId: id) {
+                self.currentLevel = Int(levelValue)
+            }
+            self.setOccupiedSetpointSliderValue(finalValue: Float(self.currentLevel))
+        }
+        if let node = self.node, let rainmakerNode = node.getRainmakerNode(), let controller = rainmakerNode.matterControllerNode, let controllerNodeId = controller.node_id, let matterNodeId = rainmakerNode.matter_node_id, let deviceId = self.deviceId {
+            if let ocs = MatterControllerParser.shared.getCurrentOccupiedCoolingSetpoint(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
+                node.setMatterOccupiedCoolingSetpoint(ocs: Int16(ocs), deviceId: deviceId)
+                self.currentLevel = ocs
+                self.setOccupiedSetpointSliderValue(finalValue: Float(self.currentLevel))
+            }
+        }
+    }
+    
+    func readOCS(groupId: String, deviceId: UInt64) {
+        ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+            if let value = value {
+                self.currentLevel = Int(value)
+                self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: deviceId)
+                self.setOccupiedSetpointSliderValue(finalValue: Float(self.currentLevel))
+            }
+        }
+    }
+    
+    /// Subscribe to occupied cooling setpoint
+    func subscribeToOccupiedCoolingSetpoint() {
+        if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
+            ESPMTRCommissioner.shared.subscribeToOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
+                if let mode = self.node?.getMatterSystemMode(deviceId: id) {
+                    if mode == ESPMatterConstants.cool {
+                        if let value = value {
+                            self.currentLevel = Int(value)
+                            self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: id)
+                            self.setOccupiedSetpointSliderValue(finalValue: Float(value))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Change occupied cooling/heating set point
+    /// - Parameter setPoint: cooling/heating set point
+    func changeOccupiedCoolingSetpoint(setPoint: Int16) {
+        if let id = self.deviceId, let grpId = self.nodeGroup?.groupID, let node = self.node {
+            self.paramChipDelegate?.matterAPIRequestSent()
+            ESPMTRCommissioner.shared.setOccupiedCoolingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
+                self.paramChipDelegate?.matterAPIResponseReceived()
+                if result {
+                    if let node = self.node, let id = self.deviceId {
+                        node.setMatterOccupiedCoolingSetpoint(ocs: Int16(setPoint), deviceId: id)
+                    }
+                    self.currentLevel = Int(setPoint)
+                    self.setOccupiedSetpointSliderValue(finalValue: Float(self.currentLevel))
+                } else {
+                    self.setOccupiedSetpointSliderValue(finalValue: Float(self.currentLevel))
+                }
+            }
+        }
+    }
+    
+    /// Set setpoint slider final value
+    /// - Parameter finalValue: slider final value
+    func setOccupiedSetpointSliderValue(finalValue: Float) {
+        DispatchQueue.main.async {
+            if self.slider.value != finalValue {
+                self.slider.setValue(finalValue, animated: true)
+                self.setSliderThumbUI()
+            }
+        }
+    }
 }
+#endif
