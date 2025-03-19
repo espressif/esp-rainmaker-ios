@@ -19,7 +19,7 @@
 import UIKit
 
 protocol TBRNodesDiscoveredDelegate {
-    func threadBorderRoutersDiscovered(threadBorderRouters: [String], threadNetworks: [String: String])
+    func threadBorderRoutersDiscovered(threadBorderRouters: [String], threadNetworks: [String: String], threadNetworksData: [String: [String : Data]])
 }
 
 class TBRConnectionManager: NSObject {
@@ -30,6 +30,7 @@ class TBRConnectionManager: NSObject {
     private var serviceTimeout = Timer()
     var hosts: [String] = []
     var threadNetworks: [String: String] = [:]
+    var threadNetworksData: [String: [String : Data]] = [:]
     let timeout: TimeInterval = 10.0
     let threadBorderRouterDiscoveryTimeout: TimeInterval = 10.0
     var delegate: TBRNodesDiscoveredDelegate?
@@ -55,6 +56,7 @@ class TBRConnectionManager: NSObject {
         )
         hosts.removeAll()
         threadNetworks.removeAll()
+        threadNetworksData.removeAll()
         servicesBeingResolved.removeAll()
         serviceBrowser.stop()
         serviceBrowser.searchForServices(ofType: type, inDomain: domain)
@@ -78,7 +80,7 @@ class TBRConnectionManager: NSObject {
     /// Tell delegate there is change in available services.
     ///
     private func updateServiceList() {
-        self.delegate?.threadBorderRoutersDiscovered(threadBorderRouters: hosts, threadNetworks: threadNetworks)
+        self.delegate?.threadBorderRoutersDiscovered(threadBorderRouters: hosts, threadNetworks: threadNetworks, threadNetworksData: threadNetworksData)
     }
     
     /// Remove resolved service from queue of found services.
@@ -136,6 +138,7 @@ extension TBRConnectionManager: NetServiceDelegate {
             hosts.append(name)
             if let data = sender.txtRecordData() {
                 let dict = NetService.dictionary(fromTXTRecord: data)
+                threadNetworksData[name] = dict
                 if let networkNameData = dict[networkNameRecordKey], let networkName = String(data: networkNameData, encoding: .utf8) {
                     threadNetworks[name] = networkName
                 }

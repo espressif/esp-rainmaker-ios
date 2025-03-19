@@ -89,6 +89,24 @@ public class ESPMatterClusterUtil {
         return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: borderRouter.clusterId.uintValue)
     }
     
+    /// Is thread border router server supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: (status, endpoint id)
+    public func isTBRMSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: threadBorderRouterManagement.clusterId.uintValue)
+    }
+    
+    /// Is thread border router server supported
+    /// - Parameters:
+    ///   - groupId: group id
+    ///   - deviceId: device id
+    /// - Returns: (status, endpoint id)
+    public func isGeneralCommissioningSupported(groupId: String, deviceId: UInt64) -> (Bool, String?) {
+        return isServerClusterSupported(groupId: groupId, deviceId: deviceId, clusterId: generalcommissioning.clusterId.uintValue)
+    }
+    
     /// Is rainmaker server supported
     /// - Parameters:
     ///   - groupId: group id

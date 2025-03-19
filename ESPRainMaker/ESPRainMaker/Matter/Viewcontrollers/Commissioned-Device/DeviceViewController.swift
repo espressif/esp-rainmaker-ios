@@ -313,6 +313,9 @@ class DeviceViewController: UIViewController {
         if ESPMatterClusterUtil.shared.isBRSupported(groupId: groupId, deviceId: deviceId).0 {
             cellInfo.append(ESPMatterConstants.borderRouter)
         }
+        if ESPMatterClusterUtil.shared.isTBRMSupported(groupId: groupId, deviceId: deviceId).0 {
+            cellInfo.append(ESPMatterConstants.borderRouter)
+        }
         if ESPMatterClusterUtil.shared.isTempMeasurementSupported(groupId: groupId, deviceId: deviceId).0 {
             if ESPMatterClusterUtil.shared.isMeasuredValueAttributeSupported(groupId: groupId, deviceId: deviceId) {
                 cellInfo.append(ESPMatterConstants.measuredTemperature)

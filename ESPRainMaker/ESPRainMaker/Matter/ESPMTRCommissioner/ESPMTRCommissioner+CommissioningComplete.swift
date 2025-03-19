@@ -122,6 +122,7 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
         self.uidelegate?.hideLoaderFromView()
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         if let _ = status {
+            User.shared.updateDeviceList = true
             if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].matterNodeId {
                 self.exportMatterNodeData(isRainmaker: true, groupId: grpId, matterNodeId: matterNodeId, temporaryDeviceId: temporaryDeviceId)
             }
@@ -138,6 +139,7 @@ extension ESPMTRCommissioner: ESPConfirmNodeCommissioningPresentationLogic {
         self.uidelegate?.hideLoaderFromView()
         let temporaryDeviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
         guard let _ = error else {
+            User.shared.updateDeviceList = true
             if let response = response, let status = response.status, status.lowercased() == ESPMatterConstants.success {
                 if let group = group, let grpId = group.groupID, let data = self.fabricDetails.getAddNodeToMatterFabricDetails(groupId: grpId, deviceId: temporaryDeviceId), let certs = data.certificates, certs.count > 0, let matterNodeId = certs[0].matterNodeId {
                     self.exportMatterNodeData(isRainmaker: false, groupId: grpId, matterNodeId: matterNodeId, temporaryDeviceId: temporaryDeviceId)

@@ -37,7 +37,8 @@ class User {
     var discoveredNodesCompletion: (([String]) -> Void)?
     var discoveredTBRs: [String] = []
     var discoveredThreadNetworks: [String: String] = [:]
-    var discoveredTBRsCompletion: (([String], [String: String]) -> Void)?
+    var discoveredThreadNetworksData: [String: [String: Data]] = [:]
+    var discoveredTBRsCompletion: (([String], [String: String], [String: [String: Data]]) -> Void)?
     var matterLightOnStatus: [String: Bool] = [String: Bool]()
     
     private let esp = "esp"
@@ -212,10 +213,11 @@ class User {
     
     /// Scan for TBRs broadcasting on service  "_meshcop._udp"
     /// - Parameter discoveredTBRs: TBRs discovered
-    func scanThreadBorderRouters(discoveredTBRsCompletion: @escaping ([String], [String: String]) -> Void) {
+    func scanThreadBorderRouters(discoveredTBRsCompletion: @escaping ([String], [String: String], [String: [String: Data]]) -> Void) {
         DispatchQueue.main.async {
             self.discoveredTBRs.removeAll()
             self.discoveredThreadNetworks.removeAll()
+            self.discoveredThreadNetworksData.removeAll()
             self.discoveredTBRsCompletion = discoveredTBRsCompletion
             self.tbrConnectionManager.delegate = self
             self.tbrConnectionManager.searchForServicesOfType(type: Constants.threadBRMDNSServiceType, domain: Constants.serviceDomain)
@@ -254,9 +256,10 @@ extension User: ESPMatterNodesDiscoveredDelegate {
 }
 
 extension User: TBRNodesDiscoveredDelegate {
-    func threadBorderRoutersDiscovered(threadBorderRouters: [String], threadNetworks: [String: String]) {
+    func threadBorderRoutersDiscovered(threadBorderRouters: [String], threadNetworks: [String: String], threadNetworksData: [String: [String: Data]]) {
         self.discoveredTBRs = threadBorderRouters
         self.discoveredThreadNetworks = threadNetworks
-        self.discoveredTBRsCompletion?(threadBorderRouters, threadNetworks)
+        self.discoveredThreadNetworksData = threadNetworksData
+        self.discoveredTBRsCompletion?(threadBorderRouters, threadNetworks, threadNetworksData)
     }
 }

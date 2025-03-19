@@ -83,7 +83,7 @@ extension UIViewController: ThreadProvManagerProtocol {
     /// dataset in order to provision the thread end device.
     /// - Parameter threadList: scanned thread list from ESP device.
     func checkAssociatedNodeListForTBR(threadList: [ESPThreadNetwork], completion: @escaping (Data?, String) -> Void) {
-        User.shared.scanThreadBorderRouters { scannedTBRs, scannedNetworks in
+        User.shared.scanThreadBorderRouters { scannedTBRs, scannedNetworks, _ in
             User.shared.stopThreadBRSearch()
             for threadNetwork in threadList {
                 guard scannedTBRs.count > 0 else {
@@ -115,9 +115,9 @@ extension UIViewController: ThreadProvManagerProtocol {
     /// Perform thread provisioning using the active store operational datraset of iOS
     @available(iOS 15.0, *)
     func performActiveThreadNetworkProv(espDevice: ESPDevice, _ completion: @escaping (Data?, String) -> Void) {
-        ThreadCredentialsManager.shared.fetchThreadCredentials { cred in
+        ThreadCredentialsManager.shared.fetchThreadCredentials { cred, _ in
             if let cred = cred, let networkKey = cred.networkKey, let networkName = cred.networkName {
-                User.shared.scanThreadBorderRouters() { tBRs, scannedNetworks in
+                User.shared.scanThreadBorderRouters() { tBRs, scannedNetworks, _ in
                     User.shared.stopThreadBRSearch()
                     for tBR in tBRs {
                         if let scannedNetworkName = scannedNetworks[tBR], scannedNetworkName == networkName {
@@ -159,7 +159,7 @@ extension UIViewController: ThreadProvManagerProtocol {
     ///   - completion: completion
     ///   - failureCompletionHandler: invoked if there is no active ESP thread border router
     func performActiveESPThreadNetworkProv(_ completion: @escaping (Data?, String) -> Void, failureCompletionHandler: @escaping () -> Void) {
-        User.shared.scanThreadBorderRouters() { tBRs, scannedNetworks in
+        User.shared.scanThreadBorderRouters() { tBRs, scannedNetworks, _ in
             User.shared.stopThreadBRSearch()
             if tBRs.count > 0 {
                 for associatedNode in User.shared.associatedNodeList ?? [] {

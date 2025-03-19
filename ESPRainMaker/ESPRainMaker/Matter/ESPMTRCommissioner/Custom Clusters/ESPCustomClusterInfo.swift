@@ -200,7 +200,7 @@ enum temperatureMeasurement {
 }
 
 /*
- // MARK: Custom Rainmaker Cluster Info
+ // MARK: Custom Rainmaker  Info
  */
 enum borderRouter {
     
@@ -342,4 +342,70 @@ enum basicInfomation {
     
     static let clusterId: NSNumber = NSNumber(value: 40)
     static let clusterIdString = "40"
+}
+
+/*
+ // MARK: Thread Border Router Management Cluster
+ */
+enum threadBorderRouterManagement {
+    
+    enum attributes {
+        case borderRouterName
+        case borderAgentID
+        case threadVersion
+        case interfaceEnabled
+        case activeDatasetTimestamp
+        case pendingDatasetTimestamp
+        
+        var attributeId: NSNumber {
+            switch self {
+            case .borderRouterName:
+                return NSNumber(value: 0)
+            case .borderAgentID:
+                return NSNumber(value: 1)
+            case .threadVersion:
+                return NSNumber(value: 2)
+            case .interfaceEnabled:
+                return NSNumber(value: 3)
+            case .activeDatasetTimestamp:
+                return NSNumber(value: 4)
+            case .pendingDatasetTimestamp:
+                return NSNumber(value: 5)
+            }
+        }
+    }
+    
+    enum commands {
+        case getActiveDatasetRequest
+        case getPendingDatasetRequest
+        case datasetResponse
+        case setActiveDatasetRequest
+        case setPendingDatasetRequest
+        
+        var commandId: NSNumber {
+            switch self {
+            case .getActiveDatasetRequest:
+                return NSNumber(value: 0)
+            case .getPendingDatasetRequest:
+                return NSNumber(value: 1)
+            case .datasetResponse:
+                return NSNumber(value: 2)
+            case .setActiveDatasetRequest:
+                return NSNumber(value: 3)
+            case .setPendingDatasetRequest:
+                return NSNumber(value: 4)
+            }
+        }
+    }
+    
+    static let clusterId: NSNumber = NSNumber(value: 1106)
+    static let clusterIdString = "1106"
+}
+
+/*
+ // MARK: General Commissioning Cluster
+ */
+enum generalcommissioning {
+    static let clusterId: NSNumber = NSNumber(value: 48)
+    static let clusterIdString = "48"
 }
