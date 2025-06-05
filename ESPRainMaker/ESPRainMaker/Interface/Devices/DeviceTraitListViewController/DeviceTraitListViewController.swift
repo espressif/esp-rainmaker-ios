@@ -30,6 +30,12 @@ class DeviceTraitListViewController: UIViewController {
     var device: Device!
     var pollingTimer: Timer!
     var skipNextAttributeUpdate = false
+    
+    // NEW: Notification-aware polling system
+    private var isNotificationUpdateInProgress = false
+    private var pendingPollingUpdate = false
+    private var lastNotificationTimestamp: Date = Date()
+    private let notificationUpdateTimeout: TimeInterval = 2.0 // 2 seconds timeout for notification updates
 
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var tableView: UITableView!
@@ -78,10 +84,22 @@ class DeviceTraitListViewController: UIViewController {
         let insets = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
         tableView.contentInset = insets
 
+        // OPTIMIZATION: Check if device data already exists before showing loader
         if device?.isReachable() ?? false {
             if ESPNetworkMonitor.shared.isConnectedToWifi || ESPNetworkMonitor.shared.isConnectedToNetwork {
-                showLoader(message: "Getting info")
-                updateDeviceAttributes()
+                // Check if we already have device parameters
+                if let deviceParams = device?.params, !deviceParams.isEmpty {
+                    // Data exists - render immediately, no loader needed
+                    checkForCentralParam()
+                    tableView.reloadData()
+                    
+                    // Start background refresh for latest data (silent)
+                    startBackgroundDataRefresh()
+                } else {
+                    // No data - show loader and fetch
+                    showLoader(message: "Getting info")
+                    updateDeviceAttributes()
+                }
             }
         } else {
             checkForCentralParam()
@@ -155,7 +173,13 @@ class DeviceTraitListViewController: UIViewController {
         super.viewWillAppear(animated)
         checkNetworkUpdate()
         tabBarController?.tabBar.isHidden = true
-        pollingTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(fetchNodeInfo), userInfo: nil, repeats: true)
+        
+        // OPTIMIZATION: Start polling only after UI is ready
+        // This ensures UI renders first, then polling begins
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.startPolling()
+        }
+        
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(paramUpdated), name: Notification.Name(Constants.paramUpdateNotification), object: nil)
@@ -171,7 +195,11 @@ class DeviceTraitListViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        pollingTimer.invalidate()
+        // Stop polling when view disappears
+        if let timer = pollingTimer, timer.isValid {
+            timer.invalidate()
+            pollingTimer = nil
+        }
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -212,7 +240,8 @@ class DeviceTraitListViewController: UIViewController {
 
     @objc func appEnterForeground() {
         isInitialLoadingComplete = true
-        pollingTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(fetchNodeInfo), userInfo: nil, repeats: true)
+        // Restart polling when app comes to foreground
+        startPolling()
     }
 
     @objc func appEnterBackground() {
@@ -220,10 +249,22 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     @objc func fetchNodeInfo() {
-        if skipNextAttributeUpdate {
-            skipNextAttributeUpdate = false
-        } else {
-            refreshDeviceAttributes()
+        // NEW: Smart polling that respects notification updates
+        // Check if notification update is in progress
+        if isNotificationUpdateInProgress {
+            pendingPollingUpdate = true
+            return
+        }
+        
+        // Check if notification was received recently (within timeout)
+        let timeSinceLastNotification = Date().timeIntervalSince(lastNotificationTimestamp)
+        if timeSinceLastNotification < notificationUpdateTimeout {
+            return
+        }
+        
+        // Proceed with polling update
+        if device?.isReachable() ?? false {
+            updateDeviceAttributesSilently()
         }
     }
 
@@ -243,14 +284,29 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func refreshDeviceAttributes() {
-        if isInitialLoadingComplete, device?.isReachable() ?? false {
+        // FIX: Remove the isInitialLoadingComplete check that was blocking updates
+        // Also ensure we're updating the UI properly
+        if device?.isReachable() ?? false {
+            // Check if notification was received recently
+            let timeSinceLastNotification = Date().timeIntervalSince(lastNotificationTimestamp)
+            if timeSinceLastNotification < notificationUpdateTimeout {
+                return
+            }
+            
             NetworkManager.shared.getDeviceParam(device: device) { error in
                 if error != nil {
                     return
                 }
                 DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                    self.reloadTableView()
+                    // Double-check notification status before updating UI
+                    let currentTimeSinceNotification = Date().timeIntervalSince(self.lastNotificationTimestamp)
+                    if currentTimeSinceNotification < self.notificationUpdateTimeout {
+                        return
+                    }
+                    
+                    // Update the UI with fresh data
+                    self.checkForCentralParam()
+                    self.tableView.reloadData()
                 }
             }
         }
@@ -334,6 +390,90 @@ class DeviceTraitListViewController: UIViewController {
                         self.device = updatedDevice
                     }
                     break
+                }
+            }
+        }
+    }
+    
+    /// Start background data refresh without showing loader
+    private func startBackgroundDataRefresh() {
+        // Refresh device attributes in background to get latest data
+        // This ensures UI is responsive while keeping data fresh
+        DispatchQueue.global(qos: .utility).async {
+            self.updateDeviceAttributesSilently()
+        }
+    }
+    
+    /// Start polling timer for device updates
+    private func startPolling() {
+        // Start polling timer for regular device updates
+        // This ensures UI is rendered before polling begins
+        if pollingTimer == nil || !pollingTimer.isValid {
+            pollingTimer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(fetchNodeInfo), userInfo: nil, repeats: true)
+            // Test polling immediately to verify it's working
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.fetchNodeInfo()
+            }
+        }
+    }
+    
+    /// Suspend polling during notification updates
+    private func suspendPolling() {
+        if let timer = pollingTimer, timer.isValid {
+            timer.invalidate()
+            pollingTimer = nil
+        }
+    }
+    
+    /// Resume polling after notification update completes
+    private func resumePolling() {
+        // Check if there's a pending polling update
+        if pendingPollingUpdate {
+            pendingPollingUpdate = false
+            
+            // Process the pending update immediately
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.fetchNodeInfo()
+            }
+        }
+        
+        // Restart the polling timer
+        if pollingTimer == nil || !pollingTimer.isValid {
+            startPolling()
+        }
+    }
+    
+    /// Update device attributes silently (no loader, no UI blocking)
+    private func updateDeviceAttributesSilently() {
+        
+        // Check if notification was received recently (within timeout)
+        let timeSinceLastNotification = Date().timeIntervalSince(lastNotificationTimestamp)
+        if timeSinceLastNotification < notificationUpdateTimeout {
+            return
+        }
+        
+        NetworkManager.shared.getNodeInfo(nodeId: (self.device?.node?.node_id)!) { node, error in
+            if error == nil, let node = node {
+                DispatchQueue.main.async {
+                    // Double-check notification status before updating UI
+                    let currentTimeSinceNotification = Date().timeIntervalSince(self.lastNotificationTimestamp)
+                    if currentTimeSinceNotification < self.notificationUpdateTimeout {
+                        return
+                    }
+                    
+                    // Update the device data silently
+                    if let index = User.shared.associatedNodeList?.firstIndex(where: { $0.node_id == (self.device?.node?.node_id)! }) {
+                        let oldNode = User.shared.associatedNodeList![index]
+                        node.localNetwork = oldNode.localNetwork
+                        User.shared.associatedNodeList![index] = node
+                        
+                        if let currentDevice = node.devices?.first(where: { $0.name == self.device?.name }) {
+                            self.device = currentDevice
+                            // Refresh UI with updated data
+                            self.checkForCentralParam()
+                            self.tableView.reloadData()
+                        }
+                    }
                 }
             }
         }

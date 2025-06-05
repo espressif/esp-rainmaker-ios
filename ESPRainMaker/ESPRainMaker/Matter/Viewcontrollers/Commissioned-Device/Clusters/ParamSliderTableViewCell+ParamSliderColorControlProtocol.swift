@@ -38,14 +38,19 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
     /// - Parameters:
     ///   - completionHandler: completion
     func getColorCluster(completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
-        if let group = nodeGroup, let groupId = group.groupID, let id = deviceId, let controller = ESPMTRCommissioner.shared.sController {
-            let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: id)
-            controller.getBaseDevice(id, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let endpoint = endpoint, let point = UInt16(endpoint), let colorControlCluster = MTRBaseClusterColorControl(device: device, endpoint: UInt16(truncating: NSNumber(value: point)), queue: ESPMTRCommissioner.shared.matterQueue) {
-                    completionHandler(colorControlCluster)
-                } else {
-                    completionHandler(nil)
+        if let group = nodeGroup, let groupId = group.groupID, let id = deviceId {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let controller = commissioner.sController {
+                let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: id)
+                controller.getBaseDevice(id, queue: commissioner.matterQueue) { device, _ in
+                    if let device = device, let endpoint = endpoint, let point = UInt16(endpoint), let colorControlCluster = MTRBaseClusterColorControl(device: device, endpoint: UInt16(truncating: NSNumber(value: point)), queue: commissioner.matterQueue) {
+                        completionHandler(colorControlCluster)
+                    } else {
+                        completionHandler(nil)
+                    }
                 }
+            } else {
+                completionHandler(nil)
             }
         } else {
             completionHandler(nil)
@@ -134,7 +139,8 @@ extension ParamSliderTableViewCell: ParamSliderColorControlProtocol {
     /// Subscribe to hue attribute
     func subscribeToHueAttribute() {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToHueValue(groupId: grpId, deviceId: deviceId) { hue in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToHueValue(groupId: grpId, deviceId: deviceId) { hue in
                 DispatchQueue.main.async {
                     let finalValue = (CGFloat(hue)*360.0)/254.0
                     if let node = self.node, let id = self.deviceId {

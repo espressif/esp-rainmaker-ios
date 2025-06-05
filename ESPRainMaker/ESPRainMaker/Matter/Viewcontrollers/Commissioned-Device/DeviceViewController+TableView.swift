@@ -159,6 +159,7 @@ extension DeviceViewController: DeviceNameDelegate {
                 textField.text = value
                 self.addHeightConstraint(textField: textField)
             }
+            input.addAction(UIAlertAction(title: "Cancel", style: .destructive))
             input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
                 let valueTextField = input?.textFields![0]
                 if let text = valueTextField?.text, text.count > 0, text.count <= 32 {
@@ -171,7 +172,6 @@ extension DeviceViewController: DeviceNameDelegate {
                                    callback: {})
                 }
             }))
-            input.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             self.present(input, animated: true, completion: nil)
         }
     }
@@ -216,6 +216,7 @@ extension DeviceViewController: DeviceNameDelegate {
                 textField.text = node.matterDeviceName
                 self.addHeightConstraint(textField: textField)
             }
+            input.addAction(UIAlertAction(title: "Cancel", style: .destructive))
             input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
                 let valueTextField = input?.textFields![0]
                 if let text = valueTextField?.text, text.replacingOccurrences(of: " ", with: "").count > 0, text.count <= 32 {
@@ -239,7 +240,6 @@ extension DeviceViewController: DeviceNameDelegate {
                                buttonTitle: ESPMatterConstants.okTxt,
                                callback: {})
             }))
-            input.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             self.present(input, animated: true, completion: nil)
         }
     }
@@ -283,6 +283,7 @@ extension DeviceViewController: DeviceNameDelegate {
                 textField.text = node.matterDeviceName
                 self.addHeightConstraint(textField: textField)
             }
+            input.addAction(UIAlertAction(title: "Cancel", style: .destructive))
             input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
                 let valueTextField = input?.textFields![0]
                 if let text = valueTextField?.text, text.replacingOccurrences(of: " ", with: "").count > 0, text.count <= 32 {
@@ -306,7 +307,6 @@ extension DeviceViewController: DeviceNameDelegate {
                                buttonTitle: ESPMatterConstants.okTxt,
                                callback: {})
             }))
-            input.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             self.present(input, animated: true, completion: nil)
         }
     }

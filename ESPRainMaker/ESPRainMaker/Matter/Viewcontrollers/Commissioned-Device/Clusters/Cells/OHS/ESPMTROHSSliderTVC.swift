@@ -363,7 +363,8 @@ extension ESPMTROHSSliderTVC: StepSliderProtocol {
     }
     
     func readOHS(groupId: String, deviceId: UInt64) {
-        ESPMTRCommissioner.shared.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
             if let value = value {
                 self.currentLevel = Int(value)
                 self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: deviceId)
@@ -375,7 +376,8 @@ extension ESPMTROHSSliderTVC: StepSliderProtocol {
     /// Subscribe to occupied heating setpoint
     func subscribeToOccupiedHeatingSetpoint() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToOccupiedHeatingSetpoint(groupId: grpId, deviceId: id) { value in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToOccupiedHeatingSetpoint(groupId: grpId, deviceId: id) { value in
                 if let mode = self.node?.getMatterSystemMode(deviceId: id) {
                     if mode == ESPMatterConstants.heat {
                         if let value = value {
@@ -394,7 +396,8 @@ extension ESPMTROHSSliderTVC: StepSliderProtocol {
     func changeOccupiedHeatingSetpoint(setPoint: Int16) {
         if let id = self.deviceId, let grpId = self.nodeGroup?.groupID, let node = self.node {
             self.paramChipDelegate?.matterAPIRequestSent()
-            ESPMTRCommissioner.shared.setOccupiedHeatingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.setOccupiedHeatingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
                 self.paramChipDelegate?.matterAPIResponseReceived()
                 if result {
                     node.setMatterOccupiedHeatingSetpoint(ohs: Int16(setPoint), deviceId: id)

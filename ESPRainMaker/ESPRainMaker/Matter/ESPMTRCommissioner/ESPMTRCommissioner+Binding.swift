@@ -63,8 +63,8 @@ extension ESPMTRCommissioner {
     ///   - completionHandler: completion handler
     func bind(bindingEndpointClusterId: [String: UInt]?, cluster: String, sourceDeviceId: UInt64, destinationDeviceId: UInt64, completionHandler: @escaping (Bool) -> Void) {
         if let controller = sController {
-            controller.getBaseDevice(sourceDeviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let clusterId = cluster.clusterId, let device = device, let bindingEndpointClusterId = bindingEndpointClusterId, bindingEndpointClusterId.keys.count > 0, let key = bindingEndpointClusterId.keys.first, let endpoint = Int(key), let bindingCluster = MTRBaseClusterBinding(device: device, endpointID: NSNumber(value: endpoint), queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(sourceDeviceId, queue: self.matterQueue) { device, _ in
+                if let clusterId = cluster.clusterId, let device = device, let bindingEndpointClusterId = bindingEndpointClusterId, bindingEndpointClusterId.keys.count > 0, let key = bindingEndpointClusterId.keys.first, let endpoint = Int(key), let bindingCluster = MTRBaseClusterBinding(device: device, endpointID: NSNumber(value: endpoint), queue: self.matterQueue) {
                     bindingCluster.readAttributeBinding(with: nil) { params, _ in
                         var finalParams = [MTRBindingClusterTargetStruct]()
                         if let params = params as? [MTRBindingClusterTargetStruct], params.count > 0 {
@@ -146,8 +146,8 @@ extension ESPMTRCommissioner {
     ///   - completionHandler: completion handler
     func unbind(bindingEndpointClusterId: [String: UInt]?, cluster: String, sourceDeviceId: UInt64, destinationDeviceId: UInt64, completionHandler: @escaping (Bool) -> Void) {
         if let controller = sController {
-            controller.getBaseDevice(sourceDeviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let bindingEndpointClusterId = bindingEndpointClusterId, bindingEndpointClusterId.keys.count > 0, let key = bindingEndpointClusterId.keys.first, let endpoint = Int(key), let bindingCluster = MTRBaseClusterBinding(device: device, endpointID: NSNumber(value: endpoint), queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(sourceDeviceId, queue: self.matterQueue) { device, _ in
+                if let device = device, let bindingEndpointClusterId = bindingEndpointClusterId, bindingEndpointClusterId.keys.count > 0, let key = bindingEndpointClusterId.keys.first, let endpoint = Int(key), let bindingCluster = MTRBaseClusterBinding(device: device, endpointID: NSNumber(value: endpoint), queue: self.matterQueue) {
                     bindingCluster.readAttributeBinding(with: nil) { val, _ in
                         if let params = val as? [MTRBindingClusterTargetStruct], params.count > 0 {
                             let newParams = params.filter {

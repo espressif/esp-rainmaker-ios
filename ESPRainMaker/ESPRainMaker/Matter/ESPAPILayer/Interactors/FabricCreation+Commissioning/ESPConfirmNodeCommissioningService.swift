@@ -76,7 +76,11 @@ class ESPConfirmNodeCommissioningService: ESPConfirmNodeCommissioningLogic {
         self.apiWorker.callDataAPI(endPoint: endpoint) { data, error in
             if let data = data, let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = json[ESPMatterConstants.status] as? String, status.lowercased() == ESPMatterConstants.success {
                 let isRainmakerMatter: Bool = json[ESPMatterConstants.isRainmakerNode] as? Bool ?? false
-                self.presenter?.matterRainmakerCommissioningConfirmed(status: rainmakerNodeId, token: token, isRainmakerMatter: isRainmakerMatter)
+                let node = Node()
+                node.node_id = rainmakerNodeId
+                ESPNodeMetadataService.shared.setIsRainMakerFlag(node: node, isRainmaker: isRainmakerMatter) { result, _ in
+                    self.presenter?.matterRainmakerCommissioningConfirmed(status: rainmakerNodeId, token: token, isRainmakerMatter: isRainmakerMatter)
+                }
             } else {
                 self.presenter?.matterRainmakerCommissioningConfirmed(status: nil, token: token, isRainmakerMatter: nil)
             }

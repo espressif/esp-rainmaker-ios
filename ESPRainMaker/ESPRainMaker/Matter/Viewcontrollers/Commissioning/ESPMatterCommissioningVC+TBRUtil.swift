@@ -29,17 +29,20 @@ extension ESPMatterCommissioningVC {
     /// - Parameters:
     ///   - deviceId: device id
     ///   - endpoint: endpoint
+    ///   - groupId: group id
     ///   - completion: completion
-    func readThreadDataFromDevice(deviceId: UInt64, endpoint: UInt16, completion: @escaping (_ activeOpsDataset: Data?, _ borderAgentId: Data?) -> Void) {
+    func readThreadDataFromDevice(deviceId: UInt64, endpoint: UInt16, groupId: String, completion: @escaping (_ activeOpsDataset: Data?, _ borderAgentId: Data?) -> Void) {
         #if MTR_ENABLE_PROVISIONAL
-        ESPMTRCommissioner.shared.getTBRActiveOperationalDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
-            ESPMTRCommissioner.shared.readTBRAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { borderAgentId in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.getTBRActiveOperationalDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
+            commissioner.readTBRAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { borderAgentId in
                 completion(dataset, borderAgentId)
             }
         }
         #else
-        ESPMTRCommissioner.shared.readAttributeActiveOpDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
-            ESPMTRCommissioner.shared.readAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { bAgentId in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.readAttributeActiveOpDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
+            commissioner.readAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { bAgentId in
                 completion(dataset, bAgentId)
             }
         }
@@ -51,11 +54,12 @@ extension ESPMatterCommissioningVC {
     ///   - groupId: group id
     ///   - deviceId: device id
     func performThreadOperations(groupId: String, deviceId: UInt64) {
-        ESPMTRCommissioner.shared.updateThreadDataset(groupId: groupId, deviceId: deviceId) { status, message in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.updateThreadDataset(groupId: groupId, deviceId: deviceId) { status, message in
             guard status else {
                 if let message = message {
                     if  message == ThreadBRMessages.homepodDatasetNotAvailable.rawValue {
-                        ESPMTRCommissioner.shared.updateThreadDataLocally(groupId: groupId, deviceId: deviceId) { _, _ in
+                        commissioner.updateThreadDataLocally(groupId: groupId, deviceId: deviceId) { _, _ in
                             DispatchQueue.main.async {
                                 self.navigateToDevicesScreen()
                             }

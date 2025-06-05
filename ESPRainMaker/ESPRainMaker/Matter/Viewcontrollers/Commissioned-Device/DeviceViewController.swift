@@ -127,7 +127,10 @@ class DeviceViewController: UIViewController {
         DispatchQueue.main.async {
             Utility.showLoader(message: "", view: self.view)
         }
-        ESPMTRCommissioner.shared.shutDownController()
+        if let group = self.group, let groupId = group.groupID {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.shutDownController()
+        }
         self.restartMatterController()
         self.showDefaultUI = false
         DispatchQueue.main.async {
@@ -179,12 +182,13 @@ class DeviceViewController: UIViewController {
     /// Restart matter controller
     func restartMatterController() {
         if let group = self.group, let groupId = group.groupID, let userNOCDetails = self.fabricDetails.getUserNOCDetails(groupId: groupId) {
-            if let grp = ESPMTRCommissioner.shared.group, let grpId = grp.groupID, grpId != groupId {
-                ESPMTRCommissioner.shared.shutDownController()
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let grp = commissioner.group, let grpId = grp.groupID, grpId != groupId {
+                commissioner.shutDownController()
             }
-            if ESPMTRCommissioner.shared.sController == nil {
-                ESPMTRCommissioner.shared.group = self.group
-                ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCDetails)
+            if commissioner.sController == nil {
+                commissioner.group = self.group
+                commissioner.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCDetails)
             }
         }
     }
@@ -248,7 +252,8 @@ class DeviceViewController: UIViewController {
             switch self.nodeConnectionStatus {
             case .local:
                 if let key = isParticipantDataSupported.1, let endpoint = UInt16(key) {
-                    ESPMTRCommissioner.shared.readParticipantData(deviceId: deviceId, endpoint: endpoint) { data in
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.readParticipantData(deviceId: deviceId, endpoint: endpoint) { data in
                         if let data = data {
                             self.fabricDetails.saveParticipantData(groupId: groupId, deviceId: deviceId, participantData: data)
                         } else {
@@ -372,7 +377,11 @@ class DeviceViewController: UIViewController {
             case .remote:
                 self.connectionStatusLabel.text = ESPMatterConstants.remoteMode
             case .offline:
-                self.connectionStatusLabel.text = ESPMatterConstants.offlineMode
+                if let node = self.rainmakerNode, node.isMatter, node.isRainmakerMatter, node.timestamp.getShortDate().count > 0 {
+                    self.connectionStatusLabel.text = "Offline at \(node.timestamp.getShortDate())"
+                } else {
+                    self.connectionStatusLabel.text = ESPMatterConstants.offlineMode
+                }
             case .controller:
                 self.connectionStatusLabel.text = ESPMatterConstants.controllerMode
             }

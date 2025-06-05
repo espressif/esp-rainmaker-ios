@@ -60,7 +60,8 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     func getCurrentSaturationValue(groupId: String, deviceId: UInt64) {
         self.setupInitialSaturationValue()
         if self.nodeConnectionStatus == .local {
-            if let _ = ESPMTRCommissioner.shared.sController {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let _ = commissioner.sController {
                 self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         cluster.readAttributeCurrentSaturation { val, _ in
@@ -97,7 +98,8 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     func getCurrentCCTValue(groupId: String, deviceId: UInt64) {
         self.setupInitialCCTUI()
         if self.nodeConnectionStatus == .local {
-            if let _ = ESPMTRCommissioner.shared.sController {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let _ = commissioner.sController {
                 self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         cluster.readAttributeColorTemperatureMireds { val, _ in
@@ -130,14 +132,16 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     /// Change saturation
     /// - Parameters:
     ///   - value: value
+    ///   - groupId: group id
     ///   - completion: completion
     func changeSaturation(value: Float) {
         var saturation = Int(value*2.54)
         if saturation == 0 {
             saturation = 1
         }
-        if self.nodeConnectionStatus == .local {
-            if let _ = ESPMTRCommissioner.shared.sController {
+        if self.nodeConnectionStatus == .local, let groupId = self.nodeGroup?.groupID {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let _ = commissioner.sController {
                 self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         let params = MTRColorControlClusterMoveToSaturationParams()
@@ -190,11 +194,14 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     }
     
     /// Change fan speed
-    /// - Parameter speed: new speed value
+    /// - Parameters:
+    ///   - cct: cct value
+    ///   - groupId: group id
     func changeCCT(cct: Int) {
-        if let id = self.deviceId, let grpId = self.nodeGroup?.groupID {
+        if let id = self.deviceId, let groupId = self.nodeGroup?.groupID {
             if self.nodeConnectionStatus == .local {
-                if let _ = ESPMTRCommissioner.shared.sController {
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                if let _ = commissioner.sController {
                     self.getColorCluster() { cluster in
                         if let cluster = cluster {
                             let cctParams = MTRColorControlClusterMoveToColorTemperatureParams()
@@ -250,7 +257,8 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     /// Subscribe to saturation attribute
     func subscribeToSaturationAttribute() {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToSaturationValue(groupId: grpId, deviceId: deviceId) { saturation in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToSaturationValue(groupId: grpId, deviceId: deviceId) { saturation in
                 DispatchQueue.main.async {
                     let finalSaturationValue = Int(CGFloat(saturation)/2.54)
                     if let node = self.node, let id = self.deviceId {
@@ -266,7 +274,8 @@ extension ParamSliderTableViewCell: ParamSliderSaturationControlProtocol {
     /// Subscribe to saturation attribute
     func subscribeToCCTAttribute() {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToCCTValue(groupId: grpId, deviceId: deviceId) { cct in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToCCTValue(groupId: grpId, deviceId: deviceId) { cct in
                 DispatchQueue.main.async {
                     let finalCCTValue = Int(cct)
                     if let node = self.node, let id = self.deviceId {

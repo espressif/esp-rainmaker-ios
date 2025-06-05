@@ -151,6 +151,36 @@ class DevicesViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(controllerParamUpdateReceived), name: Notification.Name(Constants.controllerParamUpdate), object: nil)
         #endif
         tabBarController?.tabBar.isHidden = false
+        
+        // Force refresh all visible cells to ensure UI state is synchronized
+        forceRefreshVisibleCells()
+    }
+    
+    /// Force refresh all visible cells to ensure UI state is synchronized
+    private func forceRefreshVisibleCells() {
+        // Reload all visible cells to ensure fresh state
+        for cell in collectionView.visibleCells {
+            #if ESPRainMakerMatter
+            if #available(iOS 16.4, *) {
+                if let deviceCell = cell as? DeviceCollectionViewCell {
+                    // Force cell to update its UI state
+                    deviceCell.setNeedsLayout()
+                    deviceCell.layoutIfNeeded()
+                    
+                    // Refresh connection status UI
+                    deviceCell.setConnectionStatusUI(status: deviceCell.connectionStatus)
+                    
+                    // Ensure cell reflects current state from UserDefaults
+                    deviceCell.refreshFromCurrentState()
+                }
+            }
+            #endif
+        }
+        
+        // Also reload the entire collection view to ensure all cells are fresh
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
 
     // MARK: - Observer functions
@@ -226,7 +256,11 @@ class DevicesViewController: UIViewController {
         showLoader()
         #if ESPRainMakerMatter
         if #available(iOS 16.4, *) {
-            ESPMTRCommissioner.shared.shutDownController()
+            // Shut down all commissioner instances
+            let allCommissioners = ESPMTRCommissionerManager.shared.getAllCommissioners()
+            for (_, commissioner) in allCommissioners {
+                commissioner.shutDownController()
+            }
         }
         #endif
         collectionView.isUserInteractionEnabled = false
@@ -319,8 +353,11 @@ class DevicesViewController: UIViewController {
     ///   - userNOCDetails: user noc data
     @available(iOS 16.4, *)
     func resetMatterController(matterFabricData: ESPNodeGroup, userNOCDetails: ESPIssueUserNOCResponse) {
-        ESPMTRCommissioner.shared.group = matterFabricData
-        ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: matterFabricData, userNOCData: userNOCDetails)
+        if let groupId = matterFabricData.groupID {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.group = matterFabricData
+            commissioner.initializeMTRControllerWithUserNOC(matterFabricData: matterFabricData, userNOCData: userNOCDetails)
+        }
     }    
     #endif
     
@@ -429,6 +466,14 @@ class DevicesViewController: UIViewController {
                 actionSheet.addAction(bleAction)
                 actionSheet.addAction(softapAction)
                 actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                
+                // Configure for iPad
+                if let popover = actionSheet.popoverPresentationController {
+                    popover.sourceView = self.view
+                    popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+                    popover.permittedArrowDirections = []
+                }
+                
                 present(actionSheet, animated: true, completion: nil)
             }
         }
@@ -467,6 +512,13 @@ class DevicesViewController: UIViewController {
             collectionView.reloadData()
         }
         collectionView.isUserInteractionEnabled = true
+        
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *) {
+            // Setup subscriptions for all Matter devices
+            ESPMTRCommissionerManager.shared.setupDeviceMonitoringForAllFabrics()
+        }
+        #endif
     }
 
     private func showLoader() {

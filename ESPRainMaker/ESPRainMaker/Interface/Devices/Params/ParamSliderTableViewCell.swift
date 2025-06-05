@@ -147,7 +147,7 @@ class ParamSliderTableViewCell: SliderTableViewCell {
                 let val = sender.value
                 switch self.sliderParamType {
                 case .brightness:
-                    self.changeLevel(groupId: grouoId, deviceId: deviceId, toValue: val)
+                    self.changeLevel(toValue: val)
                 case .saturation:
                     self.changeSaturation(value: val)
                 case .airConditioner:
@@ -256,7 +256,8 @@ extension ParamSliderTableViewCell {
     #if ESPRainMakerMatter
     @available(iOS 16.4, *)
     func sendHueCommandViaMatter(chipDevice: MTRBaseDevice, _ sender: UISlider) {
-        if let colorControl = MTRBaseClusterColorControl(device: chipDevice, endpoint: 0, queue: ESPMTRCommissioner.shared.matterQueue) {
+        let matterQueue = DispatchQueue(label: "com.espressif.matter.queue", qos: .utility)
+        if let colorControl = MTRBaseClusterColorControl(device: chipDevice, endpoint: 0, queue: matterQueue) {
             if dataType.lowercased() == "int" {
                 sliderValue = paramName + ": \(Int(slider.value))"
                 let params = MTRColorControlClusterMoveToHueParams()
@@ -290,7 +291,8 @@ extension ParamSliderTableViewCell {
     #if ESPRainMakerMatter
     @available(iOS 16.4, *)
     func sendSaturationCommandViaMatter(chipDevice: MTRBaseDevice, _ sender: UISlider) {
-        if let colorControl = MTRBaseClusterColorControl(device: chipDevice, endpoint: 1, queue: ESPMTRCommissioner.shared.matterQueue) {
+        let matterQueue = DispatchQueue(label: "com.espressif.matter.queue", qos: .utility)
+        if let colorControl = MTRBaseClusterColorControl(device: chipDevice, endpoint: 1, queue: matterQueue) {
             if dataType.lowercased() == "int" {
                 sliderValue = paramName + ": \(Int(slider.value))"
                 let params = MTRColorControlClusterMoveToSaturationParams()

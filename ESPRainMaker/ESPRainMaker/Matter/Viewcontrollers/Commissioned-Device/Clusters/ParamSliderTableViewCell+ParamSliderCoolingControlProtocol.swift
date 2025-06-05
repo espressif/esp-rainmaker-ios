@@ -25,7 +25,8 @@ import Matter
 extension ParamSliderTableViewCell {
     
     func readOHS(groupId: String, deviceId: UInt64) {
-        ESPMTRCommissioner.shared.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.readOccupiedHeatingSetpoint(groupId: groupId, deviceId: deviceId) { value in
             if let value = value {
                 self.currentLevel = Int(value)
                 self.node?.setMatterOccupiedHeatingSetpoint(ohs: value, deviceId: deviceId)
@@ -35,7 +36,8 @@ extension ParamSliderTableViewCell {
     }
     
     func readOCS(groupId: String, deviceId: UInt64) {
-        ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
             if let value = value {
                 self.currentLevel = Int(value)
                 self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: deviceId)
@@ -185,7 +187,8 @@ extension ParamSliderTableViewCell {
     /// Subscribe to occupied cooling setpoint
     func subscribeToOccupiedCoolingSetpoint() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
                 if let mode = self.node?.getMatterSystemMode(deviceId: id) {
                     if mode == ESPMatterConstants.cool {
                         if let value = value {
@@ -202,7 +205,8 @@ extension ParamSliderTableViewCell {
     /// Subscribe to occupied heating setpoint
     func subscribeToOccupiedHeatingSetpoint() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToOccupiedHeatingSetpoint(groupId: grpId, deviceId: id) { value in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToOccupiedHeatingSetpoint(groupId: grpId, deviceId: id) { value in
                 if let mode = self.node?.getMatterSystemMode(deviceId: id) {
                     if mode == ESPMatterConstants.heat {
                         if let value = value {
@@ -222,7 +226,8 @@ extension ParamSliderTableViewCell {
         if let id = self.deviceId, let grpId = self.nodeGroup?.groupID, let node = self.node {
             self.paramChipDelegate?.matterAPIRequestSent()
             if let val = node.getMatterSystemMode(deviceId: id), val.lowercased() == "heat" {
-                ESPMTRCommissioner.shared.setOccupiedHeatingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+                commissioner.setOccupiedHeatingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
                     self.paramChipDelegate?.matterAPIResponseReceived()
                     if result {
                         node.setMatterOccupiedHeatingSetpoint(ohs: Int16(setPoint*100), deviceId: id)
@@ -233,7 +238,8 @@ extension ParamSliderTableViewCell {
                     }
                 }
             } else {
-                ESPMTRCommissioner.shared.setOccupiedCoolingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+                commissioner.setOccupiedCoolingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
                     self.paramChipDelegate?.matterAPIResponseReceived()
                     if result {
                         if let node = self.node, let id = self.deviceId {

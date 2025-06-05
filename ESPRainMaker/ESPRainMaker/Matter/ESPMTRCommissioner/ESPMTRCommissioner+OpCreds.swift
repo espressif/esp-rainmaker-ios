@@ -30,14 +30,14 @@ extension ESPMTRCommissioner {
     func getOpCredsCluster(deviceId: UInt64, endpoint: UInt16 = 0, completion: @escaping (MTRBaseClusterOperationalCredentials?) -> Void) {
         if let controller = sController {
             if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
-                if let cluster = MTRBaseClusterOperationalCredentials(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue) {
+                if let cluster = MTRBaseClusterOperationalCredentials(device: device, endpointID: NSNumber(value: 0), queue: self.matterQueue) {
                     completion(cluster)
                 } else {
                     completion(nil)
                 }
             } else {
-                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                    if let device = device, let cluster = MTRBaseClusterOperationalCredentials(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue) {
+                controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                    if let device = device, let cluster = MTRBaseClusterOperationalCredentials(device: device, endpointID: NSNumber(value: 0), queue: self.matterQueue) {
                         completion(cluster)
                     } else {
                         completion(nil)

@@ -56,6 +56,29 @@ class ESPNodeMetadataService {
         }
     }
     
+    /// Set is rainmaker flag for matter devices
+    /// - Parameters:
+    ///   - nodeId: node id
+    ///   - deviceName: device name
+    ///   - completion: completion
+    func setIsRainMakerFlag(node: Node, isRainmaker: Bool, completion: @escaping (Bool, ESPAPIError?) -> Void) {
+        self.extendSessionWorker.checkUserSession { accessToken, error in
+            guard let accessToken = accessToken, let nodeId = node.node_id else {
+                completion(false, ESPAPIError.noAccessToken)
+                return
+            }
+            var matterMetaData: [String: Any] = [:]
+            var metadata: [String: Any] = [:]
+            matterMetaData[ESPMatterConstants.isRainmaker] = isRainmaker ? ESPMatterConstants.trueFlag : ESPMatterConstants.falseFlag
+            metadata[ESPMatterConstants.matter] = matterMetaData
+            let url = ESPNodeMetadataService.nodeMetadataURL + "?node_id=\(nodeId)"
+            let headers: HTTPHeaders = [ESPMatterConstants.contentType: ESPMatterConstants.applicationJSON,
+                           ESPMatterConstants.authorization: accessToken]
+            let params = [ESPNodeMetadataService.metadataKey: metadata]
+            self.callCloudAPI(node: node, url: url, method: .put, headers: headers, parameters: params, completion: completion)
+        }
+    }
+    
     /// Call the cloud API to update the matter only device name to device metadata
     /// - Parameters:
     ///   - url:API endpoint

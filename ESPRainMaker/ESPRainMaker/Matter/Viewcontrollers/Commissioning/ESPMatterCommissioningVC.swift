@@ -66,7 +66,8 @@ class ESPMatterCommissioningVC: UIViewController {
                 Utility.showLoader(message: "Issuing user NOC...", view: self.view)
                 var finalCSRString = ""
                 self.csrQueue.async {
-                    ESPMTRCommissioner.shared.generateCSR(groupId: groupId) { csr in
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.generateCSR(groupId: groupId) { csr in
                         if let csr = csr {
                             finalCSRString = csr.replacingOccurrences(of: "\n", with: "")
                             finalCSRString = "\(ESPMatterConstants.csrHeader)\n" + finalCSRString + "\n\(ESPMatterConstants.csrFooter)"
@@ -78,7 +79,8 @@ class ESPMatterCommissioningVC: UIViewController {
                 }
                 return
             }
-            ESPMTRCommissioner.shared.shutDownController()
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.shutDownController()
             Task {
                 await self.setup()
             }
@@ -88,9 +90,10 @@ class ESPMatterCommissioningVC: UIViewController {
     /// Initialize matter controller
     func initializeMatterController() {
         if let group = group, let grpId = group.groupID, let userNOCData = self.fabricDetails.getUserNOCDetails(groupId: grpId) {
-            ESPMTRCommissioner.shared.shutDownController()
-            ESPMTRCommissioner.shared.group = group
-            ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCData)
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.shutDownController()
+            commissioner.group = group
+            commissioner.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCData)
         }
     }
     
@@ -155,7 +158,14 @@ class ESPMatterCommissioningVC: UIViewController {
                 try await setupRequest.perform()
                 self.validatePayloadAndStartCommissioning(groupName: groupName)
             } catch {
-                self.validatePayloadAndStartCommissioning(groupName: groupName)
+                self.showErrorAlert(title: ESPMatterConstants.failureTxt,
+                                    message: ESPMatterConstants.commissioningFailureMsg,
+                                    buttonTitle: ESPMatterConstants.okTxt,
+                                    callback: {
+                    DispatchQueue.main.async {
+                        self.navigationController?.popToRootViewController(animated: true)
+                    }
+                })
             }
         }
     }
@@ -191,7 +201,8 @@ class ESPMatterCommissioningVC: UIViewController {
                 DispatchQueue.main.async {
                     Utility.showLoader(message: "", view: self.view)
                 }
-                if let nodeID = ESPMTRCommissioner.shared.rainmakerNodeId {
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                if let nodeID = commissioner.rainmakerNodeId {
                     // First update device timezone
                     self.updateTimezone(nodeID: nodeID) { _ in
                         // Update device name
@@ -312,12 +323,13 @@ extension ESPMatterCommissioningVC {
     
     /// start custom fabric commissioning flow
     func startCommissioning() {
-        if let payload = ESPMatterEcosystemInfo.shared.getOnboardingPayload() {
+        if let payload = ESPMatterEcosystemInfo.shared.getOnboardingPayload(), let groupId = self.groupId {
             self.initializeMatterController()
             let deviceId = ESPMatterDeviceManager.shared.getNextAvailableDeviceID()
             ESPMatterDeviceManager.shared.setNextAvailableDeviceID(deviceId+1)
-            ESPMTRCommissioner.shared.uidelegate = self
-            ESPMTRCommissioner.shared.startCommissioningWithUserNOC(onboardingPayload: payload, deviceId: deviceId)
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.uidelegate = self
+            commissioner.startCommissioningWithUserNOC(onboardingPayload: payload, deviceId: deviceId)
         }
     }
 }
@@ -333,7 +345,8 @@ extension ESPMatterCommissioningVC: ESPIssueUserNOCPresentationLogic {
         guard let _ = error else {
             if let response = response {
                 self.fabricDetails.saveUserNOCDetails(groupId: groupId, data: response)
-                ESPMTRCommissioner.shared.shutDownController()
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                commissioner.shutDownController()
                 Task {
                     await self.setup()
                 }
@@ -400,7 +413,8 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                         if let point = clusterInfo.1, let id = UInt16(point) {
                             endpoint = id
                         }
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
+                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                        commissioner.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
                             DispatchQueue.main.async {
                                 Utility.hideLoader(view: self.view)
                                 self.goToHomeScreen(isRainmaker: isRainmaker)
@@ -439,8 +453,9 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
         var index = 0
         if let group = self.group, group.shouldUpdate, let fabricDetails = group.fabricDetails, let catIdAdmin = fabricDetails.catIdAdminDecimal, let catIdOperate = fabricDetails.catIdOperateDecimal, let nodes = self.nodes, nodes.count > 0 {
             for node in nodes {
-                if let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal {
-                    ESPMTRCommissioner.shared.readAllACLAttributes(deviceId: deviceId) { accessControlEntries in
+                if let matterNodeId = node.matterNodeID, let deviceId = matterNodeId.hexToDecimal, let groupId = group.groupID {
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.readAllACLAttributes(deviceId: deviceId) { accessControlEntries in
                         if var accessControlEntries = accessControlEntries, accessControlEntries.count > 0 {
                             var entries = [MTRAccessControlClusterAccessControlEntryStruct]()
                             for index in 0..<accessControlEntries.count {
@@ -452,7 +467,7 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
                                 }
                                 entries.append(entry)
                             }
-                            ESPMTRCommissioner.shared.writeAllACLAttributes(deviceId: deviceId, accessControlEntry: entries) { result in
+                            commissioner.writeAllACLAttributes(deviceId: deviceId, accessControlEntry: entries) { result in
                                 index+=1
                                 if index >= nodes.count {
                                     completion()

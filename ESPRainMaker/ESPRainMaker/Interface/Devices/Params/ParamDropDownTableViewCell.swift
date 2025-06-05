@@ -89,7 +89,8 @@ class ParamDropDownTableViewCell: DropDownTableViewCell {
                             value = 4
                         }
                         self.paramChipDelegate?.matterAPIRequestSent()
-                        ESPMTRCommissioner.shared.setControlSequenceOfOperation(groupId: grpId, deviceId: dId, cos: NSNumber(value: value)) { result in
+                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+                        commissioner.setControlSequenceOfOperation(groupId: grpId, deviceId: dId, cos: NSNumber(value: value)) { result in
                             self.paramChipDelegate?.matterAPIResponseReceived()
                             if result {
                                 self.matterNode?.setMatterControlledSequenceOfOperation(cso: item, deviceId: dId)
@@ -108,7 +109,8 @@ class ParamDropDownTableViewCell: DropDownTableViewCell {
                             value = 4
                         }
                         self.paramChipDelegate?.matterAPIRequestSent()
-                        ESPMTRCommissioner.shared.setSystemMode(groupId: grpId, deviceId: dId, mode: NSNumber(value: value)) { result in
+                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+                        commissioner.setSystemMode(groupId: grpId, deviceId: dId, mode: NSNumber(value: value)) { result in
                             self.paramChipDelegate?.matterAPIResponseReceived()
                             if result {
                                 self.matterNode?.setMatterSystemMode(systemMode: item, deviceId: dId)

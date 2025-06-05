@@ -57,7 +57,7 @@ extension ESPMTRCommissioner {
         self.isMaterTaskCompleted = false
         self.matterDeviceNotFoundCompletion = completion
         if let controller = sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
+            controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
                 if !self.isMaterTaskCompleted {
                     self.isMaterTaskCompleted = true
                     if let _ = device {
@@ -79,7 +79,7 @@ extension ESPMTRCommissioner {
         if let deviceId = matterNodeId.hexToDecimal {
             var isMaterTaskCompleted = false
             if let controller = sController {
-                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
+                controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
                     if !isMaterTaskCompleted {
                         isMaterTaskCompleted = true
                         if let _ = device {

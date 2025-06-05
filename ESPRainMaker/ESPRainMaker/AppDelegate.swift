@@ -50,6 +50,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setTabBarAttribute()
         updateUIViewAppearance()
 
+        // Configure tab bar appearance
+        if #available(iOS 13.0, *) {
+            let tabBarAppearance = UITabBarAppearance()
+            tabBarAppearance.stackedLayoutAppearance.selected.iconColor = UIColor(hexString: "#8265E3")
+            tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#8864e4")]
+            tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#8181A8")
+            tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#8181a8")]
+            UITabBar.appearance().standardAppearance = tabBarAppearance
+            if #available(iOS 15.0, *) {
+                UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+            }
+        } else {
+            UITabBar.appearance().tintColor = UIColor(hexString: "#8265E3")
+            UITabBar.appearance().unselectedItemTintColor = UIColor(hexString: "#8181A8")
+        }
+
         // Uncomment the next line to see library related logs.
 //        ESPProvisionManager.shared.enableLogs(true)
 
