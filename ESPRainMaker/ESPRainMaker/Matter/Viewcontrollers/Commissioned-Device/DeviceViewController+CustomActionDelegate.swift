@@ -23,6 +23,7 @@ import UIKit
 @available(iOS 16.4, *)
 extension DeviceViewController: CustomActionDelegate {
     
+    func launchRainmakerController() {}
     func mergeThreadDataset() {}
     func setActiveThreadDataset() {}
     

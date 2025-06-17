@@ -456,8 +456,12 @@ class SuccessViewController: UIViewController {
                 self.provisionFinsihedWithStatus(message: "Device Added Successfully!!")
                 
                 //Client-Only-Controller - Only call for devices that support this flow
-                if let finalNode = self.finalNode, finalNode.isClientOnlyControllerFlowSupported, let _ = finalNode.clientOnlyControllerGroupParam {
-                    self.handleClientOnlyControllerFlow()
+                if let finalNode = self.finalNode {
+                    if finalNode.isClientOnlyControllerFlowSupported, let _ = finalNode.clientOnlyControllerGroupParam {
+                        self.handleClientOnlyControllerFlow()
+                    } else if finalNode.isRmakerControllerSupported {
+                        self.showRainmakerLoginScreen()
+                    }
                 }
             }
         }
@@ -592,7 +596,7 @@ extension SuccessViewController {
     }
     
     /// Show Rainmaker Login Screen
-    func showRainmakerLoginScreen(groupId: String) {
+    func showRainmakerLoginScreen(groupId: String? = nil) {
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController {
             if let signInVC = nav.viewControllers.first as? SignInViewController, let tab = self.tabBarController {
@@ -641,25 +645,51 @@ extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
         let baseURL = Configuration.shared.awsConfiguration.baseURL
         let refreshToken = cloudResponse.refreshToken ?? ""
         
+        if let node = self.finalNode {
+            if node.isClientOnlyControllerFlowSupported {
+                self.updateParamsForClientOnlyController(baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, node: node)
+            } else if node.isRmakerControllerSupported {
+                self.updateParamsForRmakerController(baseURL: baseURL, refreshToken: refreshToken, node: node)
+            }
+        }
+    }
+    
+    private func updateParamsForClientOnlyController(baseURL: String?, refreshToken: String, groupId: String?, node: Node) {
         if refreshToken.count > 0,
-            let finalNode = self.finalNode,
-            let serviceName = finalNode.getServiceName(forServiceType: Constants.matterControllerServiceType),
-            let nodeId = finalNode.node_id,
-            let grpIdParamName = finalNode.clientOnlyControllerGroupParam?.name,
-            let baseURLParamName = finalNode.clientOnlyControllerBaseURLParam?.name,
-            let userTokenName = finalNode.clientOnlyControllerUserTokenParam?.name,
-            let groupId = groupId {
+           let baseURL = baseURL,
+           let serviceName = node.getServiceName(forServiceType: Constants.matterControllerServiceType),
+           let nodeId = node.node_id,
+           let grpIdParamName = node.clientOnlyControllerGroupParam?.name,
+           let baseURLParamName = node.clientOnlyControllerBaseURLParam?.name,
+           let userTokenName = node.clientOnlyControllerUserTokenParam?.name,
+           let groupId = groupId {
             
             let params: [String: Any] = [serviceName : [baseURLParamName: baseURL,
-                                            userTokenName: refreshToken,
+                                                           userTokenName: refreshToken,
                                                           grpIdParamName: groupId] as Any]
             DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
                 if status == .success {
                     //Client-Only-Controller
                 }
             }
-        } else {
+        }
+    }
+    
+    private func updateParamsForRmakerController(baseURL: String?, refreshToken: String, node: Node) {
+        if refreshToken.count > 0,
+           let baseURL = baseURL,
+           let serviceName = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType),
+           let nodeId = node.node_id,
+           let baseURLParamName = node.rmakerControllerBaseURLParam?.name,
+           let userTokenName = node.rmakerControllerUserTokenParam?.name {
             
+            let params: [String: Any] = [serviceName : [baseURLParamName: baseURL,
+                                            userTokenName: refreshToken] as Any]
+            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
+                if status == .success {
+                    //Rainmaker-Controller
+                }
+            }
         }
     }
 }

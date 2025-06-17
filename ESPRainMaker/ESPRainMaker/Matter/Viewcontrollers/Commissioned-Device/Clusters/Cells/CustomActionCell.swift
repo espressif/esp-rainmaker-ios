@@ -20,6 +20,7 @@ import UIKit
 
 /// Actions supported by the custom action cell
 enum CustomAction {
+    case launchRainmakerController
     case launchController
     case updateThreadDataset
     case setActiveThreadDataset
@@ -29,7 +30,7 @@ enum CustomAction {
 
 /// This protocol defines the actions that the CustomAction cell supports
 protocol CustomActionDelegate: AnyObject {
-    
+    func launchRainmakerController()
     func launchController()
     func updateThreadDataset()
     func setActiveThreadDataset()
@@ -80,6 +81,9 @@ class CustomActionCell: UITableViewCell {
         DispatchQueue.main.async {
             self.workflow = workflow
             switch workflow {
+            case .launchRainmakerController:
+                self.headerLabel.text = "Controller"
+                self.descriptionLabel.text = "Update Params"
             case .launchController:
                 self.headerLabel.text = "Controller"
                 self.descriptionLabel.text = "Update Device List"
@@ -105,6 +109,8 @@ class CustomActionCell: UITableViewCell {
     /// - Parameter sender: button
     @IBAction func performCustomAction(_ sender: Any) {
         switch workflow {
+        case .launchRainmakerController:
+            self.delegate?.launchRainmakerController()
         case .launchController:
             self.delegate?.launchController()
         case .updateThreadDataset:

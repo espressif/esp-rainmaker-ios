@@ -179,6 +179,23 @@ class DeviceTraitListViewController: UIViewController {
                     }
                 }
             }
+            if let service = node.getService(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType), let params = service.params {
+                var userTokenParamExists = false
+                var baseURLParamExists = false
+                var appendedParam: Param?
+                for param in params {
+                    if let type = param.type, type == RainmakerControllerConstants.paramUserToken {
+                        userTokenParamExists = true
+                    }
+                    if let type = param.type, type == RainmakerControllerConstants.paramBaseURL {
+                        baseURLParamExists = true
+                        appendedParam = param
+                    }
+                }
+                if userTokenParamExists, baseURLParamExists, let param = appendedParam {
+                    dataSource.append(param)
+                }
+            }
         }
         // Remove hidden UI type parameters from list.
         dataSource = dataSource.filter({ $0.uiType != Constants.hidden })
@@ -603,7 +620,21 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func getTableViewCellBasedOn(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
-        if dynamicAttribute.type == ClientOnlyControllerConstants.paramMatterCtlCmd {
+        if dynamicAttribute.type == RainmakerControllerConstants.paramBaseURL {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
+                cell.delegate = self
+                cell.topSpaceConstraint.constant = 0
+                cell.bottomSpaceConstraint.constant = 0
+                cell.setupWorkflow(workflow: .launchRainmakerController)
+                self.setAutoresizingMask(cell)
+                if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected || node.localNetwork {
+                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: false)
+                } else {
+                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: true)
+                }
+                return cell
+            }
+        } else if dynamicAttribute.type == ClientOnlyControllerConstants.paramMatterCtlCmd {
             if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
                 cell.delegate = self
                 cell.topSpaceConstraint.constant = 0
