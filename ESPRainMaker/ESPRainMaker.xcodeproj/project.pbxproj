@@ -612,6 +612,7 @@
 		F87C31E02DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */; };
 		F8E470112E66E72D0056383C /* PairingModeMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E470102E66E7240056383C /* PairingModeMessages.swift */; };
 		F8E470132E66E7E30056383C /* ESPMTRCommissionerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E470122E66E7DB0056383C /* ESPMTRCommissionerManager.swift */; };
+		F8E470152E6715EF0056383C /* ESPMTRCommissioner+MTRDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E470142E6715EF0056383C /* ESPMTRCommissioner+MTRDevice.swift */; };
 		F8E994792DF16C06006F406C /* ClientOnlyControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E994782DF16C05006F406C /* ClientOnlyControllerConstants.swift */; };
 		F8E9947B2DF1733F006F406C /* Node+ClientOnlyControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */; };
 /* End PBXBuildFile section */
@@ -1259,6 +1260,7 @@
 		F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = esp_rmaker_chal_resp.pb.swift; sourceTree = "<group>"; };
 		F8E470102E66E7240056383C /* PairingModeMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingModeMessages.swift; sourceTree = "<group>"; };
 		F8E470122E66E7DB0056383C /* ESPMTRCommissionerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRCommissionerManager.swift; sourceTree = "<group>"; };
+		F8E470142E6715EF0056383C /* ESPMTRCommissioner+MTRDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPMTRCommissioner+MTRDevice.swift"; sourceTree = "<group>"; };
 		F8E994782DF16C05006F406C /* ClientOnlyControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientOnlyControllerConstants.swift; sourceTree = "<group>"; };
 		F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+ClientOnlyControllerUtility.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1758,6 +1760,7 @@
 		0CD3592B2A2D25F30081017C /* ESPMTRCommissioner */ = {
 			isa = PBXGroup;
 			children = (
+				F8E470142E6715EF0056383C /* ESPMTRCommissioner+MTRDevice.swift */,
 				F8E470122E66E7DB0056383C /* ESPMTRCommissionerManager.swift */,
 				0C50F64D2AAEECA600BA7B6B /* ESPMTRCommissioner+Subscriber.swift */,
 				0CD359332A2D25F30081017C /* FabricKeys */,
@@ -3415,6 +3418,7 @@
 				F1BDFEDC27DDD489005AF812 /* User+GetDeviceList.swift in Sources */,
 				0C6FE3BD2A667ACD00AB3194 /* ESPMatterFabricDetails+NodeGroupSharingData.swift in Sources */,
 				F191CD462511231C00BDCEF1 /* ConnectViewController.swift in Sources */,
+				F8E470152E6715EF0056383C /* ESPMTRCommissioner+MTRDevice.swift in Sources */,
 				F15EABF423E043DA008A766B /* CustomUIElements.swift in Sources */,
 				F1AC6D8B27AD54490051F6E7 /* ESPRMDeviceType.swift in Sources */,
 				0C80AA2526FDBD4B00480C53 /* ESPServerParams.swift in Sources */,

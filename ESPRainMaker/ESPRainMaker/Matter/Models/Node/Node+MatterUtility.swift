@@ -29,12 +29,8 @@ extension Node {
     
     /// Is on off client supported
     var isOnOffClientSupported: Bool {
-        if let metadata = matterMetadata, let clientsData = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
-            for key in clientsData.keys {
-                if let list = clientsData[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
-                    return true
-                }
-            }
+        if let matterNodeId = self.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let groupId = self.groupId {
+            return ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0
         }
         return false
     }
@@ -42,85 +38,117 @@ extension Node {
     /// On off clients
     var onOffClients: [String: UInt] {
         var endpointClusters: [String: UInt] = [String: UInt]()
-        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
-            for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
-                    endpointClusters[key] = onOff.clusterId.uintValue
+        
+        // Try new endpoints format first
+        if let metadata = matterMetadata, let endpoints = metadata[ESPMatterConstants.endpoints] as? [String: Any] {
+            for (endpointKey, endpointData) in endpoints {
+                guard let endpointDict = endpointData as? [String: Any],
+                      let clusters = endpointDict["clusters"] as? [String: Any],
+                      let clients = clusters["clients"] as? [String: Any] else {
+                    continue
+                }
+                
+                // Check if this endpoint has the onOff cluster as a client
+                for clusterKey in clients.keys {
+                    if let clusterId = parseHexToUInt(clusterKey), clusterId == onOff.clusterId.uintValue {
+                        // Convert endpoint key from hex to decimal
+                        if let endpointId = parseHexToUInt(endpointKey) {
+                            endpointClusters["\(endpointId)"] = onOff.clusterId.uintValue
+                        }
+                        break
+                    }
                 }
             }
         }
+        
+        // Fallback to old clientsData format for backward compatibility
+        if endpointClusters.isEmpty {
+            if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.clientsData] as? [String: [UInt]] {
+                for key in val.keys {
+                    if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
+                        endpointClusters[key] = onOff.clusterId.uintValue
+                    }
+                }
+            }
+        }
+        
         return endpointClusters
+    }
+    
+    /// Helper method to parse hex string to UInt
+    private func parseHexToUInt(_ hexString: String) -> UInt? {
+        let cleanHex = hexString.hasPrefix("0x") ? String(hexString.dropFirst(2)) : hexString
+        return UInt(cleanHex, radix: 16)
     }
     
     /// Binding servers
     var bindingServers: [String: UInt] {
         var endpointClusters: [String: UInt] = [String: UInt]()
-        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
-            for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(binding.clusterId.uintValue) {
-                    endpointClusters[key] = binding.clusterId.uintValue
+        
+        // Try new endpoints format first
+        if let metadata = matterMetadata, let endpoints = metadata[ESPMatterConstants.endpoints] as? [String: Any] {
+            for (endpointKey, endpointData) in endpoints {
+                guard let endpointDict = endpointData as? [String: Any],
+                      let clusters = endpointDict["clusters"] as? [String: Any],
+                      let servers = clusters["servers"] as? [String: Any] else {
+                    continue
+                }
+                
+                // Check if this endpoint has the binding cluster as a server
+                for clusterKey in servers.keys {
+                    if let clusterId = parseHexToUInt(clusterKey), clusterId == binding.clusterId.uintValue {
+                        // Convert endpoint key from hex to decimal
+                        if let endpointId = parseHexToUInt(endpointKey) {
+                            endpointClusters["\(endpointId)"] = binding.clusterId.uintValue
+                        }
+                        break
+                    }
                 }
             }
         }
+        
+        // Fallback to old serversData format for backward compatibility
+        if endpointClusters.isEmpty {
+            if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
+                for key in val.keys {
+                    if let list = val[key], list.count > 0, list.contains(binding.clusterId.uintValue) {
+                        endpointClusters[key] = binding.clusterId.uintValue
+                    }
+                }
+            }
+        }
+        
         return endpointClusters
     }
     
     /// Is controllerserver supported
     var isControllerServerSupported: (Bool, String?) {
-        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
-            for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(rainmakerController.clusterId.uintValue) {
-                    return (true, key)
-                }
-            }
+        if let matterNodeId = self.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let groupId = self.groupId {
+            return ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId)
         }
         return (false, nil)
     }
     
     /// Is on off server supported
     var isOnOffServerSupported: (Bool, String?) {
-        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
-            for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(onOff.clusterId.uintValue) {
-                    return (true, key)
-                }
-            }
+        if let matterNodeId = self.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let groupId = self.groupId {
+            return ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId)
         }
         return (false, nil)
     }
     
     /// Is level control server supported
     var isLevelControlServerSupported: (Bool, String?) {
-        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
-            for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(levelControl.clusterId.uintValue) {
-                    return (true, key)
-                }
-            }
+        if let matterNodeId = self.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let groupId = self.groupId {
+            return ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId)
         }
         return (false, nil)
     }
     
     /// Is color control server supported
     var isColorControlServerSupported: (Bool, String?) {
-        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
-            for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(colorControl.clusterId.uintValue) {
-                    return (true, key)
-                }
-            }
-        }
-        return (false, nil)
-    }
-    
-    /// Is open commissioning window supported
-    var isOpenCommissioningWindowSupported: (Bool, String?) {
-        if let metadata = matterMetadata, let val = metadata[ESPMatterConstants.serversData] as? [String: [UInt]] {
-            for key in val.keys {
-                if let list = val[key], list.count > 0, list.contains(commissioningWindow.clusterId.uintValue) {
-                    return (true, key)
-                }
-            }
+        if let matterNodeId = self.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let groupId = self.groupId {
+            return ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId)
         }
         return (false, nil)
     }

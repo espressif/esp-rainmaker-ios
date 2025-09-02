@@ -114,6 +114,7 @@ struct ESPMatterConstants {
     static let linkedDevices = "LINKED DEVICES"
     static let unlinkedDevices = "AVAILABLE DEVICES"
     static let navigationController = "NavigationViewController"
+    static let endpoints = "endpoints"
 
     /// Device view controller
     static let name = "name"

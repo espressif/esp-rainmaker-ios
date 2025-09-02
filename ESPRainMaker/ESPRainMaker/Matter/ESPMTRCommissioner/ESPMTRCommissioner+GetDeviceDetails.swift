@@ -84,32 +84,13 @@ extension ESPMTRCommissioner {
                                         if let type = deviceType {
                                             self.fabricDetails.saveDeviceType(groupId: groupId, deviceId: deviceId, type: type)
                                         }
-                                        //Read and save all device endpoints
-                                        self.getAllDeviceEndpoints(deviceId: deviceId) { endpoints in
-                                            if endpoints.count > 0 {
-                                                self.fabricDetails.saveEndpointsData(groupId: groupId, deviceId: deviceId, endpoints: endpoints)
-                                                //Read and save all clients on all endpoints
-                                                self.getAllClients(deviceId: deviceId, index: 0, endpoints: endpoints) { clients in
-                                                    if clients.count > 0 {
-                                                        self.fabricDetails.saveClientsData(groupId: groupId, deviceId: deviceId, clients: clients)
-                                                    }
-                                                    //Read and save all servers on all endpoints
-                                                    self.getAllServers(deviceId: deviceId, index: 0, endpoints: endpoints) { servers in
-                                                        if servers.count > 0 {
-                                                            self.fabricDetails.saveServersData(groupId: groupId, deviceId: deviceId, servers: servers)
-                                                        }
-                                                        //Read and save all attributes on all endpoints
-                                                        self.getMatterAttributes(groupID: groupId, deviceId: deviceId) { attributes in
-                                                            if attributes.count > 0 {
-                                                                self.fabricDetails.saveAttributesData(groupId: groupId, deviceId: deviceId, attributes: attributes)
-                                                            }
-                                                            completionHandler()
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                completionHandler()
+                                        self.readAttribute(groupId: groupId, deviceId: deviceId) { result in
+                                            if let result = result {
+                                                let deviceInfo = ESPMTRCommissioner.parseDeviceInfo(from: result)
+                                                let clusters = ESPMTRCommissioner.convertToJSONFormat(from: deviceInfo)
+                                                self.fabricDetails.saveClustersData(groupId: groupId, deviceId: deviceId, clusters: clusters)
                                             }
+                                            completionHandler()
                                         }
                                     }
                                 }
