@@ -26,6 +26,8 @@ extension DeviceViewController: CustomActionDelegate {
     func mergeThreadDataset() {}
     func setActiveThreadDataset() {}
     
+    func launchKinesisVideo(channel: String?) {}
+    
     //MARK: Custom Action
     /// Launch controller
     func launchController() {

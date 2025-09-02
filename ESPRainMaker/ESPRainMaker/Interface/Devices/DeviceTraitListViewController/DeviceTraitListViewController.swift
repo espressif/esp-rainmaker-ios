@@ -58,6 +58,7 @@ class DeviceTraitListViewController: UIViewController {
 
     /// Thread Border Router service
     let tbrService = ThreadBRUpdateService()
+    var channel: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,6 +106,20 @@ class DeviceTraitListViewController: UIViewController {
             checkForCentralParam()
         }
         checkOfflineStatus()
+    }
+    
+    func setupCamera() {
+        if let node = self.device.node, let channel = node.channelParamValue, let nodeId = node.node_id {
+            self.channel = channel
+            DispatchQueue.main.async {
+                Utility.showLoader(message: "Fetching Assume Role creedentials...", view: self.view)
+            }
+            ESPAssumeRoleCredentialManager.shared.getAssumeRoleCredentials(nodeId: nodeId) { _, _ in
+                DispatchQueue.main.async {
+                    Utility.hideLoader(view: self.view)
+                }
+            }
+        }
     }
     
     /// Setup beta view
@@ -186,6 +201,7 @@ class DeviceTraitListViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkOfflineStatus), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadParamTableView), name: Notification.Name(Constants.reloadParamTableView), object: nil)
+        self.setupCamera()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -242,6 +258,7 @@ class DeviceTraitListViewController: UIViewController {
         isInitialLoadingComplete = true
         // Restart polling when app comes to foreground
         startPolling()
+        self.setupCamera()
     }
 
     @objc func appEnterBackground() {
@@ -820,6 +837,23 @@ class DeviceTraitListViewController: UIViewController {
                 cell.triggerButton.alpha = 0.5
             }
             return cell
+        } else if dynamicAttribute.type == Constants.channelParamType {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
+                if let channel = dynamicAttribute.value as? String {
+                    cell.channel = channel
+                }
+                cell.delegate = self
+                cell.topSpaceConstraint.constant = 0
+                cell.bottomSpaceConstraint.constant = 0
+                cell.setupWorkflow(workflow: .launchKinesisVideo)
+                self.setAutoresizingMask(cell)
+                if dynamicAttribute.properties?.contains("read") ?? false, let node = device.node, node.isConnected || node.localNetwork {
+                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: false)
+                } else {
+                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: true)
+                }
+                return cell
+            }
         }
 
         return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)

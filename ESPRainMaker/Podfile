@@ -20,6 +20,13 @@ target 'ESPRainMaker' do
   pod 'JCore'
   pod 'JPush'
   pod 'WechatOpenSDK-XCFramework'
+  
+  pod 'AWSCognitoIdentityProvider'
+  pod 'CommonCryptoModule'
+  pod 'AWSKinesisVideo'
+  pod 'AWSKinesisVideoSignaling'
+  pod 'GoogleWebRTC', '~> 1.1'
+  pod 'Starscream', '~> 3.0'
 
 end
 

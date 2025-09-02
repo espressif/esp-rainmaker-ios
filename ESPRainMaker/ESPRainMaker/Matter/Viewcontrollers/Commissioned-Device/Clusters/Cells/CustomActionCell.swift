@@ -24,6 +24,7 @@ enum CustomAction {
     case updateThreadDataset
     case setActiveThreadDataset
     case mergeThreadDataset
+    case launchKinesisVideo
 }
 
 /// This protocol defines the actions that the CustomAction cell supports
@@ -33,6 +34,7 @@ protocol CustomActionDelegate: AnyObject {
     func updateThreadDataset()
     func setActiveThreadDataset()
     func mergeThreadDataset()
+    func launchKinesisVideo(channel: String?)
 }
 
 class CustomActionCell: UITableViewCell {
@@ -47,6 +49,8 @@ class CustomActionCell: UITableViewCell {
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var topSpaceConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomSpaceConstraint: NSLayoutConstraint!
+    
+    var channel: String?
     
     override func awakeFromNib() {
         super.layoutSubviews()
@@ -89,6 +93,10 @@ class CustomActionCell: UITableViewCell {
                 self.headerLabel.text = "Border Router"
                 self.descriptionLabel.text = "Merge With Homepod"
                 self.launchButton.setTitle("Merge", for: .normal)
+            case .launchKinesisVideo:
+                self.headerLabel.text = "WebRTC"
+                self.descriptionLabel.text = "Video Streaming"
+                self.launchButton.setTitle("Start", for: .normal)
             }
         }
     }
@@ -105,6 +113,8 @@ class CustomActionCell: UITableViewCell {
             self.delegate?.setActiveThreadDataset()
         case .mergeThreadDataset:
             self.delegate?.mergeThreadDataset()
+        case .launchKinesisVideo:
+            self.delegate?.launchKinesisVideo(channel: channel)
         }
     }
     

@@ -239,4 +239,9 @@ struct Constants {
     static let settingsStoryboardName = "Settings"
     
     static let customColor = "#8265E3"
+    
+    // Web RTC constants
+    static let channelParamType = "esp.param.channel"
+    static let cameraDeviceType = "esp.device.camera"
+    static let channelParam = "esp.param.channel"
 }

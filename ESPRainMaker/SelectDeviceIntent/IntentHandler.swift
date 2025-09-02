@@ -24,18 +24,18 @@ class IntentHandler: INExtension, ConfigurationIntentHandling  {
         if let nodes = ESPLocalStorageNodes(ESPLocalStorageKeys.suiteName).fetchNodeDetails() {
             var userDevices:[UserDevice] = []
             for node in nodes {
-                for device in node.devices ?? [] {
-                    let userDevice = UserDevice(identifier: (node.node_id ?? "")+(device.name  ?? ""), display: device.getDeviceName() ?? "")
-                    userDevice.name = device.getDeviceName() ?? device.name
-                    userDevices.append(userDevice)
+                if !node.isMatter {
+                    for device in node.devices ?? [] {
+                        let userDevice = UserDevice(identifier: (node.node_id ?? "")+(device.name  ?? ""), display: device.getDeviceName() ?? "")
+                        userDevice.name = device.getDeviceName() ?? device.name
+                        userDevices.append(userDevice)
                     }
                 }
+            }
             completion(INObjectCollection(items: userDevices), nil)
-        }
-        else {
+        } else {
             completion(nil, nil)
         }
-        
     }
     
     

@@ -286,6 +286,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         }
 
         cell.deviceImageView.image = ESPRMDeviceType(rawValue: device.type ?? "")?.getImageFromDeviceType() ?? UIImage(named: Constants.dummyDeviceImage)
+        self.setSecurityCameraImage(cell: cell, device: device)
         return cell
     }
 
@@ -389,6 +390,20 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         cell.rainmakerNode = rainmakerNode
     }
     #endif
+    
+    /// Set device image as security camera
+    /// - Parameters:
+    ///   - cell: cell
+    ///   - device: esp device
+    func setSecurityCameraImage(cell: DevicesCollectionViewCell, device: Device) {
+        if let params = device.params {
+            for param in params {
+                if let type = param.type, type == Constants.channelParamType {
+                    cell.deviceImageView.image = UIImage(named: "security_camera")
+                }
+            }
+        }
+    }
 }
 
 extension DeviceGroupCollectionViewCell: UICollectionViewDelegateFlowLayout {
