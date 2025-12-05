@@ -308,6 +308,8 @@ class ScheduleViewController: UIViewController {
                                     if !nodesFailed {
                                         if self.isNewSchedule {
                                             self.delegate?.serviceAdded()
+                                            // Trigger in-app review for first schedule creation
+                                            ESPReviewManager.shared.onScheduleCreated()
                                         } else {
                                             self.delegate?.serviceUpdated()
                                         }
@@ -325,6 +327,8 @@ class ScheduleViewController: UIViewController {
                         if !nodesFailed {
                             if self.isNewSchedule {
                                 self.delegate?.serviceAdded()
+                                // Trigger in-app review for first schedule creation
+                                ESPReviewManager.shared.onScheduleCreated()
                             } else {
                                 self.delegate?.serviceUpdated()
                             }

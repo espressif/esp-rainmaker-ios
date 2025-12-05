@@ -66,6 +66,8 @@ class SuccessViewController: UIViewController {
     @IBOutlet weak var step5Label: UILabel!
     @IBOutlet weak var step5TopSpaceConstraint: NSLayoutConstraint!
     
+    let deviceAddedMessage = "device added successfully"
+    
     var finalNode: Node?
 
     override func viewDidLoad() {
@@ -548,6 +550,10 @@ class SuccessViewController: UIViewController {
         okayButton.alpha = 1.0
         finalStatusLabel.text = message
         finalStatusLabel.isHidden = false
+        // Trigger in-app review for device provisioning success
+        if message.lowercased().contains(deviceAddedMessage) {
+            ESPReviewManager.shared.onDeviceProvisioned()
+        }
     }
 
     @objc func sendRequestToAddDevice() {
