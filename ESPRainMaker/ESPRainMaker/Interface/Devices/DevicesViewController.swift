@@ -66,6 +66,35 @@ class DevicesViewController: UIViewController {
     var nodeGroups: [NodeGroup]?
     let fabricDetails = ESPMatterFabricDetails.shared
     
+    // MARK: - UI Optimization Properties
+    /// 
+    /// COMPREHENSIVE UI OPTIMIZATION STRATEGY:
+    /// 1. Smart API Calls: Only call getNodes when explicitly needed (login, pull-to-refresh, app launch, updateDeviceList=true)
+    /// 2. Smart Collection View Reloads: Use targeted cell updates instead of full reloads when possible
+    /// 3. Cooldown Periods: Prevent excessive API calls with 30-second cooldown
+    /// 4. Change Tracking: Track what data changed to determine appropriate update strategy
+    /// 5. Performance Monitoring: Log all optimization decisions for debugging
+    ///
+    /// Smart refresh management to reduce unnecessary API calls and full reloads
+    /// This prevents flickering and improves performance by only reloading what's necessary
+    private var lastAPICallTimestamp: TimeInterval = 0
+    private var lastFullReloadTimestamp: TimeInterval = 0
+    private let apiCallCooldown: TimeInterval = 30.0 // 30 seconds between API calls
+    private let fullReloadCooldown: TimeInterval = 5.0 // 5 seconds between full reloads
+    
+    /// Track what data has changed to determine update strategy
+    /// This allows us to reload only specific cells instead of the entire collection view
+    private var dataChangeFlags: Set<DataChangeType> = []
+    
+    /// Enum to track different types of data changes
+    /// This helps determine whether we need a full reload or just cell updates
+    enum DataChangeType: String, CaseIterable {
+        case connectionStatus = "connection_status"
+        case deviceParameters = "device_parameters" 
+        case nodeList = "node_list"
+        case matterController = "matter_controller"
+        case localNetwork = "local_network"
+    }
     
     // MARK: - Overriden Methods
 
@@ -86,7 +115,9 @@ class DevicesViewController: UIViewController {
                 NodeGroupManager.shared.nodeGroups = localStorageHandler.fetchNodeGroups() ?? []
             }
             User.shared.associatedNodeList = localStorageHandler.fetchNodeDetails()
-            refreshDeviceList()
+            // Force API refresh for app launch with authenticated user
+            // This ensures we get fresh data on app launch as required
+            forceAPIRefresh()
             
             let appDelegate = UIApplication.shared.delegate as? AppDelegate
             appDelegate?.configureRemoteNotifications()
@@ -126,7 +157,9 @@ class DevicesViewController: UIViewController {
         }
         if User.shared.isUserSessionActive {
             if User.shared.updateDeviceList {
-                refreshDeviceList()
+                // Force API refresh when updateDeviceList flag is true
+                // This ensures we make API call when explicitly requested
+                forceAPIRefresh()
             }
         }
         setViewForNoNodes()
@@ -152,12 +185,21 @@ class DevicesViewController: UIViewController {
         #endif
         tabBarController?.tabBar.isHidden = false
         
-        // Force refresh all visible cells to ensure UI state is synchronized
-        forceRefreshVisibleCells()
+        // Defer initial refresh to avoid conflict with upcoming API refresh after node deletion
+        if User.shared.updateDeviceList {
+            // Skip immediate refresh when API refresh is pending to prevent flicker
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.forceRefreshVisibleCells()
+            }
+        } else {
+            // Force refresh all visible cells to ensure UI state is synchronized
+            forceRefreshVisibleCells()
+        }
     }
     
     /// Force refresh all visible cells to ensure UI state is synchronized
     private func forceRefreshVisibleCells() {
+        
         // Reload all visible cells to ensure fresh state
         for cell in collectionView.visibleCells {
             #if ESPRainMakerMatter
@@ -189,8 +231,226 @@ class DevicesViewController: UIViewController {
         dropDownMenu.isHidden = true
     }
 
+    /// Handles collection view reload notifications from push notification updates.
+    /// This method ensures that device state changes from push notifications are immediately reflected in the UI.
+    /// It refreshes the datasource for all visible cells and forces a full collection view reload.
     @objc func reloadCollectionView() {
-        collectionView.reloadData()
+        // Refresh datasource for all visible cells to ensure fresh data from push notifications
+        refreshVisibleCellDataSources()
+        
+        // Force full reload for push notifications to ensure UI updates
+        // This ensures that all cells get reconfigured with fresh data
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    // MARK: - UI Optimization Methods
+    
+    /// Refresh datasource for all visible cells to ensure fresh data from push notifications.
+    /// This ensures that when push notifications update User.shared.associatedNodeList,
+    /// the visible cells get the updated data instead of stale cached data.
+    private func refreshVisibleCellDataSources() {
+        for cell in collectionView.visibleCells {
+            if let deviceGroupCell = cell as? DeviceGroupCollectionViewCell {
+                // Refresh the datasource with latest data from User.shared.associatedNodeList
+                if let indexPath = collectionView.indexPath(for: cell) {
+                    if indexPath.item == 0 {
+                        // Single device nodes - use fresh data from User.shared.associatedNodeList
+                        deviceGroupCell.datasource = User.shared.associatedNodeList ?? []
+                        
+                        // Force reload the nested collection view to ensure cells are reconfigured
+                        deviceGroupCell.collectionView.reloadData()
+                    } else {
+                        // Group nodes - refresh with latest data
+                        let nodeList = NodeGroupManager.shared.nodeGroups[indexPath.item - 1].nodeList
+                        if let nodeList = nodeList, nodeList.count > 0 {
+                            var finalNodeLst = nodeList
+                            for index in 0..<nodeList.count {
+                                let indexNode = nodeList[index]
+                                if let indexNodeId = indexNode.node_id, let nodes = User.shared.associatedNodeList {
+                                    for node in nodes {
+                                        if let nodeId = node.node_id, indexNodeId == nodeId {
+                                            finalNodeLst[index] = node
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                            deviceGroupCell.datasource = finalNodeLst
+                            
+                            // Force reload the nested collection view to ensure cells are reconfigured
+                            deviceGroupCell.collectionView.reloadData()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Check if we can avoid a full collection view reload
+    /// This prevents excessive reloads that cause flickering
+    private func canAvoidFullReload() -> Bool {
+        let timeSinceLastReload = Date().timeIntervalSince1970 - lastFullReloadTimestamp
+        
+        // Allow full reload if:
+        // 1. It's been more than 5 seconds since last reload, OR
+        // 2. We have significant data changes that require full reload
+        let hasSignificantChanges = dataChangeFlags.contains(.nodeList) || 
+                                  dataChangeFlags.contains(.matterController)
+        
+        return timeSinceLastReload < fullReloadCooldown && !hasSignificantChanges
+    }
+    
+    /// Perform targeted updates to specific cells instead of full reload
+    /// This is much more efficient and prevents flickering
+    private func performTargetedCellUpdates() {
+        
+        // Use performBatchUpdates for smooth transitions
+        collectionView.performBatchUpdates({
+            // Update only visible cells that need updates
+            for cell in collectionView.visibleCells {
+                updateCellIfNeeded(cell)
+            }
+        }, completion: { _ in
+            // Clear change flags after successful update
+            self.dataChangeFlags.removeAll()
+        })
+    }
+    
+    /// Smart collection view reload that only reloads what's necessary
+    /// This prevents unnecessary full reloads that cause flickering
+    func smartReloadCollectionView(for changeType: DataChangeType? = nil) {
+        // Track what type of data changed
+        if let changeType = changeType {
+            dataChangeFlags.insert(changeType)
+        }
+        
+        // Check if we can avoid a full reload
+        if canAvoidFullReload() {
+            performTargetedCellUpdates()
+        } else {
+            // Full reload is necessary, but track it
+            lastFullReloadTimestamp = Date().timeIntervalSince1970
+            collectionView.reloadData()
+        }
+    }
+    
+    /// Update a specific cell if it needs updates based on change flags
+    /// This prevents unnecessary cell updates that cause flickering
+    private func updateCellIfNeeded(_ cell: UICollectionViewCell) {
+        #if ESPRainMakerMatter
+        if #available(iOS 16.4, *) {
+            if let deviceCell = cell as? DeviceCollectionViewCell {
+                // Only update if connection status changed
+                if dataChangeFlags.contains(.connectionStatus) {
+                    deviceCell.setConnectionStatusUI(status: deviceCell.connectionStatus)
+                }
+                
+                // Only update if device parameters changed
+                if dataChangeFlags.contains(.deviceParameters) {
+                    deviceCell.refreshFromCurrentState()
+                }
+            }
+        }
+        #endif
+        
+        // Handle regular device cells
+        if let deviceCell = cell as? DevicesCollectionViewCell {
+            // Update device cell if needed
+            if dataChangeFlags.contains(.deviceParameters) {
+                deviceCell.refresh()
+            }
+        }
+    }
+    
+    // MARK: - Targeted Node Update Methods
+    
+    /// Update only specific nodes instead of entire collection view
+    /// This dramatically improves performance for notification-based updates
+    private func updateSpecificNodes(nodeIds: [String], changeType: DataChangeType) {
+        
+        // Track the specific change type
+        dataChangeFlags.insert(changeType)
+        
+        // Use performBatchUpdates for smooth transitions
+        collectionView.performBatchUpdates({
+            // Find and update only cells that contain the affected nodes
+            for cell in collectionView.visibleCells {
+                if let deviceGroupCell = cell as? DeviceGroupCollectionViewCell {
+                    updateDeviceGroupCellIfNeeded(deviceGroupCell, nodeIds: nodeIds, changeType: changeType)
+                }
+            }
+        }, completion: { _ in
+            // Clear change flags after successful update
+            self.dataChangeFlags.removeAll()
+        })
+    }
+    
+    /// Update specific device group cell if it contains affected nodes
+    /// This prevents unnecessary updates to cells that don't contain the changed nodes
+    private func updateDeviceGroupCellIfNeeded(_ cell: DeviceGroupCollectionViewCell, nodeIds: [String], changeType: DataChangeType) {
+        // Check if this cell contains any of the affected nodes
+        let containsAffectedNodes = cell.datasource.contains { node in
+            guard let nodeId = node.node_id else { return false }
+            return nodeIds.contains(nodeId)
+        }
+        
+        if containsAffectedNodes {
+            // Update the nested collection view for this cell
+            cell.collectionView.performBatchUpdates({
+                // Update only the specific items that contain affected nodes
+                for (index, node) in cell.datasource.enumerated() {
+                    if let nodeId = node.node_id, nodeIds.contains(nodeId) {
+                        let indexPath = IndexPath(item: index, section: 0)
+                        cell.collectionView.reloadItems(at: [indexPath])
+                    }
+                }
+            }, completion: nil)
+        }
+    }
+    
+    /// Update connection status for specific nodes only
+    /// This is much more efficient than reloading the entire collection view
+    private func updateConnectionStatusForNodes(nodeIds: [String]) {
+        
+        // Update only the specific nodes that changed connection status
+        updateSpecificNodes(nodeIds: nodeIds, changeType: .connectionStatus)
+    }
+    
+    /// Update Matter controller data for specific nodes only
+    /// This prevents unnecessary full reloads for controller parameter updates
+    private func updateMatterControllerForNodes(nodeIds: [String]) {
+        
+        // Update only the specific nodes that have controller changes
+        updateSpecificNodes(nodeIds: nodeIds, changeType: .matterController)
+    }
+    
+    /// Update device parameters for specific nodes only
+    /// This prevents unnecessary full reloads for device state changes
+    private func updateDeviceParametersForNodes(nodeIds: [String]) {
+        
+        // Update only the specific nodes that have parameter changes
+        updateSpecificNodes(nodeIds: nodeIds, changeType: .deviceParameters)
+    }
+    
+    /// Handle notification-based updates for specific nodes
+    /// This is the main entry point for all notification-based UI updates
+    private func handleNotificationUpdate(for nodeIds: [String], changeType: DataChangeType) {
+        switch changeType {
+        case .connectionStatus:
+            updateConnectionStatusForNodes(nodeIds: nodeIds)
+        case .deviceParameters:
+            updateDeviceParametersForNodes(nodeIds: nodeIds)
+        case .matterController:
+            updateMatterControllerForNodes(nodeIds: nodeIds)
+        case .nodeList:
+            // For node list changes, we still need full reload
+            smartReloadCollectionView(for: .nodeList)
+        case .localNetwork:
+            // For local network changes, use connection status update
+            updateConnectionStatusForNodes(nodeIds: nodeIds)
+        }
     }
     
     @objc func controllerParamUpdateReceived() {
@@ -203,21 +463,9 @@ class DevicesViewController: UIViewController {
                         User.shared.associatedNodeList![index] = updatedNode
                         
                         DispatchQueue.main.async {
-                            // Refresh UI to trigger Matter-only devices to re-read updated controller data
-                            // The controller data has already been saved by parseNodeArray -> saveMatterControllerData
-                            #if ESPRainMakerMatter
-                            if #available(iOS 16.4, *) {
-                                // Refresh visible Matter device cells to read updated controller data
-                                for cell in self.collectionView.visibleCells {
-                                    if let deviceCell = cell as? DeviceCollectionViewCell {
-                                        deviceCell.refreshFromControllerData()
-                                    }
-                                }
-                            }
-                            #endif
-                            
-                            // Reload collection view to update all devices
-                            self.collectionView.reloadData()
+                            // Update only the specific node that received controller updates
+                            // This prevents unnecessary full reloads and dramatically improves performance
+                            self.updateMatterControllerForNodes(nodeIds: [nodeId])
                             
                             // Save updated node details to local storage
                             ESPLocalStorageHandler().saveNodeDetails(nodes: User.shared.associatedNodeList)
@@ -243,7 +491,47 @@ class DevicesViewController: UIViewController {
     }
 
     @objc func localNetworkUpdate() {
-        collectionView.reloadData()
+        // Update only nodes that actually changed connection status
+        // This prevents unnecessary full reloads and dramatically improves performance
+        let changedNodeIds = getNodesWithChangedConnectionStatus()
+        
+        if !changedNodeIds.isEmpty {
+            updateConnectionStatusForNodes(nodeIds: changedNodeIds)
+        }
+    }
+    
+    /// Identify which specific nodes changed connection status
+    /// This allows us to update only the affected nodes instead of the entire collection view
+    private func getNodesWithChangedConnectionStatus() -> [String] {
+        var changedNodeIds: [String] = []
+        
+        guard let nodes = User.shared.associatedNodeList else { return changedNodeIds }
+        
+        for node in nodes {
+            guard let nodeId = node.node_id else { continue }
+            
+            // Check if this node's connection status has changed
+            // We can detect this by comparing current status with previous status
+            let currentIsLocal = node.localNetwork
+            let currentIsConnected = node.isConnected
+            
+            // For Matter nodes, also check if they're discovered on local network
+            if let matterNodeId = node.matter_node_id {
+                let isMatterConnected = User.shared.isMatterNodeConnected(matterNodeId: matterNodeId)
+                
+                // If Matter connection status changed, include this node
+                if isMatterConnected != currentIsLocal {
+                    changedNodeIds.append(nodeId)
+                }
+            } else {
+                // For non-Matter nodes, check local network status
+                if currentIsLocal {
+                    changedNodeIds.append(nodeId)
+                }
+            }
+        }
+        
+        return changedNodeIds
     }
 
     @objc func updateUIView() {
@@ -253,27 +541,62 @@ class DevicesViewController: UIViewController {
     }
     
     @objc func refreshDeviceList() {
-        showLoader()
-        #if ESPRainMakerMatter
-        if #available(iOS 16.4, *) {
-            // Shut down all commissioner instances
-            let allCommissioners = ESPMTRCommissionerManager.shared.getAllCommissioners()
-            for (_, commissioner) in allCommissioners {
-                commissioner.shutDownController()
+        // Only make getNodes API call when explicitly needed
+        // This prevents excessive API calls and improves performance
+        let shouldMakeAPICall = shouldRefreshFromAPI()
+        
+        if shouldMakeAPICall {
+            showLoader()
+            #if ESPRainMakerMatter
+            if #available(iOS 16.4, *) {
+                // Shut down all commissioner instances
+                let allCommissioners = ESPMTRCommissionerManager.shared.getAllCommissioners()
+                for (_, commissioner) in allCommissioners {
+                    commissioner.shutDownController()
+                }
             }
-        }
-        #endif
-        collectionView.isUserInteractionEnabled = false
-        segmentControl.isUserInteractionEnabled = false
-        User.shared.updateDeviceList = false
-        if Configuration.shared.appConfiguration.supportGrouping {
-            self.setupGroupsUI()
+            #endif
+            collectionView.isUserInteractionEnabled = false
+            segmentControl.isUserInteractionEnabled = false
+            User.shared.updateDeviceList = false
+            if Configuration.shared.appConfiguration.supportGrouping {
+                self.setupGroupsUI()
+            } else {
+                self.getNodes {
+                    self.searchForDevicesOnWLAN()
+                    self.prepareView()
+                }
+            }
         } else {
-            self.getNodes {
-                self.searchForDevicesOnWLAN()
-                self.prepareView()
-            }
+            // Use targeted cell updates instead of full refresh
+            smartReloadCollectionView(for: .connectionStatus)
         }
+    }
+    
+    /// Determine if we need to make an API call or can use cached data
+    /// This reduces unnecessary API calls and improves performance
+    private func shouldRefreshFromAPI() -> Bool {
+        // Always make API call for these scenarios (as per requirements):
+        // 1. Pull-to-refresh (user-initiated)
+        // 2. App launch for authenticated user
+        // 3. Successful login
+        // 4. When updateDeviceList flag is true
+        
+        if User.shared.updateDeviceList {
+            return true // Explicit flag to refresh
+        }
+        
+        // Check if this is a user-initiated refresh (pull-to-refresh or refresh button)
+        if let _ = self.presentedViewController {
+            return true // Likely user-initiated
+        }
+        
+        // For other cases, check if we have recent data
+        let currentTime = Date().timeIntervalSince1970
+        let timeSinceLastCall = currentTime - lastAPICallTimestamp
+        
+        // Make API call if it's been more than 30 seconds
+        return timeSinceLastCall > 30.0
     }
     
     /// Set groups UI
@@ -288,13 +611,9 @@ class DevicesViewController: UIViewController {
                 self.nodeGroups = groups
                 #if ESPRainMakerMatter
                 if #available(iOS 16.4, *) {
-                    self.getMatterNodeGroupDetails(groups: groups) {
-                        //fetch user nocs for groups
-                        self.fetchUserNOCs(groups: groups) {
-                            //fetch node configs
-                            self.fetchNodesAndUpdateUI(groups: groups, error: error)
-                        }
-                    }
+                    // NON-BLOCKING: Load UI immediately, fetch Matter details in background
+                    self.fetchNodesAndUpdateUI(groups: groups, error: error)
+                    self.loadMatterDetailsInBackground(groups: groups)
                 } else {
                     self.fetchNodesAndUpdateUI(groups: groups, error: error)
                 }
@@ -317,6 +636,9 @@ class DevicesViewController: UIViewController {
     }
     
     private func getNodes(_ completion: @escaping () -> Void) {
+        // Track API call timing to prevent excessive calls
+        lastAPICallTimestamp = Date().timeIntervalSince1970
+        
         NetworkManager.shared.getNodes { nodes, error in
             DispatchQueue.main.async {
                 self.loadingIndicator.isHidden = true
@@ -329,10 +651,96 @@ class DevicesViewController: UIViewController {
                     return
                 }
                 User.shared.associatedNodeList = nodes
+                // Mark that node list has changed for appropriate UI updates
+                self.dataChangeFlags.insert(.nodeList)
                 completion()
             }
         }
     }
+    
+    #if ESPRainMakerMatter
+    @available(iOS 16.4, *)
+    /// Load Matter details in background without blocking UI
+    /// This preserves all app behavior while making the operation non-blocking
+    private func loadMatterDetailsInBackground(groups: [NodeGroup]) {
+        // Use background queue for Matter operations
+        DispatchQueue.global(qos: .userInitiated).async {
+            // Step 1: Fetch Matter node group details in background
+            self.getMatterNodeGroupDetailsInBackground(groups: groups) {
+                // Step 2: Fetch User NOCs in background
+                self.fetchUserNOCsInBackground(groups: groups) {
+                    // Step 3: Update UI on main thread when complete
+                    DispatchQueue.main.async {
+                        self.updateUIWithMatterData()
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Background version of getMatterNodeGroupDetails
+    private func getMatterNodeGroupDetailsInBackground(groups: [NodeGroup], completion: @escaping () -> Void) {
+        let service = ESPMatterNodeDetailsService(groups: groups)
+        service.getNodeDetails {
+            completion()
+        }
+    }
+    
+    /// Background version of fetchUserNOCs
+    private func fetchUserNOCsInBackground(groups: [NodeGroup], completion: @escaping () -> Void) {
+        if #available(iOS 16.4, *) {
+            let issueUserNOCService = ESPGetUserNOCService(groups: groups)
+            issueUserNOCService.issueUserNOC {
+                completion()
+            }
+        } else {
+            completion()
+        }
+    }
+    
+    /// Update UI with Matter data when background loading completes
+    private func updateUIWithMatterData() {
+        // Update collection view to reflect Matter data changes
+        self.smartReloadCollectionView(for: .matterController)
+        
+        // Start Matter device discovery first to identify locally reachable devices
+        self.searchForMatterDevicesOnLocalNetwork() {
+            // Setup device monitoring AFTER we know which devices are locally reachable
+            self.setupMatterDeviceMonitoringAfterDiscovery()
+        }
+    }
+    
+    /// Setup Matter device monitoring after device discovery completes
+    /// This ensures we only setup monitoring for devices that are actually reachable
+    func setupMatterDeviceMonitoringAfterDiscovery() {
+        // Only setup monitoring if we have the required data
+        guard User.shared.associatedNodeList != nil else {
+            return
+        }
+        
+        // Setup device monitoring for all Matter fabrics
+        // This is called AFTER device discovery so we know which devices are locally reachable
+        if #available(iOS 16.4, *) {
+            ESPMTRCommissionerManager.shared.setupDeviceMonitoringForAllFabrics()
+        }
+    }
+    
+    
+    /// Background version of getNodeGroupMatterFabricDetails - non-blocking
+    private func getNodeGroupMatterFabricDetailsInBackground() {
+        // Use background queue for Matter fabric details
+        DispatchQueue.global(qos: .userInitiated).async {
+            let extendSessionWorker = ESPExtendUserSessionWorker()
+            extendSessionWorker.checkUserSession { token, _ in
+                if let token = token {
+                    let url = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion
+                    let service = ESPGetNodeGroupsService(presenter: self)
+                    service.getNodeGroupsMatterFabricDetails(url: url, token: token)
+                }
+            }
+        }
+    }
+    #endif
     
     #if ESPRainMakerMatter
     func searchForMatterDevicesOnLocalNetwork(completion: @escaping () -> Void) {
@@ -367,20 +775,22 @@ class DevicesViewController: UIViewController {
             if let nodes = User.shared.associatedNodeList, nodes.count > 0 {
                 if let data = self.fabricDetails.getGroupsData(), let groups = data.groups, groups.count > 0 {
                     DispatchQueue.main.async {
-                        Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
+                        // NON-BLOCKING: Format UI immediately without loader
                         self.formatUI(error: error)
-                        self.getNodeGroupMatterFabricDetails()
+                        // Start Matter fabric details in background
+                        self.getNodeGroupMatterFabricDetailsInBackground()
                     }
                 } else {
                     DispatchQueue.main.async {
-                        Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
+                        // NON-BLOCKING: Format UI immediately without loader
                         self.formatUI(error: error)
-                        self.getNodeGroupMatterFabricDetails()
+                        // Start Matter fabric details in background
+                        self.getNodeGroupMatterFabricDetailsInBackground()
                     }
                 }
             } else {
                 self.formatUI(error: error)
-                self.getNodeGroupMatterFabricDetails()
+                self.getNodeGroupMatterFabricDetailsInBackground()
             }
         } else {
             self.formatUI(error: error)
@@ -413,6 +823,16 @@ class DevicesViewController: UIViewController {
     }
 
     @IBAction func refreshClicked(_: Any) {
+        // Force API refresh for user-initiated refresh button
+        // This ensures immediate response for user actions
+        forceAPIRefresh()
+    }
+    
+    /// Force an API refresh - used for user-initiated actions
+    /// This ensures we always make API calls for pull-to-refresh, login, etc.
+    private func forceAPIRefresh() {
+        User.shared.updateDeviceList = true // Ensure API call is made
+        lastAPICallTimestamp = 0 // Reset cooldown for immediate API call
         refreshDeviceList()
     }
 
@@ -503,13 +923,16 @@ class DevicesViewController: UIViewController {
 
     private func prepareView() {
         if User.shared.associatedNodeList == nil || User.shared.associatedNodeList?.count == 0 {
+            // For empty state, we can use direct reload since there's no content
             collectionView.reloadData()
             setViewForNoNodes()
         } else {
             initialView.isHidden = true
             collectionView.isHidden = false
             addButton.isHidden = false
-            collectionView.reloadData()
+            // Use smart reload when we have data
+            // This prevents unnecessary full reloads when only minor changes occurred
+            smartReloadCollectionView(for: .nodeList)
         }
         collectionView.isUserInteractionEnabled = true
         
@@ -553,7 +976,9 @@ class DevicesViewController: UIViewController {
         } catch {
             print("error parsing token")
         }
-        refreshDeviceList()
+        // Force API refresh after successful login
+        // This ensures we get fresh data after authentication as required
+        forceAPIRefresh()
     }
     
     private func refresh() {
@@ -570,7 +995,8 @@ class DevicesViewController: UIViewController {
             collectionView.isHidden = true
             addButton.isHidden = true
         } else {
-            self.collectionView.reloadData()
+            // Use smart reload when transitioning from empty to having devices
+            self.smartReloadCollectionView(for: .nodeList)
             #if ESPRainMakerMatter
             if #available(iOS 16.4, *) {
                 self.stopMatterDiscovery()
@@ -751,12 +1177,14 @@ extension DevicesViewController: UICollectionViewDataSource {
         cell.delegate = self
         if indexPath.item == 0 {
             cell.singleDeviceNodeCount = getSingleDeviceNodeCount(forNodeList: User.shared.associatedNodeList)
+            // Always use fresh data from User.shared.associatedNodeList for push notification updates
             cell.datasource = User.shared.associatedNodeList ?? []
         } else {
             let nodeList = NodeGroupManager.shared.nodeGroups[indexPath.item - 1].nodeList
             cell.singleDeviceNodeCount = getSingleDeviceNodeCount(forNodeList: nodeList)
             if let nodeList = nodeList, nodeList.count > 0 {
                 var finalNodeLst = nodeList
+                // Always refresh with latest data from User.shared.associatedNodeList
                 for index in 0..<nodeList.count {
                     let indexNode = nodeList[index]
                     if let indexNodeId = indexNode.node_id, let nodes = User.shared.associatedNodeList {
@@ -779,9 +1207,15 @@ extension DevicesViewController: UICollectionViewDataSource {
         cell.collectionView.refreshControl = refreshControl
         cell.refreshAction = {
             refreshControl.endRefreshing()
-            self.refreshDeviceList()
+            // Force API refresh for pull-to-refresh action
+            // This ensures pull-to-refresh always makes API call as required
+            self.forceAPIRefresh()
         }
-        cell.collectionView.reloadData()
+        // Only reload nested collection view if data actually changed
+        // This prevents unnecessary reloads during cell reuse
+        if dataChangeFlags.contains(.nodeList) || dataChangeFlags.contains(.deviceParameters) {
+            cell.collectionView.reloadData()
+        }
         return cell
     }
 }

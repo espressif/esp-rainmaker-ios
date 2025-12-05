@@ -85,7 +85,7 @@ class DeviceTraitListViewController: UIViewController {
         let insets = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
         tableView.contentInset = insets
 
-        // OPTIMIZATION: Check if device data already exists before showing loader
+        // Check if device data already exists before showing loader
         if device?.isReachable() ?? false {
             if ESPNetworkMonitor.shared.isConnectedToWifi || ESPNetworkMonitor.shared.isConnectedToNetwork {
                 // Check if we already have device parameters
@@ -206,7 +206,7 @@ class DeviceTraitListViewController: UIViewController {
         checkNetworkUpdate()
         tabBarController?.tabBar.isHidden = true
         
-        // OPTIMIZATION: Start polling only after UI is ready
+        // Start polling only after UI is ready
         // This ensures UI renders first, then polling begins
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.startPolling()

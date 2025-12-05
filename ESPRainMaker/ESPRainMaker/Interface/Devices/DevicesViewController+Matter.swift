@@ -107,9 +107,7 @@ extension DevicesViewController {
 extension DevicesViewController: ESPGetNodeGroupsPresentationLogic {
     
     func receivedNodeGroupsData(data: ESPNodeGroups?, error: Error?) {
-        DispatchQueue.main.async {
-            Utility.hideLoader(view: self.view)
-        }
+        // No loader hiding needed since we're not showing blocking loaders
         if let data = data, let groups = data.groups, groups.count > 0 {
             if let savedGroupsData = self.fabricDetails.getGroupsData(), let savedGroups = savedGroupsData.groups {
                 self.removeSavedUserNOCs(savedGroups: savedGroups, groups: groups)
@@ -118,23 +116,24 @@ extension DevicesViewController: ESPGetNodeGroupsPresentationLogic {
             self.groups?.removeAll()
             self.groups = data.groups
             if let nodeGroups = self.nodeGroups {
-                DispatchQueue.main.async {
-                    Utility.showLoader(message: ESPMatterConstants.fetchingDeviceDetailsMsg, view: self.view)
-                }
-                self.fetchUserNOCs(groups: nodeGroups) {
-                    DispatchQueue.main.async {
-                        Utility.hideLoader(view: self.view)
-                    }
-                    self.searchForMatterDevices { _ in
-                        DispatchQueue.main.async {
-                            self.stopMatterDiscovery()
-                            self.collectionView.reloadData()
-                        }
-                        let updateCATService = ESPUpdateCATIdService()
-                        updateCATService.updateCATId {
+                // NON-BLOCKING: Process in background without blocking UI
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.fetchUserNOCs(groups: nodeGroups) {
+                        self.searchForMatterDevices { _ in
                             DispatchQueue.main.async {
                                 self.stopMatterDiscovery()
-                                self.searchForMatterDevicesOnLocalNetwork() {}
+                                // Use smart reload instead of full reload
+                                self.smartReloadCollectionView(for: .matterController)
+                            }
+                            let updateCATService = ESPUpdateCATIdService()
+                            updateCATService.updateCATId {
+                                DispatchQueue.main.async {
+                                    self.stopMatterDiscovery()
+                                    self.searchForMatterDevicesOnLocalNetwork() {
+                                        // Setup device monitoring after discovery completes
+                                        self.setupMatterDeviceMonitoringAfterDiscovery()
+                                    }
+                                }
                             }
                         }
                     }
