@@ -88,7 +88,9 @@ extension DeviceTraitListViewController {
             awsRegionValue = region
         }
         let awsRegionType = awsRegionValue.aws_regionTypeValue()
-        let localSenderClientID = "ConsumerViewer"
+        // Use RainMaker user ID, fallback to "ConsumerViewer" if not available
+        let userInfo = UserInfo.getUserInfo()
+        let localSenderClientID = ESPAWSConstants.connectAsViewClientId
         let isMaster = false
         let sendAudioEnabled = false
         
@@ -133,7 +135,8 @@ extension DeviceTraitListViewController {
         let wssURL = createSignedWSSUrl(channelARN: channelARN!,
                                        region: awsRegionValue,
                                        wssEndpoint: wssEndpoint,
-                                       isMaster: false)
+                                        isMaster: false,
+                                        clientId: localSenderClientID)
         
         // Get ICE server configuration
         let httpsEndpoint = AWSEndpoint(region: awsRegionType,
@@ -276,7 +279,7 @@ extension DeviceTraitListViewController {
         return RTCIceServersList
     }
     
-    private func createSignedWSSUrl(channelARN: String, region: String, wssEndpoint: String?, isMaster: Bool) -> URL? {
+    private func createSignedWSSUrl(channelARN: String, region: String, wssEndpoint: String?, isMaster: Bool, clientId: String) -> URL? {
         var AWSCredentials: AWSCredentials?
         
         // Use ESPAssumeRoleCredentialsProvider to get credentials
@@ -298,7 +301,7 @@ extension DeviceTraitListViewController {
         var httpUrlString = wssEndpoint!
             + "?X-Amz-ChannelARN=" + channelARN
         if !isMaster {
-            httpUrlString += "&X-Amz-ClientId=" + "ConsumerViewer"
+            httpUrlString += "&X-Amz-ClientId=" + clientId
         }
         
         let httpRequestURL = URL(string: httpUrlString)

@@ -19,6 +19,26 @@
 import Foundation
 import WebRTC
 
+private enum WebRTCStatsConstants {
+    static let remoteInboundRtpType = "remote-inbound-rtp"
+    static let inboundRtpType = "inbound-rtp"
+    static let candidatePairType = "candidate-pair"
+    static let codecType = "codec"
+    static let trackType = "track"
+
+    static let framesPerSecondKey = "framesPerSecond"
+    static let framesDroppedKey = "framesDropped"
+    static let bytesReceivedKey = "bytesReceived"
+    static let packetsReceivedKey = "packetsReceived"
+    static let packetsLostKey = "packetsLost"
+    static let jitterKey = "jitter"
+    static let frameWidthKey = "frameWidth"
+    static let frameHeightKey = "frameHeight"
+    static let codecIdKey = "codecId"
+    static let mimeTypeKey = "mimeType"
+    static let jitterBufferDelayKey = "jitterBufferDelay"
+}
+
 protocol WebRTCClientDelegate: class {
     func webRTCClient(_ client: WebRTCClient, didGenerate candidate: RTCIceCandidate)
     func webRTCClient(_ client: WebRTCClient, didChangeConnectionState state: RTCIceConnectionState)
@@ -29,7 +49,6 @@ protocol WebRTCClientDelegate: class {
 final class WebRTCClient: NSObject {
     private static let factory: RTCPeerConnectionFactory = {
         RTCInitializeSSL()
-        //support all codec formats for encode and decode
         return RTCPeerConnectionFactory(encoderFactory: RTCDefaultVideoEncoderFactory(),
                                         decoderFactory: RTCDefaultVideoDecoderFactory())
     }()
@@ -37,7 +56,6 @@ final class WebRTCClient: NSObject {
     weak var delegate: WebRTCClientDelegate?
     private let peerConnection: RTCPeerConnection
 
-    // Accept video and audio from remote peer
     private let streamId = "KvsLocalMediaStream"
     private let mediaConstrains = [kRTCMediaConstraintsOfferToReceiveAudio: kRTCMediaConstraintsValueFalse,
                                    kRTCMediaConstraintsOfferToReceiveVideo: kRTCMediaConstraintsValueTrue]
@@ -48,7 +66,6 @@ final class WebRTCClient: NSObject {
     private var remoteDataChannel: RTCDataChannel?
     private var constructedIceServers: [RTCIceServer]?
     
-    // Store video renderers to add tracks when they become available
     private var remoteVideoRenderers: [RTCVideoRenderer] = []
 
     private var peerConnectionFoundMap = [String: RTCPeerConnection]()
@@ -82,12 +99,10 @@ final class WebRTCClient: NSObject {
         audioSession.isAudioEnabled = false
         do {
             try? audioSession.lockForConfiguration()
-            // Convert enum values to raw string values
             try audioSession.setCategory(AVAudioSession.Category.playAndRecord.rawValue, 
                                        with: .defaultToSpeaker)
             try audioSession.setMode(AVAudioSession.Mode.default.rawValue)
             try audioSession.overrideOutputAudioPort(.speaker)
-            // Updated renamed method
             try? AVAudioSession.sharedInstance().setActive(true, 
                                                          options: .notifyOthersOnDeactivation)
             audioSession.unlockForConfiguration()
@@ -145,7 +160,6 @@ final class WebRTCClient: NSObject {
     }
 
     func handlePendingIceCandidates(clientId: String) {
-        // Add any pending ICE candidates from the queue for the client ID
         if pendingIceCandidatesMap.index(forKey: clientId) != nil {
             var pendingIceCandidateListByClientId: Set<RTCIceCandidate> = pendingIceCandidatesMap[clientId]!;
             while !pendingIceCandidateListByClientId.isEmpty {
@@ -153,7 +167,6 @@ final class WebRTCClient: NSObject {
                 let peerConnectionCurrent : RTCPeerConnection = peerConnectionFoundMap[clientId]!
                 peerConnectionCurrent.add(iceCandidate)
             }
-            // After sending pending ICE candidates, the client ID's peer connection need not be tracked
             pendingIceCandidatesMap.removeValue(forKey: clientId)
         }
     }
@@ -166,25 +179,19 @@ final class WebRTCClient: NSObject {
     }
 
     func checkAndAddIceCandidate(remoteCandidate: RTCIceCandidate, clientId: String) {
-        // if answer/offer is not received, it means peer connection is not found. Hold the received ICE candidates in the map.
         if peerConnectionFoundMap.index(forKey: clientId) == nil {
-
-            // If the entry for the client ID already exists (in case of subsequent ICE candidates), update the queue
             if pendingIceCandidatesMap.index(forKey: clientId) != nil {
                 var pendingIceCandidateListByClientId: Set<RTCIceCandidate> = pendingIceCandidatesMap[clientId]!
                 pendingIceCandidateListByClientId.insert(remoteCandidate)
                 pendingIceCandidatesMap[clientId] = pendingIceCandidateListByClientId
             }
-            // If the first ICE candidate before peer connection is received, add entry to map and ICE candidate to a queue
             else {
                 var pendingIceCandidateListByClientId = Set<RTCIceCandidate>()
                 pendingIceCandidateListByClientId.insert(remoteCandidate)
                 pendingIceCandidatesMap[clientId] = pendingIceCandidateListByClientId
             }
         }
-        // This is the case where peer connection is established and ICE candidates are received for the established connection
         else {
-            // Remote sent us ICE candidates, add to local peer connection
             let peerConnectionCurrent : RTCPeerConnection = peerConnectionFoundMap[clientId]!
             peerConnectionCurrent.add(remoteCandidate);
         }
@@ -216,27 +223,22 @@ final class WebRTCClient: NSObject {
     }
 
     func renderRemoteVideo(to renderer: RTCVideoRenderer) {
-        // Store the renderer for when remote track becomes available
         remoteVideoRenderers.append(renderer)
         
-        // If we already have a remote video track, add it to the renderer
         if let remoteVideoTrack = remoteVideoTrack {
             remoteVideoTrack.add(renderer)
-        } else {
         }
     }
     
     private func handleRemoteVideoTrack(_ track: RTCVideoTrack) {
         self.remoteVideoTrack = track
         
-        // Add the track to all stored renderers
         DispatchQueue.main.async {
             for renderer in self.remoteVideoRenderers {
                 track.add(renderer)
             }
         }
         
-        // Notify delegate
         delegate?.webRTCClient(self, didReceiveRemoteVideoTrack: track)
     }
     
@@ -244,8 +246,8 @@ final class WebRTCClient: NSObject {
         self.peerConnection.statistics { statsReport in
             for (_, stats) in statsReport.statistics {
                 let type = stats.type
-                if type == "remote-inbound-rtp" {
-                    if let frameRate = stats.values["framesPerSecond"] as? Double {
+                if type == WebRTCStatsConstants.remoteInboundRtpType {
+                    if let frameRate = stats.values[WebRTCStatsConstants.framesPerSecondKey] as? Double {
                         completion(frameRate)
                         break
                     }
@@ -258,16 +260,49 @@ final class WebRTCClient: NSObject {
         self.peerConnection.statistics { statsReport in
             for (_, stats) in statsReport.statistics {
                 let type = stats.type
-                if type == "inbound-rtp" {
-                    if let frameRate = stats.values["framesPerSecond"] as? Double {
+                if type == WebRTCStatsConstants.inboundRtpType {
+                    if let frameRate = stats.values[WebRTCStatsConstants.framesPerSecondKey] as? Double {
                         fpsCompletion(frameRate)
                     }
-                } else if type == "candidate-pair" {
-                    if let frameHeight = stats.values["frameHeight"] as? Double, let frameWidth = stats.values["frameWidth"] as? Double {
+                } else if type == WebRTCStatsConstants.candidatePairType {
+                    if let frameHeight = stats.values[WebRTCStatsConstants.frameHeightKey] as? Double, let frameWidth = stats.values[WebRTCStatsConstants.frameWidthKey] as? Double {
                         frameSizeCompletion(frameHeight, frameWidth)
                     }
                 }
             }
+        }
+    }
+    
+    func getDetailedStats(completion: @escaping (DetailedStats) -> Void) {
+        self.peerConnection.statistics { statsReport in
+            var stats = DetailedStats()
+            var codecId: String? = nil
+
+            for (_, stat) in statsReport.statistics where stat.type == WebRTCStatsConstants.inboundRtpType {
+                if let frameRate = self.doubleValue(from: stat.values[WebRTCStatsConstants.framesPerSecondKey]) {
+                    stats.currentFps = frameRate
+                }
+                stats.totalFramesDropped = self.int64Value(from: stat.values[WebRTCStatsConstants.framesDroppedKey]) ?? stats.totalFramesDropped
+                stats.totalBytesReceived = self.int64Value(from: stat.values[WebRTCStatsConstants.bytesReceivedKey]) ?? stats.totalBytesReceived
+                stats.totalPacketsReceived = self.int64Value(from: stat.values[WebRTCStatsConstants.packetsReceivedKey]) ?? stats.totalPacketsReceived
+                stats.totalPacketsLost = self.int64Value(from: stat.values[WebRTCStatsConstants.packetsLostKey]) ?? stats.totalPacketsLost
+                if let jitter = self.doubleValue(from: stat.values[WebRTCStatsConstants.jitterKey]) {
+                    stats.jitterMs = jitter * 1000.0
+                }
+                stats.currentFrameWidth = self.intValue(from: stat.values[WebRTCStatsConstants.frameWidthKey]) ?? stats.currentFrameWidth
+                stats.currentFrameHeight = self.intValue(from: stat.values[WebRTCStatsConstants.frameHeightKey]) ?? stats.currentFrameHeight
+                codecId = stat.values[WebRTCStatsConstants.codecIdKey] as? String ?? codecId
+            }
+
+            stats.videoCodec = self.resolveVideoCodec(from: statsReport.statistics, preferredCodecId: codecId)
+
+            if stats.jitterMs == 0 {
+                stats.jitterMs = self.resolveTrackJitter(from: statsReport.statistics) ?? 0
+            }
+            
+            stats.receivedFps = stats.currentFps
+            
+            completion(stats)
         }
     }
 
@@ -276,7 +311,6 @@ final class WebRTCClient: NSObject {
 
         if let localVideoTrack = localVideoTrack {
             peerConnection.add(localVideoTrack, streamIds: [streamId])
-            // Don't try to get remote track here - it will come via didAdd track delegate
         }
     }
 
@@ -307,11 +341,9 @@ extension WebRTCClient: RTCPeerConnectionDelegate {
     func peerConnection(_: RTCPeerConnection, didChange stateChanged: RTCSignalingState) {
     }
 
-    // DEPRECATED: This method is deprecated but keeping for compatibility
     func peerConnection(_: RTCPeerConnection, didAdd _: RTCMediaStream) {
     }
     
-    // MODERN: Use this method for receiving remote tracks
     func peerConnection(_ peerConnection: RTCPeerConnection, didAdd rtpReceiver: RTCRtpReceiver, streams mediaStreams: [RTCMediaStream]) {
         
         guard let track = rtpReceiver.track else {
@@ -347,6 +379,86 @@ extension WebRTCClient: RTCPeerConnectionDelegate {
 
     func peerConnection(_: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
         remoteDataChannel = dataChannel
+    }
+}
+
+private extension WebRTCClient {
+    func resolveVideoCodec(from statistics: [String: RTCStatistics], preferredCodecId: String?) -> String {
+        if let preferredCodecId = preferredCodecId {
+            for (_, stat) in statistics where stat.type == WebRTCStatsConstants.codecType {
+                if let id = stat.id as? String, id == preferredCodecId,
+                   let mimeType = stat.values[WebRTCStatsConstants.mimeTypeKey] as? String {
+                    return mimeType
+                }
+            }
+        }
+
+        for (_, stat) in statistics where stat.type == WebRTCStatsConstants.codecType {
+            if let mimeType = stat.values[WebRTCStatsConstants.mimeTypeKey] as? String {
+                return mimeType
+            }
+        }
+        return "N/A"
+    }
+
+    func resolveTrackJitter(from statistics: [String: RTCStatistics]) -> Double? {
+        for (_, stat) in statistics where stat.type == WebRTCStatsConstants.trackType {
+            if let jitterBufferDelay = doubleValue(from: stat.values[WebRTCStatsConstants.jitterBufferDelayKey]) {
+                return jitterBufferDelay
+            }
+        }
+        return nil
+    }
+
+    func int64Value(from value: Any?) -> Int64? {
+        switch value {
+        case let int64Value as Int64:
+            return int64Value
+        case let intValue as Int:
+            return Int64(intValue)
+        case let doubleValue as Double:
+            return Int64(doubleValue)
+        case let number as NSNumber:
+            return number.int64Value
+        case let stringValue as String:
+            return Int64(stringValue)
+        default:
+            return nil
+        }
+    }
+
+    func intValue(from value: Any?) -> Int? {
+        switch value {
+        case let intValue as Int:
+            return intValue
+        case let int64Value as Int64:
+            return Int(int64Value)
+        case let doubleValue as Double:
+            return Int(doubleValue)
+        case let number as NSNumber:
+            return number.intValue
+        case let stringValue as String:
+            return Int(stringValue)
+        default:
+            return nil
+        }
+    }
+
+    func doubleValue(from value: Any?) -> Double? {
+        switch value {
+        case let doubleValue as Double:
+            return doubleValue
+        case let intValue as Int:
+            return Double(intValue)
+        case let int64Value as Int64:
+            return Double(int64Value)
+        case let number as NSNumber:
+            return number.doubleValue
+        case let stringValue as String:
+            return Double(stringValue)
+        default:
+            return nil
+        }
     }
 }
 

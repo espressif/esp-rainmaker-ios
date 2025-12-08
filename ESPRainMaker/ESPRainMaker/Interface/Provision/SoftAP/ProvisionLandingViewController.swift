@@ -201,7 +201,7 @@ class ProvisionLandingViewController: UIViewController {
             
             //Check the "rmaker"/"cap" to see if assisted claiming is supported.
             //If yes show error as assisted claiming is not supported for SoftAP.
-            if versionInfo.isAssistedClaimingSupported() {
+            if versionInfo.isAssistedCameraClaimSupported() || versionInfo.isAssistedClaimingSupported() {
                 self.retry(message: "Assisted Claiming not supported for SoftAP. Cannot Proceed.")
                 return
             }

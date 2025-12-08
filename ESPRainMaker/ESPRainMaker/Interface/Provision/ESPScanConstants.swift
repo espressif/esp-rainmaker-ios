@@ -27,6 +27,9 @@ class ESPScanConstants {
     static let rmaker = "rmaker"
     static let prov = "prov"
     static let claim = "claim"
+    static let cameraCalim = "camera_claim"
+    static let nodePolicies = "node_policies"
+    static let videoStream = "videostream"
     
     static let wifi = "wifi"
     static let wiFiScan = "wifi_scan"

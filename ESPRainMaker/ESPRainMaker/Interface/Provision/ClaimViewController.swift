@@ -32,6 +32,7 @@ class ClaimViewController: UIViewController {
     var count = 0
     var threadOperationalDataset: Data!
     var provisionCompletionHandler: (() -> Void)?
+    var isCameraDevice: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,7 +64,7 @@ class ClaimViewController: UIViewController {
 
     func startAssistedClaiming() {
         let assistedClaiming = AssistedClaiming(espDevice: device)
-        assistedClaiming.initiateAssistedClaiming { result, error in
+        assistedClaiming.initiateAssistedClaiming(isCameraDevice: self.isCameraDevice) { result, error in
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
                 if result {
