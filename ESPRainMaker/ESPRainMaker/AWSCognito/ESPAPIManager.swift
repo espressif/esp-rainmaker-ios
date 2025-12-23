@@ -344,6 +344,48 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         }
     }
 
+    /// Subscribe controller node to a group.
+    /// PUT /user/nodes/{node_id}/groups/{group_id}/controller
+    func addControllerToGroup(nodeId: String, groupId: String, completionHandler: @escaping (Bool, ESPNetworkError?) -> Void) {
+        let sessionWorker = ESPExtendUserSessionWorker()
+        sessionWorker.checkUserSession { [weak self] accessToken, error in
+            guard let self = self else { return }
+            
+            if let token = accessToken {
+                let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
+                guard let baseURL = Configuration.shared.awsConfiguration.baseURL else {
+                    completionHandler(false, .unknownError)
+                    return
+                }
+                let url = "\(baseURL)/\(Constants.apiVersion)/user/nodes/\(nodeId)/groups/\(groupId)/controller"
+                let body: [String: String] = ["operation": "subscribe"]
+                self.session.request(url, method: .put, parameters: body, encoding: JSONEncoding.default, headers: headers).responseData { response in
+                    if let statusCode = response.response?.statusCode, (200...299).contains(statusCode) {
+                        if let data = response.data,
+                           !data.isEmpty,
+                           let jsonObject = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                           let status = jsonObject[Constants.statusKey] as? String,
+                           status.lowercased() == Constants.failure.lowercased() {
+                            let description = jsonObject[Constants.descriptionKey] as? String ?? "Failed to add controller to group"
+                            completionHandler(false, .serverError(description))
+                            return
+                        }
+                        completionHandler(true, nil)
+                        return
+                    }
+                    switch response.result {
+                    case let .failure(err):
+                        completionHandler(false, .serverError(err.localizedDescription))
+                    case .success:
+                        completionHandler(false, .serverError("Failed to add controller to group"))
+                    }
+                }
+            } else if self.validatedRefreshToken(error: error) {
+                completionHandler(false, .emptyToken)
+            }
+        }
+    }
+
     /// Method to fetch device association status
     ///
     /// - Parameters:

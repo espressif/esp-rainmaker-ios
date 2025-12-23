@@ -24,6 +24,7 @@ import UIKit
 extension DeviceViewController: CustomActionDelegate, ParamCustomActionDelegate {
     
     func launchRainmakerController() {}
+    func addToGroup() {}
     func mergeThreadDataset() {}
     func setActiveThreadDataset() {}
     

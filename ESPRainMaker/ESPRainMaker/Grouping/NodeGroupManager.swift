@@ -58,6 +58,15 @@ class NodeGroupManager {
         })
     }
 
+    /// Returns true when cached group data lists this node id (uses `NodeGroup.nodes` from last fetch).
+    /// Call after `getNodeGroups` has populated `nodeGroups` (e.g. fabric selection already loads groups).
+    func isNodeInGroup(nodeId: String, groupId: String) -> Bool {
+        guard let nodes = getGroupForId(id: groupId)?.nodes else {
+            return false
+        }
+        return nodes.contains(nodeId)
+    }
+
     /// Method to get node groups for the current user
     ///
     /// - Parameters:
@@ -183,6 +192,20 @@ class NodeGroupManager {
                 completionHandler(false, .parsingError(error.localizedDescription))
             }
         }
+    }
+    
+    /// Add a node to an existing group.
+    /// - Parameters:
+    ///   - nodeId: Node id to be added.
+    ///   - groupId: Group id where node should be added.
+    ///   - completionHandler: Callback invoked with operation status.
+    func addNodeToGroup(nodeId: String, groupId: String, completionHandler: @escaping (Bool, ESPNetworkError?) -> Void) {
+        guard let group = getGroupForId(id: groupId) else {
+            completionHandler(false, .serverError("Group not found"))
+            return
+        }
+        let parameter: [String: Any] = ["operation": "add", "nodes": [nodeId]]
+        performNodeGroupOperation(group: group, parameter: parameter, method: .put, completionHandler: completionHandler)
     }
 
     /// Method to add reference of node object in groups

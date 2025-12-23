@@ -168,7 +168,21 @@ class DeviceTraitListViewController: UIViewController {
                 }
             }
             var isFound = false
-            if let service = node.getService(forServiceType: Constants.matterControllerServiceType), let params = service.params {
+            if let service = node.getService(forServiceType: MatterControllerConstants.serviceType),
+               let params = service.params {
+                isFound = true
+                let param = Param()
+                param.type = ClientOnlyControllerConstants.defaultType
+                dataSource.append(param)
+                for param in params {
+                    if let type = param.type, type == ClientOnlyControllerConstants.paramMatterCtlCmd {
+                        dataSource.append(param)
+                        break
+                    }
+                }
+            } else if node.isMatterControllerSetupSupported,
+                      let service = node.getService(forServiceType: ClientOnlyControllerConstants.setupServiceType),
+                      let params = service.params {
                 isFound = true
                 let param = Param()
                 param.type = ClientOnlyControllerConstants.defaultType
@@ -180,9 +194,14 @@ class DeviceTraitListViewController: UIViewController {
                     }
                 }
             }
-            if let _ = node.getService(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType), !isFound  {
+            if (node.isRmakerControllerSupported || node.isRmControllerSupported), !isFound {
                 let param = Param()
                 param.type = RainmakerControllerConstants.defaultType
+                dataSource.append(param)
+            }
+            if node.isGroupsServiceSupported && node.isGroupsGroupIdEmpty {
+                let param = Param()
+                param.type = RainmakerControllerConstants.groupsServiceDefaultType
                 dataSource.append(param)
             }
         }
@@ -838,6 +857,12 @@ class DeviceTraitListViewController: UIViewController {
             }
             configureCustomActionCell(cell, workflow: .launchRainmakerController, param: dynamicAttribute)
             return cell
+        } else if dynamicAttribute.type == RainmakerControllerConstants.groupsServiceDefaultType {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
+            }
+            configureCustomActionCell(cell, workflow: .addToGroup, param: dynamicAttribute)
+            return cell
         } else if dynamicAttribute.type == ClientOnlyControllerConstants.paramMatterCtlCmd ||
                     dynamicAttribute.type == ClientOnlyControllerConstants.defaultType {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
@@ -921,7 +946,10 @@ class DeviceTraitListViewController: UIViewController {
     
     /// Check if device is online (connected or on local network)
     private func isDeviceOnline(for param: Param) -> Bool {
-        if (param.type == ClientOnlyControllerConstants.defaultType || param.type == RainmakerControllerConstants.defaultType), let node = device.node {
+        if (param.type == ClientOnlyControllerConstants.defaultType
+            || param.type == RainmakerControllerConstants.defaultType
+            || param.type == RainmakerControllerConstants.groupsServiceDefaultType),
+           let node = device.node {
             return node.isConnected || node.localNetwork
         }
         guard let properties = param.properties, properties.contains("write"),

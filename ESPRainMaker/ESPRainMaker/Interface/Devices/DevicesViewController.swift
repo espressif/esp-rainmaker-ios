@@ -155,11 +155,19 @@ class DevicesViewController: UIViewController {
             User.shared.updateUserInfo = false
             updateUserInfo()
         }
-        if User.shared.isUserSessionActive {
-            if User.shared.updateDeviceList {
-                // Force API refresh when updateDeviceList flag is true
-                // This ensures we make API call when explicitly requested
-                forceAPIRefresh()
+        let currentCount = User.shared.associatedNodeList?.count ?? 0
+        if User.shared.isUserSessionActive, User.shared.updateDeviceList {
+            // Mirror pull-to-refresh timing: run refresh after Home is fully visible.
+            let preRefreshCount = currentCount
+            forceAPIRefresh()
+            // Commissioning can return before cloud list is fully propagated.
+            // One delayed retry (same API path as pull-to-refresh) avoids requiring manual pull.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                guard self.isViewLoaded, self.view.window != nil else { return }
+                let postRefreshCount = User.shared.associatedNodeList?.count ?? 0
+                if postRefreshCount <= preRefreshCount {
+                    self.forceAPIRefresh()
+                }
             }
         }
         setViewForNoNodes()

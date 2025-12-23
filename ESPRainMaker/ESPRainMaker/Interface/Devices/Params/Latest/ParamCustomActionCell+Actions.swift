@@ -31,6 +31,8 @@ extension ParamCustomActionCell {
             delegate?.launchController()
         case .updateDeviceList:
             delegate?.updateDeviceList()
+        case .addToGroup:
+            delegate?.addToGroup()
         case .updateThreadDataset:
             delegate?.updateThreadDataset()
         case .setActiveThreadDataset:

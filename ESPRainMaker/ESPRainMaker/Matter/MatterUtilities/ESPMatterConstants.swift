@@ -251,6 +251,8 @@ struct ESPMatterConstants {
     static let enterDeviceNameMsg = "Enter device name of length 1-32 characters"
     static let removeGroupSharingMsg = "Are you sure you want to remove this group?"
     static let revokeRequestMsg = "Are you sure you want revoke access to this group?"
+    static let revokeGroupSharingAccessConfirmationMsg = "Do you want to revoke group sharing access?"
+    static let cancelGroupSharingRequestConfirmationMsg = "Do you want to cancel group sharing request?"
     static let commissioningWindowOpenFailedMsg = "Failed to open commissioning window."
     static let shareGroupEmailMessage = "Enter email id of user to share the device with"
     static let openCWFailureMsg = "Failed to open commissioning window. Please try later!"

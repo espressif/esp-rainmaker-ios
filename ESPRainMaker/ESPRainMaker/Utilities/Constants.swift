@@ -196,11 +196,11 @@ struct Constants {
     static let scenesKey = "Scenes"
     
     // Controller constants
-    static let matterControllerServiceType = "esp.service.matter-controller"
     static let paramMatterDevices = "esp.param.matter-devices"
     static let paramMatterControllerDataVersion = "esp.param.matter-controller-data-version"
     static let paramMatterControllerData = "esp.param.matter-controller-data"
     static let controllerDeviceType = "esp.device.matter-controller"
+    static let rainmakerControllerDeviceType = "esp.device.controller"
     
     // APIs JSON keys
     static let contentType = "Content-Type"

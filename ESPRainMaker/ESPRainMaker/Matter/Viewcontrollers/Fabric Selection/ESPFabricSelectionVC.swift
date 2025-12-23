@@ -21,6 +21,11 @@ import UIKit
 
 protocol ClientOnlyControllerGroupSelectionDelegate: AnyObject {
     func groupSelected(groupId: String)
+    func groupsServiceGroupSelected(groupId: String)
+}
+
+extension ClientOnlyControllerGroupSelectionDelegate {
+    func groupsServiceGroupSelected(groupId: String) {}
 }
 
 class ESPFabricSelectionVC: UIViewController {
@@ -41,6 +46,7 @@ class ESPFabricSelectionVC: UIViewController {
     var onboardingPayload: String? = ""
     
     var isClientOnlyContoller: Bool = false
+    var groupSelectionPurpose: ControllerGroupSelectionPurpose = .clientOnlyController
     weak var clientOnlyControllerDelegate: ClientOnlyControllerGroupSelectionDelegate?
     
     override func viewDidLoad() {
@@ -122,7 +128,12 @@ extension ESPFabricSelectionVC {
     func fabricSelected(grpId: String) {
         DispatchQueue.main.async {
             if self.isClientOnlyContoller {
-                self.clientOnlyControllerDelegate?.groupSelected(groupId: grpId)
+                switch self.groupSelectionPurpose {
+                case .clientOnlyController:
+                    self.clientOnlyControllerDelegate?.groupSelected(groupId: grpId)
+                case .groupsServiceOnly:
+                    self.clientOnlyControllerDelegate?.groupsServiceGroupSelected(groupId: grpId)
+                }
             } else {
                 self.goToMatterCommissioning()
             }
@@ -380,10 +391,13 @@ extension ESPFabricSelectionVC: UITableViewDelegate, UITableViewDataSource {
             let nodeGroup = nodeGroups[indexPath.row]
             if let groupId = nodeGroup.group_id {
                 self.groupId = groupId
-                if let isMatter = nodeGroup.is_matter, isMatter, #available(iOS 16.4, *) {
-                    self.fabricSelected(grpId: groupId)
-                } else {
-                    if #available(iOS 16.4, *) {
+                if #available(iOS 16.4, *) {
+                    // RainMaker groups-service nodes are not Matter; skip fabric conversion.
+                    if self.isClientOnlyContoller && self.groupSelectionPurpose == .groupsServiceOnly {
+                        self.fabricSelected(grpId: groupId)
+                    } else if let isMatter = nodeGroup.is_matter, isMatter {
+                        self.fabricSelected(grpId: groupId)
+                    } else {
                         self.updateNodeGroupToMatterFabric(groupId: groupId)
                     }
                 }

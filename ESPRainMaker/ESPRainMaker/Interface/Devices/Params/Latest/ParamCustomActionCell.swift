@@ -26,6 +26,7 @@ protocol ParamCustomActionDelegate: AnyObject {
     func launchRainmakerController()
     func launchController()
     func updateDeviceList()
+    func addToGroup()
     func updateThreadDataset()
     func setActiveThreadDataset()
     func mergeThreadDataset()

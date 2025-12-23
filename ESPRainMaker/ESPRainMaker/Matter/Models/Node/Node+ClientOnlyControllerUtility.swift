@@ -18,46 +18,98 @@
 
 extension Node {
     
-    var isClientOnlyControllerSupported: Bool {
-        if let _ = self.getService(forServiceType: Constants.matterControllerServiceType) {
+    var isMatterControllerSetupSupported: Bool {
+        if let _ = self.getService(forServiceType: ClientOnlyControllerConstants.setupServiceType) {
             return true
         }
         return false
     }
     
+    var isClientOnlyControllerSupported: Bool {
+        if let _ = self.getService(forServiceType: MatterControllerConstants.serviceType)
+            ?? self.getService(forServiceType: ClientOnlyControllerConstants.setupServiceType) {
+            return true
+        }
+        return false
+    }
+    
+    /// Matches Android `isCtlAvailable`: `matter-controller` service requires `esp.param.matter-node-id`.
+    var isMatterControllerClientServiceAvailable: Bool {
+        guard getService(forServiceType: MatterControllerConstants.serviceType) != nil else { return false }
+        return getServiceParam(forServiceType: MatterControllerConstants.serviceType,
+                               andParamType: MatterControllerConstants.paramMatterNodeId) != nil
+    }
+    
     var clientOnlyControllerRmakerGroupParam: Param? {
-        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramRainmakerGroupId), let properties = dynamicAttribute.properties, properties.contains("write") {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: MatterControllerConstants.serviceType, andParamType: ClientOnlyControllerConstants.paramRainmakerGroupId), let properties = dynamicAttribute.properties, properties.contains("write") {
             return dynamicAttribute
         }
         return nil
     }
     
     var clientOnlyControllerGroupParam: Param? {
-        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramGroupId), let properties = dynamicAttribute.properties, properties.contains("write") {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: MatterControllerConstants.serviceType, andParamType: ClientOnlyControllerConstants.paramGroupId), let properties = dynamicAttribute.properties, properties.contains("write") {
             return dynamicAttribute
         }
         return nil
     }
     
     var clientOnlyControllerUserTokenParam: Param? {
-        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramUserToken), let properties = dynamicAttribute.properties, properties.contains("write") {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: MatterControllerConstants.serviceType, andParamType: ClientOnlyControllerConstants.paramUserToken), let properties = dynamicAttribute.properties, properties.contains("write") {
             return dynamicAttribute
         }
         return nil
     }
     
     var clientOnlyControllerBaseURLParam: Param? {
-        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramBaseURL), let properties = dynamicAttribute.properties, properties.contains("write") {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: MatterControllerConstants.serviceType, andParamType: ClientOnlyControllerConstants.paramBaseURL), let properties = dynamicAttribute.properties, properties.contains("write") {
             return dynamicAttribute
         }
         return nil
     }
     
     var clientOnlyControllerUpdateDeviceListCommandParam: Param? {
-        return self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramMatterCtlCmd)
+        return self.getServiceParam(forServiceType: MatterControllerConstants.serviceType, andParamType: ClientOnlyControllerConstants.paramMatterCtlCmd)
+        ?? self.getServiceParam(forServiceType: ClientOnlyControllerConstants.setupServiceType, andParamType: ClientOnlyControllerConstants.paramMatterCtlCmd)
     }
     
     var clientOnlyControllerNodeIdParam: Param? {
-        return self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramMatterNodeId)
+        return self.getServiceParam(forServiceType: MatterControllerConstants.serviceType, andParamType: ClientOnlyControllerConstants.paramMatterNodeId)
+    }
+
+    var clientOnlyControllerSetupServiceName: String? {
+        return self.getServiceName(forServiceType: ClientOnlyControllerConstants.setupServiceType)
+    }
+
+    var clientOnlyControllerSetupGroupParam: Param? {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: ClientOnlyControllerConstants.setupServiceType, andParamType: ClientOnlyControllerConstants.paramGroupId),
+           let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
+    }
+
+    var clientOnlyControllerSetupRmakerGroupParam: Param? {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: ClientOnlyControllerConstants.setupServiceType, andParamType: ClientOnlyControllerConstants.paramRainmakerGroupId),
+           let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
+    }
+
+    var clientOnlyControllerSetupUserTokenParam: Param? {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: ClientOnlyControllerConstants.setupServiceType, andParamType: ClientOnlyControllerConstants.paramUserToken),
+           let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
+    }
+
+    var clientOnlyControllerSetupBaseURLParam: Param? {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: ClientOnlyControllerConstants.setupServiceType, andParamType: ClientOnlyControllerConstants.paramBaseURL),
+           let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
     }
 }

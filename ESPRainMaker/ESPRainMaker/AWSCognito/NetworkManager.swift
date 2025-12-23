@@ -111,6 +111,11 @@ class NetworkManager {
         apiManager.addDeviceToUser(parameter: parameter, completionHandler: completionHandler)
     }
 
+    /// Subscribe a controller node to the selected group.
+    func addControllerToGroup(nodeId: String, groupId: String, completionHandler: @escaping (Bool, ESPNetworkError?) -> Void) {
+        apiManager.addControllerToGroup(nodeId: nodeId, groupId: groupId, completionHandler: completionHandler)
+    }
+
     /// Method to fetch device association status
     ///
     /// - Parameters:

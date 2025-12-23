@@ -33,6 +33,7 @@ class ESPMatterCommissioningVC: UIViewController {
     var nodes: [ESPNodeDetails]?
     var onboardingPayload: String?
     let fabricDetails = ESPMatterFabricDetails.shared
+    private let commissionedNodeSyncService = ESPCommissionedNodeSyncService()
     let paramTypes = [Constants.scanQRCode,
                  Constants.slider,
                  Constants.hue,
@@ -184,14 +185,22 @@ class ESPMatterCommissioningVC: UIViewController {
     
     
     /// Navigate to devices screen
-    func navigateToDevicesScreen(hideLoader: Bool = true) {
+    func navigateToDevicesScreen() {
         DispatchQueue.main.async {
-            if hideLoader {
+            Utility.showLoader(message: "", view: self.view)
+        }
+        self.commissionedNodeSyncService.syncCommissionedNode(groupId: self.groupId,
+                                                              matterNodeId: self.matterNodeId,
+                                                              retries: 8,
+                                                              retryDelay: 1.25) { node in
+            DispatchQueue.main.async {
+                if let node = node {
+                    self.upsertAssociatedNodeList(with: node)
+                }
                 Utility.hideLoader(view: self.view)
+                self.markDeviceListNeedsRefresh()
+                self.navigationController?.popToRootViewController(animated: true)
             }
-            User.shared.updateDeviceList = true
-            NotificationCenter.default.post(name: Notification.Name(Constants.refreshDeviceList), object: nil)
-            self.navigationController?.popToRootViewController(animated: true)
         }
     }
     
@@ -225,13 +234,13 @@ class ESPMatterCommissioningVC: UIViewController {
                 }
             } else {
                 if #available(iOS 18.4, *) {
-                    self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId, hideLoader: false)
+                    self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
                 } else {
-                    self.navigateToDevicesScreen(hideLoader: false)
+                    self.navigateToDevicesScreen()
                 }
             }
         } else {
-            self.navigateToDevicesScreen(hideLoader: false)
+            self.navigateToDevicesScreen()
         }
     }
 
@@ -395,53 +404,25 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
     
     func reloadData(groupId: String? = nil, matterNodeId: String? = nil, isRainmaker: Bool) {
         self.matterNodeId = matterNodeId
-        if let groupId = groupId, let matterNodeId = matterNodeId, let deviceId = matterNodeId.hexToDecimal {
-            if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0, isRainmaker {
-                //Show login screen
-                self.alertUser(title: ESPMatterConstants.emptyString,
-                               message: ESPMatterConstants.controllerNeedsAccessMsg,
-                               buttonTitle: ESPMatterConstants.okTxt) {
+        guard let groupId = groupId,
+              let matterNodeId = matterNodeId,
+              let deviceId = matterNodeId.hexToDecimal else { return }
+        
+        self.handlePostCommissioningSetupControllerFlowIfNeeded(groupId: groupId, isRainmaker: isRainmaker) { _ in
+            // Go to home screen.
+            if let nodes = User.shared.associatedNodeList, nodes.count > 0 {
+                DispatchQueue.main.async {
+                    Utility.showLoader(message: "", view: self.view)
+                }
+                self.sendUpdateDeviceListToControllersInGroup(groupId: groupId) {
                     DispatchQueue.main.async {
-                        self.showRainmakerLoginScreen(groupId: groupId, matterNodeId: matterNodeId)
+                        Utility.hideLoader(view: self.view)
+                        self.goToHomeScreen(isRainmaker: isRainmaker)
                     }
                 }
             } else {
-                //Go to home screen
-                if let nodes = User.shared.associatedNodeList, nodes.count > 0 {
-                    var shouldUpdateDeviceList = false
-                    var id: UInt64?
-                    for node in  nodes {
-                        if let grpId = node.groupId, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, grpId == groupId, node.isRainmakerControllerSupported.0, node.isRainmakerMatter {
-                            shouldUpdateDeviceList = true
-                            id = deviceId
-                            break
-                        }
-                    }
-                    if shouldUpdateDeviceList, let id = id {
-                        DispatchQueue.main.async {
-                            Utility.showLoader(message: "", view: self.view)
-                        }
-                        var endpoint: UInt16 = 0
-                        let clusterInfo = ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: id)
-                        if let point = clusterInfo.1, let id = UInt16(point) {
-                            endpoint = id
-                        }
-                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
-                        commissioner.updateDeviceListOnDevice(deviceId: id, endpoint: endpoint) { result in
-                            DispatchQueue.main.async {
-                                Utility.hideLoader(view: self.view)
-                                self.goToHomeScreen(isRainmaker: isRainmaker)
-                            }
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.goToHomeScreen(isRainmaker: isRainmaker)
-                        }
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.goToHomeScreen(isRainmaker: isRainmaker)
-                    }
+                DispatchQueue.main.async {
+                    self.goToHomeScreen(isRainmaker: isRainmaker)
                 }
             }
         }
@@ -503,6 +484,233 @@ extension ESPMatterCommissioningVC: ESPMTRUIDelegate {
         } else {
             completion()
         }
+    }
+
+    private func sendUpdateDeviceListToControllersInGroup(groupId: String, completion: @escaping () -> Void) {
+        guard let allNodes = User.shared.associatedNodeList else {
+            completion()
+            return
+        }
+
+        var updatePayloads: [(String, [String: Any])] = []
+        for node in allNodes where self.isNodeInTargetGroup(node: node, groupId: groupId) {
+            guard let nodeId = node.node_id else { continue }
+            var body: [String: Any] = [:]
+
+            if let serviceName = node.getServiceName(forServiceType: MatterControllerConstants.serviceType),
+               let commandName = node.clientOnlyControllerUpdateDeviceListCommandParam?.name {
+                body[serviceName] = [commandName: 2]
+            }
+
+            if let serviceName = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType),
+               let commandName = node.rmakerControllerUpdateDeviceListCommandParam?.name {
+                body[serviceName] = [commandName: 2]
+            }
+
+            if let serviceName = node.getServiceName(forServiceType: ClientOnlyControllerConstants.setupServiceType),
+               let commandName = node.clientOnlyControllerUpdateDeviceListCommandParam?.name {
+                body[serviceName] = [commandName: 2]
+            }
+
+            if !body.isEmpty {
+                updatePayloads.append((nodeId, body))
+            }
+        }
+
+        if updatePayloads.isEmpty {
+            completion()
+            return
+        }
+
+        print("Update payloads: \(updatePayloads.description)")
+        var pending = updatePayloads.count
+        for payload in updatePayloads {
+            print("Node addition command to be sent for nodeid: \(payload.0) with params: \(payload.1)")
+            DeviceControlHelper.shared.updateParam(nodeID: payload.0, parameter: payload.1, delegate: nil) { _ in
+                pending -= 1
+                if pending == 0 {
+                    completion()
+                }
+            }
+        }
+    }
+
+    private func isNodeInTargetGroup(node: Node, groupId: String) -> Bool {
+        if node.groupId == groupId {
+            return true
+        }
+        let candidateGroupIds: [String?] = [
+            node.clientOnlyControllerRmakerGroupParam?.value as? String,
+            node.clientOnlyControllerGroupParam?.value as? String,
+            node.clientOnlyControllerSetupRmakerGroupParam?.value as? String,
+            node.clientOnlyControllerSetupGroupParam?.value as? String,
+            node.rmakerControllerGroupParam?.value as? String
+        ]
+        for candidate in candidateGroupIds {
+            if let id = candidate?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !id.isEmpty,
+               id == groupId {
+                return true
+            }
+        }
+        return false
+    }
+
+    private func markDeviceListNeedsRefresh() {
+        User.shared.updateDeviceList = true
+    }
+
+    private func upsertAssociatedNodeList(with updatedNode: Node) {
+        guard let nodeId = updatedNode.node_id?.trimmingCharacters(in: .whitespacesAndNewlines), !nodeId.isEmpty else {
+            return
+        }
+        var nodes = User.shared.associatedNodeList ?? []
+        if let index = nodes.firstIndex(where: { $0.node_id == nodeId }) {
+            nodes[index] = updatedNode
+        } else if let matterNodeId = updatedNode.matter_node_id,
+                  let index = nodes.firstIndex(where: { $0.matter_node_id == matterNodeId }) {
+            nodes[index] = updatedNode
+        } else {
+            nodes.append(updatedNode)
+        }
+        User.shared.associatedNodeList = nodes
+    }
+}
+
+@available(iOS 16.4, *)
+private final class ESPCommissionedNodeSyncService: NSObject {
+
+    private let apiManager = ESPAPIManager()
+    private let getNodeGroupsService: ESPGetNodeGroupsService
+    private var nodeGroupDetailsCompletion: ((ESPNodeGroupDetails?) -> Void)?
+
+    override init() {
+        self.getNodeGroupsService = ESPGetNodeGroupsService()
+        super.init()
+        self.getNodeGroupsService.presenter = self
+    }
+
+    func syncCommissionedNode(groupId: String?,
+                              matterNodeId: String?,
+                              retries: Int,
+                              retryDelay: TimeInterval,
+                              completion: @escaping (Node?) -> Void) {
+        guard let groupId = groupId, !groupId.isEmpty else {
+            completion(nil)
+            return
+        }
+        resolveRainmakerNodeId(groupId: groupId,
+                               matterNodeId: matterNodeId,
+                               retriesLeft: retries,
+                               retryDelay: retryDelay) { nodeId in
+            guard let nodeId = nodeId, !nodeId.isEmpty else {
+                completion(nil)
+                return
+            }
+            self.fetchNodeDetails(nodeId: nodeId,
+                                  retriesLeft: retries,
+                                  retryDelay: retryDelay,
+                                  completion: completion)
+        }
+    }
+
+    private func resolveRainmakerNodeId(groupId: String,
+                                        matterNodeId: String?,
+                                        retriesLeft: Int,
+                                        retryDelay: TimeInterval,
+                                        completion: @escaping (String?) -> Void) {
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        if let nodeId = commissioner.rainmakerNodeId?.trimmingCharacters(in: .whitespacesAndNewlines), !nodeId.isEmpty {
+            completion(nodeId)
+            return
+        }
+        guard let matterNodeId = matterNodeId?.trimmingCharacters(in: .whitespacesAndNewlines), !matterNodeId.isEmpty else {
+            completion(nil)
+            return
+        }
+        fetchNodeGroupDetails(groupId: groupId) { details in
+            let nodeId = self.findRainmakerNodeId(matterNodeId: matterNodeId, details: details)
+            if let nodeId = nodeId, !nodeId.isEmpty {
+                completion(nodeId)
+                return
+            }
+            guard retriesLeft > 1 else {
+                completion(nil)
+                return
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) {
+                self.resolveRainmakerNodeId(groupId: groupId,
+                                            matterNodeId: matterNodeId,
+                                            retriesLeft: retriesLeft - 1,
+                                            retryDelay: retryDelay,
+                                            completion: completion)
+            }
+        }
+    }
+
+    private func findRainmakerNodeId(matterNodeId: String, details: ESPNodeGroupDetails?) -> String? {
+        guard let groups = details?.groups else {
+            return nil
+        }
+        for group in groups {
+            for node in group.nodeDetails ?? [] {
+                let candidateMatterNodeId = node.matterNodeID?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                if candidateMatterNodeId.caseInsensitiveCompare(matterNodeId) == .orderedSame {
+                    let nodeId = node.nodeID?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    if !nodeId.isEmpty {
+                        return nodeId
+                    }
+                }
+            }
+        }
+        return nil
+    }
+
+    private func fetchNodeGroupDetails(groupId: String, completion: @escaping (ESPNodeGroupDetails?) -> Void) {
+        let worker = ESPExtendUserSessionWorker()
+        worker.checkUserSession { token, _ in
+            guard let token = token else {
+                completion(nil)
+                return
+            }
+            let nodeGroupURL = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion
+            self.nodeGroupDetailsCompletion = completion
+            self.getNodeGroupsService.getNodeDetails(url: nodeGroupURL, token: token, groupId: groupId)
+        }
+    }
+
+    private func fetchNodeDetails(nodeId: String,
+                                  retriesLeft: Int,
+                                  retryDelay: TimeInterval,
+                                  completion: @escaping (Node?) -> Void) {
+        self.apiManager.getNodeInfo(nodeId: nodeId) { node, _ in
+            let fetchedNodeId = node?.node_id?.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let fetchedNodeId = fetchedNodeId, !fetchedNodeId.isEmpty {
+                completion(node)
+                return
+            }
+            guard retriesLeft > 1 else {
+                completion(nil)
+                return
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) {
+                self.fetchNodeDetails(nodeId: nodeId,
+                                      retriesLeft: retriesLeft - 1,
+                                      retryDelay: retryDelay,
+                                      completion: completion)
+            }
+        }
+    }
+}
+
+@available(iOS 16.4, *)
+extension ESPCommissionedNodeSyncService: ESPGetNodeGroupsPresentationLogic {
+    func receivedNodeGroupsData(data: ESPNodeGroups?, error: Error?) {}
+
+    func receivedNodeGroupDetailsData(data: ESPNodeGroupDetails?, error: Error?) {
+        let completion = self.nodeGroupDetailsCompletion
+        self.nodeGroupDetailsCompletion = nil
+        completion?(data)
     }
 }
 

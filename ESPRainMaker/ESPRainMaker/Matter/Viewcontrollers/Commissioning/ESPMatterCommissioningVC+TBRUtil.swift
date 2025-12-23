@@ -88,11 +88,11 @@ extension ESPMatterCommissioningVC {
     ///   - groupId: group id
     ///   - deviceId: device id
     @available(iOS 18.4, *)
-    func performTBRActionAndNavigate(groupId: String, deviceId: UInt64, hideLoader: Bool = true) {
+    func performTBRActionAndNavigate(groupId: String, deviceId: UInt64) {
         if ESPMatterClusterUtil.shared.isTBRMSupported(groupId: groupId, deviceId: deviceId).0 {
             self.performThreadOperations(groupId: groupId, deviceId: deviceId)
         } else {
-            self.navigateToDevicesScreen(hideLoader: hideLoader)
+            self.navigateToDevicesScreen()
         }
     }
 }
