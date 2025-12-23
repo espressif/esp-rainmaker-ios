@@ -38,7 +38,7 @@ extension DeviceViewController: ParamCHIPDelegate {
     func levelInitialValuesSet() {
         if cellInfo.contains(ESPMatterConstants.colorControl) {
             if let row = cellInfo.firstIndex(of: ESPMatterConstants.colorControl) {
-                if let cell = self.deviceTableView.cellForRow(at: IndexPath(row: row, section: 0)) as? ParamSliderTableViewCell {
+                if let cell = self.deviceTableView.cellForRow(at: IndexPath(row: row, section: 0)) as? ParamHueSliderCell {
                     Utility.showLoader(message: "", view: self.view)
                     cell.setCurrentHueValue()
                 }

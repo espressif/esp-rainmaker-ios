@@ -159,13 +159,13 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         #if ESPRainMakerMatter
         let node = getNodeAt(indexPath: indexPath)
         if #available(iOS 16.4, *), node.isMatter, node.clientOnlyControllerNodeIdParam == nil, var cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
-            var status: NodeConnectionStatus = .offline
+            // Use node.connectionStatus computed property instead of recalculating
+            // This ensures we use the same logic as everywhere else and get updated values
+            var status: NodeConnectionStatus = node.connectionStatus
             if let id = node.node_id, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
-                if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
-                    status = .local
-                } else if node.isRainmakerMatter, node.isConnected {
-                    status = .remote
-                } else {
+                // Check for controller mode (not handled by connectionStatus computed property)
+                // Controller mode: device is offline/remote but reachable via a controller
+                if status == .offline || status == .remote {
                     if let controller = node.matterControllerNode, let controllerNodeId = controller.node_id {
                         let controllerStatus = controller.connectionStatus
                         if controllerStatus == .remote, let matterNodeData = MatterControllerParser.shared.getMatterNodeData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let enabled = matterNodeData.enabled, let reachable = matterNodeData.reachable, enabled, reachable {

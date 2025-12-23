@@ -41,6 +41,11 @@ class User {
     var discoveredTBRsCompletion: (([String], [String: String], [String: [String: Data]]) -> Void)?
     var matterLightOnStatus: [String: Bool] = [String: Bool]()
     
+    // Track when each node was last successfully discovered on local network
+    // Used to handle WiFi changes: if node hasn't been discovered for >60 seconds, clear localNetwork
+    private var lastLocalDiscoveryTime: [String: Date] = [:]
+    private let localDiscoveryTimeout: TimeInterval = 60.0 // 60 seconds
+    
     private let esp = "esp"
     private let prov = "prov"
     private let secVer = "sec_ver"
@@ -104,8 +109,21 @@ class User {
         if let nodeList = User.shared.associatedNodeList {
             let group = DispatchGroup()
             var localNodeList: [Node] = []
+            
+            // Only update localNetwork if we have a non-empty discovery result
+            // This prevents clearing localNetwork when discovery temporarily returns empty (timeout/restart)
+            let hasValidDiscoveryResult = !localServices.isEmpty
+            
             for node in nodeList {
-                if localServices.keys.contains(node.node_id ?? "") {
+                let nodeId = node.node_id ?? "unknown"
+                let previousLocalNetwork = node.localNetwork
+                let isInLocalServices = localServices.keys.contains(nodeId)
+                let lastDiscovery = lastLocalDiscoveryTime[nodeId]
+                let timeSinceLastDiscovery = lastDiscovery.map { Date().timeIntervalSince($0) } ?? Double.infinity
+                
+                if isInLocalServices {
+                    // Device is discovered - update timestamp and set localNetwork = true
+                    lastLocalDiscoveryTime[nodeId] = Date()
                     node.localNetwork = true
                     notifyLocalNetworkUpdate = false
                     setEncryptionOnLocalControl(node: node)
@@ -332,14 +350,24 @@ extension User: ESPLocalControlDelegate {
             }
             localServices[hostname] = service
         }
+        
         updateNodeLocalNetworkInfo()
     }
 }
 
 extension User: ESPMatterNodesDiscoveredDelegate {
     func matterDevicesDiscovered(matterNodes: [String]) {
+        let previousNodes = self.discoveredNodes
         self.discoveredNodes = matterNodes
         self.discoveredNodesCompletion?(matterNodes)
+        
+        // Post notification when Matter connection status changes
+        // This allows DeviceViewController to update UI when devices connect/disconnect
+        if previousNodes != matterNodes {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(Notification(name: Notification.Name(Constants.matterDeviceConnectivityUpdate)))
+            }
+        }
     }
 }
 

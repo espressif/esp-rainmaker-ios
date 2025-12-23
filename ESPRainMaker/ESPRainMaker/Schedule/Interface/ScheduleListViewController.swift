@@ -325,14 +325,20 @@ extension ScheduleListViewController: ScheduleListTableViewCellDelegate {
 
 extension ScheduleListViewController: ServiceUpdateActionsDelegate {
     func serviceAdded() {
+        // Refresh schedule list to show newly created schedule
+        showScheduleList()
         Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleCreationSuccessMessage, duration: 2.0)
     }
     
     func serviceUpdated() {
+        // Refresh schedule list to show updated schedule
+        showScheduleList()
         Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdationSuccessMessage, duration: 2.0)
     }
     
     func serviceRemoved() {
+        // Refresh schedule list to reflect deletion
+        showScheduleList()
         Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleDeletionSuccessMessage, duration: 2.0)
     }
 }

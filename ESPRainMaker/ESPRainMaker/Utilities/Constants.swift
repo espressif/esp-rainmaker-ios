@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct Constants {
     static let bundleIdentifier = Bundle.main.infoDictionary!["CFBundleIdentifier"] as! String
@@ -155,6 +156,7 @@ struct Constants {
     static let reloadParamTableView = "com.espressif.reloadParamTableView"
     static let refreshDeviceList = "com.espressif.refreshDeviceList"
     static let controllerParamUpdate = "com.espressif.controllerParamUpdate"
+    static let matterDeviceConnectivityUpdate = "com.espressif.matterDeviceConnectivityUpdate"
 
     // Claim APIs - Convert to computed properties
     static var claimInitPath: String { Configuration.shared.awsConfiguration.claimURL + "/claim/initiate" }
@@ -239,6 +241,26 @@ struct Constants {
     static let settingsStoryboardName = "Settings"
     
     static let customColor = "#8265E3"
+    
+    // MARK: - UI Color Constants (matches original XIB values)
+    // Cell background colors
+    static let cellBackgroundLightGray = UIColor(red: 0.96470588235294119, green: 0.96470588235294119, blue: 0.98431372549019602, alpha: 1)
+    
+    // Text colors
+    static let textColorDarkGray = UIColor(red: 0.10196078431372549, green: 0.10196078431372549, blue: 0.10196078431372549, alpha: 1)
+    static let textColorGrayBlue = UIColor(red: 0.50588235294117645, green: 0.50588235294117645, blue: 0.6588235294117647, alpha: 1)
+    
+    // Slider colors
+    static let sliderTrackPurple = UIColor(red: 0.32549019610000002, green: 0.18823529410000001, blue: 0.72549019609999998, alpha: 1)
+    static let sliderTrackGrayBlue = UIColor(red: 0.50588235294117645, green: 0.50588235294117645, blue: 0.6588235294117647, alpha: 1)
+    
+    // Button colors
+    static let buttonBackgroundBlue = UIColor(red: 0.0, green: 0.32941176470588235, blue: 0.57647058823529407, alpha: 1)
+    static let buttonTitleLight = UIColor(red: 0.96862745100000003, green: 0.96470588239999999, blue: 0.98431372549999996, alpha: 1)
+    
+    // Trigger button colors
+    static let triggerButtonBackground = UIColor(red: 0.50980392159999999, green: 0.39607843139999999, blue: 0.89019607840000003, alpha: 1)
+    static let triggerButtonBorderGray = UIColor(white: 0.66666666669999997, alpha: 1)
     
     // Web RTC constants
     static let channelParamType = "esp.param.channel"

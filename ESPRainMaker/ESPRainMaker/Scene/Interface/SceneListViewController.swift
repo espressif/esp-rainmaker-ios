@@ -366,14 +366,20 @@ extension SceneListViewController: UITextFieldDelegate {
 extension SceneListViewController: ServiceUpdateActionsDelegate {
     
     func serviceAdded() {
+        // Refresh scene list to show newly created scene
+        showScenesList()
         Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneCreationSuccessMessage, duration: 2.0)
     }
     
     func serviceUpdated() {
+        // Refresh scene list to show updated scene
+        showScenesList()
         Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneUpdationSuccessMessage, duration: 2.0)
     }
     
     func serviceRemoved() {
+        // Refresh scene list to reflect deletion
+        showScenesList()
         Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneDeletionSuccessMessage, duration: 2.0)
     }
 }

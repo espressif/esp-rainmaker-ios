@@ -16,7 +16,7 @@
 //  ESPRainMaker
 //
 
-extension DeviceTraitListViewController: CustomActionDelegate {
+extension DeviceTraitListViewController: ParamCustomActionDelegate {
     
     /// Launch Rainmaker controller flow for the device
     func launchRainmakerController() {
@@ -431,7 +431,7 @@ extension DeviceTraitListViewController: ClientOnlyControllerCredentialsDelegate
     func showGroupSelectionScreen() {
         #if ESPRainMakerMatter
         let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
-        let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as! ESPFabricSelectionVC
+        guard let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as? ESPFabricSelectionVC else { return }
         fabricSelectionVC.isClientOnlyContoller = true
         fabricSelectionVC.clientOnlyControllerDelegate = self
         self.navigationController?.setNavigationBarHidden(true, animated: false)

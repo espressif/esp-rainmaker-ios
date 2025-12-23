@@ -100,12 +100,21 @@ class DeviceViewController: UIViewController {
         self.showRightBarButtons()
         self.showBetaLabel()
         self.registerCells()
+        
+        // Performance optimizations
+        self.deviceTableView.estimatedRowHeight = 70.0
+        self.deviceTableView.rowHeight = UITableView.automaticDimension
     }
     
     override func viewWillAppear(_ animated: Bool) {
         self.setNavigationTextAttributes(color: .darkGray)
         tabBarController?.tabBar.isHidden = true
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateConnectionStatus), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateConnectionStatus), name: Notification.Name(Constants.matterDeviceConnectivityUpdate), object: nil)
+        
+        // Update connection status when view appears
+        updateConnectionStatus()
         
         // Listen for controller parameter updates when in controller mode
         if nodeConnectionStatus == .controller {
@@ -115,6 +124,8 @@ class DeviceViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.matterDeviceConnectivityUpdate), object: nil)
         
         #if ESPRainMakerMatter
         if nodeConnectionStatus == .controller {
@@ -139,6 +150,8 @@ class DeviceViewController: UIViewController {
                 Utility.hideLoader(view: self.view)
             }
         }
+        // Update connection status when app enters foreground (WiFi might have changed)
+        updateConnectionStatus()
     }
     
     @objc func controllerParamUpdateReceived() {
@@ -201,7 +214,7 @@ class DeviceViewController: UIViewController {
     //TODO: Show node info screen
     @objc func showNodeInfo() {
         let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
-        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
+        guard let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as? NodeDetailsViewController else { return }
         destination.currentNode = self.rainmakerNode
         destination.group = self.group
         destination.allNodes = self.allNodes
@@ -221,19 +234,27 @@ class DeviceViewController: UIViewController {
     
     /// Register cells
     func registerCells() {
-        self.deviceTableView.register(UINib(nibName: "GenericControlTableViewCell", bundle: nil), forCellReuseIdentifier: "genericControlCell")
-        self.deviceTableView.register(UINib(nibName: SliderTableViewCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: SliderTableViewCell.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
-        self.deviceTableView.register(UINib(nibName: ESPMTRLevelSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTRLevelSliderTVC.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: ESPMTRSaturationSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTRSaturationSliderTVC.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: ESPMTRCCTSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTRCCTSliderTVC.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: ESPMTROCSSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTROCSSliderTVC.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: ESPMTROHSSliderTVC.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ESPMTROHSSliderTVC.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: DeviceInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: DeviceInfoCell.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: CustomInfoCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: CustomInfoCell.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: ParticipantDataCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: ParticipantDataCell.reuseIdentifier)
-        self.deviceTableView.register(UINib(nibName: CustomActionCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: CustomActionCell.reuseIdentifier)
+        registerProgrammaticCells()
+        registerMatterInfoCells()
         self.generateCells()
+    }
+    
+    /// Register programmatic cells
+    private func registerProgrammaticCells() {
+        deviceTableView.register(ParamSliderCell.self, forCellReuseIdentifier: ParamSliderCell.reuseIdentifier)
+        deviceTableView.register(ParamHueSliderCell.self, forCellReuseIdentifier: ParamHueSliderCell.reuseIdentifier)
+        deviceTableView.register(ParamDropDownCell.self, forCellReuseIdentifier: ParamDropDownCell.reuseIdentifier)
+        deviceTableView.register(ParamGenericCell.self, forCellReuseIdentifier: ParamGenericCell.reuseIdentifier)
+        deviceTableView.register(ParamCustomActionCell.self, forCellReuseIdentifier: ParamCustomActionCell.reuseIdentifier)
+    }
+    
+    /// Register Matter-specific info cells (XIB-based, to be migrated later)
+    private func registerMatterInfoCells() {
+        let matterCells = [DeviceInfoCell.reuseIdentifier, CustomInfoCell.reuseIdentifier,
+                         ParticipantDataCell.reuseIdentifier]
+        matterCells.forEach { identifier in
+            deviceTableView.register(UINib(nibName: identifier, bundle: nil), forCellReuseIdentifier: identifier)
+        }
     }
     
     /// Read participant
@@ -366,24 +387,145 @@ class DeviceViewController: UIViewController {
         }
     }
     
+    /// Update connection status from rainmakerNode and refresh UI
+    @objc func updateConnectionStatus(_ notification: Notification? = nil) {
+        // Update rainmakerNode from global list (connection status might have changed)
+        if let rainmakerNode = self.rainmakerNode, let nodeId = rainmakerNode.node_id {
+            // Find the updated node in associatedNodeList
+            if let updatedNode = User.shared.associatedNodeList?.first(where: { $0.node_id == nodeId }) {
+                let previousStatus = self.nodeConnectionStatus
+                self.rainmakerNode = updatedNode
+                
+                // Update connection status from rainmakerNode
+                // CRITICAL: Force fresh read of connection status by checking discoveredNodes directly
+                // This ensures we get the latest state even if node reference is stale
+                if let node = self.rainmakerNode {
+                    var newStatus: NodeConnectionStatus = .offline
+                    
+                    // Check Matter discovery status directly (most up-to-date source)
+                    if let matterNodeId = node.matter_node_id {
+                        if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
+                            newStatus = .local
+                        } else if node.isRainmakerMatter, node.isConnected {
+                            // Matter+Rainmaker device that's remote - treat as offline for DeviceViewController
+                            newStatus = .offline
+                        } else {
+                            newStatus = .offline
+                        }
+                    } else {
+                        // Not a Matter device - use node.connectionStatus
+                        newStatus = node.connectionStatus
+                    }
+                    
+                    // Check for controller mode separately (connectionStatus doesn't return .controller)
+                    // DeviceViewController does NOT support remote mode - only local, controller, and offline
+                    if newStatus == .offline {
+                        // Check if device is reachable via controller
+                        if let matterNodeId = node.matter_node_id, let controller = node.matterControllerNode, let controllerNodeId = controller.node_id {
+                            let controllerStatus = controller.connectionStatus
+                            if controllerStatus == .remote, let matterNodeData = MatterControllerParser.shared.getMatterNodeData(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId), let enabled = matterNodeData.enabled, let reachable = matterNodeData.reachable, enabled, reachable {
+                                newStatus = .controller
+                            }
+                        }
+                    }
+                    
+                    // If status is remote, treat as offline (DeviceViewController doesn't support remote mode)
+                    if newStatus == .remote {
+                        newStatus = .offline
+                    }
+                    
+                    self.nodeConnectionStatus = newStatus
+                    self.isDeviceOffline = (newStatus == .offline)
+                } else {
+                    self.nodeConnectionStatus = .offline
+                    self.isDeviceOffline = true
+                }
+            }
+        }
+        
+        // Update UI
+        DispatchQueue.main.async {
+            self.setupOfflineUI()
+            
+            // Update visible cells directly to reflect connection status change
+            // This ensures cells are updated even if reloadData() is skipped
+            if let visibleIndexPaths = self.deviceTableView.indexPathsForVisibleRows {
+                for indexPath in visibleIndexPaths {
+                    if let cell = self.deviceTableView.cellForRow(at: indexPath) {
+                        // Update cell alpha and enabled state based on connection status
+                        let alpha: CGFloat = self.isDeviceOffline ? 0.5 : 1.0
+                        cell.alpha = alpha
+                        cell.isUserInteractionEnabled = !self.isDeviceOffline
+                        
+                        // Update specific cell types that have connection status-dependent UI
+                        if let deviceNameCell = cell as? DeviceInfoCell {
+                            deviceNameCell.isUserInteractionEnabled = !self.isDeviceOffline
+                            deviceNameCell.editButton.isEnabled = !self.isDeviceOffline
+                            deviceNameCell.alpha = alpha
+                            deviceNameCell.deviceName.alpha = alpha
+                            if let propertyName = deviceNameCell.propertyName {
+                                propertyName.alpha = alpha
+                            }
+                        } else if let onOffCell = cell as? DeviceOnOffCell {
+                            onOffCell.nodeConnectionStatus = self.nodeConnectionStatus
+                            onOffCell.toggleSwitch.isEnabled = !self.isDeviceOffline
+                            onOffCell.isUserInteractionEnabled = !self.isDeviceOffline
+                            onOffCell.alpha = alpha
+                            onOffCell.onOffStatus.alpha = alpha
+                            onOffCell.toggleSwitch.alpha = alpha
+                        } else if let sliderCell = cell as? ParamSliderCell {
+                            // Update Matter slider cells
+                            sliderCell.isDeviceOffline = self.isDeviceOffline
+                            sliderCell.nodeConnectionStatus = self.nodeConnectionStatus
+                            sliderCell.updateConnectionState()
+                        } else if let hueSliderCell = cell as? ParamHueSliderCell {
+                            // Update Matter hue slider cells
+                            hueSliderCell.isDeviceOffline = self.isDeviceOffline
+                            hueSliderCell.nodeConnectionStatus = self.nodeConnectionStatus
+                            hueSliderCell.updateConnectionState()
+                        }
+                    }
+                }
+            }
+            
+            // Reload table view to update cell alpha values and connection status
+            if self.presentedViewController == nil {
+                self.deviceTableView.reloadData()
+            }
+        }
+    }
+    
     /// Setup offline UI
     func setupOfflineUI() {
         DispatchQueue.main.async {
+            // Show connection status label for all states
             self.offlineView.isHidden = false
             self.offlineViewHeight.constant = 17.0
+            
             switch self.nodeConnectionStatus {
-            case .local:
-                self.connectionStatusLabel.text = ESPMatterConstants.localMode
-            case .remote:
-                self.connectionStatusLabel.text = ESPMatterConstants.remoteMode
             case .offline:
                 if let node = self.rainmakerNode, node.isMatter, node.isRainmakerMatter, node.timestamp.getShortDate().count > 0 {
                     self.connectionStatusLabel.text = "Offline at \(node.timestamp.getShortDate())"
                 } else {
                     self.connectionStatusLabel.text = ESPMatterConstants.offlineMode
                 }
+            case .local:
+                // Device is online locally
+                if let node = self.rainmakerNode, node.supportsEncryption {
+                    self.connectionStatusLabel.text = "🔒 Reachable on WLAN"
+                } else {
+                    self.connectionStatusLabel.text = "Reachable on WLAN"
+                }
             case .controller:
-                self.connectionStatusLabel.text = ESPMatterConstants.controllerMode
+                // Device is online via controller
+                self.connectionStatusLabel.text = "Controller"
+            case .remote:
+                // DeviceViewController does NOT support remote mode - treat as offline
+                if let node = self.rainmakerNode, node.isMatter, node.isRainmakerMatter, node.timestamp.getShortDate().count > 0 {
+                    self.connectionStatusLabel.text = "Offline at \(node.timestamp.getShortDate())"
+                } else {
+                    self.connectionStatusLabel.text = ESPMatterConstants.offlineMode
+                }
             }
         }
     }
