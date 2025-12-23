@@ -88,9 +88,8 @@ extension DeviceTraitListViewController {
             awsRegionValue = region
         }
         let awsRegionType = awsRegionValue.aws_regionTypeValue()
-        // Use RainMaker user ID, fallback to "ConsumerViewer" if not available
-        let userInfo = UserInfo.getUserInfo()
-        let localSenderClientID = ESPAWSConstants.connectAsViewClientId
+        // Generate a random UUID for local sender client ID each time stream starts
+        let localSenderClientID = UUID().uuidString
         let isMaster = false
         let sendAudioEnabled = false
         
