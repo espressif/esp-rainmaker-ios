@@ -18,6 +18,17 @@
 
 import Foundation
 
+private enum NodeSharingConstants {
+    static let nodeSharingKey = "node_sharing"
+    static let statusKey = "status"
+    static let descriptionKey = "description"
+    static let usersKey = "users"
+    static let primaryKey = "primary"
+    static let secondaryKey = "secondary"
+    static let successStatus = "success"
+    static let failureStatus = "failure"
+}
+
 // Class managing node sharing operations.
 class NodeSharingManager {
     private var apiManager = ESPAPIManager()
@@ -51,9 +62,9 @@ class NodeSharingManager {
     func getSharingDetails(node: Node, completionHandler: @escaping (ESPNetworkError?) -> Void) {
         let url = Constants.sharing + "?node_id=" + (node.node_id ?? "")
         apiManager.genericAuthorizedJSONRequest(url: url, parameter: nil, method: .get) { response, error in
-            guard let json = response as? [String: Any], let node_sharing = json["node_sharing"] as? [[String: Any]] else {
-                if let failureJSON = response as? [String: String], let status = failureJSON["status"], let description = failureJSON["description"] {
-                    if status == "failure" {
+            guard let json = response as? [String: Any], let node_sharing = json[NodeSharingConstants.nodeSharingKey] as? [[String: Any]] else {
+                if let failureJSON = response as? [String: String], let status = failureJSON[NodeSharingConstants.statusKey], let description = failureJSON[NodeSharingConstants.descriptionKey] {
+                    if status == NodeSharingConstants.failureStatus {
                         completionHandler(ESPNetworkError.serverError(description))
                         return
                     }
@@ -66,9 +77,9 @@ class NodeSharingManager {
             }
 
             let node_info = node_sharing[0]
-            if let users = node_info["users"] as? [String: [String]] {
-                node.primary = users["primary"]
-                node.secondary = users["secondary"]
+            if let users = node_info[NodeSharingConstants.usersKey] as? [String: Any] {
+                node.primary = users[NodeSharingConstants.primaryKey] as? [String]
+                node.secondary = users[NodeSharingConstants.secondaryKey] as? [String]
             }
             completionHandler(nil)
             return
@@ -90,7 +101,7 @@ class NodeSharingManager {
                 let decoder = JSONDecoder()
                 let response = try decoder.decode(ESPCloudResponse.self, from: response)
                 // Check for success in response
-                if response.status.lowercased() == "success" {
+                if response.status.lowercased() == NodeSharingConstants.successStatus {
                     completionHandler(true, nil)
                     return
                 } else {
@@ -219,7 +230,7 @@ class NodeSharingManager {
                 let decoder = JSONDecoder()
                 let response = try decoder.decode(ESPCloudResponse.self, from: response)
                 // Check for success in response
-                if response.status.lowercased() == "success" {
+                if response.status.lowercased() == NodeSharingConstants.successStatus {
                     completionHandler(true, nil)
                     return
                 } else {
@@ -245,7 +256,7 @@ class NodeSharingManager {
                 let decoder = JSONDecoder()
                 let response = try decoder.decode(ESPCloudResponse.self, from: response)
                 // Check for success in response
-                if response.status.lowercased() == "success" {
+                if response.status.lowercased() == NodeSharingConstants.successStatus {
                     completionHandler(true, nil)
                     return
                 } else {

@@ -32,13 +32,13 @@ class EditNodeGroupViewController: UIViewController {
     var remainingNodes: [Node] = []
     var singleDeviceNodeCount = 0
     var currentNodeGroup: NodeGroup!
-    var emailField: UITextField?
+    private let removeGroupFooterButton = UIButton(type: .system)
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBarController?.tabBar.isHidden = true
         #if ESPRainMakerMatter
-        self.shareButton.setTitle("Share", for: .normal)
+        self.hideTopBarRemoveButton()
         #else
         self.shareButton.isHidden = true
         #endif
@@ -52,6 +52,7 @@ class EditNodeGroupViewController: UIViewController {
         getSingleDeviceNodeCount()
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
         collectionView.collectionViewLayout = GroupDevicesFlowLayout()
+        setupBottomRemoveButton()
         // Add name of current group in label
         nameLabel.text = currentNodeGroup.group_name ?? ""
     }
@@ -61,6 +62,7 @@ class EditNodeGroupViewController: UIViewController {
     @IBAction func removeGroupButtonPressed(_: Any) {
         // Add confirmation alert before removing node group
         let alertController = UIAlertController(title: "Remove", message: "Are you sure you want to remove this group?", preferredStyle: .alert)
+        alertController.view.tintColor = UIColor(hexString: "#8265E3")
         let cancelAction = UIAlertAction(title: "No", style: .default, handler: nil)
         let confirmAction = UIAlertAction(title: "Yes", style: .destructive) { _ in
             Utility.showLoader(message: "Removing group...", view: self.view)
@@ -94,6 +96,7 @@ class EditNodeGroupViewController: UIViewController {
     @IBAction func nameButtonPressed(_: Any) {
         // Open dialog box for renaming the group
         let input = UIAlertController(title: "Enter new name", message: "", preferredStyle: .alert)
+        input.view.tintColor = UIColor(hexString: "#8265E3")
         // Add textfield for entering new name of the group
         input.addTextField { textField in
             textField.text = self.currentNodeGroup.group_name ?? ""
@@ -140,36 +143,8 @@ class EditNodeGroupViewController: UIViewController {
     
     #if ESPRainMakerMatter
     @IBAction func shareButtonPressed(_ sender: Any) {
-        let alert = UIAlertController(title: "Add member", message: "", preferredStyle: .alert)
-        alert.addTextField { emailIdField in
-            self.emailField = emailIdField
-            self.emailField?.keyboardType = .emailAddress
-            emailIdField.placeholder = ESPMatterConstants.email
-        }
-        alert.addAction(UIAlertAction(title: ESPMatterConstants.cancelTxt, style: .destructive, handler: nil))
-        alert.addAction(UIAlertAction(title: ESPMatterConstants.sendRequestTxt, style: .default) { _ in
-            if let email = self.emailField?.text, email.count > 0, let group = self.currentNodeGroup, let groupId = group.group_id, let groupName = group.group_name {
-                Utility.showLoader(message: ESPMatterConstants.sharingGroupMsg, view: self.view)
-                NodeGroupSharingManager.shared.shareNodeGroup(groupId: groupId, groupName: groupName, userName: email, isPrimary: false) { data in
-                    Utility.hideLoader(view: self.view)
-                    if let data = data, let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = response[ESPMatterConstants.status] as? String {
-                        if status.lowercased() == ESPMatterConstants.success {
-                            self.alertUser(title: ESPMatterConstants.emptyString,
-                                           message: ESPMatterConstants.groupShareSuccessMsg,
-                                           buttonTitle: ESPMatterConstants.okTxt,
-                                           callback: {})
-                        } else if let errorDescription = response[ESPMatterConstants.description] as? String {
-                            self.showGroupSharingFailedDialog(message: errorDescription)
-                        } else {
-                            self.showGroupSharingFailedDialog(message: ESPMatterConstants.groupShareFailedMsg)
-                        }
-                    } else {
-                        self.showGroupSharingFailedDialog(message: ESPMatterConstants.groupShareFailedMsg)
-                    }
-                }
-            }
-        })
-        self.present(alert, animated: true)
+        let sharingDetailsVC = GroupSharingDetailsViewController(group: currentNodeGroup)
+        navigationController?.pushViewController(sharingDetailsVC, animated: true)
     }
     #endif
     
@@ -227,6 +202,40 @@ class EditNodeGroupViewController: UIViewController {
             }
         }
         remainingNodes = nodeList
+    }
+
+    private func hideTopBarRemoveButton() {
+        guard let topBarView = shareButton.superview else { return }
+        for case let button as BarButton in topBarView.subviews where button !== shareButton {
+            if button.currentTitle == "Remove" {
+                button.isHidden = true
+                button.isEnabled = false
+                break
+            }
+        }
+    }
+
+    private func setupBottomRemoveButton() {
+        removeGroupFooterButton.translatesAutoresizingMaskIntoConstraints = false
+        removeGroupFooterButton.setTitle("Remove Group", for: .normal)
+        removeGroupFooterButton.setTitleColor(UIColor(hexString: "#F45C10"), for: .normal)
+        removeGroupFooterButton.backgroundColor = UIColor(hexString: "#FFECE4")
+        removeGroupFooterButton.layer.cornerRadius = 10.0
+        removeGroupFooterButton.layer.borderWidth = 2.0
+        removeGroupFooterButton.layer.borderColor = UIColor(hexString: "#F45C10").cgColor
+        removeGroupFooterButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0, weight: .semibold)
+        removeGroupFooterButton.setImage(UIImage(named: "trash"), for: .normal)
+        removeGroupFooterButton.tintColor = UIColor(hexString: "#F45C10")
+        removeGroupFooterButton.semanticContentAttribute = .forceRightToLeft
+        removeGroupFooterButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: -6)
+        removeGroupFooterButton.addTarget(self, action: #selector(removeGroupButtonPressed(_:)), for: .touchUpInside)
+        view.addSubview(removeGroupFooterButton)
+        NSLayoutConstraint.activate([
+            removeGroupFooterButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16.0),
+            removeGroupFooterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16.0),
+            removeGroupFooterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12.0),
+            removeGroupFooterButton.heightAnchor.constraint(equalToConstant: 48.0)
+        ])
     }
 }
 
@@ -408,3 +417,606 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
         }
     }
 }
+
+#if ESPRainMakerMatter
+private enum GroupSharingSection: Int, CaseIterable {
+    case overview
+    case sharedUsers
+}
+
+private struct GroupSharingRequestRow {
+    let requestId: String
+    let sharedWith: String
+    let requestTimestamp: Int
+}
+
+final class GroupSharingDetailsViewController: UIViewController {
+    private enum UIConstants {
+        static let cardCornerRadius: CGFloat = 10.0
+        static let cardBorderWidth: CGFloat = 0.5
+        static let cardHorizontalInset: CGFloat = 0.0
+        static let cardVerticalInset: CGFloat = 0.0
+        static let rowHeight: CGFloat = 56.0
+        static let pendingHeaderRowHeight: CGFloat = 40.0
+        static let headerHeight: CGFloat = 50.0
+        static let sectionSpacing: CGFloat = 20.0
+        static let addMemberTextColor = UIColor(hexString: "#8265E3")
+        static let appToggleOnColor = UIColor(hexString: "#8265E3")
+    }
+
+    private let group: NodeGroup
+    private let tableView = UITableView(frame: .zero, style: .plain)
+    private let refreshControl = UIRefreshControl()
+    private let topBarView = TopBarView()
+    private let topBarTitle = BarTitle()
+    private let backButton = BarButton()
+    private let topBarBottomLine = UIView()
+    private var canManageSharing = false
+    private var sharedUsers: [String] = []
+    private var pendingRequests: [GroupSharingRequestRow] = []
+    private var isLoading = false
+    private var collapsedSections = [false, false]
+
+    init(group: NodeGroup) {
+        self.group = group
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        return nil
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        tabBarController?.tabBar.isHidden = true
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        configureTopBar()
+        configureTableView()
+        refreshData()
+    }
+
+    private func configureTopBar() {
+        topBarView.translatesAutoresizingMaskIntoConstraints = false
+        topBarTitle.translatesAutoresizingMaskIntoConstraints = false
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        topBarBottomLine.translatesAutoresizingMaskIntoConstraints = false
+
+        topBarTitle.text = group.group_name ?? NodeGroupSharingConstants.titleGroupDetails
+        topBarTitle.font = UIFont.systemFont(ofSize: 17.0, weight: .semibold)
+        topBarTitle.textAlignment = .center
+
+        backButton.setTitle("Back", for: .normal)
+        backButton.contentHorizontalAlignment = .left
+        backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
+
+        view.addSubview(topBarView)
+        topBarView.addSubview(topBarTitle)
+        topBarView.addSubview(backButton)
+        topBarView.addSubview(topBarBottomLine)
+        topBarBottomLine.backgroundColor = UIColor(white: 0.67, alpha: 1.0)
+
+        let proportionalHeightConstraint = topBarView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.107)
+        proportionalHeightConstraint.priority = .required
+
+        NSLayoutConstraint.activate([
+            topBarView.topAnchor.constraint(equalTo: view.topAnchor),
+            topBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            topBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            proportionalHeightConstraint,
+            topBarView.heightAnchor.constraint(lessThanOrEqualToConstant: 96.0),
+
+            topBarTitle.centerXAnchor.constraint(equalTo: topBarView.centerXAnchor),
+            topBarTitle.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: -14.0),
+
+            backButton.leadingAnchor.constraint(equalTo: topBarView.leadingAnchor, constant: 16.0),
+            backButton.centerYAnchor.constraint(equalTo: topBarTitle.centerYAnchor),
+            backButton.widthAnchor.constraint(equalToConstant: 70.0),
+            backButton.heightAnchor.constraint(equalToConstant: 50.0),
+
+            topBarBottomLine.leadingAnchor.constraint(equalTo: topBarView.leadingAnchor),
+            topBarBottomLine.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor),
+            topBarBottomLine.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor),
+            topBarBottomLine.heightAnchor.constraint(equalToConstant: 1.0)
+        ])
+    }
+
+    private func configureTableView() {
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(UINib(nibName: "NodeDetailsHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "nodeDetailsHV")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "GroupSharingCell")
+        tableView.register(UINib(nibName: "MembersInfoTableViewCell", bundle: nil), forCellReuseIdentifier: "membersInfoTVC")
+        tableView.register(UINib(nibName: "SharingTableViewCell", bundle: nil), forCellReuseIdentifier: "sharingTVC")
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
+        tableView.tableFooterView = UIView()
+        tableView.sectionHeaderHeight = UITableView.automaticDimension
+        tableView.estimatedSectionHeaderHeight = UIConstants.headerHeight
+        tableView.estimatedRowHeight = 70.0
+        tableView.rowHeight = UIConstants.rowHeight
+        if #available(iOS 15.0, *) {
+            tableView.sectionHeaderTopPadding = 0
+        }
+        refreshControl.addTarget(self, action: #selector(handlePullToRefresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        view.addSubview(tableView)
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 20.0),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32.0),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32.0),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+
+    @objc
+    private func backButtonPressed() {
+        navigationController?.popViewController(animated: true)
+    }
+
+    @objc
+    private func handlePullToRefresh() {
+        refreshData()
+    }
+
+    private func refreshData() {
+        guard !isLoading else { return }
+        isLoading = true
+        Utility.showLoader(message: NodeGroupSharingConstants.fetchingSharingDetailsMsg, view: view)
+
+        let group = DispatchGroup()
+        var sharingData: Data?
+        var requestData: Data?
+
+        group.enter()
+        NodeGroupSharingManager.shared.getNodeGroupSharing(groupId: self.group.group_id) { data in
+            sharingData = data
+            group.leave()
+        }
+
+        group.enter()
+        NodeGroupSharingManager.shared.getNodeGroupSharingRequests(isPrimary: true) { data in
+            requestData = data
+            group.leave()
+        }
+
+        group.notify(queue: .main) {
+            Utility.hideLoader(view: self.view)
+            self.refreshControl.endRefreshing()
+            self.isLoading = false
+            self.applySharingData(sharingData)
+            self.applyPendingRequestData(requestData)
+            self.tableView.reloadData()
+        }
+    }
+
+    private func applySharingData(_ data: Data?) {
+        sharedUsers.removeAll()
+        canManageSharing = false
+        guard
+            let data = data,
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let groupSharing = json["group_sharing"] as? [[String: Any]],
+            let item = groupSharing.first,
+            let users = item["users"] as? [String: Any]
+        else {
+            return
+        }
+
+        let currentUser = User.shared.userInfo.email
+        let primaryUsers = users["primary"] as? [String] ?? []
+        let secondaryUsers = users["secondary"] as? [String] ?? []
+
+        canManageSharing = primaryUsers.contains(currentUser)
+        if canManageSharing {
+            let usersToShow = (primaryUsers + secondaryUsers).filter { $0 != currentUser }
+            sharedUsers = Array(Set(usersToShow)).sorted()
+        } else {
+            sharedUsers = Array(Set(primaryUsers)).sorted()
+        }
+    }
+
+    private func applyPendingRequestData(_ data: Data?) {
+        pendingRequests.removeAll()
+        guard
+            let data = data,
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let sharingRequests = json["sharing_requests"] as? [[String: Any]],
+            let groupId = group.group_id
+        else {
+            return
+        }
+
+        let currentUser = User.shared.userInfo.email
+        for request in sharingRequests {
+            let requestStatus = (request["request_status"] as? String ?? "").lowercased()
+            guard requestStatus == NodeGroupSharingConstants.statusPending else { continue }
+            guard let groupIds = request["group_ids"] as? [String], groupIds.contains(groupId) else { continue }
+            guard let sharedBy = request["primary_user_name"] as? String, sharedBy == currentUser else { continue }
+            guard let requestId = request["request_id"] as? String else { continue }
+            let sharedWith = request["user_name"] as? String ?? NodeGroupSharingConstants.unknownUser
+            let requestTimestamp = request["request_timestamp"] as? Int ?? 0
+            pendingRequests.append(GroupSharingRequestRow(requestId: requestId, sharedWith: sharedWith, requestTimestamp: requestTimestamp))
+        }
+    }
+
+    private func presentAddMemberPrompt() {
+        let alert = UIAlertController(title: NodeGroupSharingConstants.titleAddMember, message: nil, preferredStyle: .alert)
+        alert.view.tintColor = UIColor(hexString: "#8265E3")
+        let grantSwitch = UISwitch()
+        grantSwitch.onTintColor = UIConstants.appToggleOnColor
+
+        alert.addTextField { field in
+            field.keyboardType = .emailAddress
+            field.placeholder = NodeGroupSharingConstants.usernamePlaceholder
+        }
+        alert.addTextField { field in
+            field.text = "Grant full access"
+            field.clearButtonMode = .never
+            field.rightView = grantSwitch
+            field.rightViewMode = .always
+        }
+
+        alert.addAction(UIAlertAction(title: ESPMatterConstants.cancelTxt, style: .cancel))
+        alert.addAction(UIAlertAction(title: ESPMatterConstants.shareTxt, style: .default) { _ in
+            guard
+                let email = alert.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+                !email.isEmpty,
+                let groupId = self.group.group_id,
+                let groupName = self.group.group_name
+            else {
+                return
+            }
+            self.sendGroupShareRequest(email: email, groupId: groupId, groupName: groupName, isPrimary: grantSwitch.isOn)
+        })
+        present(alert, animated: true)
+    }
+
+    private func sendGroupShareRequest(email: String, groupId: String, groupName: String, isPrimary: Bool) {
+        Utility.showLoader(message: NodeGroupSharingConstants.sharingGroupMsg, view: self.view)
+        NodeGroupSharingManager.shared.shareNodeGroup(groupId: groupId, groupName: groupName, userName: email, isPrimary: isPrimary) { data in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                if let data = data,
+                   let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let status = response[ESPMatterConstants.status] as? String,
+                   status.lowercased() == ESPMatterConstants.success {
+                    self.refreshData()
+                    return
+                }
+                let response = (data.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }) ?? [:]
+                let message = (response[Constants.descriptionKey] as? String) ?? NodeGroupSharingConstants.groupShareFailedMsg
+                Utility.showToastMessage(view: self.view, message: message, duration: 5.0)
+            }
+        }
+    }
+
+    private func revokeSharing(forEmail email: String) {
+        guard let groupId = group.group_id else { return }
+        Utility.showLoader(message: NodeGroupSharingConstants.revokingRequestMsg, view: view)
+        NodeGroupSharingManager.shared.revokeAccess(groupId: groupId, email: email) { success, message in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                if success {
+                    self.refreshData()
+                } else {
+                    Utility.showToastMessage(view: self.view, message: message ?? NodeGroupSharingConstants.revokeRequestFailedMsg, duration: 5.0)
+                }
+            }
+        }
+    }
+
+    private func cancelPendingRequest(requestId: String) {
+        Utility.showLoader(message: NodeGroupSharingConstants.cancellingRequestMsg, view: view)
+        NodeGroupSharingManager.shared.deleteRequest(requestId: requestId) { success, message in
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                if success {
+                    self.refreshData()
+                } else {
+                    Utility.showToastMessage(view: self.view, message: message ?? NodeGroupSharingConstants.cancelRequestFailedMsg, duration: 5.0)
+                }
+            }
+        }
+    }
+
+    private func remainingDays(for requestTimestamp: Int) -> Int {
+        guard requestTimestamp > 0 else { return -1 }
+        let requestDate = Date(timeIntervalSince1970: TimeInterval(requestTimestamp))
+        let calendar = Calendar.current
+        let startOfRequestDate = calendar.startOfDay(for: requestDate)
+        let startOfToday = calendar.startOfDay(for: Date())
+        let elapsedDays = calendar.dateComponents([.day], from: startOfRequestDate, to: startOfToday).day ?? 0
+        return 7 - elapsedDays
+    }
+
+    @objc
+    private func pendingCancelButtonPressed(_ sender: UIButton) {
+        guard let requestId = sender.accessibilityIdentifier, !requestId.isEmpty else { return }
+        presentConfirmationAlert(
+            title: ESPMatterConstants.cancelTxt,
+            message: NodeGroupSharingConstants.cancelGroupSharingRequestConfirmationMsg
+        ) {
+            self.cancelPendingRequest(requestId: requestId)
+        }
+    }
+
+    @objc
+    private func approvedRemoveButtonPressed(_ sender: UIButton) {
+        guard let email = sender.accessibilityIdentifier, !email.isEmpty else { return }
+        presentConfirmationAlert(
+            title: ESPMatterConstants.revoke,
+            message: NodeGroupSharingConstants.revokeGroupSharingAccessConfirmationMsg
+        ) {
+            self.revokeSharing(forEmail: email)
+        }
+    }
+
+    private func presentConfirmationAlert(title: String, message: String, onConfirm: @escaping () -> Void) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.view.tintColor = UIColor(hexString: "#8265E3")
+        alert.addAction(UIAlertAction(title: ESPMatterConstants.no, style: .cancel))
+        alert.addAction(UIAlertAction(title: ESPMatterConstants.yes, style: .destructive) { _ in
+            onConfirm()
+        })
+        present(alert, animated: true)
+    }
+
+    private func applyCardStyle(to cell: UITableViewCell) {
+        cell.backgroundColor = .clear
+        cell.contentView.backgroundColor = .white
+        cell.contentView.layer.cornerRadius = UIConstants.cardCornerRadius
+        cell.contentView.layer.borderWidth = UIConstants.cardBorderWidth
+        cell.contentView.layer.borderColor = UIColor.lightGray.cgColor
+        cell.contentView.layer.masksToBounds = true
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 16.0, weight: .regular)
+        cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 13.0, weight: .regular)
+    }
+
+    private enum SharedSectionRow {
+        case user(String)
+        case addMember
+        case pendingHeader
+        case pendingRequest(GroupSharingRequestRow)
+    }
+
+    private func sharedSectionRows() -> [SharedSectionRow] {
+        var rows: [SharedSectionRow] = []
+
+        if !sharedUsers.isEmpty {
+            rows.append(contentsOf: sharedUsers.map { .user($0) })
+        }
+
+        if canManageSharing {
+            rows.append(.addMember)
+            if !pendingRequests.isEmpty {
+                rows.append(.pendingHeader)
+                rows.append(contentsOf: pendingRequests.map { .pendingRequest($0) })
+            }
+        }
+        return rows
+    }
+}
+
+extension GroupSharingDetailsViewController: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return GroupSharingSection.allCases.count
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard let section = GroupSharingSection(rawValue: section) else { return 0 }
+        if collapsedSections[section.rawValue] {
+            return 0
+        }
+        switch section {
+        case .overview:
+            return 2
+        case .sharedUsers:
+            return sharedSectionRows().count
+        }
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let section = GroupSharingSection(rawValue: indexPath.section) else {
+            return UITableViewCell(style: .default, reuseIdentifier: nil)
+        }
+        switch section {
+        case .overview:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "membersInfoTVC", for: indexPath) as! MembersInfoTableViewCell
+            cell.selectionStyle = .none
+            cell.removeMemberButton.isHidden = true
+            cell.timeStampLabel.isHidden = true
+            cell.secondaryUserLabel.textColor = .label
+            if indexPath.row == 0 {
+                cell.secondaryUserLabel.text = "Name: \(group.group_name ?? "NA")"
+            } else {
+                let isMatter = group.is_matter ?? false
+                cell.secondaryUserLabel.text = "Matter Fabric: \(isMatter ? "Yes" : "No")"
+            }
+            return cell
+        case .sharedUsers:
+            let rows = sharedSectionRows()
+            guard indexPath.row < rows.count else {
+                return UITableViewCell(style: .default, reuseIdentifier: nil)
+            }
+            switch rows[indexPath.row] {
+            case .pendingHeader:
+                let pendingHeaderCell = tableView.dequeueReusableCell(withIdentifier: "sharingTVC", for: indexPath) as! SharingTableViewCell
+                pendingHeaderCell.selectionStyle = .none
+                return pendingHeaderCell
+            case .addMember:
+                let addMemberCell = tableView.dequeueReusableCell(withIdentifier: "membersInfoTVC", for: indexPath) as! MembersInfoTableViewCell
+                addMemberCell.selectionStyle = .none
+                addMemberCell.removeMemberButton.isHidden = true
+                addMemberCell.timeStampLabel.isHidden = true
+                addMemberCell.secondaryUserLabel.text = NodeGroupSharingConstants.titleAddMember
+                addMemberCell.secondaryUserLabel.textColor = UIConstants.addMemberTextColor
+                return addMemberCell
+            case .user(let email):
+                let userCell = tableView.dequeueReusableCell(withIdentifier: "membersInfoTVC", for: indexPath) as! MembersInfoTableViewCell
+                userCell.selectionStyle = .none
+                userCell.secondaryUserLabel.text = email
+                userCell.secondaryUserLabel.textColor = .label
+                userCell.timeStampLabel.isHidden = true
+                if canManageSharing {
+                    userCell.removeMemberButton.isHidden = false
+                    userCell.removeButtonAction = { [weak self] in
+                        self?.presentConfirmationAlert(
+                            title: ESPMatterConstants.revoke,
+                            message: NodeGroupSharingConstants.revokeGroupSharingAccessConfirmationMsg
+                        ) {
+                            self?.revokeSharing(forEmail: email)
+                        }
+                    }
+                } else {
+                    userCell.removeMemberButton.isHidden = true
+                }
+                return userCell
+            case .pendingRequest(let request):
+                let pendingCell = tableView.dequeueReusableCell(withIdentifier: "membersInfoTVC", for: indexPath) as! MembersInfoTableViewCell
+                pendingCell.selectionStyle = .none
+                pendingCell.secondaryUserLabel.text = request.sharedWith
+                pendingCell.secondaryUserLabel.textColor = .label
+                let remaining = remainingDays(for: request.requestTimestamp)
+                if remaining == 0 {
+                    pendingCell.timeStampLabel.text = NodeGroupSharingConstants.expiresToday
+                    pendingCell.timeStampLabel.isHidden = false
+                } else if remaining > 0 && remaining <= 7 {
+                    pendingCell.timeStampLabel.text = NodeGroupSharingConstants.expiresInDays(remaining)
+                    pendingCell.timeStampLabel.isHidden = false
+                } else {
+                    pendingCell.timeStampLabel.isHidden = true
+                }
+                pendingCell.removeMemberButton.isHidden = false
+                pendingCell.removeButtonAction = { [weak self] in
+                    self?.presentConfirmationAlert(
+                        title: ESPMatterConstants.cancelTxt,
+                        message: NodeGroupSharingConstants.cancelGroupSharingRequestConfirmationMsg
+                    ) {
+                        self?.cancelPendingRequest(requestId: request.requestId)
+                    }
+                }
+                return pendingCell
+            }
+        }
+        return UITableViewCell(style: .default, reuseIdentifier: nil)
+    }
+}
+
+extension GroupSharingDetailsViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let section = GroupSharingSection(rawValue: indexPath.section) else { return }
+        if section == .sharedUsers {
+            let rows = sharedSectionRows()
+            if indexPath.row < rows.count, case .addMember = rows[indexPath.row] {
+                tableView.deselectRow(at: indexPath, animated: true)
+                presentAddMemberPrompt()
+            }
+        }
+    }
+
+    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard let section = GroupSharingSection(rawValue: indexPath.section) else {
+            return UIConstants.rowHeight
+        }
+        if section == .sharedUsers {
+            let rows = sharedSectionRows()
+            if indexPath.row < rows.count, case .pendingHeader = rows[indexPath.row] {
+                return UIConstants.pendingHeaderRowHeight
+            }
+        }
+        return UIConstants.rowHeight
+    }
+
+    func tableView(_: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard let resolvedSection = GroupSharingSection(rawValue: section) else { return 0 }
+        switch resolvedSection {
+        case .overview, .sharedUsers:
+            return UIConstants.headerHeight
+        }
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let resolvedSection = GroupSharingSection(rawValue: section) else { return nil }
+        let title: String
+        switch resolvedSection {
+        case .overview:
+            title = NodeGroupSharingConstants.titleGroupInfo
+        case .sharedUsers:
+            title = canManageSharing ? NodeGroupSharingConstants.titleSharedWith : NodeGroupSharingConstants.titleSharedBy
+        }
+
+        let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "nodeDetailsHV") as? NodeDetailsHeaderView
+        headerView?.headerLabel.text = title
+        headerView?.tintColor = .clear
+        let isCollapsed = collapsedSections[resolvedSection.rawValue]
+        headerView?.arrowImageView.isHidden = false
+        headerView?.arrowImageView.image = UIImage(named: isCollapsed ? "right_arrow_icon" : "down_arrow_icon")
+        headerView?.headerTappedAction = { [weak self] in
+            guard let self = self else { return }
+            self.collapsedSections[resolvedSection.rawValue].toggle()
+            self.tableView.reloadSections(IndexSet(integer: resolvedSection.rawValue), with: .automatic)
+        }
+        return headerView
+    }
+
+    func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
+        return UIConstants.sectionSpacing
+    }
+
+    func tableView(_: UITableView, viewForFooterInSection _: Int) -> UIView? {
+        let footerView = UIView()
+        footerView.backgroundColor = .clear
+        return footerView
+    }
+
+    func tableView(_: UITableView, willDisplay cell: UITableViewCell, forRowAt _: IndexPath) {
+        let inset = UIEdgeInsets(top: UIConstants.cardVerticalInset,
+                                 left: UIConstants.cardHorizontalInset,
+                                 bottom: UIConstants.cardVerticalInset,
+                                 right: UIConstants.cardHorizontalInset)
+        cell.separatorInset = inset
+        cell.layoutMargins = inset
+        cell.preservesSuperviewLayoutMargins = false
+    }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let section = GroupSharingSection(rawValue: indexPath.section) else { return nil }
+        guard section == .sharedUsers else {
+            return nil
+        }
+        let rows = sharedSectionRows()
+        guard indexPath.row < rows.count else { return nil }
+        switch rows[indexPath.row] {
+        case .user(let email):
+            guard canManageSharing else { return nil }
+            let action = UIContextualAction(style: .destructive, title: "Revoke") { _, _, completion in
+                self.presentConfirmationAlert(
+                    title: ESPMatterConstants.revoke,
+                    message: NodeGroupSharingConstants.revokeGroupSharingAccessConfirmationMsg
+                ) {
+                    self.revokeSharing(forEmail: email)
+                }
+                completion(true)
+            }
+            return UISwipeActionsConfiguration(actions: [action])
+        case .pendingRequest(let request):
+            guard canManageSharing else { return nil }
+            let action = UIContextualAction(style: .destructive, title: "Cancel") { _, _, completion in
+                self.presentConfirmationAlert(
+                    title: ESPMatterConstants.cancelTxt,
+                    message: NodeGroupSharingConstants.cancelGroupSharingRequestConfirmationMsg
+                ) {
+                    self.cancelPendingRequest(requestId: request.requestId)
+                }
+                completion(true)
+            }
+            return UISwipeActionsConfiguration(actions: [action])
+        default:
+            return nil
+        }
+    }
+}
+#endif

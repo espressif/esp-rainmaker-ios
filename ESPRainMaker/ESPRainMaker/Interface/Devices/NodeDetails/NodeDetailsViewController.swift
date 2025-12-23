@@ -21,6 +21,12 @@ import UIKit
 import Matter
 
 class NodeDetailsViewController: UIViewController {
+    private enum NodeSharingDisplayRole {
+        case primary
+        case secondary
+        case unavailable
+    }
+
     // Constants
     let systemServices = "System Services"
     let firmwareUpdate = "firmwareUpdate"
@@ -400,25 +406,24 @@ class NodeDetailsViewController: UIViewController {
             sharingIndex = index
             dataSource.append([])
             dataSource[index].append("Sharing")
-            if let primaryUsers = currentNode.primary {
-                if primaryUsers.contains(User.shared.userInfo.email) {
-                    // If user is primary displayed information about the user currently this node is shared with.
-                    dataSource[index][0] = "Shared With"
-                    if let secondaryUsers = currentNode.secondary {
-                        dataSource[index].append(contentsOf: secondaryUsers)
-                    }
-                    // Provided option to add new members.
-                    dataSource[index].append("Add Member")
-                    loadingIndicator.isHidden = false
-                    loadingIndicator.animate()
-                    loadingLabel.isHidden = false
-                    getSharingRequests()
-                } else {
-                    // If user is secondary displayed information about the primary user.
-                    dataSource[index][0] = "Shared by"
-                    dataSource[index].append(contentsOf: primaryUsers)
+            switch getNodeSharingDisplayRole() {
+            case .primary:
+                // If user is primary displayed information about the user currently this node is shared with.
+                dataSource[index][0] = "Shared With"
+                if let secondaryUsers = currentNode.secondary {
+                    dataSource[index].append(contentsOf: secondaryUsers)
                 }
-            } else {
+                // Provided option to add new members.
+                dataSource[index].append("Add Member")
+                loadingIndicator.isHidden = false
+                loadingIndicator.animate()
+                loadingLabel.isHidden = false
+                getSharingRequests()
+            case .secondary:
+                // If user is secondary displayed information about the primary user.
+                dataSource[index][0] = "Shared by"
+                dataSource[index].append(contentsOf: currentNode.primary ?? [])
+            case .unavailable:
                 // No sharing information is available
                 dataSource[index].append("Not Available")
             }
@@ -503,7 +508,7 @@ class NodeDetailsViewController: UIViewController {
             }
             if error != nil {
                 // Unable to collect sharing information for this particular node.
-                Utility.showToastMessage(view: self.view, message: "Unable to update current node details with error:\(error!.description).")
+                Utility.showToastMessage(view: self.view, message: error!.description)
                 return
             }
             // Navigate to node details view controller
@@ -605,7 +610,7 @@ class NodeDetailsViewController: UIViewController {
                 return
             }
             DispatchQueue.main.async {
-                self.view.makeToast("Failed to share node with error: \(apiError.description)", duration: 5.0, position: ToastManager.shared.position, title: nil, image: nil, style: ToastManager.shared.style, completion: nil)
+                self.view.makeToast(apiError.description, duration: 5.0, position: ToastManager.shared.position, title: nil, image: nil, style: ToastManager.shared.style, completion: nil)
             }
         }
     }
@@ -624,7 +629,7 @@ class NodeDetailsViewController: UIViewController {
                 return
             }
             DispatchQueue.main.async {
-                Utility.showToastMessage(view: self.view, message: "Failed to delete node sharing request with error: \(apiError.description)")
+                Utility.showToastMessage(view: self.view, message: apiError.description)
             }
         }
     }
@@ -762,8 +767,10 @@ extension NodeDetailsViewController: UITableViewDataSource {
                                 Utility.hideLoader(view: self.view)
                                 guard let apiError = error else {
                                     if success {
-                                        if let index = self.currentNode.secondary!.firstIndex(of: cell.secondaryUserLabel.text ?? "") {
-                                            self.currentNode.secondary!.remove(at: index)
+                                        if var secondaryUsers = self.currentNode.secondary,
+                                           let index = secondaryUsers.firstIndex(of: cell.secondaryUserLabel.text ?? "") {
+                                            secondaryUsers.remove(at: index)
+                                            self.currentNode.secondary = secondaryUsers
                                         }
                                         self.dataSource[self.sharingIndex].remove(at: indexPath.row + 1)
                                         DispatchQueue.main.async {
@@ -771,13 +778,13 @@ extension NodeDetailsViewController: UITableViewDataSource {
                                         }
                                     } else {
                                         DispatchQueue.main.async {
-                                            Utility.showToastMessage(view: self.view, message: "Failed to delete node sharing with error: Unknown error.")
+                                            Utility.showToastMessage(view: self.view, message: "Failed to delete node sharing.")
                                         }
                                     }
                                     return
                                 }
                                 DispatchQueue.main.async {
-                                    Utility.showToastMessage(view: self.view, message: "Failed to delete node sharing with error: \(apiError.description)")
+                                    Utility.showToastMessage(view: self.view, message: apiError.description)
                                 }
                             }
                         }
@@ -844,6 +851,12 @@ extension NodeDetailsViewController: UITableViewDataSource {
 
             // Provide different cell for allowing timezone configuration
             if title == "Timezone" {
+                guard let timeZoneParam = timeZoneParam else {
+                    let fallbackCell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailsTVC", for: indexPath) as! NodeDetailsTableViewCell
+                    fallbackCell.titleLabel.text = title
+                    fallbackCell.detailLabel.text = String(value.dropFirst(title.count + 1))
+                    return fallbackCell
+                }
                 let cell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
                 object_setClass(cell, TimeZoneTableViewCell.self)
                 let timeZoneCell = cell as! TimeZoneTableViewCell
@@ -907,6 +920,30 @@ extension NodeDetailsViewController: SystemServiceTableViewCellDelegate {
 
 //MARK: Node deletion APIs
 extension NodeDetailsViewController {
+    private func getNodeSharingDisplayRole() -> NodeSharingDisplayRole {
+        let userEmail = User.shared.userInfo.email
+        let primaryUsers = currentNode.primary ?? []
+        let secondaryUsers = currentNode.secondary ?? []
+
+        if primaryUsers.contains(userEmail) {
+            return .primary
+        }
+
+        if secondaryUsers.contains(userEmail) {
+            return .secondary
+        }
+
+        // Fallback for cases where only secondary users are present.
+        if primaryUsers.isEmpty, !secondaryUsers.isEmpty {
+            return .primary
+        }
+
+        if !primaryUsers.isEmpty {
+            return .secondary
+        }
+
+        return .unavailable
+    }
     
     /// Remove device information from group metadata
     /// Remove device from rainmaker cloud

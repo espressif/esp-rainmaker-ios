@@ -39,8 +39,8 @@ class NodeGroupSharingRequestsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBarController?.tabBar.isHidden = true
-        title = "Group Sharing"
-        self.topBarTitle.text = "Group Sharing"
+        title = NodeGroupSharingConstants.titleGroupSharing
+        self.topBarTitle.text = NodeGroupSharingConstants.titleGroupSharing
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.addCustomBottomLine(color: .black, height: 0.5)
         requestsTable.register(UINib(nibName: RequestSentCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: RequestSentCell.reuseIdentifier)
@@ -91,7 +91,7 @@ class NodeGroupSharingRequestsViewController: UIViewController {
                             acceptedByUserRequests: Bool = true,
                             nodeGroupSharingRequests: Bool = true,
                             acceptedSharingRequests: Bool = true) {
-        Utility.showLoader(message: "Fetching sharing requests...", view: self.view)
+        Utility.showLoader(message: NodeGroupSharingConstants.fetchingSharingRequestsMsg, view: self.view)
         self.fetchNodeGroupSharingRequestsSent(skip: !fetchNodeGroupSharingRequests) {
             self.getAcceptedByUserRequests(skip: !acceptedByUserRequests) {
                 self.getNodeGroupSharingRequests(skip: !nodeGroupSharingRequests) {
@@ -127,6 +127,7 @@ extension NodeGroupSharingRequestsViewController {
     private func fetchNodeGroupSharingRequestsSent(skip: Bool = false, completion: @escaping () -> Void) {
         if skip {
             completion()
+            return
         }
         NodeGroupSharingManager.shared.getNodeGroupSharingRequests(isPrimary: true) { data in
             if let data = data {
@@ -149,7 +150,7 @@ extension NodeGroupSharingRequestsViewController {
         var sRequets = [ESPNodeGroupSharingRequest]()
         if let sharingRequests = self.fabricDetails.getNodeGroupSharingRequestsSent(), let requests = sharingRequests.sharingRequests {
             for sharingRequest in requests {
-                if let primaryUser = sharingRequest.sharedBy, primaryUser == User.shared.userInfo.email, let groupIds = sharingRequest.groupIds, let sharedWith = sharingRequest.sharedWith, let requestStatus = sharingRequest.requestStatus, requestStatus.lowercased() == ESPMatterConstants.pending.lowercased() {
+                if let primaryUser = sharingRequest.sharedBy, primaryUser == User.shared.userInfo.email, let groupIds = sharingRequest.groupIds, let sharedWith = sharingRequest.sharedWith, let requestStatus = sharingRequest.requestStatus, requestStatus.lowercased() == NodeGroupSharingConstants.statusPending {
                     var groupName: String? = nil
                     if let metadata = sharingRequest.metadata, let name = metadata[ESPMatterConstants.groupName] as? String {
                         groupName = name
@@ -168,6 +169,7 @@ extension NodeGroupSharingRequestsViewController {
     private func getAcceptedByUserRequests(skip: Bool = false, completion: @escaping () -> Void) {
         if skip {
             completion()
+            return
         }
         NodeGroupSharingManager.shared.getNodeGroupSharing { sharedData in
             if let sharedData = sharedData, let response = try? JSONSerialization.jsonObject(with: sharedData) as? [String: Any], let status = response[ESPMatterConstants.status] as? String, status.lowercased() == ESPMatterConstants.failure {
@@ -203,6 +205,7 @@ extension NodeGroupSharingRequestsViewController {
     private func getNodeGroupSharingRequests(skip: Bool = false, completion: @escaping () -> Void) {
         if skip {
             completion()
+            return
         }
         NodeGroupSharingManager.shared.getNodeGroupSharingRequests(isPrimary: false) { data in
             if let data = data {
@@ -227,7 +230,7 @@ extension NodeGroupSharingRequestsViewController {
         if let sharingRequests = self.fabricDetails.getNodeGroupSharingRequestsReceived() {
             if let requests = sharingRequests.sharingRequests, requests.count > 0 {
                 for request in requests {
-                    if let sharedWith = request.sharedWith, sharedWith == User.shared.userInfo.email, let sharedBy = request.sharedBy, let requestId = request.requestId, let status = request.requestStatus, status.lowercased() == ESPMatterConstants.pending {
+                    if let sharedWith = request.sharedWith, sharedWith == User.shared.userInfo.email, let sharedBy = request.sharedBy, let requestId = request.requestId, let status = request.requestStatus, status.lowercased() == NodeGroupSharingConstants.statusPending {
                         var groupName: String? = nil
                         if let metadata = request.metadata, let name = metadata[ESPMatterConstants.groupName] as? String {
                             groupName = name
@@ -245,6 +248,7 @@ extension NodeGroupSharingRequestsViewController {
     private func getAcceptedSharingRequests(skip: Bool = false, completion: @escaping () -> Void) {
         if skip {
             completion()
+            return
         }
         NodeGroupSharingManager.shared.getNodeGroupSharing { sharedData in
             if let sharedData = sharedData {
@@ -410,8 +414,8 @@ extension NodeGroupSharingRequestsViewController: RequestReceivedAction {
     /// - Parameter request: request
     func acceptRequest(request: ESPNodeGroupSharingRequest?) {
         if let request = request, let requestId = request.requestId {
-            Utility.showLoader(message: "Accepting request...", view: self.view)
-            NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestId, accept: true) { result in
+            Utility.showLoader(message: NodeGroupSharingConstants.acceptingRequestMsg, view: self.view)
+            NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestId, accept: true) { result, message in
                 Utility.hideLoader(view: self.view)
                 if result {
                     User.shared.updateDeviceList = true
@@ -421,7 +425,7 @@ extension NodeGroupSharingRequestsViewController: RequestReceivedAction {
                                               acceptedSharingRequests: true)
                 } else {
                     self.showErrorAlert(title: ESPMatterConstants.failureTxt,
-                                        message: ESPMatterConstants.requestAcceptFailedMsg,
+                                        message: message ?? NodeGroupSharingConstants.requestAcceptFailedMsg,
                                         buttonTitle: ESPMatterConstants.okTxt,
                                         callback: {})
                 }
@@ -433,13 +437,13 @@ extension NodeGroupSharingRequestsViewController: RequestReceivedAction {
     /// - Parameter request: sharing request
     func declineRequest(request: ESPNodeGroupSharingRequest?) {
         if let request = request, let requestId = request.requestId {
-            Utility.showLoader(message: "Declining request...", view: self.view)
-            NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestId, accept: false) { result in
+            Utility.showLoader(message: NodeGroupSharingConstants.decliningRequestMsg, view: self.view)
+            NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestId, accept: false) { result, message in
                 Utility.hideLoader(view: self.view)
                 if result {
                     User.shared.updateDeviceList = true
                     self.showErrorAlert(title: ESPMatterConstants.successTxt,
-                                        message: ESPMatterConstants.requestDeclinedMsg,
+                                        message: NodeGroupSharingConstants.requestDeclinedMsg,
                                         buttonTitle: ESPMatterConstants.okTxt,
                                         callback: {
                         self.refreshSharingData(fetchNodeGroupSharingRequests: false,
@@ -449,7 +453,7 @@ extension NodeGroupSharingRequestsViewController: RequestReceivedAction {
                     })
                 } else {
                     self.showErrorAlert(title: ESPMatterConstants.failureTxt,
-                                        message: ESPMatterConstants.requestDeclinedMsg,
+                                        message: message ?? NodeGroupSharingConstants.requestDeclinedMsg,
                                         buttonTitle: ESPMatterConstants.okTxt,
                                         callback: {})
                 }
@@ -464,8 +468,8 @@ extension NodeGroupSharingRequestsViewController: RequestSentActionDelegate {
     func deleteSharing(groupId: String, sharedWith: String) {
         let noAction = UIAlertAction(title: ESPMatterConstants.noTxt, style: .default)
         let yesAction = UIAlertAction(title: ESPMatterConstants.yesTxt, style: .destructive, handler: { _ in
-            Utility.showLoader(message: ESPMatterConstants.revokingRequestMsg, view: self.view)
-            NodeGroupSharingManager.shared.revokeAccess(groupId: groupId, email: sharedWith) { result in
+            Utility.showLoader(message: NodeGroupSharingConstants.revokingRequestMsg, view: self.view)
+            NodeGroupSharingManager.shared.revokeAccess(groupId: groupId, email: sharedWith) { result, message in
                 Utility.hideLoader(view: self.view)
                 if result {
                     User.shared.updateDeviceList = true
@@ -474,11 +478,11 @@ extension NodeGroupSharingRequestsViewController: RequestSentActionDelegate {
                                               nodeGroupSharingRequests: false,
                                               acceptedSharingRequests: false)
                 } else {
-                    self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.revokeRequestFailedMsg, buttonTitle: ESPMatterConstants.okTxt) {}
+                    self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: message ?? NodeGroupSharingConstants.revokeRequestFailedMsg, buttonTitle: ESPMatterConstants.okTxt) {}
                 }
             }
         })
-        self.showAlertWithOptions(title: ESPMatterConstants.revokeRequestTxt, message: ESPMatterConstants.revokeRequestMsg, actions: [noAction, yesAction])
+        self.showAlertWithOptions(title: NodeGroupSharingConstants.revokeRequestTitle, message: NodeGroupSharingConstants.revokeGroupSharingAccessConfirmationMsg, actions: [noAction, yesAction])
     }
     
     /// Delete request created by user
@@ -486,8 +490,8 @@ extension NodeGroupSharingRequestsViewController: RequestSentActionDelegate {
     func deleteRequest(requestId: String) {
         let noAction = UIAlertAction(title: ESPMatterConstants.noTxt, style: .default)
         let yesAction = UIAlertAction(title: ESPMatterConstants.yesTxt, style: .destructive, handler: { _ in
-            Utility.showLoader(message: ESPMatterConstants.cancellingRequestMsg, view: self.view)
-            NodeGroupSharingManager.shared.deleteRequest(requestId: requestId) { result in
+            Utility.showLoader(message: NodeGroupSharingConstants.cancellingRequestMsg, view: self.view)
+            NodeGroupSharingManager.shared.deleteRequest(requestId: requestId) { result, message in
                 Utility.hideLoader(view: self.view)
                 if result {
                     User.shared.updateDeviceList = true
@@ -496,11 +500,11 @@ extension NodeGroupSharingRequestsViewController: RequestSentActionDelegate {
                                               nodeGroupSharingRequests: false,
                                               acceptedSharingRequests: false)
                 } else {
-                    self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.cancelRequestFailedMsg, buttonTitle: ESPMatterConstants.okTxt) {}
+                    self.showErrorAlert(title: ESPMatterConstants.failureTxt, message: message ?? NodeGroupSharingConstants.cancelRequestFailedMsg, buttonTitle: ESPMatterConstants.okTxt) {}
                 }
             }
         })
-        self.showAlertWithOptions(title: ESPMatterConstants.cancelRequestTxt, message: ESPMatterConstants.cancelRequestMsg, actions: [noAction, yesAction])
+        self.showAlertWithOptions(title: NodeGroupSharingConstants.cancelRequestTitle, message: NodeGroupSharingConstants.cancelGroupSharingRequestConfirmationMsg, actions: [noAction, yesAction])
     }
 }
 
@@ -514,7 +518,7 @@ extension NodeGroupSharingRequestsViewController: RequestAccpetedActionDelegate 
         let noAction = UIAlertAction(title: ESPMatterConstants.noTxt, style: .default)
         let yesAction = UIAlertAction(title: ESPMatterConstants.yesTxt, style: .destructive, handler: { _ in
             Utility.showLoader(message: ESPMatterConstants.removeGroupSharingMsg, view: self.view)
-            NodeGroupSharingManager.shared.revokeAccess(groupId: groupId, email: sharedWith) { result in
+            NodeGroupSharingManager.shared.revokeAccess(groupId: groupId, email: sharedWith) { result, message in
                 Utility.hideLoader(view: self.view)
                 if result {
                     User.shared.updateDeviceList = true
@@ -524,13 +528,13 @@ extension NodeGroupSharingRequestsViewController: RequestAccpetedActionDelegate 
                                               acceptedSharingRequests: true)
                 } else {
                     self.showErrorAlert(title: ESPMatterConstants.failureTxt,
-                                        message: ESPMatterConstants.revokeRequestFailedMsg,
+                                        message: message ?? NodeGroupSharingConstants.revokeRequestFailedMsg,
                                         buttonTitle: ESPMatterConstants.okTxt) {}
                 }
             }
         })
-        self.showAlertWithOptions(title: ESPMatterConstants.revokeRequestTxt,
-                                  message: ESPMatterConstants.revokeRequestMsg,
+        self.showAlertWithOptions(title: NodeGroupSharingConstants.revokeRequestTitle,
+                                  message: NodeGroupSharingConstants.revokeGroupSharingAccessConfirmationMsg,
                                   actions: [noAction, yesAction])
     }
 }
