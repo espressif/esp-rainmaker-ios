@@ -22,6 +22,7 @@ import UIKit
 // Enum containing different notification categories.
 enum ESPNotificationCategory: String {
     case addSharing = "ADD_SHARING"
+    case advertisement = "ADVERTISEMENT"
 }
 
 // Add Sharing Category with actions.
@@ -36,7 +37,8 @@ enum ESPNotificationsAddSharingCategory: String {
         let declineActions = UNNotificationAction(identifier: ESPNotificationsAddSharingCategory.decline.rawValue, title: "Decline", options: .destructive)
         
         let sharingRequestCategory = UNNotificationCategory(identifier: ESPNotificationCategory.addSharing.rawValue, actions: [acceptAction, declineActions], intentIdentifiers: [], hiddenPreviewsBodyPlaceholder: "", options: .customDismissAction)
+        let advertisementCategory = UNNotificationCategory(identifier: ESPNotificationCategory.advertisement.rawValue, actions: [], intentIdentifiers: [], options: .customDismissAction)
         let notficationCentre = UNUserNotificationCenter.current()
-        notficationCentre.setNotificationCategories([sharingRequestCategory])
+        notficationCentre.setNotificationCategories([sharingRequestCategory, advertisementCategory])
     }
 }
