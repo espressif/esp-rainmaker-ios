@@ -30,7 +30,7 @@ class ScheduleListViewController: UIViewController {
     private let refreshControl = UIRefreshControl()
     var scheduleList: [String] = []
 
-    // MARK: - Overriden methods
+    // MARK: - Overridden methods
 
     override func viewDidLoad() {
         super.viewDidLoad()

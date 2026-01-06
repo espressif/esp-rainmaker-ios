@@ -65,7 +65,7 @@ static const NSString * MTRCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
         return self;
     }
 
-    // Generate a keypair.  For now harcoded to 256 bits until the framework exposes this constant.
+    // Generate a keypair.  For now hardcoded to 256 bits until the framework exposes this constant.
     const size_t keySizeInBits = 256;
     CFErrorRef error = NULL;
     const NSDictionary * keygenParams = @{
@@ -111,7 +111,7 @@ static const NSString * MTRCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
 
 + (NSDictionary *)privateKeyCreationParams
 {
-    // For now harcoded to 256 bits until the framework exposes this constant.
+    // For now hardcoded to 256 bits until the framework exposes this constant.
     const size_t keySizeInBits = 256;
 
     return @{
@@ -204,7 +204,7 @@ static const NSString * MTRCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
 
 + (NSDictionary *)publicKeyCreationParams
 {
-    // For now harcoded to 256 bits until the framework exposes this constant.
+    // For now hardcoded to 256 bits until the framework exposes this constant.
     const size_t keySizeInBits = 256;
 
     return @{

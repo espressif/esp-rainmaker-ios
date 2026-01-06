@@ -25,7 +25,7 @@ class ScheduleDropDownTableViewCell: DropDownTableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        // Cutomised appearance of control element for schedule action
+        // Customised appearance of control element for schedule action
         checkButton.isHidden = false
         trailingSpaceConstraint.constant = 0
         leadingSpaceConstraint.constant = 30.0

@@ -46,7 +46,7 @@ class KeychainWrapper: NSObject {
      */
     func get(account: String) throws -> String? {
         if try KeychainOperations.shared.exists(account: account) {
-            if let data = try KeychainOperations.shared.retreive(account: account) {
+            if let data = try KeychainOperations.shared.retrieve(account: account) {
                 let value = String(decoding: data, as: UTF8.self)
                 return value
             }

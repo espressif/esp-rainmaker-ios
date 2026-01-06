@@ -53,7 +53,7 @@ For more details :
 
 - This feature allows discovering devices on local Wi-Fi network using Bonjour (mDNS) and controlling them using HTTP as per the [ESP Local Control](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/protocols/esp_local_ctrl.html) specifications.
 - Local Control ensures your devices are reachable even when your internet connection is poor or there is no internet over connected Wi-Fi.
-- Supports both secure and unsecure communication with device over local network.
+- Supports both secure and insecure communication with device over local network.
 
 Local Control feature is optional but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Local Control` key from `App Configuration` to `NO`.
 
@@ -133,7 +133,7 @@ Device automation is optional but enabled by default. It can be disabled from th
 
 ### Push Notifications
 
-ESPRainMaker app supports remote notifiations in order to notify app in realtime for any updates. Types of notification enabled in the app :
+ESPRainMaker app supports remote notifications in order to notify app in realtime for any updates. Types of notification enabled in the app :
 
 1. Alert notification: User will be updated by sending alert notification in case of below events:
    - A new node is added to the user.
@@ -182,7 +182,7 @@ OTA update is optional and disabled by default. It can be enabled from the `Conf
 
 - App now supports continuous update feature that allows users to move a slider continuously and see the changes reflect on the device in real-time as the slider is moved.
 - Continuous update are supported only for sliders and hue circle type of UI.
-- This feautre is configurable but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Continuous Updates` key from `App Configuration` to `NO`.
+- This feature is configurable but enabled by default. It can be disabled from the `Configuration.plist` by setting `Enable Continuous Updates` key from `App Configuration` to `NO`.
 - Minimum gap between two updates can be managed by setting `Continuous Update Interval` under `App Configuration` in `Configuration.plist`. This value is considered in milliseconds and acceptable value is in range 400 - 1000.
 
 ### App Widget
@@ -229,7 +229,7 @@ To support Custom Matter Fabric on the app do the following:
 Note: This app with ESPRainmakerMatter configuration cannot be run on iOS simulators.
 ```
 
-To build app for Rainmaker only devcies:
+To build app for Rainmaker only devices:
 - Open Xcode go to Scheme selection dropdown.
 - Select ESPRainmaker scheme.
 - Build/Run/Archive the app and it will be built without Matter support.
@@ -239,7 +239,7 @@ In order to build the Rainmaker only app for simulator user needs to do the foll
 - On Xcode select ESPRainmaker project from navigator.
 - Select General tab.
 - Scroll down to Frameworks, Libraries and Embedded Content
-- Delete Matter.farmework from the list.
+- Delete Matter.framework from the list.
 - User will be able to run the app on simulator.
 
 If user wants to rerun the app for Matter: 
@@ -281,7 +281,7 @@ Settings associated with provisioning a device can be modified in the `Configura
 | ESP Transport | String | Possible values: <br>**Both**(Default) : Supports both BLE and SoftAP device provisioning.<br>**SoftAP** : supports only SoftAP device provisioning.<br>**BLE** : supports only BLE device provisioning. |
 | BLE Device Prefix | String | Search for BLE devices with this prefix in name. |
 | ESP Allow Prefix Search | Bool | Prefix search allows you to filter available BLE device list based on prefix value.  |
-| ESP Security Mode | String | Possible values: <br>**Secure**(Default) : for secure/encrypted communication between device and app.<br>**Unsecure** : for unsecure/unencrypted communication between device and app.|
+| ESP Security Mode | String | Possible values: <br>**Secure**(Default) : for secure/encrypted communication between device and app.<br>**Insecure** : for insecure/unencrypted communication between device and app.|
 
 ## License
 

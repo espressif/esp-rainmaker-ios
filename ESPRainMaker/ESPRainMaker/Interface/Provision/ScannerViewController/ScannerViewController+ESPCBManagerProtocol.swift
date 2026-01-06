@@ -90,7 +90,7 @@ extension ScannerViewController: ESPCBManagerProtocol {
         }
     }
     
-    /// Handle BLE persmission status workflow
+    /// Handle BLE permission status workflow
     /// - Parameter cbStatus: BLE status
     func handleCBPermissionError(cbStatus: CBManagerState) {
         switch cbStatus {

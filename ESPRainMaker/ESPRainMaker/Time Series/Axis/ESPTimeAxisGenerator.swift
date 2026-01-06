@@ -86,7 +86,7 @@ struct ESPTimeAxisGenerator {
         return xModel
     }
     
-    // Method to get fromatted string from timestamp.
+    // Method to get formatted string from timestamp.
     private func getxAxisLabel(scalar: Double) -> String {
         let xAxisFormatter = ESPXAxisNameFormater(timeInterval: timeInterval, timezone: timezone)
         if scalar > endTime {

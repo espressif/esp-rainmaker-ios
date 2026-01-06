@@ -1,8 +1,8 @@
 .check_pre_commit_template:
   stage: check
-  image: $ESP_DOCS_ENV_IMAGE
-  extends:
-    - .before_script_minimal
+  image: python:3.8
+  tags:
+    - build
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:

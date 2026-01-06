@@ -49,7 +49,7 @@ class ScheduleViewController: UIViewController {
     
     weak var delegate: ServiceUpdateActionsDelegate?
 
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -478,8 +478,8 @@ class ScheduleViewController: UIViewController {
     }
     
     /// Sort devices in the following order [allowed devices, max reached devices, offline devices]
-    /// - Parameter availableDevices: list of avaiable devices
-    /// - Returns: list of avaiable devices after sorting
+    /// - Parameter availableDevices: list of available devices
+    /// - Returns: list of available devices after sorting
     private func sortDevices(availableDevices: [Device]) -> [Device] {
         var devices = [Device]()
         var availableCount = 0

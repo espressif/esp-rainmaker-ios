@@ -47,7 +47,7 @@ class NodeSharingManager {
     /// Method to get sharing details of the logged in user.
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func getSharingDetails(node: Node, completionHandler: @escaping (ESPNetworkError?) -> Void) {
         let url = Constants.sharing + "?node_id=" + (node.node_id ?? "")
         apiManager.genericAuthorizedJSONRequest(url: url, parameter: nil, method: .get) { response, error in
@@ -78,7 +78,7 @@ class NodeSharingManager {
     /// Method to remove sharing of node between users..
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func deleteSharing(forNode: Node, email: String, completionHandler: @escaping (Bool, ESPNetworkError?) -> Void) {
         let url = Constants.sharing + "?nodes=\(forNode.node_id ?? "")&user_name=\(email)"
         apiManager.genericAuthorizedDataRequest(url: url, parameter: nil, method: .delete) { result, error in
@@ -105,7 +105,7 @@ class NodeSharingManager {
     /// Method to create a new sharing request.
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func createSharingRequest(userName: String, node: Node, completionHandler: @escaping (SharingRequest?, ESPNetworkError?) -> Void) {
         var devicesList: [[String: String]] = [[:]]
         if let devices = node.devices {
@@ -143,7 +143,7 @@ class NodeSharingManager {
     /// Method to get all sharing request for the logged in user.
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func getSharingRequests(primaryUser: Bool, nextRequestID: String? = nil, completionHandler: @escaping ([SharingRequest]?, ESPNetworkError?) -> Void) {
         var sharingRequestURL = nodeSharingURL + "/requests?primary_user="
         if primaryUser {
@@ -208,7 +208,7 @@ class NodeSharingManager {
     /// Method to delete sharing request which are pending to be accepted.
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func deleteSharingRequest(request: SharingRequest, completionHandler: @escaping (Bool, ESPNetworkError?) -> Void) {
         apiManager.genericAuthorizedDataRequest(url: nodeSharingURL + "/requests?request_id=\(request.request_id)", parameter: nil, method: .delete) { result, error in
             guard let response = result else {
@@ -234,7 +234,7 @@ class NodeSharingManager {
     /// Method to update sharing requests for a user.
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func updateSharing(parameter: [String: Any], completionHandler: @escaping (Bool, ESPNetworkError?) -> Void) {
         apiManager.genericAuthorizedDataRequest(url: nodeSharingURL + "/requests", parameter: parameter, method: .put) { result, error in
             guard let response = result else {

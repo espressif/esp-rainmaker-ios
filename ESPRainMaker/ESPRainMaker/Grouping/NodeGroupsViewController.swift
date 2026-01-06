@@ -28,7 +28,7 @@ class NodeGroupsViewController: UIViewController {
     // Pull to refresh control
     private let refreshControl = UIRefreshControl()
 
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,7 +120,7 @@ class NodeGroupsViewController: UIViewController {
         editButton.isHidden = true
     }
 
-    // Method to show inital view based on group count
+    // Method to show initial view based on group count
     private func setupInitialView() {
         // Check if group count is more than zero.
         // Display group list in table view.

@@ -624,7 +624,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         }
     }
     
-    /// Set client only controller flow in tne app
+    /// Set client only controller flow in the app
     /// - Parameters:
     ///   - isRainmakerControllerFlow: is rainmaker controller
     ///   - isClientOnlyControllerFlow: is client only controller

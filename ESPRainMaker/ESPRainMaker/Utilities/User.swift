@@ -88,7 +88,7 @@ class User {
     ///
     /// - Parameters:
     ///   - session: Current established session with the device for sending information.
-    ///   - delegate: Object that will recieve notification whether the info was delivered successfully
+    ///   - delegate: Object that will receive notification whether the info was delivered successfully
     func associateNodeWithUser(device: ESPDevice, delegate: DeviceAssociationProtocol) {
         currentAssociationInfo = AssociationConfig()
         currentAssociationInfo?.uuid = UUID().uuidString

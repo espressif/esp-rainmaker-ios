@@ -278,7 +278,7 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaFlowInitiationDelegate {
 extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
     
     /// Call alexa API service to fetch alexa access token using alexa auth code
-    /// If alexa access tolen is fetched then call get Alexa API endpoint
+    /// If alexa access token is fetched then call get Alexa API endpoint
     /// If error occurs then show error alert
     /// - Parameter code: alexa auth code
     func getAlexaAccessToken(code: String) {
@@ -411,7 +411,7 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
     }
     
     /// Request alexa access token using alexa refresh token
-    /// - Parameter completionHandler: callback invoked with access token is accessed ot nil if absent.
+    /// - Parameter completionHandler: callback invoked with access token is accessed or nil if absent.
     func getAlexaAccessTokenWithRefreshToken(completionHandler: @escaping (String?) -> Void) {
         apiService.getESPAlexaAccessTokenWithRefreshToken() { status in
             switch status {

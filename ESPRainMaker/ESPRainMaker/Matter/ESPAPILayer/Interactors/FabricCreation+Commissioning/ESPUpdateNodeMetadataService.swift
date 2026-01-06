@@ -43,10 +43,10 @@ class ESPUpdateNodeMetadataService {
                   presenter: presenter)
     }
     
-    func updateNodeMetadata(nodeId: String, metdata: [String: Any?]) {
+    func updateNodeMetadata(nodeId: String, metadata: [String: Any?]) {
         if let token = ESPTokenWorker.shared.accessTokenString {
             let url = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion
-            let endpoint = ESPMatterAPIEndpoint.updateNodeMetadata(url: url, nodeId: nodeId, token: token, metadata: metdata)
+            let endpoint = ESPMatterAPIEndpoint.updateNodeMetadata(url: url, nodeId: nodeId, token: token, metadata: metadata)
             self.apiWorker.callDataAPI(endPoint: endpoint) { data, _ in
                 if let data = data, let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = response[ESPMatterConstants.status] as? String, status.lowercased() == ESPMatterConstants.success {
                     if let string = String(data: data, encoding: .utf8) {

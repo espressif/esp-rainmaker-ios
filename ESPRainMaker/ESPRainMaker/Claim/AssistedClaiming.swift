@@ -187,7 +187,7 @@ class AssistedClaiming {
                 }
             }
         } catch {
-            completionHandler(false, "Serializing CSR data to send as paramater throws exception:\(error.localizedDescription)")
+            completionHandler(false, "Serializing CSR data to send as parameter throws exception:\(error.localizedDescription)")
         }
     }
 

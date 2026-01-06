@@ -63,7 +63,7 @@ extension ESPAutomationTriggerAction {
                             var params:[String] = []
                             if let param = value as? [String: Any] {
                                 for (key, value) in param {
-                                    // Replaced occurence of == string with = for better readability.
+                                    // Replaced occurrence of == string with = for better readability.
                                     if check == "==" {
                                         check = ":"
                                     }

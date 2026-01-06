@@ -50,7 +50,7 @@ class ESPNodeGroupMetadataService {
     /// Unbind device
     /// - Parameters:
     ///   - node: source node
-    ///   - destinationNodeId: detination node id
+    ///   - destinationNodeId: destination node id
     ///   - completion: completion
     func unbindDevice(node: Node, cluster: String, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
         if let groupId = node.groupId, let clusterId = cluster.clusterId {
@@ -64,7 +64,7 @@ class ESPNodeGroupMetadataService {
     
     /// Get binding string from list of node ids
     /// - Parameter ids: ids
-    /// - Returns: bidning string
+    /// - Returns: binding string
     func getBindingValue(ids: [String]) -> String {
         var finalStr = ""
         for index in 0..<ids.count {
@@ -135,7 +135,7 @@ class ESPNodeGroupMetadataService {
     ///   - groupId: group id
     ///   - cluster: cluster
     ///   - node: source node
-    ///   - destinationNodeId: destionation node id
+    ///   - destinationNodeId: destination node id
     ///   - completion: completion
     func removeDeviceGroupMetadata(groupId: String, clusterId: UInt, node: Node, destinationNodeId: String, completion: @escaping (Bool) -> Void) {
         var metadata = [String: Any]()

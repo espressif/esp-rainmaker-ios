@@ -81,7 +81,7 @@ struct ESPErrorCodeDescription {
          "101001": "User name is missing",
          "101002": "Email-id is not in correct format",
          "101003": "Password or verification code is missing",
-         "101004": "Password must be atleast 8 characters long. It should contain atleast one uppercase, one lowercase character and a number",
+         "101004": "Password must be at least 8 characters long. It should contain at least one uppercase, one lowercase character and a number",
          "101006": "User account already exist",
          "101007": "User name or password is not as per specified policy",
          "101009": "Incorrect user name or password",

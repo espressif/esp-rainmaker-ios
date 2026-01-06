@@ -45,7 +45,7 @@ struct ESPYAxisGenerator {
     }
     
     
-    /// Method to calucate offsets for Y-axis
+    /// Method to calculate offsets for Y-axis
     /// - Returns: tuple containing value for first and last point with multiplier.
     func calculateMultiplier() -> (firstValue: Int, lastValue: Int, multiplier:Int) {
         let firstIntegerValue = Int(range.firstValue)

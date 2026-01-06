@@ -67,7 +67,7 @@ class ESPIdProviderLoginService: ESPIdProviderLoginLogic {
     
     
     /// Login with third party login
-    /// - Parameter idProvider: thrid party login provider
+    /// - Parameter idProvider: third party login provider
     func loginWith(idProvider: String) {
         var url = self.authURL+"/authorize?identity_provider="+idProvider+"&redirect_uri="+self.redirectURL+"&response_type=CODE&client_id="
         if let clientId = self.appClientID {

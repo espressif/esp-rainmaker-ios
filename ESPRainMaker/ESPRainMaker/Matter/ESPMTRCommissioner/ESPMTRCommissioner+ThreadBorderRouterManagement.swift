@@ -155,7 +155,7 @@ extension ESPMTRCommissioner {
     /// - Parameters:
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint id
-    ///   - completion: completion handelr with border agent id
+    ///   - completion: completion handler with border agent id
     func readTBRAttributeBorderAgentId(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (Data?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {

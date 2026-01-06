@@ -37,7 +37,7 @@ class ThreadCredentialsManager: NSObject {
         }
     }
     
-    /// Fetch thread credetials
+    /// Fetch thread credentials
     /// - Parameter completion: THCredentials
     func fetchThreadCredentials(_ completion: @escaping (THCredentials?, Bool) -> Void) {
         self.client.retrievePreferredCredentials { credentials, error in
@@ -65,7 +65,7 @@ class ThreadCredentialsManager: NSObject {
         }
     }
     
-    /// Fetch thread credetials
+    /// Fetch thread credentials
     /// - Parameter completion: THCredentials
     func fetchThreadCredentialsWithError(_ completion: @escaping (THCredentials?, Error?) -> Void) {
         self.client.retrievePreferredCredentials { credentials, error in

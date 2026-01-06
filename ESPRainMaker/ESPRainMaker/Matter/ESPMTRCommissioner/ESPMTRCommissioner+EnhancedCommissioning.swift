@@ -23,7 +23,7 @@ import Matter
 @available(iOS 16.4, *)
 extension ESPMTRCommissioner {
     
-    /// Generate random discriminator for enhanced commisssioning mode
+    /// Generate random discriminator for enhanced commissioning mode
     /// - Returns: discriminator
     func generateRandomDiscriminator() -> NSNumber {
         // Define the range for valid discriminator values

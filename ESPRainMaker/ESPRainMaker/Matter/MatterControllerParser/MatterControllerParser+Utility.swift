@@ -41,7 +41,7 @@ extension MatterControllerParser {
     /// - Parameters:
     ///   - cluster: cluster
     ///   - clusterId: cluster id
-    ///   - attributeId: attriubute id
+    ///   - attributeId: attribute id
     /// - Returns: cluster/attribute value
     func getClusterAttributeValue(cluster: [String: MatterAttributeData]?, clusterId: String, attributeId: String) -> String? {
         if let cluster = cluster {

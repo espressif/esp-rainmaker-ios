@@ -71,11 +71,11 @@ struct ESPPushOTAUpdateService: ESPPushOTAUpdateLogic {
                     data, error in
                     guard let responseData = data else {
                         if let serverError = error {
-                            // Error occured while sending the API request.
+                            // Error occurred while sending the API request.
                             self.presenter?.pushOTAUpdateStatus(pushOTAUpdateStatus: nil, error: .serverError(serverError))
                             return
                         }
-                        // No respose received.
+                        // No response received.
                         self.presenter?.pushOTAUpdateStatus(pushOTAUpdateStatus: nil, error: .noData)
                         return
                     }

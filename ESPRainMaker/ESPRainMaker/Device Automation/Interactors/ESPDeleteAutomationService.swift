@@ -58,11 +58,11 @@ class ESPDeleteAutomationService : ESPDeleteAutomationLogic {
                     data, error in
                     guard let responseData = data else {
                         if let serverError = error {
-                            // Error occured while sending the API request.
+                            // Error occurred while sending the API request.
                             self.presenter?.didFinishDeletingAutomationWith(automationID: automationID, error: .serverError(serverError))
                             return
                         }
-                        // No respose received.
+                        // No response received.
                         self.presenter?.didFinishDeletingAutomationWith(automationID: automationID, error: .noData)
                         return
                     }

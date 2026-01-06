@@ -87,7 +87,7 @@ extension DevicesViewController {
     /// Remove user nocs for changed cat ids
     /// - Parameters:
     ///   - savedGroups: saved groups
-    ///   - groups: recevied groups
+    ///   - groups: received groups
     func removeSavedUserNOCs(savedGroups: [ESPNodeGroup], groups: [ESPNodeGroup]) {
         for group in groups {
             for savedGroup in savedGroups {

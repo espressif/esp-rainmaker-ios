@@ -89,7 +89,7 @@ extension AppDelegate {
     // MARK: - Callbacks
     
     func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        // Retreive device token from deviceToken data.
+        // Retrieve device token from deviceToken data.
         var token: String?
         if ESPLocaleManager.shared.isLocaleChinaWithAuroraConfigured {
             JPUSHService.registerDeviceToken(deviceToken)

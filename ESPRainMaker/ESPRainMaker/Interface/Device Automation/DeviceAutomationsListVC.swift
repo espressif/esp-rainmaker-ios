@@ -38,7 +38,7 @@ class DeviceAutomationsListVC: UIViewController {
     private let refreshControl = UIRefreshControl()
     private var doneAction = UIAlertAction()
     
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()

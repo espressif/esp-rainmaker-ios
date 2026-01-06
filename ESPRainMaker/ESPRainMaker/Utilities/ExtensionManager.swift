@@ -256,11 +256,11 @@ extension UIView {
 
 extension UIDatePicker {
     func setDate(from string: String, format: String, animated: Bool = true) {
-        let formater = DateFormatter()
+        let formatter = DateFormatter()
 
-        formater.dateFormat = format
+        formatter.dateFormat = format
 
-        let date = formater.date(from: string) ?? Date()
+        let date = formatter.date(from: string) ?? Date()
 
         setDate(date, animated: animated)
     }
@@ -400,7 +400,7 @@ extension UnkeyedDecodingContainer {
     mutating func decode(_: [Any].Type) throws -> [Any] {
         var array: [Any] = []
         while isAtEnd == false {
-            // See if the current value in the JSON array is `null` first and prevent infite recursion with nested arrays.
+            // See if the current value in the JSON array is `null` first and prevent infinite recursion with nested arrays.
             if try decodeNil() {
                 continue
             } else if let value = try? decode(Bool.self) {

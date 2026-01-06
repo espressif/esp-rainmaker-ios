@@ -104,7 +104,7 @@ extension ESPMTRCommissioner {
         }
     }
     
-    //MARK: Contol sequence of operation
+    //MARK: Control sequence of operation
     
     /// Get control sequence of operation
     /// - Parameters:

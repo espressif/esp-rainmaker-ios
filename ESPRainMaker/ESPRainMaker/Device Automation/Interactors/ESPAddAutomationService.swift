@@ -47,7 +47,7 @@ class ESPAddAutomationService : ESPAddAutomationLogic {
         self.presenter = presenter
     }
     
-    /// Method to provide property info of a device on local netowrk.
+    /// Method to provide property info of a device on local network.
     ///
     /// - Parameters:
     ///   - automation: New automation trigger which needs to be added.
@@ -58,11 +58,11 @@ class ESPAddAutomationService : ESPAddAutomationLogic {
                     data, error in
                     guard let responseData = data else {
                         if let serverError = error {
-                            // Error occured while sending the API request.
+                            // Error occurred while sending the API request.
                             self.presenter?.didFinishAddingAutomationWith(automationID: nil, error: .serverError(serverError))
                             return
                         }
-                        // No respose received.
+                        // No response received.
                         self.presenter?.didFinishAddingAutomationWith(automationID: nil, error: .noData)
                         return
                     }

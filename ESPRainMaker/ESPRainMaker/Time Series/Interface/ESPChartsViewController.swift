@@ -80,8 +80,8 @@ class ESPChartsViewController: UIViewController {
     }
     
     @IBAction func aggregateSegmentChange(sender: UISegmentedControl) {
-        if let aggregateString = sender.titleForSegment(at: sender.selectedSegmentIndex), let aggregrate = ESPAggregate(rawValue: aggregateString) {
-            espTSArguments.aggregate = aggregrate
+        if let aggregateString = sender.titleForSegment(at: sender.selectedSegmentIndex), let aggregate = ESPAggregate(rawValue: aggregateString) {
+            espTSArguments.aggregate = aggregate
             loadChart()
         }
     }

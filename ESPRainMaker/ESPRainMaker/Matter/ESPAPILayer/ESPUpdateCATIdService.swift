@@ -91,7 +91,7 @@ class ESPUpdateCATIdService {
         return (newEntries, updateACL)
     }
     
-    /// Updte CAT id
+    /// Update CAT id
     /// - Parameter completion: completion
     func updateCATId(completion: @escaping () -> Void) {
         self.completion = completion

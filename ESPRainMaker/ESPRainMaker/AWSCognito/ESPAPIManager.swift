@@ -56,8 +56,8 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     /// Any changes of the device params from the app trigger this method
     ///
     /// - Parameters:
-    ///   - parameter: list of paramters to be updated
-    ///   - completionHandler: handler called when response to setDeviceParam is recieved
+    ///   - parameter: list of parameters to be updated
+    ///   - completionHandler: handler called when response to setDeviceParam is received
     func setMultipleDeviceParam(parameter: [[String: Any]], completionHandler: (([ESPCloudResponse]?, ESPNetworkError?) -> Void)? = nil) {
         self.genericAuthorizedMultiParamDataRequest(url: Constants.setParam, parameter: parameter) { response, error in
             if error == nil {
@@ -169,7 +169,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     /// Get node info like device list, param list and online/offline status
     ///
     /// - Parameters:
-    ///   - completionHandler: handler called when response to get node info is recieved
+    ///   - completionHandler: handler called when response to get node info is received
     func getNodeInfo(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
@@ -216,7 +216,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     /// Get device parameters current value
     ///
     /// - Parameters:
-    ///   - completionHandler: handler called when response to get device paramater is recieved
+    ///   - completionHandler: handler called when response to get device parameter is received
     func getDeviceParams(device: Device, completionHandler: @escaping (ESPNetworkError?) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
@@ -263,7 +263,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     /// Method to fetch online/offline status of associated nodes
     ///
     /// - Parameters:
-    ///   - completionHandler: handler called when response to get node status is recieved
+    ///   - completionHandler: handler called when response to get node status is received
     func getNodeStatus(node: Node, completionHandler: @escaping (Node?, Error?) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
@@ -304,7 +304,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     ///
     /// - Parameters:
     ///   - parameter: Request parameter
-    ///   - completionHandler: handler called when response to add device to user is recieved with id of the request
+    ///   - completionHandler: handler called when response to add device to user is received with id of the request
     func addDeviceToUser(parameter: [String: String], completionHandler: @escaping (String?, ESPNetworkError?) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
@@ -345,12 +345,12 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
         }
     }
 
-    /// Method to fetch device assoication staus
+    /// Method to fetch device association status
     ///
     /// - Parameters:
     ///   - nodeID: Id of the node for which association status is fetched
     ///   - requestID: Request id to match with the device association request
-    ///   - completionHandler: handler called when response to deviceAssociationStatus is recieved
+    ///   - completionHandler: handler called when response to deviceAssociationStatus is received
     func deviceAssociationStatus(nodeID: String, requestID: String, completionHandler: @escaping (String) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, error in
@@ -388,7 +388,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     ///
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
-    ///   - completionHandler: handler called when response to setDeviceParam is recieved
+    ///   - completionHandler: handler called when response to setDeviceParam is received
     func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: ((ESPCloudResponseStatus) -> Void)? = nil) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if let nodeid = nodeID {
@@ -435,7 +435,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     ///   - parameters: Parameter to be included in the api call
     ///   - encoding: ParameterEncoding
     ///   - header: HTTp headers
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func genericRequest(url: URLConvertible, method: HTTPMethod, parameters: Parameters, encoding: ParameterEncoding, headers: HTTPHeaders, completionHandler: @escaping ([String: Any]?) -> Void) {
         session.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers).responseJSON { response in
             switch response.result {
@@ -457,7 +457,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     ///   - url: URL of the api
     ///   - parameter: Parameter to be included in the api call
     ///   - method: HTTP method
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, method: HTTPMethod = .post, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
@@ -494,7 +494,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     /// - Parameters:
     ///   - url: URL of the api
     ///   - parameter: Parameter to be included in the api call
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func genericAuthorizedJSONRequest(url: String, parameter: [String: Any]?, method: HTTPMethod, completionHandler: @escaping (Any?, ESPNetworkError?) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in
@@ -528,7 +528,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
     ///   - url: URL of the api
     ///   - parameter: Parameter to be included in the api call
     ///   - method: HTTP method
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func genericAuthorizedMultiParamDataRequest(url: String, parameter: [[String: Any]]?, method: HTTPMethod = .post, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
         
         ESPExtendUserSessionWorker().checkUserSession() { accessToken, serverError in

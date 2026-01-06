@@ -37,7 +37,7 @@ enum ESPLocalServiceError {
         case let .httpError(error):
             return "Error while sending HTTP request: \(error.localizedDescription)"
         case let .failure(status):
-            return "Recieved failure response from device with status:\(status)"
+            return "Received failure response from device with status:\(status)"
         case let .decodingError(error):
             return "Error decoding device response:\(error.localizedDescription)"
         case let .encodingError(error):
@@ -65,10 +65,10 @@ class ESPLocalService: NSObject {
         espLocalDevice.hostname = hostname
     }
 
-    /// Method to provide property info of a device on local netowrk.
+    /// Method to provide property info of a device on local network.
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func getPropertyInfo(completionHandler: @escaping ([String: Any]?, ESPLocalServiceError?) -> Swift.Void) {
         let data = try! createGetPropertyCountRequest()
         propertyInfo.removeAll()
