@@ -153,6 +153,7 @@ extension ESPMTRCommissioner {
         self.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
+                params.shouldReplaceExistingSubscriptions = true
                 params.minInterval = NSNumber(value: 1.0)
                 params.maxInterval = NSNumber(value: 2.0)
                 cluster.subscribeAttributeCurrentSaturation(with: params, subscriptionEstablished: nil) { val, _ in

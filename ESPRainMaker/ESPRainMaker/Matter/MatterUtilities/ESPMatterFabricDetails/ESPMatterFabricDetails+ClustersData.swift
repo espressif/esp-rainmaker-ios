@@ -21,6 +21,33 @@ import UIKit
 
 extension ESPMatterFabricDetails {
     
+    /// Save servers data
+    /// - Parameters:
+    ///   - deviceId: device id
+    ///   - servers: servers
+    func saveClustersData(groupId: String, deviceId: UInt64, clusters: [String: Any]) {
+        let key = ESPMatterFabricKeys.shared.groupClustersDataKey(groupId, deviceId)
+        if let data = try? JSONSerialization.data(withJSONObject: clusters) {
+            UserDefaults.standard.set(data as Any, forKey: key)
+        }
+    }
+    
+    /// fetch servers data
+    /// - Parameter deviceId: device id
+    /// - Returns: [endpoints: [servers]]
+    func fetchClustersData(groupId: String, deviceId: UInt64) -> [String: Any] {
+        let key = ESPMatterFabricKeys.shared.groupClustersDataKey(groupId, deviceId)
+        if let data = UserDefaults.standard.value(forKey: key) as? Data, let val = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return val
+        }
+        return [String: Any]()
+    }
+    
+    func removeClustersData(groupId: String, deviceId: UInt64) {
+        let key = ESPMatterFabricKeys.shared.groupClustersDataKey(groupId, deviceId)
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+    
     /// Save device type
     /// - Parameters:
     ///   - deviceId: device id

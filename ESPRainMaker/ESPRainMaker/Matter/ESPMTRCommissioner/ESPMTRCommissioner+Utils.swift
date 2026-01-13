@@ -144,21 +144,9 @@ extension ESPMTRCommissioner {
     ///   - metaData: meta data
     func extractDeviceMetaData(groupId: String, deviceId: UInt64) -> [String: Any] {
         var metaData = [String: Any]()
-        let serversData = self.fabricDetails.fetchServersData(groupId: groupId, deviceId: deviceId)
-        if serverData.count > 0 {
-            metaData[ESPMatterConstants.serversData] = serversData
-        }
-        let clientsData = self.fabricDetails.fetchClientsData(groupId: groupId, deviceId: deviceId)
-        if clientsData.count > 0 {
-            metaData[ESPMatterConstants.clientsData] = clientsData
-        }
-        let endpointsData = self.fabricDetails.fetchEndpointsData(groupId: groupId, deviceId: deviceId)
-        if endpointsData.count > 0 {
-            metaData[ESPMatterConstants.endpointsData] = endpointsData
-        }
-        let attributesData = self.fabricDetails.fetchAttributesData(groupId: groupId, deviceId: deviceId)
-        if attributesData.count > 0 {
-            metaData[ESPMatterConstants.attributesData] = attributesData
+        let clustersData = self.fabricDetails.fetchClustersData(groupId: groupId, deviceId: deviceId)
+        if clustersData.count > 0, let data = clustersData[ESPMatterConstants.endpoints] as? [String: Any] {
+            metaData[ESPMatterConstants.endpoints] = data
         }
         metaData[ESPMatterConstants.groupId] = groupId
         if let deviceName = ESPMatterEcosystemInfo.shared.getDeviceName() {

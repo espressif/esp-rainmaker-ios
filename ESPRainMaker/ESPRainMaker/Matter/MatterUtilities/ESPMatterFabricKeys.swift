@@ -146,5 +146,8 @@ class ESPMatterFabricKeys {
     var participantDataKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
         return "\(groupId).\(deviceId).matter.participant.data.key"
     }
+    var groupClustersDataKey: (_ groupId: String, _ deviceId: UInt64) -> String = { groupId, deviceId in
+        return "\(groupId).\(deviceId).clusters.data"
+    }
 }
 
