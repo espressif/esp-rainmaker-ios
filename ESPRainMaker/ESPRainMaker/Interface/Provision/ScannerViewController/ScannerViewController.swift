@@ -303,7 +303,14 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             actionSheet.addAction(mtrCommAction)
             #endif
             actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            actionSheet.popoverPresentationController?.sourceView = manualActionButton
+            
+            // Configure for iPad
+            if let popover = actionSheet.popoverPresentationController {
+                popover.sourceView = manualActionButton
+                popover.sourceRect = manualActionButton.bounds
+                popover.permittedArrowDirections = [.up, .down]
+            }
+            
             present(actionSheet, animated: true, completion: nil)
         }
     }

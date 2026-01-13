@@ -71,6 +71,9 @@ extension DeviceViewController {
                 cell.setupOfflineUI(deviceId: deviceId)
             } else {
                 cell.setupInitialUI()
+                if !self.isDeviceOffline, !self.showDefaultUI {
+                    cell.subscribeToOnOffAttribute()
+                }
             }
             cell.toggleSwitch.isEnabled = !self.isDeviceOffline
             cell.isUserInteractionEnabled = !self.isDeviceOffline
@@ -103,7 +106,10 @@ extension DeviceViewController {
             if self.isDeviceOffline || self.showDefaultUI {
                 cell.setupInitialLevelValues()
             } else {
-                cell.getCurrentLevelValues(groupId: groupId, deviceId: deviceId)
+                cell.getCurrentLevelValues()
+                if !self.isDeviceOffline, !self.showDefaultUI {
+                    cell.subscribeToLevelAttribute()
+                }
             }
             cell.isUserInteractionEnabled = !self.isDeviceOffline
             cell.slider.isEnabled = !self.isDeviceOffline
@@ -168,7 +174,10 @@ extension DeviceViewController {
             if self.isDeviceOffline || self.showDefaultUI {
                 cell.setupInitialSaturationValue()
             } else {
-                cell.getCurrentSaturationValue(groupId: groupId, deviceId: deviceId)
+                cell.getCurrentSaturationValue()
+                if !self.isDeviceOffline, !self.showDefaultUI {
+                    cell.subscribeToSaturationAttribute()
+                }
             }
             cell.isUserInteractionEnabled = !self.isDeviceOffline
             cell.slider.isEnabled = !self.isDeviceOffline
@@ -471,7 +480,10 @@ extension DeviceViewController {
             if self.isDeviceOffline || self.showDefaultUI {
                 cell.setupInitialCCTUI()
             } else {
-                cell.getCurrentCCTValue(groupId: groupId, deviceId: deviceId)
+                cell.getCurrentCCTValue()
+                if !self.isDeviceOffline, !self.showDefaultUI {
+                    cell.subscribeToCCTAttribute()
+                }
             }
             cell.setSliderThumbUI()
             cell.isUserInteractionEnabled = !self.isDeviceOffline

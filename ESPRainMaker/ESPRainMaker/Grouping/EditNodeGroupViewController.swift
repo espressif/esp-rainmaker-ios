@@ -269,7 +269,29 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "selectGroupNodeCVC", for: indexPath) as! SelectGroupNodeCollectionViewCell
         let device = getDeviceAt(indexPath: indexPath)
-        if let isMatter = device.isMatter, isMatter, let node = device.node {
+        if let node = device.node, node.isMatter, let groupId = node.groupId, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, node.clientOnlyControllerNodeIdParam == nil {
+            
+            let (result, _) = ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId)
+            if result {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.lightDevice)
+            } else if ESPMatterClusterUtil.shared.isOnOffClientSupported(groupId: groupId, deviceId: deviceId).0 {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.switchDevice)
+            } else {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.defaultDevice)
+            }
+            if ESPMatterClusterUtil.shared.isThermostatConditionerSupported(groupId: groupId, deviceId: deviceId).0 {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.airConditioner)
+            } else if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0, let type = node.deviceType, type == 266 || type == 267 {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.outletDevice)
+            } else if ESPMatterClusterUtil.shared.isRainmakerControllerServerSupported(groupId: groupId, deviceId: deviceId).0 {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.controller)
+            } else if ESPMatterClusterUtil.shared.isTBRMSupported(groupId: groupId, deviceId: deviceId).0 {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.threadBR)
+            } else if ESPMatterClusterUtil.shared.isDoorLockServerSupported(groupId: groupId, deviceId: deviceId).0 {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.lock)
+            } else if ESPMatterClusterUtil.shared.isWindowCoveringServerSupported(groupId: groupId, deviceId: deviceId).0 {
+                cell.deviceImageView.image = UIImage(named: ESPMatterConstants.externalBlinds)
+            }
             if let deviceName = node.matterDeviceName {
                 cell.selectButton.isHidden = true
                 cell.selectedImage.isHidden = true
@@ -324,6 +346,7 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
         cell.layer.masksToBounds = false
 
         cell.deviceImageView.image = ESPRMDeviceType(rawValue: device.type ?? "")?.getImageFromDeviceType() ?? UIImage(named: Constants.dummyDeviceImage)
+        
         return cell
     }
 

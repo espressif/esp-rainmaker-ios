@@ -456,7 +456,7 @@ class SuccessViewController: UIViewController {
                 self.provisionFinsihedWithStatus(message: "Device Added Successfully!!")
                 
                 //Client-Only-Controller - Only call for devices that support this flow
-                if let finalNode = self.finalNode, finalNode.isClientOnlyControllerFlowSupported {
+                if let finalNode = self.finalNode, finalNode.isClientOnlyControllerFlowSupported, let _ = finalNode.clientOnlyControllerGroupParam {
                     self.handleClientOnlyControllerFlow()
                 }
             }

@@ -76,7 +76,8 @@ class DeviceOnOffCell: UITableViewCell {
         if self.nodeConnectionStatus == .local {
             if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
                 if !sender.isOn {
-                    ESPMTRCommissioner.shared.turnOff(groupId: groupId, deviceId: deviceId) { result in
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.turnOff(groupId: groupId, deviceId: deviceId) { result in
                         DispatchQueue.main.async {
                             if result {
                                 self.onOffStatus.text = ESPMatterConstants.offTxt
@@ -87,7 +88,8 @@ class DeviceOnOffCell: UITableViewCell {
                         }
                     }
                 } else {
-                    ESPMTRCommissioner.shared.turnOn(groupId: groupId, deviceId: deviceId) { result in
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.turnOn(groupId: groupId, deviceId: deviceId) { result in
                         DispatchQueue.main.async {
                             if result {
                                 self.onOffStatus.text = ESPMatterConstants.onTxt
@@ -152,7 +154,8 @@ class DeviceOnOffCell: UITableViewCell {
                             self.onOffStatus.text = status ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt
                         }
                     } else {
-                        ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
+                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                        commissioner.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
                             DispatchQueue.main.async {
                                 node.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
                                 self.toggleSwitch.setOn(isLightOn, animated: true)
@@ -209,7 +212,8 @@ class DeviceOnOffCell: UITableViewCell {
     /// Subscribe to on/off attribute value
     func subscribeToOnOffAttribute() {
         if let group = self.group, let groupId = group.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToOnOffValue(groupId: groupId, deviceId: deviceId) { status in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.subscribeToOnOffValue(groupId: groupId, deviceId: deviceId) { status in
                 DispatchQueue.main.async {
                     self.node?.setMatterLightOnStatus(status: status, deviceId: deviceId)
                     self.onOffStatus.text = status ? ESPMatterConstants.onTxt : ESPMatterConstants.offTxt

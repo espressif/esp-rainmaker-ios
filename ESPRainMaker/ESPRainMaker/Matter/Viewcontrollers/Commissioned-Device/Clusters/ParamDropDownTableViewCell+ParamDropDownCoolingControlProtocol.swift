@@ -42,7 +42,8 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
                 self.controlValueLabel.text = cso
                 self.matterNode?.setMatterControlledSequenceOfOperation(cso: cso, deviceId: id)
             } else {
-                ESPMTRCommissioner.shared.readControlSequenceOfOperation(groupId: grpId, deviceId: id) { value in
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+                commissioner.readControlSequenceOfOperation(groupId: grpId, deviceId: id) { value in
                     if let value = value {
                         let val = value.intValue
                         var cso = ESPMatterConstants.off
@@ -62,7 +63,8 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
     /// Subscribe to control sequence of operation
     func subscribeControlSequenceOfOperation() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeControlSequenceOfOperation(groupId: grpId, deviceId: id) { value in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeControlSequenceOfOperation(groupId: grpId, deviceId: id) { value in
                 if let value = value {
                     let val = value.intValue
                     var cso = ESPMatterConstants.off
@@ -96,7 +98,8 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
     }
     
     func readAndSubscribeToSystemMode(groupId: String, deviceId: UInt64) {
-        ESPMTRCommissioner.shared.readSystemMode(groupId: groupId, deviceId: deviceId) { value in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.readSystemMode(groupId: groupId, deviceId: deviceId) { value in
             if let value = value {
                 let val = value.intValue
                 var systemMode = ESPMatterConstants.off
@@ -139,7 +142,8 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
     
     func readMode() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
-            ESPMTRCommissioner.shared.readSystemMode(groupId: grpId, deviceId: id) { value in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.readSystemMode(groupId: grpId, deviceId: id) { value in
                 if let value = value {
                     let mode = value.intValue
                     var systemMode = ESPMatterConstants.off
@@ -164,7 +168,8 @@ extension ParamDropDownTableViewCell: ParamDropDownCoolingControlProtocol {
     /// Subscribe to system mode
     func subscribeSystemMode() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeSystemMode(groupId: grpId, deviceId: id) { value in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeSystemMode(groupId: grpId, deviceId: id) { value in
                 if let value = value {
                     let mode = value.intValue
                     var systemMode = ESPMatterConstants.off

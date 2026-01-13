@@ -54,7 +54,8 @@ class ESPGetUserNOCService {
                 guard let _ = ESPMatterFabricDetails.shared.getUserNOCDetails(groupId: groupId) else {
                     self.csrQueue.async {
                         var finalCSRString = ""
-                        ESPMTRCommissioner.shared.generateCSR(groupId: groupId) { csr in
+                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                        commissioner.generateCSR(groupId: groupId) { csr in
                             if let csr = csr {
                                 finalCSRString = csr.replacingOccurrences(of: "\n", with: "")
                                 finalCSRString = "\(ESPMatterConstants.csrHeader)\n" + finalCSRString + "\n\(ESPMatterConstants.csrFooter)"

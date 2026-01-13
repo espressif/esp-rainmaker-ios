@@ -345,7 +345,8 @@ extension ESPMTROCSSliderTVC: StepSliderProtocol {
     }
     
     func readOCS(groupId: String, deviceId: UInt64) {
-        ESPMTRCommissioner.shared.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.readOccupiedCoolingSetpoint(groupId: groupId, deviceId: deviceId) { value in
             if let value = value {
                 self.currentLevel = Int(value)
                 self.node?.setMatterOccupiedCoolingSetpoint(ocs: value, deviceId: deviceId)
@@ -357,7 +358,8 @@ extension ESPMTROCSSliderTVC: StepSliderProtocol {
     /// Subscribe to occupied cooling setpoint
     func subscribeToOccupiedCoolingSetpoint() {
         if let grpId = self.nodeGroup?.groupID, let id = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToOccupiedCoolingSetpoint(groupId: grpId, deviceId: id) { value in
                 if let mode = self.node?.getMatterSystemMode(deviceId: id) {
                     if mode == ESPMatterConstants.cool {
                         if let value = value {
@@ -376,7 +378,8 @@ extension ESPMTROCSSliderTVC: StepSliderProtocol {
     func changeOccupiedCoolingSetpoint(setPoint: Int16) {
         if let id = self.deviceId, let grpId = self.nodeGroup?.groupID, let node = self.node {
             self.paramChipDelegate?.matterAPIRequestSent()
-            ESPMTRCommissioner.shared.setOccupiedCoolingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.setOccupiedCoolingSetpoint(groupId: grpId, deviceId: id, ocs: NSNumber(value: setPoint*100)) { result in
                 self.paramChipDelegate?.matterAPIResponseReceived()
                 if result {
                     if let node = self.node, let id = self.deviceId {

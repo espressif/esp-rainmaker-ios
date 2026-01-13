@@ -32,14 +32,14 @@ extension ESPMTRCommissioner {
         let endpointClusterId = ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId)
         if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
             if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
-                if let cluster = MTRBaseClusterOnOff(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                if let cluster = MTRBaseClusterOnOff(device: device, endpoint: endpoint, queue: self.matterQueue) {
                     completion(cluster)
                 } else {
                     completion(nil)
                 }
             } else {
-                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                    if let device = device, let cluster = MTRBaseClusterOnOff(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                    if let device = device, let cluster = MTRBaseClusterOnOff(device: device, endpoint: endpoint, queue: self.matterQueue) {
                         completion(cluster)
                     } else {
                         completion(nil)

@@ -29,7 +29,7 @@ class RequestSentCell: UITableViewCell {
     
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var sharedWithText: UILabel!
-    @IBOutlet weak var cancelRequestButton: UIButton!
+    @IBOutlet weak var cancelRequestButton: PrimaryButton!
     var request: ESPNodeGroupSharingRequest?
     var sharing: ESPNodeGroupSharingStruct?
     weak var delegate: RequestSentActionDelegate?

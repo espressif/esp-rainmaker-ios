@@ -116,19 +116,21 @@ class CustomActionCell: UITableViewCell {
     }
     
     func setControllerUnauthorizedStatus() {
-        let normalText = "Controller "
-        let italicText = "(Unauthorized)"
-                        
-        let baseFont = self.headerLabel.font!
-        let italicFont = UIFont(descriptor: baseFont.fontDescriptor.withSymbolicTraits(.traitItalic) ?? baseFont.fontDescriptor, size: baseFont.pointSize)
-                        
-        let attributedString = NSMutableAttributedString(string: normalText, attributes: [
-            NSAttributedString.Key.font: baseFont
-        ])
-        let italicAttributedString = NSAttributedString(string: italicText, attributes: [
-            NSAttributedString.Key.font: italicFont
-        ])
-        attributedString.append(italicAttributedString)
-        self.headerLabel.attributedText = attributedString
+        DispatchQueue.main.async {
+            let normalText = "Controller "
+            let italicText = "(Unauthorized)"
+                            
+            let baseFont = self.headerLabel.font!
+            let italicFont = UIFont(descriptor: baseFont.fontDescriptor.withSymbolicTraits(.traitItalic) ?? baseFont.fontDescriptor, size: baseFont.pointSize)
+                            
+            let attributedString = NSMutableAttributedString(string: normalText, attributes: [
+                NSAttributedString.Key.font: baseFont
+            ])
+            let italicAttributedString = NSAttributedString(string: italicText, attributes: [
+                NSAttributedString.Key.font: italicFont
+            ])
+            attributedString.append(italicAttributedString)
+            self.headerLabel.attributedText = attributedString
+        }
     }
 }

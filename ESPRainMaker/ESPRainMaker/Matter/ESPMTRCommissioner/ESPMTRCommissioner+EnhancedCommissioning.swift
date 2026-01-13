@@ -69,7 +69,7 @@ extension ESPMTRCommissioner {
     ///   - completion: completion handler with setup payload and error
     func openMTRPairingWindow(deviceId: UInt64, completion: @escaping (String?) -> Void) {
         if let controller = self.sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
+            controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
                 if let device = device {
                     let passcode = MTRSetupPayload.generateRandomSetupPasscode()
                     let discriminator = self.generateRandomDiscriminator()

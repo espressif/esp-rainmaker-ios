@@ -47,6 +47,8 @@ class NodeDetailsViewController: UIViewController {
     
     let nodeRemovalFailedMsg = "Unable to remove node. Please check your internet connection."
     
+    var pairingModeCell: NodeDetailActionTableViewCell?
+    
     //Binding requirements
     var group: ESPNodeGroup?
     var node: ESPNodeDetails?
@@ -129,10 +131,34 @@ class NodeDetailsViewController: UIViewController {
     
     #if ESPRainMakerMatter
     @available(iOS 16.4, *)
+    private func isCommissioningWindowOpen(_ completionHandler: @escaping (Bool?) -> Void) {
+        if let node = self.currentNode, let matterNodeId = node.matter_node_id, let groupId = node.groupId,  User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+            let status = ESPMatterClusterUtil.shared.isOpenCommissioningWindowSupported(groupId: groupId, deviceId: deviceId)
+            if status.0, let endpoint = status.1, let endpointInt = UInt8(endpoint) {
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                commissioner.isCommissioningWindowOpen(deviceId: deviceId, endpoint: endpointInt) { result, _ in
+                    completionHandler(result)
+                }
+            } else {
+                completionHandler(nil)
+            }
+        } else {
+            completionHandler(nil)
+        }
+    }
+
+    @available(iOS 16.4, *)
     private func getTableViewCellForEnablePairingMode(forIndexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailActionTVC", for: forIndexPath) as! NodeDetailActionTableViewCell
         view.endEditing(true)
         cell.nodeDetailActionLabel.text = "Turn On Pairing Mode"
+        self.isCommissioningWindowOpen { result in
+            if let result = result, result {
+                DispatchQueue.main.async {
+                    cell.nodeDetailActionLabel.text = "Turn Off Pairing Mode"
+                }
+            }
+        }
         cell.addMemberButtonAction = {
             if let node = self.currentNode, let matterNodeId = node.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
                 self.openCommissioningWindow()
@@ -140,47 +166,44 @@ class NodeDetailsViewController: UIViewController {
                 Utility.showToastMessage(view: self.view, message: ESPMatterConstants.deviceNotReachableMsg)
             }
         }
+        self.pairingModeCell = cell
         return cell
     }
     
     /// Open commissioning Window
     @available(iOS 16.4, *)
     private func openCommissioningWindow() {
-        if let node = currentNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
-            if User.shared.isMatterNodeConnected(matterNodeId: matterNodeId) {
-                let status = node.isOpenCommissioningWindowSupported
-                if status.0, let endpoint = status.1, let endpointInt = UInt8(endpoint) {
-                    ESPMTRCommissioner.shared.isCommissioningWindowOpen(deviceId: deviceId, endpoint: endpointInt) { result, _ in
-                        if let result = result, result {
-                            DispatchQueue.main.async {
-                                self.showCWOpenDialog(deviceId: deviceId)
-                            }
-                        } else {
-                            self.startNewPairingWindow(deviceId: deviceId)
-                        }
+        if let node = currentNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let groupId = node.groupId {
+            self.isCommissioningWindowOpen { result in
+                if let result = result, result {
+                    DispatchQueue.main.async {
+                        self.showCWOpenDialog(deviceId: deviceId, groupId: groupId)
                     }
+                } else {
+                    self.startNewPairingWindow(deviceId: deviceId, groupId: groupId)
                 }
-            } else {
-                DispatchQueue.main.async {
-                    Utility.showToastMessage(view: self.view, message: ESPMatterConstants.deviceNotReachableMsg)
-                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                Utility.showToastMessage(view: self.view, message: ESPMatterConstants.deviceNotReachableMsg)
             }
         }
     }
     
     /// Show dialog informing user that the commissioning window is open
     /// - Parameter deviceId: device id
+    /// - Parameter groupId: group id
     @available(iOS 16.4, *)
-    private func showCWOpenDialog(deviceId: UInt64) {
+    private func showCWOpenDialog(deviceId: UInt64, groupId: String) {
         // Show alert asking user if they want to stop current pairing session
-        let alert = UIAlertController(title: "Device in Pairing Mode",
-                                    message: "Device is already in pairing mode. Do you want to stop it to restart a new pairing session?",
+        let alert = UIAlertController(title: PairingModeMessages.deviceInPairingModeMsg,
+                                    message: PairingModeMessages.closePairingModeMsg,
                                     preferredStyle: .alert)
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
         
-        let turnOffAction = UIAlertAction(title: "Turn off pairing mode", style: .default) { _ in
-            self.turnOffPairingMode(deviceId: deviceId)
+        let turnOffAction = UIAlertAction(title: PairingModeMessages.turnOffPairingModeMsg, style: .default) { _ in
+            self.turnOffPairingMode(deviceId: deviceId, groupId: groupId)
         }
         
         alert.addAction(cancelAction)
@@ -190,11 +213,16 @@ class NodeDetailsViewController: UIViewController {
     
     /// Start new pairning window
     /// - Parameter deviceId: device id
+    /// - Parameter groupId: group id
     @available(iOS 16.4, *)
-    private func startNewPairingWindow(deviceId: UInt64) {
-        ESPMTRCommissioner.shared.openMTRPairingWindow(deviceId: deviceId) { setupPasscode in
+    private func startNewPairingWindow(deviceId: UInt64, groupId: String) {
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.openMTRPairingWindow(deviceId: deviceId) { setupPasscode in
             DispatchQueue.main.async {
                 if let setupPasscode = setupPasscode {
+                    if let cell = self.pairingModeCell {
+                        cell.nodeDetailActionLabel.text = PairingModeMessages.turnOffPairingModeMsg
+                    }
                     self.showManualPairingCode(setupPasscode: setupPasscode)
                 } else {
                     self.alertUser(title: ESPMatterConstants.failureTxt,
@@ -208,21 +236,26 @@ class NodeDetailsViewController: UIViewController {
     
     /// Turn off pairing mode
     /// - Parameter deviceId: device id
+    /// - Parameter groupId: group id
     @available(iOS 16.4, *)
-    private func turnOffPairingMode(deviceId: UInt64) {
-        ESPMTRCommissioner.shared.revokeCommissioningWindow(deviceId: deviceId) { success in
+    private func turnOffPairingMode(deviceId: UInt64, groupId: String) {
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.revokeCommissioningWindow(deviceId: deviceId) { success in
             if success {
                 // If revoke successful, start new pairing window
                 DispatchQueue.main.async {
-                    self.alertUser(title: "Matter",
-                                 message: "Pairing mode turned off successfully!",
+                    if let cell = self.pairingModeCell {
+                        cell.nodeDetailActionLabel.text = PairingModeMessages.turnOnPairingModeMsg
+                    }
+                    self.alertUser(title: ESPMatterConstants.successTxt,
+                                   message: PairingModeMessages.pairingModeOffSuccessMsg,
                                  buttonTitle: ESPMatterConstants.okTxt,
                                  callback: {})
                 }
             } else {
                 DispatchQueue.main.async {
                     self.alertUser(title: ESPMatterConstants.failureTxt,
-                                 message: "Failed to turn off pairing mode",
+                                   message: PairingModeMessages.pairingModeOffFailureMsg,
                                  buttonTitle: ESPMatterConstants.okTxt,
                                  callback: {})
                 }
@@ -274,12 +307,13 @@ class NodeDetailsViewController: UIViewController {
     /// Remove fabric
     /// - Parameter completion: completion handler
     func removeFabric(completion: @escaping (Bool) -> Void) {
-        if let node = currentNode, let matterNodeId = node.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal {
+        if let node = currentNode, let matterNodeId = node.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let deviceId = matterNodeId.hexToDecimal, let groupId = node.groupId {
             #if ESPRainMakerMatter
             if #available(iOS 16.4, *) {
-                ESPMTRCommissioner.shared.readCurrentFabricIndex(deviceId: deviceId) { index in
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                commissioner.readCurrentFabricIndex(deviceId: deviceId) { index in
                     if let index = index {
-                        ESPMTRCommissioner.shared.removeFabricAtIndex(deviceId: deviceId, atIndex: index) { result in
+                        commissioner.removeFabricAtIndex(deviceId: deviceId, atIndex: index) { result in
                             completion(result)
                         }
                     } else {
@@ -426,8 +460,8 @@ class NodeDetailsViewController: UIViewController {
         }
         
         #if ESPRainMakerMatter
-        if #available(iOS 16.4, *), let node = currentNode, let matterNodeId = node.matter_node_id {
-            if node.isOpenCommissioningWindowSupported.0 {
+        if #available(iOS 16.4, *), let node = currentNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, let groupId = node.groupId {
+            if ESPMatterClusterUtil.shared.isOpenCommissioningWindowSupported(groupId: groupId, deviceId: deviceId).0 {
                 index += 1
                 dataSource.append([])
                 dataSource[index].append(enablePairingMode)

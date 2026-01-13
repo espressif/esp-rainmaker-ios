@@ -144,6 +144,14 @@ class SelectEventViewController: UIViewController {
             }
         }
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        // Configure for iPad
+        if let popover = actionSheet.popoverPresentationController {
+            popover.sourceView = self.view
+            popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        
         self.present(actionSheet, animated: true, completion: nil)
     }
     

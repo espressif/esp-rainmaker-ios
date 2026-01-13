@@ -72,10 +72,11 @@ class DevicesBindingViewController: UIViewController {
     }
     
     @objc func appEnterForeground() {
-        ESPMTRCommissioner.shared.shutDownController()
         if let group = self.group, let groupId = group.groupID, let userNOCDetails = self.fabricDetails.getUserNOCDetails(groupId: groupId) {
-            ESPMTRCommissioner.shared.group = group
-            ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCDetails)
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.shutDownController()
+            commissioner.group = group
+            commissioner.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOCDetails)
         }
     }
     
@@ -337,74 +338,79 @@ extension DevicesBindingViewController: BindingTableViewCellDelegate {
             }
             if action == .add {
                 Utility.showLoader(message: ESPMatterConstants.linkingDevicesMeg, view: self.view)
-                ESPMTRCommissioner.shared.linkDevice(bindingEndpointClusterId: self.bindingEndpointClusterId, cluster: self.cluster, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
-                    DispatchQueue.main.async {
-                        Utility.hideLoader(view: self.view)
-                        if result {
-                            var rainmakerNode: Node?
-                            let nodes = User.shared.associatedNodeList ?? []
-                            for node in nodes {
-                                if let nodeId = node.node_id, nodeId == sourceNodeId {
-                                    rainmakerNode = node
-                                    break
-                                }
-                            }
-                            if let node = rainmakerNode {
-                                Utility.showLoader(message: ESPMatterConstants.linkingDevicesMeg, view: self.view)
-                                self.service = ESPNodeGroupMetadataService(switchIndex: self.switchIndex)
-                                self.service?.bindDevice(node: node, cluster: self.cluster, destinationNodeId: destinationNodeId) { result in
-                                    if result {
-                                        self.getLinkedNodes()
-                                        self.getUnLinkedNodes()
-                                    }
-                                    DispatchQueue.main.async {
-                                        Utility.hideLoader(view: self.view)
-                                        self.bindingTable.reloadData()
+                if let group = self.group, let groupId = group.groupID {
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.linkDevice(bindingEndpointClusterId: self.bindingEndpointClusterId, cluster: self.cluster, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
+                        DispatchQueue.main.async {
+                            Utility.hideLoader(view: self.view)
+                            if result {
+                                var rainmakerNode: Node?
+                                let nodes = User.shared.associatedNodeList ?? []
+                                for node in nodes {
+                                    if let nodeId = node.node_id, nodeId == sourceNodeId {
+                                        rainmakerNode = node
+                                        break
                                     }
                                 }
+                                if let node = rainmakerNode {
+                                    Utility.showLoader(message: ESPMatterConstants.linkingDevicesMeg, view: self.view)
+                                    self.service = ESPNodeGroupMetadataService(switchIndex: self.switchIndex)
+                                    self.service?.bindDevice(node: node, cluster: self.cluster, destinationNodeId: destinationNodeId) { result in
+                                        if result {
+                                            self.getLinkedNodes()
+                                            self.getUnLinkedNodes()
+                                        }
+                                        DispatchQueue.main.async {
+                                            Utility.hideLoader(view: self.view)
+                                            self.bindingTable.reloadData()
+                                        }
+                                    }
+                                }
+                            } else {
+                                self.showAlertWithOptions(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.bindingFailureMsg, actions: [UIAlertAction(title: ESPMatterConstants.okTxt, style: .default, handler: nil)])
                             }
-                        } else {
-                            self.showAlertWithOptions(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.bindingFailureMsg, actions: [UIAlertAction(title: ESPMatterConstants.okTxt, style: .default, handler: nil)])
                         }
                     }
-                }
-            } else {
-                Utility.showLoader(message: ESPMatterConstants.unlinkingDevicesMsg, view: self.view)
-                ESPMTRCommissioner.shared.unlinkDevice(bindingEndpointClusterId: self.bindingEndpointClusterId, cluster: self.cluster, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
-                    DispatchQueue.main.async {
-                        Utility.hideLoader(view: self.view)
-                        if result {
-                            var rainmakerNode: Node?
-                            let nodes = User.shared.associatedNodeList ?? []
-                            for node in nodes {
-                                if let nodeId = node.node_id, nodeId == sourceNodeId {
-                                    rainmakerNode = node
-                                    break
+                } else {
+                    Utility.showLoader(message: ESPMatterConstants.unlinkingDevicesMsg, view: self.view)
+                    if let group = self.group, let groupId = group.groupID {
+                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                        commissioner.unlinkDevice(bindingEndpointClusterId: self.bindingEndpointClusterId, cluster: self.cluster, sourceDeviceId: sourceDeviceId, destinationDeviveId: destinationDeviveId) { result in
+                            DispatchQueue.main.async {
+                                Utility.hideLoader(view: self.view)
+                                if result {
+                                    var rainmakerNode: Node?
+                                    let nodes = User.shared.associatedNodeList ?? []
+                                    for node in nodes {
+                                        if let nodeId = node.node_id, nodeId == sourceNodeId {
+                                            rainmakerNode = node
+                                            break
+                                        }
+                                    }
+                                    if let node = rainmakerNode {
+                                        Utility.showLoader(message: ESPMatterConstants.unlinkingDevicesMsg, view: self.view)
+                                        self.service = ESPNodeGroupMetadataService(switchIndex: self.switchIndex)
+                                        self.service?.unbindDevice(node: node, cluster: self.cluster, destinationNodeId: destinationNodeId) { result in
+                                            if result {
+                                                self.getLinkedNodes()
+                                                self.getUnLinkedNodes()
+                                            }
+                                            DispatchQueue.main.async {
+                                                Utility.hideLoader(view: self.view)
+                                                self.bindingTable.reloadData()
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    self.showAlertWithOptions(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.unbindingFailureMsg, actions: [UIAlertAction(title: ESPMatterConstants.okTxt, style: .default, handler: nil)])
                                 }
                             }
-                            if let node = rainmakerNode {
-                                Utility.showLoader(message: ESPMatterConstants.unlinkingDevicesMsg, view: self.view)
-                                self.service = ESPNodeGroupMetadataService(switchIndex: self.switchIndex)
-                                self.service?.unbindDevice(node: node, cluster: self.cluster, destinationNodeId: destinationNodeId) { result in
-                                    if result {
-                                        self.getLinkedNodes()
-                                        self.getUnLinkedNodes()
-                                    }
-                                    DispatchQueue.main.async {
-                                        Utility.hideLoader(view: self.view)
-                                        self.bindingTable.reloadData()
-                                    }
-                                }
-                            }
-                        } else {
-                            self.showAlertWithOptions(title: ESPMatterConstants.failureTxt, message: ESPMatterConstants.unbindingFailureMsg, actions: [UIAlertAction(title: ESPMatterConstants.okTxt, style: .default, handler: nil)])
                         }
                     }
                 }
             }
         }
     }
-    
     
     func getUnLinkedNodes() {
         if let group = self.group, let groupId = group.groupID, let clustedId = self.cluster.clusterId, let node = self.sourceNode, let rmNode = node.getRainmakerNode() {

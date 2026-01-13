@@ -610,6 +610,8 @@
 		F84FD89F2D790B9C00919407 /* ESPMTROCSSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */; };
 		F84FD8A02D790B9C00919407 /* ESPMTROCSSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */; };
 		F87C31E02DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */; };
+		F8E470112E66E72D0056383C /* PairingModeMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E470102E66E7240056383C /* PairingModeMessages.swift */; };
+		F8E470132E66E7E30056383C /* ESPMTRCommissionerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E470122E66E7DB0056383C /* ESPMTRCommissionerManager.swift */; };
 		F8E994792DF16C06006F406C /* ClientOnlyControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E994782DF16C05006F406C /* ClientOnlyControllerConstants.swift */; };
 		F8E9947B2DF1733F006F406C /* Node+ClientOnlyControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */; };
 /* End PBXBuildFile section */
@@ -1255,6 +1257,8 @@
 		F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTROCSSliderTVC.swift; sourceTree = "<group>"; };
 		F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTROCSSliderTVC.xib; sourceTree = "<group>"; };
 		F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = esp_rmaker_chal_resp.pb.swift; sourceTree = "<group>"; };
+		F8E470102E66E7240056383C /* PairingModeMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingModeMessages.swift; sourceTree = "<group>"; };
+		F8E470122E66E7DB0056383C /* ESPMTRCommissionerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRCommissionerManager.swift; sourceTree = "<group>"; };
 		F8E994782DF16C05006F406C /* ClientOnlyControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientOnlyControllerConstants.swift; sourceTree = "<group>"; };
 		F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+ClientOnlyControllerUtility.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1754,6 +1758,7 @@
 		0CD3592B2A2D25F30081017C /* ESPMTRCommissioner */ = {
 			isa = PBXGroup;
 			children = (
+				F8E470122E66E7DB0056383C /* ESPMTRCommissionerManager.swift */,
 				0C50F64D2AAEECA600BA7B6B /* ESPMTRCommissioner+Subscriber.swift */,
 				0CD359332A2D25F30081017C /* FabricKeys */,
 				0CD3593A2A2D25F30081017C /* ESPDefaultData.swift */,
@@ -2679,6 +2684,7 @@
 				F1BBD464255C1EE900CB0F42 /* SpinnerView.swift */,
 				F164A30725824EC500B879BC /* Configuration.swift */,
 				F1A057B1278F563200485C23 /* ESPEnvironment.swift */,
+				F8E470102E66E7240056383C /* PairingModeMessages.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -3400,6 +3406,7 @@
 				0C898D152BBED147009C5416 /* MatterControllerParser+Utility.swift in Sources */,
 				0CD359762A2D26010081017C /* ESPMatterEcosystemInfo.swift in Sources */,
 				143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */,
+				F8E470132E66E7E30056383C /* ESPMTRCommissionerManager.swift in Sources */,
 				0CF6923E270A308B0098F515 /* ESPAlexaWebViewController.swift in Sources */,
 				F1390F4127D8D70800F80DFB /* ESPDeleteAutomationService.swift in Sources */,
 				F1124F5D268CF58100FA0B9E /* ESPNotificationHandler+Actions.swift in Sources */,
@@ -3602,6 +3609,7 @@
 				F84FD8832D78C6D300919407 /* ESPMTRLevelSliderTVC.swift in Sources */,
 				F84FD8842D78C6D300919407 /* ESPMTRSaturationSliderTVC.swift in Sources */,
 				F1E132B52680C34700ED7E03 /* AppDelegate+Notifications.swift in Sources */,
+				F8E470112E66E72D0056383C /* PairingModeMessages.swift in Sources */,
 				F1C76D592687D463009E217D /* ESPNotificationHandler.swift in Sources */,
 				0C66B2242AF90BDF00BEA3C3 /* ESPMTRCommissioner+ParticipantData.swift in Sources */,
 				0CAC43DC2C466B530047B1DB /* ESPScanConstants.swift in Sources */,
@@ -4053,7 +4061,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.4.0;
+				MARKETING_VERSION = 3.4.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -4454,7 +4462,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.4.0;
+				MARKETING_VERSION = 3.4.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

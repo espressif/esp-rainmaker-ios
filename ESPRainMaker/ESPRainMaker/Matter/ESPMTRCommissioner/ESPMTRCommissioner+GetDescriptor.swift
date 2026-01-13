@@ -31,14 +31,14 @@ extension ESPMTRCommissioner {
     func getDescriptor(deviceId: UInt64, endPoint: UInt16, completion: @escaping (MTRBaseClusterDescriptor?) -> Void) {
         if let controller = sController {
             if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
-                if let descriptor = MTRBaseClusterDescriptor(device: device, endpointID: NSNumber(value: endPoint), queue: ESPMTRCommissioner.shared.matterQueue) {
+                if let descriptor = MTRBaseClusterDescriptor(device: device, endpointID: NSNumber(value: endPoint), queue: self.matterQueue) {
                     completion(descriptor)
                 } else {
                     completion(nil)
                 }
             } else {
-                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                    if let device = device, let descriptor = MTRBaseClusterDescriptor(device: device, endpointID: NSNumber(value: endPoint), queue: ESPMTRCommissioner.shared.matterQueue) {
+                controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                    if let device = device, let descriptor = MTRBaseClusterDescriptor(device: device, endpointID: NSNumber(value: endPoint), queue: self.matterQueue) {
                         completion(descriptor)
                     } else {
                         completion(nil)

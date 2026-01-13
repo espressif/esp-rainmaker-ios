@@ -146,7 +146,8 @@ extension DeviceViewController: BadgeCellDelegate {
                     DispatchQueue.main.async {
                         Utility.showLoader(message: "Updating badge details", view: self.view)
                     }
-                    ESPMTRCommissioner.shared.sendParticipantData(deviceId: deviceId, endpoint: endpoint, data: data) { apiResult in
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.sendParticipantData(deviceId: deviceId, endpoint: endpoint, data: data) { apiResult in
                         DispatchQueue.main.async {
                             Utility.hideLoader(view: self.view)
                         }

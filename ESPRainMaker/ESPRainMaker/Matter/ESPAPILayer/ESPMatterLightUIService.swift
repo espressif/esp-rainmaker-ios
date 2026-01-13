@@ -45,12 +45,13 @@ class ESPMatterLightUIService {
                 let isOnOffServerSupported = node.isOnOffServerSupported
                 if let nodeId = node.node_id, isOnOffServerSupported.0 {
                     if let groupId = self.fabricDetails.getGroupId(nodeId: nodeId), let matterNodeId = node.matter_node_id, User.shared.isMatterNodeConnected(matterNodeId: matterNodeId), let group = self.getGroup(groupId: groupId), let userNOC = self.fabricDetails.getUserNOCDetails(groupId: groupId), let deviceId = matterNodeId.hexToDecimal {
-                        if let grp = ESPMTRCommissioner.shared.group, let grpId = grp.groupID, grpId != groupId {
-                            ESPMTRCommissioner.shared.shutDownController()
-                            ESPMTRCommissioner.shared.group = group
-                            ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOC)
+                        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                        if let grp = commissioner.group, let grpId = grp.groupID, grpId != groupId {
+                            commissioner.shutDownController()
+                            commissioner.group = group
+                            commissioner.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOC)
                         }
-                        ESPMTRCommissioner.shared.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
+                        commissioner.isLightOn(groupId: groupId, deviceId: deviceId) { isLightOn in
                             self.data[nodeId] = isLightOn
                             self.index+=1
                             self.checkMatterLightStatus(index: self.index)

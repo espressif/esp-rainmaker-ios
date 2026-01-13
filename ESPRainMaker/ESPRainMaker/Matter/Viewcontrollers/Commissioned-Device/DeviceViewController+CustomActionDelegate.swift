@@ -39,9 +39,10 @@ extension DeviceViewController: CustomActionDelegate {
                 DispatchQueue.main.async {
                     Utility.showLoader(message: "", view: self.view)
                 }
-                ESPMTRCommissioner.shared.readAttributeUserNOCInstalledOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                commissioner.readAttributeUserNOCInstalledOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
                     if result {
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
+                        commissioner.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
                             DispatchQueue.main.async {
                                 Utility.hideLoader(view: self.view)
                                 if !result {
@@ -77,7 +78,8 @@ extension DeviceViewController: CustomActionDelegate {
             DispatchQueue.main.async {
                 Utility.showLoader(message: "", view: self.view)
             }
-            ESPMTRCommissioner.shared.updateThreadDataset(groupId: groupId, deviceId: deviceId) { status, message in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.updateThreadDataset(groupId: groupId, deviceId: deviceId) { status, message in
                 DispatchQueue.main.async {
                     Utility.hideLoader(view: self.view)
                     if status {
@@ -86,7 +88,7 @@ extension DeviceViewController: CustomActionDelegate {
                                        buttonTitle: ThreadBRMessages.ok.rawValue) {}
                     } else if let message = message {
                         if message == ThreadBRMessages.homepodDatasetNotAvailable.rawValue {
-                            ESPMTRCommissioner.shared.updateThreadDataLocally(groupId: groupId, deviceId: deviceId) { result, _ in
+                            commissioner.updateThreadDataLocally(groupId: groupId, deviceId: deviceId) { result, _ in
                                 DispatchQueue.main.async {
                                     self.alertUser(title: result ? ThreadBRMessages.success.rawValue : ThreadBRMessages.failure.rawValue,
                                                    message: result ? ThreadBRMessages.setThreadCredsLocally.rawValue : ThreadBRMessages.failedToSetThreadCredsLocally.rawValue,
@@ -127,15 +129,18 @@ extension DeviceViewController: CustomActionDelegate {
     /// Append refresh token
     /// - Parameters:
     ///   - deviceId: device id
+    ///   - endpoint: endpoint
+    ///   - groupId: group id
     ///   - refreshToken: refresh token
     ///   - completion: completion
-    func appendRefreshToken(deviceId: UInt64, endpoint: UInt16, refreshToken: String, completion: @escaping (Bool) -> Void) {
+    func appendRefreshToken(deviceId: UInt64, endpoint: UInt16, groupId: String, refreshToken: String, completion: @escaping (Bool) -> Void) {
         let index = refreshToken.index(refreshToken.startIndex, offsetBy: 960)
         let firstPayload = refreshToken[..<index]
         let secondPayload = refreshToken.replacingOccurrences(of: firstPayload, with: "")
-        ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: String(firstPayload)) { result in
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: String(firstPayload)) { result in
             if result {
-                ESPMTRCommissioner.shared.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: secondPayload) { result in
+                commissioner.appendRefreshTokenToDevice(deviceId: deviceId, endpoint: endpoint, token: secondPayload) { result in
                     completion(result)
                 }
                 return
@@ -146,15 +151,18 @@ extension DeviceViewController: CustomActionDelegate {
     
     /// Authorize
     /// - Parameters:
+    ///   - matterNodeId: matter node id
     ///   - deviceId: device id
+    ///   - endpoint: endpoint
+    ///   - groupId: group id
     ///   - endpointURL: endpoint URL
-    ///   - completion: completion
-    func authorize(matterNodeId: String, deviceId: UInt64, endpoint: UInt16, endpointURL: String) {
-        ESPMTRCommissioner.shared.authorizeDevice(deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
+    func authorize(matterNodeId: String, deviceId: UInt64, endpoint: UInt16, groupId: String, endpointURL: String) {
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+        commissioner.authorizeDevice(deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL) { result in
             if result {
-                ESPMTRCommissioner.shared.updateUserNOCOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
+                commissioner.updateUserNOCOnDevice(deviceId: deviceId, endpoint: endpoint) { result in
                     if result  {
-                        ESPMTRCommissioner.shared.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { isDeviceListUpdated in
+                        commissioner.updateDeviceListOnDevice(deviceId: deviceId, endpoint: endpoint) { isDeviceListUpdated in
                             DispatchQueue.main.async {
                                 if isDeviceListUpdated {
                                     Utility.hideLoader(view: self.view)
@@ -197,11 +205,12 @@ extension DeviceViewController: RainmakerControllerFlowDelegate {
                 if let point = clusterInfo.1, let id = UInt16(point) {
                     endpoint = id
                 }
-                ESPMTRCommissioner.shared.resetRefreshTokenInDevice(deviceId: deviceId, endpoint: endpoint) { result in
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                commissioner.resetRefreshTokenInDevice(deviceId: deviceId, endpoint: endpoint) { result in
                     if result {
-                        self.appendRefreshToken(deviceId: deviceId, endpoint: endpoint, refreshToken: refreshToken) { result in
+                        self.appendRefreshToken(deviceId: deviceId, endpoint: endpoint, groupId: groupId, refreshToken: refreshToken) { result in
                             if result {
-                                self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpoint: endpoint, endpointURL: Configuration.shared.awsConfiguration.baseURL)
+                                self.authorize(matterNodeId: matterNodeId, deviceId: deviceId, endpoint: endpoint, groupId: groupId, endpointURL: Configuration.shared.awsConfiguration.baseURL)
                             } else {
                                 DispatchQueue.main.async {
                                     self.hideLoaderAndShowError()

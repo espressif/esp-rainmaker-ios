@@ -182,41 +182,8 @@ class ESPMTRCCTSliderTVC: UITableViewCell {
     @IBAction func hueSliderValueChanged(_: GradientSlider) {}
 
     @IBAction func checkBoxPressed(_: Any) {}
-
-}
-
-@available(iOS 16.4, *)
-extension ESPMTRCCTSliderTVC: StepSliderProtocol {
     
-    /// Set level slider final value
-    /// - Parameter finalValue: slider finalk value
-    func setCCTSliderValue(finalValue: Float) {
-        DispatchQueue.main.async {
-            if self.slider.value != finalValue {
-                self.slider.setValue(finalValue, animated: true)
-                self.setSliderThumbUI()
-            }
-        }
-    }
-    
-    /// Get color cluster
-    /// - Parameters:
-    ///   - completionHandler: completion
-    func getColorCluster(completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
-        if let group = nodeGroup, let groupId = group.groupID, let id = deviceId, let controller = ESPMTRCommissioner.shared.sController {
-            let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: id)
-            controller.getBaseDevice(id, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let endpoint = endpoint, let point = UInt16(endpoint), let colorControlCluster = MTRBaseClusterColorControl(device: device, endpoint: UInt16(truncating: NSNumber(value: point)), queue: ESPMTRCommissioner.shared.matterQueue) {
-                    completionHandler(colorControlCluster)
-                } else {
-                    completionHandler(nil)
-                }
-            }
-        } else {
-            completionHandler(nil)
-        }
-    }
-    
+    // MARK: - Protocol Methods
     /// Setup slider min/max and step values
     /// - Parameters:
     ///   - param: device param
@@ -322,6 +289,8 @@ extension ESPMTRCCTSliderTVC: StepSliderProtocol {
         return initialValue
     }
     
+    //MARK: CCT
+    
     /// Setup the initial UI for CCT Param
     func setupInitialCCTUI() {
         DispatchQueue.main.async {
@@ -342,14 +311,12 @@ extension ESPMTRCCTSliderTVC: StepSliderProtocol {
         }
     }
     
-    /// Get current level value
-    /// - Parameters:
-    ///   - groupId: group id
-    ///   - deviceId: device id
-    func getCurrentCCTValue(groupId: String, deviceId: UInt64) {
+    /// Get current CCT value
+    func getCurrentCCTValue() {
         self.setupInitialCCTUI()
-        if self.nodeConnectionStatus == .local {
-            if let _ = ESPMTRCommissioner.shared.sController {
+        if self.nodeConnectionStatus == .local, let groupId = self.nodeGroup?.groupID {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let _ = commissioner.sController {
                 self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         cluster.readAttributeColorTemperatureMireds { val, _ in
@@ -379,12 +346,13 @@ extension ESPMTRCCTSliderTVC: StepSliderProtocol {
         }
     }
     
-    /// Change fan speed
-    /// - Parameter speed: new speed value
+    /// Change CCT
+    /// - Parameter cct: new CCT value
     func changeCCT(cct: Int) {
         if let id = self.deviceId, let grpId = self.nodeGroup?.groupID {
             if self.nodeConnectionStatus == .local {
-                if let _ = ESPMTRCommissioner.shared.sController {
+                let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+                if let _ = commissioner.sController {
                     self.getColorCluster() { cluster in
                         if let cluster = cluster {
                             let cctParams = MTRColorControlClusterMoveToColorTemperatureParams()
@@ -419,10 +387,10 @@ extension ESPMTRCCTSliderTVC: StepSliderProtocol {
                     }
                     let final = Int(1000000/cct)
                     ESPControllerAPIManager.shared.callCCTAPI(rainmakerNode: rainmakerNode,
-                                                                     controllerNodeId: controllerNodeId,
-                                                                     matterNodeId: matterNodeId,
-                                                                     endpoint: endpoint,
-                                                                     cctLevel: "\(final)") { result in
+                                                              controllerNodeId: controllerNodeId,
+                                                              matterNodeId: matterNodeId,
+                                                              endpoint: endpoint,
+                                                              cctLevel: "\(final)") { result in
                         if result {
                             if let node = self.node, let id = self.deviceId {
                                 node.setMatterCCTValue(cct: cct, deviceId: id)
@@ -437,20 +405,58 @@ extension ESPMTRCCTSliderTVC: StepSliderProtocol {
         }
     }
     
-    /// Subscribe to saturation attribute
+    /// Get color cluster
+    /// - Parameters:
+    ///   - completionHandler: completion
+    func getColorCluster(completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
+        if let group = nodeGroup, let groupId = group.groupID, let id = deviceId {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let controller = commissioner.sController {
+                let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: id)
+                controller.getBaseDevice(id, queue: commissioner.matterQueue) { device, _ in
+                    if let device = device, let endpoint = endpoint, let point = UInt16(endpoint), let colorControlCluster = MTRBaseClusterColorControl(device: device, endpoint: UInt16(truncating: NSNumber(value: point)), queue: commissioner.matterQueue) {
+                        completionHandler(colorControlCluster)
+                    } else {
+                        completionHandler(nil)
+                    }
+                }
+            } else {
+                completionHandler(nil)
+            }
+        }
+    }
+    
+    /// Subscribe to CCT attribute
     func subscribeToCCTAttribute() {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToCCTValue(groupId: grpId, deviceId: deviceId) { cct in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToCCTValue(groupId: grpId, deviceId: deviceId) { cct in
                 DispatchQueue.main.async {
-                    let finalCCTValue = Int(cct)
                     if let node = self.node, let id = self.deviceId {
                         node.setMatterCCTValue(cct: cct, deviceId: id)
                     }
-                    self.currentLevel = finalCCTValue
+                    self.currentLevel = cct
                     self.setCCTSliderValue(finalValue: Float(self.currentLevel))
                 }
             }
         }
     }
+    
+    /// Set CCT slider final value
+    /// - Parameter finalValue: slider final value
+    func setCCTSliderValue(finalValue: Float) {
+        DispatchQueue.main.async {
+            if self.slider.value != finalValue {
+                self.slider.setValue(finalValue, animated: true)
+                self.setSliderThumbUI()
+            }
+        }
+    }
+
+}
+
+@available(iOS 16.4, *)
+extension ESPMTRCCTSliderTVC: StepSliderProtocol {
+    // Protocol conformance - these methods are already implemented at the class level
 }
 #endif

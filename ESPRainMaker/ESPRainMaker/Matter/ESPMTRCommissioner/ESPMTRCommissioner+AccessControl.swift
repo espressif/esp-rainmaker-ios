@@ -29,8 +29,8 @@ extension ESPMTRCommissioner {
     ///   - completionHandler: completion handler
     func readACLAttributes(deviceId: UInt64, completionHandler: @escaping (MTRAccessControlClusterAccessControlEntryStruct?) -> Void) {
         if let controller = sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: self.matterQueue) {
                     accessControlCluster.readAttributeACL(with: nil) { val, _ in
                         if let val = val as? [MTRAccessControlClusterAccessControlEntryStruct], val.count > 0 {
                             let value = val[0]
@@ -54,8 +54,8 @@ extension ESPMTRCommissioner {
     ///   - completionHandler: completion handler
     func readAllACLAttributes(deviceId: UInt64, completionHandler: @escaping ([MTRAccessControlClusterAccessControlEntryStruct]?) -> Void) {
         if let controller = sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: self.matterQueue) {
                     accessControlCluster.readAttributeACL(with: nil) { val, _ in
                         if let val = val as? [MTRAccessControlClusterAccessControlEntryStruct] {
                             completionHandler(val)
@@ -79,8 +79,8 @@ extension ESPMTRCommissioner {
     ///   - completionHandler: completion handler
     func writeACLAttributes(deviceId: UInt64, accessControlEntry: MTRAccessControlClusterAccessControlEntryStruct, completionHandler: @escaping (Bool) -> Void) {
         if let controller = sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: self.matterQueue) {
                     accessControlCluster.writeAttributeACL(withValue: [accessControlEntry]) { error in
                         if let _ = error {
                             completionHandler(false)
@@ -104,8 +104,8 @@ extension ESPMTRCommissioner {
     ///   - completionHandler: completion handler
     func writeAllACLAttributes(deviceId: UInt64, accessControlEntry: [MTRAccessControlClusterAccessControlEntryStruct], completionHandler: @escaping (Bool) -> Void) {
         if let controller = sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                if let device = device, let accessControlCluster = MTRBaseClusterAccessControl(device: device, endpointID: NSNumber(value: 0), queue: self.matterQueue) {
                     accessControlCluster.writeAttributeACL(withValue: accessControlEntry) { error in
                         if let _ = error {
                             completionHandler(false)
@@ -124,8 +124,8 @@ extension ESPMTRCommissioner {
     
     func readBindingData(deviceId: UInt64, destinationDeviceId: UInt64, endpointId: UInt, completion: @escaping (Bool) -> Void) {
         if let controller = sController {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let bindingCluster = MTRBaseClusterBinding(device: device, endpointID: NSNumber(value: endpointId), queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                if let device = device, let bindingCluster = MTRBaseClusterBinding(device: device, endpointID: NSNumber(value: endpointId), queue: self.matterQueue) {
                     bindingCluster.readAttributeBinding(with: nil) { val, _ in
                         if var params = val as? [MTRBindingClusterTargetStruct], params.count > 0 {
                             for param in params {

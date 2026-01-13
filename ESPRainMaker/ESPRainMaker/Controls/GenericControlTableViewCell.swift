@@ -99,7 +99,8 @@ class GenericControlTableViewCell: UITableViewCell {
     func subscribeToLocalTemperature() {
         #if ESPRainMakerMatter
         if #available(iOS 16.4, *), let group = self.nodeGroup, let groupId = group.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeLocalTemperature(groupId: groupId, deviceId: deviceId) { localTemperature in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            commissioner.subscribeLocalTemperature(groupId: groupId, deviceId: deviceId) { localTemperature in
                 if let localTemperature = localTemperature {
                     self.node?.setMatterLocalTemperatureValue(temperature: localTemperature, deviceId: deviceId)
                     DispatchQueue.main.async {

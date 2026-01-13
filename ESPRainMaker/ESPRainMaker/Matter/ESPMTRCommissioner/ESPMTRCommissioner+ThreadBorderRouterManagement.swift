@@ -533,7 +533,7 @@ extension ESPMTRCommissioner {
             completion(false, ThreadBRMessages.serviceNotSupported.rawValue)
             return
         }
-        ESPMTRCommissioner.shared.readTBRAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { borderAgentId in
+        self.readTBRAttributeBorderAgentId(deviceId: deviceId, endpoint: endpoint) { borderAgentId in
             guard let borderAgentId = borderAgentId else {
                 completion(false, ThreadBRMessages.failedToReadBorderAgentId.rawValue)
                 return
@@ -545,7 +545,7 @@ extension ESPMTRCommissioner {
                     completion(result, result ? ThreadBRMessages.setThreadCredsLocally.rawValue : ThreadBRMessages.failedToSetThreadCredsLocally.rawValue)
                 }
             } else {
-                ESPMTRCommissioner.shared.getTBRActiveOperationalDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
+                self.getTBRActiveOperationalDataset(deviceId: deviceId, endpoint: endpoint) { dataset in
                     guard let dataset = dataset else {
                         completion(false, ThreadBRMessages.failedToReadActiveDataset.rawValue)
                         return

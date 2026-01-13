@@ -33,14 +33,14 @@ extension ESPMTRCommissioner {
         let endpointClusterId = ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId)
         if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
             if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
-                if let cluster = MTRBaseClusterLevelControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                if let cluster = MTRBaseClusterLevelControl(device: device, endpoint: endpoint, queue: self.matterQueue) {
                     completionHandler(cluster)
                 } else {
                     completionHandler(nil)
                 }
             } else {
-                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                    if let device = device, let cluster = MTRBaseClusterLevelControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                    if let device = device, let cluster = MTRBaseClusterLevelControl(device: device, endpoint: endpoint, queue: self.matterQueue) {
                         completionHandler(cluster)
                     } else {
                         completionHandler(nil)
@@ -61,14 +61,14 @@ extension ESPMTRCommissioner {
         let endpointClusterId = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: deviceId)
         if let controller = sController, endpointClusterId.0 == true, let key = endpointClusterId.1, let endpoint = UInt16(key) {
             if let device = try? controller.getDeviceBeingCommissioned(deviceId) {
-                if let cluster = MTRBaseClusterColorControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                if let cluster = MTRBaseClusterColorControl(device: device, endpoint: endpoint, queue: self.matterQueue) {
                     completionHandler(cluster)
                 } else {
                     completionHandler(nil)
                 }
             } else {
-                controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                    if let device = device, let cluster = MTRBaseClusterColorControl(device: device, endpoint: endpoint, queue: ESPMTRCommissioner.shared.matterQueue) {
+                controller.getBaseDevice(deviceId, queue: self.matterQueue) { device, _ in
+                    if let device = device, let cluster = MTRBaseClusterColorControl(device: device, endpoint: endpoint, queue: self.matterQueue) {
                         completionHandler(cluster)
                     } else {
                         completionHandler(nil)
@@ -87,9 +87,10 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion handler with on/off value
     func subscribeToOnOffValue(groupId: String, deviceId: UInt64, completion: @escaping (Bool) -> Void) {
-        ESPMTRCommissioner.shared.getOnOffCluster(groupId: groupId, deviceId: deviceId) { cluster in
+        self.getOnOffCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
+                params.shouldReplaceExistingSubscriptions = true
                 params.minInterval = NSNumber(value: 1.0)
                 params.maxInterval = NSNumber(value: 2.0)
                 cluster.subscribeAttributeOnOff(with: params, subscriptionEstablished: nil) { val, _ in
@@ -107,9 +108,10 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion
     func subscribeToLevelValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
-        ESPMTRCommissioner.shared.getLevelController(groupId: groupId, deviceId: deviceId) { cluster in
+        self.getLevelController(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
+                params.shouldReplaceExistingSubscriptions = true
                 params.minInterval = NSNumber(value: 1.0)
                 params.maxInterval = NSNumber(value: 2.0)
                 cluster.subscribeAttributeCurrentLevel(with: params, subscriptionEstablished: nil) { val, _ in
@@ -127,9 +129,10 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion with hue value
     func subscribeToHueValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
-        ESPMTRCommissioner.shared.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
+        self.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
+                params.shouldReplaceExistingSubscriptions = true
                 params.minInterval = NSNumber(value: 1.0)
                 params.maxInterval = NSNumber(value: 2.0)
                 cluster.subscribeAttributeCurrentHue(with: params, subscriptionEstablished: nil) { val, _ in
@@ -147,7 +150,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion with saturation value
     func subscribeToSaturationValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
-        ESPMTRCommissioner.shared.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
+        self.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
                 params.minInterval = NSNumber(value: 1.0)
@@ -167,9 +170,10 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - completion: completion with saturation value
     func subscribeToCCTValue(groupId: String, deviceId: UInt64, completion: @escaping (Int) -> Void) {
-        ESPMTRCommissioner.shared.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
+        self.getColorCluster(groupId: groupId, deviceId: deviceId) { cluster in
             if let cluster = cluster {
                 let params = MTRSubscribeParams()
+                params.shouldReplaceExistingSubscriptions = true
                 params.minInterval = NSNumber(value: 1.0)
                 params.maxInterval = NSNumber(value: 2.0)
                 cluster.subscribeAttributeColorTemperatureMireds(with: params, subscriptionEstablished: nil) { val, _ in

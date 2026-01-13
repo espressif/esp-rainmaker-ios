@@ -39,7 +39,6 @@ class ESPMTRCommissioner: NSObject {
     var fabricIndex: UInt8?
     var keys: MTRCSRKeys?
     let matterQueue = DispatchQueue(label: "com.zigbee.chip.qrcodevc.callback", qos: .userInteractive)
-    public static let shared = ESPMTRCommissioner()
     public var sController: MTRDeviceController?
     var utilsDelegate: UtilsDelegate?
     var serverData: [String: [UInt]] = [String: [UInt]]()
@@ -173,7 +172,7 @@ extension ESPMTRCommissioner: ESPAddNodeToMatterFabricPresentationLogic {
     ///   - response: response
     ///   - error: error
     func nodeNOCReceived(groupId: String, response: ESPAddNodeToFabricResponse?, error: Error?) {
-        ESPMTRCommissioner.shared.matterQueue.sync {
+        self.matterQueue.sync {
             let deviceId = ESPMatterDeviceManager.shared.getCurrentDeviceId()
             if let completion = completion, let response = response {
                 self.fabricDetails.saveAddNodeToMatterFabricDetails(groupId: groupId, deviceId: deviceId, data: response)

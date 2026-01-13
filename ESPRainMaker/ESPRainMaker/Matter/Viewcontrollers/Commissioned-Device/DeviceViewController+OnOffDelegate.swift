@@ -32,16 +32,19 @@ extension DeviceViewController: OnOffDelegate {
         if let endpointId = endpointId {
             endPoint = endpointId
         }
-        if let dId = dId, let controller = ESPMTRCommissioner.shared.sController {
-            controller.getBaseDevice(dId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let onOffCluster = MTRBaseClusterOnOff(device: device, endpointID: NSNumber(value: endPoint), queue: ESPMTRCommissioner.shared.matterQueue) {
-                    switch state {
-                    case .off:
-                        onOffCluster.off { _ in}
-                    case .on:
-                        onOffCluster.on { _ in}
-                    case .toggle:
-                        onOffCluster.toggle { _ in}
+        if let dId = dId, let group = self.group, let groupId = group.groupID {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let controller = commissioner.sController {
+                controller.getBaseDevice(dId, queue: commissioner.matterQueue) { device, _ in
+                    if let device = device, let onOffCluster = MTRBaseClusterOnOff(device: device, endpointID: NSNumber(value: endPoint), queue: commissioner.matterQueue) {
+                        switch state {
+                        case .off:
+                            onOffCluster.off { _ in}
+                        case .on:
+                            onOffCluster.on { _ in}
+                        case .toggle:
+                            onOffCluster.toggle { _ in}
+                        }
                     }
                 }
             }

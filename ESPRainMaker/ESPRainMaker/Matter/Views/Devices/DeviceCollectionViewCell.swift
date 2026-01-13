@@ -50,6 +50,49 @@ class DeviceCollectionViewCell: UICollectionViewCell {
         layer.masksToBounds = false
         let onOffTap = UITapGestureRecognizer(target: self, action: #selector(toggle))
         self.functionalOnOffButton.addGestureRecognizer(onOffTap)
+        
+        // Add observer for device-specific updates
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOnOffUpdate),
+            name: Notification.Name("MatterDeviceOnOffChanged"),
+            object: nil
+        )
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        // Reset UI elements to default state
+        self.onOffButton.image = UIImage(named: "switch_off")
+        self.deviceName.text = ""
+        self.accessibilityButton.text = ""
+        self.overlay.isHidden = true
+        self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
+        
+        // Reset data references
+        self.node = nil
+        self.group = nil
+        self.rainmakerNode = nil
+        self.connectionStatus = .local
+        
+        // Remove any pending UI updates
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
+    }
+    
+    /// Ensure the cell reflects the current state from UserDefaults
+    func refreshFromCurrentState() {
+        if let node = self.node, let deviceId = node.deviceId {
+            // Always read the current state from UserDefaults
+            if let currentStatus = node.isMatterLightOn(deviceId: deviceId) {
+                self.setToggleButtonUI(isLightOn: currentStatus)
+            }
+        }
+    }
+    
+    deinit {
+        // Clean up observers to prevent memory leaks and stale updates
+        NotificationCenter.default.removeObserver(self)
     }
     
     /// Toggle button pressed
@@ -66,7 +109,8 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                     self.setToggleButtonUI(isLightOn: false)
                 }
                 if final {
-                    ESPMTRCommissioner.shared.turnOn(groupId: groupId, deviceId: deviceId) { result in
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.turnOn(groupId: groupId, deviceId: deviceId) { result in
                         if result {
                             node.setMatterLightOnStatus(status: true, deviceId: deviceId)
                         } else {
@@ -74,7 +118,8 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                         }
                     }
                 } else {
-                    ESPMTRCommissioner.shared.turnOff(groupId: groupId, deviceId: deviceId) { result in
+                    let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+                    commissioner.turnOff(groupId: groupId, deviceId: deviceId) { result in
                         if result {
                             node.setMatterLightOnStatus(status: false, deviceId: deviceId)
                         } else {
@@ -151,6 +196,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                 DispatchQueue.main.async {
                     showLight = true
                     self.onOffButton.isHidden = false
+                    // Always read the current state from UserDefaults to ensure accuracy
                     if let lightOnOffStatus = node.isMatterLightOn(deviceId: deviceId) {
                         if lightOnOffStatus {
                             self.onOffButton.image = UIImage(named: "switch_on")
@@ -158,6 +204,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                             self.onOffButton.image = UIImage(named: "switch_off")
                         }
                     } else {
+                        // If no state is stored, default to on and store it
                         node.setMatterLightOnStatus(status: true, deviceId: deviceId)
                         self.onOffButton.image = UIImage(named: "switch_on")
                     }
@@ -204,12 +251,13 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     /// Restart matter controller
     func restartController() {
         if let group = self.group, let groupId = group.groupID, let userNOC = ESPMatterFabricDetails.shared.getUserNOCDetails(groupId: groupId) {
-            if let grp = ESPMTRCommissioner.shared.group, let grpId = grp.groupID, grpId != groupId {
-                ESPMTRCommissioner.shared.shutDownController()
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let grp = commissioner.group, let grpId = grp.groupID, grpId != groupId {
+                commissioner.shutDownController()
             }
-            if ESPMTRCommissioner.shared.sController == nil {
-                ESPMTRCommissioner.shared.group = self.group
-                ESPMTRCommissioner.shared.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOC)
+            if commissioner.sController == nil {
+                commissioner.group = self.group
+                commissioner.initializeMTRControllerWithUserNOC(matterFabricData: group, userNOCData: userNOC)
             }
         }
     }
@@ -217,7 +265,16 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     /// Toggle button
     /// - Parameter isLightOn: light on/off status
     func setToggleButtonUI(isLightOn: Bool) {
-        DispatchQueue.main.async {
+        // Use a serial queue to prevent race conditions in UI updates
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Update the data source to reflect the new state
+            if let node = self.node, let deviceId = node.deviceId {
+                // Also update the rainmakerNode if available to keep data in sync
+                node.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
+            }
+            
             if isLightOn {
                 self.onOffButton.image = UIImage(named: "switch_on")
             } else {
@@ -233,6 +290,25 @@ class DeviceCollectionViewCell: UICollectionViewCell {
             DispatchQueue.main.async {
                 self.setToggleStatusFromControllerConfig()
             }
+        }
+    }
+    
+    /// Handle on/off updates from subscriptions
+    @objc func handleOnOffUpdate(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let notificationNodeId = userInfo["nodeId"] as? String,
+              let notificationDeviceId = userInfo["deviceId"] as? UInt64,
+              let isOn = userInfo["isOn"] as? Bool,
+              let node = self.node,
+              let nodeId = node.nodeID,
+              let deviceId = node.deviceId,
+              notificationNodeId == nodeId,
+              notificationDeviceId == deviceId else {
+            return  // Only update if this is our device
+        }
+        
+        DispatchQueue.main.async {
+            self.setToggleButtonUI(isLightOn: isOn)
         }
     }
 }

@@ -171,10 +171,8 @@ class ESPMTRLevelSliderTVC: UITableViewCell {
     // IB Actions
     @IBAction func sliderValueChanged(_ sender: UISlider) {
         setSliderThumbUI()
-        if let grouoId = nodeGroup?.groupID, let deviceId = deviceId {
-            let val = sender.value
-            self.changeLevel(groupId: grouoId, deviceId: deviceId, toValue: val)
-        }
+        let val = sender.value
+        self.changeLevel(toValue: val)
     }
     
     @IBAction func sliderValueDragged(_ sender: UISlider) {
@@ -194,7 +192,8 @@ extension ESPMTRLevelSliderTVC: StepSliderProtocol {
     /// Subscribe to level attribute
     func subscribeToLevelAttribute() {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToLevelValue(groupId: grpId, deviceId: deviceId) { level in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToLevelValue(groupId: grpId, deviceId: deviceId) { level in
                 let finalLevelValue = Float(CGFloat(level)/2.54)
                 if let node = self.node, let id = self.deviceId {
                     node.setMatterLevelValue(level: level, deviceId: id)
@@ -206,15 +205,14 @@ extension ESPMTRLevelSliderTVC: StepSliderProtocol {
     }
     
     /// Change level
-    /// - Parameters:
-    ///   - groupId: group id
-    ///   - deviceId: device id
-    ///   - val: value
-    func changeLevel(groupId: String, deviceId: UInt64, toValue val: Float) {
+    /// - Parameter val: value
+    func changeLevel(toValue val: Float) {
+        guard let groupId = self.nodeGroup?.groupID, let deviceId = self.deviceId else { return }
         let finalValue = Int(val*2.54)
         if nodeConnectionStatus == .local {
-            if let cont = ESPMTRCommissioner.shared.sController {
-                self.getLevelController(groupId: groupId, deviceId: deviceId, controller: cont) { controller in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let cont = commissioner.sController {
+                self.getLevelController(controller: cont) { controller in
                     if let controller = controller {
                         let levelParams = MTRLevelControlClusterMoveToLevelWithOnOffParams()
                         levelParams.level = NSNumber(value: finalValue)
@@ -389,14 +387,13 @@ extension ESPMTRLevelSliderTVC: StepSliderProtocol {
     }
     
     /// Get current level value
-    /// - Parameters:
-    ///   - groupId: group id
-    ///   - deviceId: device id
-    func getCurrentLevelValues(groupId: String, deviceId: UInt64) {
+    func getCurrentLevelValues() {
+        guard let groupId = self.nodeGroup?.groupID, let deviceId = self.deviceId else { return }
         self.setupInitialLevelValues()
         if self.nodeConnectionStatus == .local {
-            if let controller = ESPMTRCommissioner.shared.sController {
-                self.getLevelController(groupId: groupId, deviceId: deviceId, controller: controller) { levelControl in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let controller = commissioner.sController {
+                self.getLevelController(controller: controller) { levelControl in
                     if let levelControl = levelControl {
                         self.getMinLevelValue(levelControl: levelControl) { min, _ in
                             self.getCurrentLevelValue(levelControl: levelControl) { current, _ in
@@ -430,16 +427,18 @@ extension ESPMTRLevelSliderTVC: StepSliderProtocol {
     
     /// Get level controller
     /// - Parameters:
-    ///   - timeout: time out
-    ///   - groupId: group id
-    ///   - deviceId: device id
     ///   - controller: controller
     ///   - completionHandler: completion handler
-    func getLevelController(groupId: String, deviceId: UInt64, controller: MTRDeviceController, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void) {
+    func getLevelController(controller: MTRDeviceController, completionHandler: @escaping (MTRBaseClusterLevelControl?) -> Void) {
+        guard let groupId = self.nodeGroup?.groupID, let deviceId = self.deviceId else {
+            completionHandler(nil)
+            return
+        }
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
         let (_, endpoint) = ESPMatterClusterUtil.shared.isLevelControlServerSupported(groupId: groupId, deviceId: deviceId)
         if let endpoint = endpoint, let point = UInt16(endpoint) {
-            controller.getBaseDevice(deviceId, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let levelControl = MTRBaseClusterLevelControl(device: device, endpoint: point, queue: ESPMTRCommissioner.shared.matterQueue) {
+            controller.getBaseDevice(deviceId, queue: commissioner.matterQueue) { device, _ in
+                if let device = device, let levelControl = MTRBaseClusterLevelControl(device: device, endpoint: point, queue: commissioner.matterQueue) {
                     completionHandler(levelControl)
                 } else {
                     completionHandler(nil)

@@ -296,7 +296,7 @@ struct ESPMatterConstants {
     static let updateNodeGroupMsg: String = "Do you want to update node group to matter fabric?"
     
     /// color hexcodes
-    static let customBackgroundColor: String = "#005493"
+    static let customBackgroundColor: String = "#8265E3"
     
     static let csrHeader = "-----BEGIN CERTIFICATE REQUEST-----"
     static let csrFooter = "-----END CERTIFICATE REQUEST-----"

@@ -186,30 +186,8 @@ class ESPMTRSaturationSliderTVC: UITableViewCell {
     @IBAction func hueSliderValueChanged(_: GradientSlider) {}
 
     @IBAction func checkBoxPressed(_: Any) {}
-
-}
-
-@available(iOS 16.4, *)
-extension ESPMTRSaturationSliderTVC: StepSliderProtocol {
     
-    /// Get color cluster
-    /// - Parameters:
-    ///   - completionHandler: completion
-    func getColorCluster(completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
-        if let group = nodeGroup, let groupId = group.groupID, let id = deviceId, let controller = ESPMTRCommissioner.shared.sController {
-            let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: id)
-            controller.getBaseDevice(id, queue: ESPMTRCommissioner.shared.matterQueue) { device, _ in
-                if let device = device, let endpoint = endpoint, let point = UInt16(endpoint), let colorControlCluster = MTRBaseClusterColorControl(device: device, endpoint: UInt16(truncating: NSNumber(value: point)), queue: ESPMTRCommissioner.shared.matterQueue) {
-                    completionHandler(colorControlCluster)
-                } else {
-                    completionHandler(nil)
-                }
-            }
-        } else {
-            completionHandler(nil)
-        }
-    }
-    
+    // MARK: - Protocol Methods
     /// Setup slider min/max and step values
     /// - Parameters:
     ///   - param: device param
@@ -337,13 +315,11 @@ extension ESPMTRSaturationSliderTVC: StepSliderProtocol {
     }
     
     /// Get current level value
-    /// - Parameters:
-    ///   - groupId: group id
-    ///   - deviceId: device id
-    func getCurrentSaturationValue(groupId: String, deviceId: UInt64) {
+    func getCurrentSaturationValue() {
         self.setupInitialSaturationValue()
-        if self.nodeConnectionStatus == .local {
-            if let _ = ESPMTRCommissioner.shared.sController {
+        if self.nodeConnectionStatus == .local, let groupId = self.nodeGroup?.groupID {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let _ = commissioner.sController {
                 self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         cluster.readAttributeCurrentSaturation { val, _ in
@@ -376,14 +352,14 @@ extension ESPMTRSaturationSliderTVC: StepSliderProtocol {
     /// Change saturation
     /// - Parameters:
     ///   - value: value
-    ///   - completion: completion
     func changeSaturation(value: Float) {
         var saturation = Int(value*2.54)
         if saturation == 0 {
             saturation = 1
         }
-        if self.nodeConnectionStatus == .local {
-            if let _ = ESPMTRCommissioner.shared.sController {
+        if self.nodeConnectionStatus == .local, let groupId = self.nodeGroup?.groupID {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let _ = commissioner.sController {
                 self.getColorCluster() { cluster in
                     if let cluster = cluster {
                         let params = MTRColorControlClusterMoveToSaturationParams()
@@ -435,10 +411,32 @@ extension ESPMTRSaturationSliderTVC: StepSliderProtocol {
         }
     }
     
+    /// Get color cluster
+    /// - Parameters:
+    ///   - completionHandler: completion
+    func getColorCluster(completionHandler: @escaping (MTRBaseClusterColorControl?) -> Void) {
+        if let group = nodeGroup, let groupId = group.groupID, let id = deviceId {
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
+            if let controller = commissioner.sController {
+                let (_, endpoint) = ESPMatterClusterUtil.shared.isColorControlServerSupported(groupId: groupId, deviceId: id)
+                controller.getBaseDevice(id, queue: commissioner.matterQueue) { device, _ in
+                    if let device = device, let endpoint = endpoint, let point = UInt16(endpoint), let colorControlCluster = MTRBaseClusterColorControl(device: device, endpoint: UInt16(truncating: NSNumber(value: point)), queue: commissioner.matterQueue) {
+                        completionHandler(colorControlCluster)
+                    } else {
+                        completionHandler(nil)
+                    }
+                }
+            } else {
+                completionHandler(nil)
+            }
+        }
+    }
+    
     /// Subscribe to saturation attribute
     func subscribeToSaturationAttribute() {
         if let grpId = self.nodeGroup?.groupID, let deviceId = self.deviceId {
-            ESPMTRCommissioner.shared.subscribeToSaturationValue(groupId: grpId, deviceId: deviceId) { saturation in
+            let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: grpId)
+            commissioner.subscribeToSaturationValue(groupId: grpId, deviceId: deviceId) { saturation in
                 DispatchQueue.main.async {
                     let finalSaturationValue = Int(CGFloat(saturation)/2.54)
                     if let node = self.node, let id = self.deviceId {
@@ -461,5 +459,10 @@ extension ESPMTRSaturationSliderTVC: StepSliderProtocol {
             }
         }
     }
+}
+
+@available(iOS 16.4, *)
+extension ESPMTRSaturationSliderTVC: StepSliderProtocol {
+    // Protocol conformance - these methods are already implemented at the class level
 }
 #endif

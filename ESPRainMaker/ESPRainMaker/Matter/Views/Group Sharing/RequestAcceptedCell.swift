@@ -29,7 +29,7 @@ class RequestAcceptedCell: UITableViewCell {
     var sharing: ESPNodeGroupSharingStruct?
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var sharingAcceptedMessage: UILabel!
-    @IBOutlet weak var cancelRequestButton: UIButton!
+    @IBOutlet weak var cancelRequestButton: PrimaryButton!
     var delegate: RequestAccpetedActionDelegate?
     
     override func awakeFromNib() {
@@ -38,8 +38,6 @@ class RequestAcceptedCell: UITableViewCell {
         self.container.layer.cornerRadius = 10
         self.container.layer.borderColor = UIColor.lightGray.cgColor
         self.container.layer.masksToBounds = true
-        self.cancelRequestButton.backgroundColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
-        self.cancelRequestButton.tintColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
