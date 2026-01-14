@@ -32,9 +32,10 @@ struct ESPSilentNotificationHandler: ESPSilentNotificationProtocol {
     let apsKey = "aps"
     
     /// Method to handle silent notification in the app.
+    /// Silent notifications are used to update device parameters in real time without showing a notification banner.
     ///
     /// - Parameters:
-    ///   - userInfo: Payload information in  form of dictionary.
+    ///   - userInfo: Payload information in form of dictionary containing notification data
     func handleSilentNotification(_ userInfo: [AnyHashable : Any]) {
         // Parsed the user information to get payload string.
         if let data = userInfo[dataKey] as? [String: Any] {
@@ -44,8 +45,13 @@ struct ESPSilentNotificationHandler: ESPSilentNotificationProtocol {
         }
     }
     
+    /// Processes the notification data and updates device parameters in the local node list.
+    /// This method extracts parameter updates from the notification payload and applies them to the corresponding devices.
+    ///
+    /// - Parameter data: Dictionary containing the notification event data
     func handleData(data: [String: Any]) {
         if let eventDataPayload = data[ESPNotificationKeys.eventDataPayloadKey] as? [String: Any], let eventData = eventDataPayload[ESPNotificationKeys.eventDataKey] as? [String: Any], let nodeID = eventData[ESPNotificationKeys.nodeIDKey] as? String, let payload = eventData[payloadKey] as? String {
+            
             // Converted string into data to allow conversion to json object.
             let data = payload.data(using: .utf8)!
             do {
