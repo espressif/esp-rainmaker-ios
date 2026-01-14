@@ -207,6 +207,8 @@ class SceneViewController: UIViewController {
                     if !nodesFailed {
                         if self.isNewScene {
                             self.delegate?.serviceAdded()
+                            // Trigger in-app review for first scene creation
+                            ESPReviewManager.shared.onSceneCreated()
                         } else {
                             self.delegate?.serviceUpdated()
                         }

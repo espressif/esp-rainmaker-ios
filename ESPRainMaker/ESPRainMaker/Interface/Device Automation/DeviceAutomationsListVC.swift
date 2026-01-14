@@ -305,6 +305,8 @@ extension DeviceAutomationsListVC: ESPAddAutomationDelegate {
                 automationList.insert(automation, at: 0)
                 automationList = automationList.sorted(by: { $0.name ?? "" < $1.name ?? ""})
                 updateView()
+                // Trigger in-app review for first automation creation
+                ESPReviewManager.shared.onAutomationCreated()
             }
             return
         }
