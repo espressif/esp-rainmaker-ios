@@ -150,7 +150,6 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         return
                     case let .failure(error):
                         let nserror = error as NSError
-                        print(nserror.code)
                         if nserror.code == 13 {
                             ESPNetworkMonitor.shared.setNetworkConnection(connected: false)
                         }
@@ -286,7 +285,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                             }
                         }
                     case let .failure(error):
-                        print(error)
+                        break
                     }
                     completionHandler(node, nil)
                 }
@@ -369,7 +368,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                             return
                         }
                     case let .failure(error):
-                        print(error)
+                        break
                     }
                     completionHandler("error")
                 }
@@ -380,6 +379,101 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
             }
         }
     }
+    
+    /// Get Assume Role credentials using assume role
+    /// - Parameter completionHandler: Completion handler with credentials or error
+    func getAssumeRoleCredentials(nodeId: String, completionHandler: @escaping (ESPAssumeRoleCredentialsResponse?, ESPNetworkError?) -> Void) {
+        // Get the access token
+        ESPExtendUserSessionWorker().checkUserSession { [weak self] accessToken, error in
+            guard let self = self else { return }
+            if let token = accessToken {
+                // Make the assume role API call
+                let headers: HTTPHeaders = [
+                    Constants.contentType: Constants.applicationJSON,
+                    Constants.authorization: token
+                ]
+                
+                let url = Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/assume_role"
+                
+                // Get the ID token from UserDefaults
+                guard let idToken = ESPTokenWorker.shared.idTokenString else {
+                    completionHandler(nil, .emptyToken)
+                    return
+                }
+                
+                var parameters: [String: Any] = [
+                    "user_role": "videostream",
+                    "node_ids": [nodeId]
+                ]
+                
+                self.session.request(url,
+                                   method: .post,
+                                   parameters: parameters,
+                                   encoding: JSONEncoding.default,
+                                   headers: headers)
+                    .responseJSON { response in
+                        if !self.validateJSONResponse(response: response) {
+                            DispatchQueue.main.async {
+                                completionHandler(nil, .emptyToken)
+                            }
+                            return
+                        }
+                        
+                        switch response.result {
+                        case .success(let value):
+                            if let json = value as? [String: Any] {
+                                if let status = json[Constants.statusKey] as? String,
+                                   let description = json[Constants.descriptionKey] as? String,
+                                   status == Constants.failure {
+                                    DispatchQueue.main.async {
+                                        completionHandler(nil, .serverError(description))
+                                    }
+                                    return
+                                }
+                                
+                                // Create credentials response matching the working implementation
+                                let credentials = ESPAssumeRoleCredentialsResponse(
+                                    accessKey: json["access_key"] as? String ?? "",
+                                    secretKey: json["secret_key"] as? String ?? "",
+                                    sessionToken: json["session_token"] as? String ?? "",
+                                    expiration: json["expiration"] as? String ?? ""
+                                )
+                                
+                                // Cache the credentials
+                                let credentialsDict: [String: String] = [
+                                    "access_key": credentials.accessKey,
+                                    "secret_key": credentials.secretKey,
+                                    "session_token": credentials.sessionToken,
+                                    "expiration": credentials.expiration
+                                ]
+                                
+                                UserDefaults.standard.set(credentialsDict, forKey: "ESPAWSCredentials")
+                                DispatchQueue.main.async {
+                                    completionHandler(credentials, nil)
+                                }
+                            } else {
+                                DispatchQueue.main.async {
+                                    completionHandler(nil, .parsingError("Invalid response format"))
+                                }
+                            }
+                        case .failure(let error):
+                            let nserror = error as NSError
+                            if nserror.code == 13 {
+                                ESPNetworkMonitor.shared.setNetworkConnection(connected: false)
+                            }
+                            DispatchQueue.main.async {
+                                completionHandler(nil, .serverError(error.localizedDescription))
+                            }
+                        }
+                    }
+            } else {
+                if self.validatedRefreshToken(error: error) {
+                    completionHandler(nil, .emptyToken)
+                }
+            }
+        }
+    }
+
 
     // MARK: - Thing Shadow
 
@@ -414,7 +508,6 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                             }
                             return
                         case let .failure(error):
-                            print(error)
                             completionHandler?(.failure)
                         }
                     }
@@ -445,7 +538,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                     return
                 }
             case let .failure(error):
-                print(error)
+                break
             }
             completionHandler(nil)
         }

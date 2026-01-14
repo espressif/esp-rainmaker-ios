@@ -430,6 +430,12 @@ struct IdToken {
     var exp: Date?
     var iat: Date?
     var email: String?
+    var region: String? {
+        if let iss = iss, let region = extractRegion(from: iss) {
+            return region
+        }
+        return nil
+    }
     
     init(jwt: JWT) {
         sub = jwt.subject
@@ -446,6 +452,20 @@ struct IdToken {
         exp = jwt.expiresAt
         iat = jwt.issuedAt
         email = jwt.email
+    }
+    
+    func extractRegion(from url: String, domain: String = "amazonaws.com") -> String? {
+        guard let host = URL(string: url)?.host else { return nil }
+    
+        // Ensure the host contains "amazonaws.com"
+        guard let range = host.range(of: domain) else { return nil }
+        // Get the substring before "amazonaws.com"
+        let prefix = host[..<range.lowerBound]
+        // Split by "."
+        let components = prefix.split(separator: ".")
+        
+        // We need the last component before "amazonaws.com"
+        return components.last.map(String.init)
     }
 }
 

@@ -72,6 +72,8 @@
 	<string>App requires access to local network in order to control your devices locally.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>App requires your location permission in order to get current WiFi network ssid</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires access to microphone</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>ConfigurationIntent</string>

@@ -18,9 +18,96 @@
 
 import Foundation
 import UIKit
+import CommonCrypto
 
 extension String {
+    
+    // MARK: Event
+    func base64Encoded() -> String? {
+        return data(using: .utf8)?.base64EncodedString()
+    }
 
+    func base64Decoded() -> String? {
+        var localData: Data?
+        localData = Data(base64Encoded: self)
+        var temp: String = self
+        if localData == nil {
+            temp = self + "=="
+        }
+        guard let data = Data(base64Encoded: temp, options: Data.Base64DecodingOptions(rawValue: 0)) else {
+            return nil
+        }
+        return String(data: data, encoding: .utf8)
+    }
+
+    func convertToDictionaryValueAsString() throws -> [String: Any] {
+        let data = Data(utf8)
+
+        if let anyResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+            return anyResult
+        } else {
+            return [:]
+        }
+    }
+    
+    // MARK: KVSSigner
+    func sha256() -> String {
+        if let stringData = self.data(using: String.Encoding.utf8) {
+            return hexStringFromData(input: digest(input: stringData as NSData))
+        }
+        return ""
+    }
+
+    func digest(input: NSData) -> NSData {
+        let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
+        var hash = [UInt8](repeating: 0, count: digestLength)
+        CC_SHA256(input.bytes, UInt32(input.length), &hash)
+        return NSData(bytes: hash, length: digestLength)
+    }
+
+    func hexStringFromData(input: NSData) -> String {
+        var bytes = [UInt8](repeating: 0, count: input.length)
+        input.getBytes(&bytes, length: input.length)
+
+        var hexString = ""
+        for byte in bytes {
+            hexString += String(format: "%02x", UInt8(byte))
+        }
+
+        return hexString
+    }
+
+    func hmac(keyString: String) -> Data {
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA256), keyString, keyString.count, self, count, &digest)
+        return Data.init(bytes: digest)
+    }
+
+    func hmac(keyData: Data) -> Data {
+        let keyBytes = keyData.bytes
+        let data = cString(using: String.Encoding.utf8)
+        let dataLen = Int(lengthOfBytes(using: String.Encoding.utf8))
+        var result = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA256), keyBytes, keyData.count, data, dataLen, &result)
+
+        return Data.init(bytes: result)
+    }
+
+    // MARK: SignalingClient
+    func convertToDictionary() throws -> [String: Any] {
+        let data = Data(utf8)
+
+        if let anyResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+            return anyResult
+        } else {
+            return [:]
+        }
+    }
+    
+    func trim() -> String {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
     var hexadecimal: Data? {
         var data = Data(capacity: self.count / 2)
         let regex = try! NSRegularExpression(pattern: "[0-9a-f]{1,2}", options: .caseInsensitive)
@@ -74,6 +161,11 @@ extension Data {
     
     var bytes: [UInt8] {
         return [UInt8](self)
+    }
+    
+    func toHexString() -> String {
+        let hexString = map { String(format: "%02x", $0) }.joined()
+        return hexString
     }
 }
 
