@@ -631,10 +631,12 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     ///   - groupId: group id
     func setClientOnlyControllerFlow(isRainmakerControllerFlow: Bool,
                                      isClientOnlyControllerFlow: Bool,
-                                     groupId: String) {
+                                     groupId: String? = nil) {
         self.isRainmakerControllerFlow = isRainmakerControllerFlow
         self.isClientOnlyControllerFlow = isClientOnlyControllerFlow
-        self.groupId = groupId
+        if let groupId = groupId {
+            self.groupId = groupId
+        }
     }
 
     #if ESPRainMakerMatter
