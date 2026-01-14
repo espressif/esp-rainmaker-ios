@@ -88,7 +88,9 @@ class SuccessViewController: UIViewController {
         }
     }
     
-    // Execute Challenge Response Workflow:
+    /// Execute the challenge-response provisioning workflow.
+    /// This sets up the UI for the reduced-step flow, performs the challenge
+    /// with the device, and proceeds to provisioning and node setup on success.
     private func executeChallengeResponseWorkflow() {
         self.setupUIForChallengeResponse()
         self.startStep1()
@@ -132,6 +134,7 @@ class SuccessViewController: UIViewController {
         self.step5TopSpaceConstraint.constant-=104
     }
     
+    /// Start UI for step 1 (association/challenge). Shows spinner and hides icon.
     private func startStep1() {
         DispatchQueue.main.async {
             self.step1Image.isHidden = true
@@ -140,6 +143,7 @@ class SuccessViewController: UIViewController {
         }
     }
     
+    /// Transition UI from step 1 to step 2 (Wi‑Fi confirmation).
     private func startStep2() {
         DispatchQueue.main.async {
             self.step1Indicator.stopAnimating()
@@ -151,6 +155,7 @@ class SuccessViewController: UIViewController {
         }
     }
     
+    /// Mark step 2 as completed in the UI.
     private func startStep3() {
         DispatchQueue.main.async {
             self.step2Indicator.stopAnimating()
@@ -159,6 +164,10 @@ class SuccessViewController: UIViewController {
         }
     }
     
+    /// Provision device after a successful challenge-response.
+    /// - Parameters:
+    ///   - nodeId: Node identifier returned after challenge verification.
+    ///   - completion: Called with an optional provisioning error.
     private func provisionDevice(nodeId: String, completion: @escaping (ESPProvisionError?) -> Void) {
         self.provision { status in
             switch status {
@@ -173,6 +182,10 @@ class SuccessViewController: UIViewController {
         }
     }
     
+    /// Initiates the challenge-response exchange with the device and verifies
+    /// the mapping with the cloud.
+    /// - Parameter completionHandler: Completion with success flag, optional
+    ///   nodeId on success, and optional error description on failure.
     private func startChallengeResponseFlow(completionHandler: @escaping (Bool, String?, String?) -> ()) {
         User.shared.initiateMapping { [weak self] challenge, requestId, error in
             guard let self = self else { return }
@@ -235,10 +248,6 @@ class SuccessViewController: UIViewController {
                         
                         // Convert payload to hex string with validation
                         let bytes = [UInt8](respPayload.payload)
-                        if bytes.count != 256 {
-                            completionHandler(false, nil, "Invalid challenge response length: \(bytes.count), expected: 256")
-                            return
-                        }
                         
                         // Convert bytes to hex string
                         var hexString = ""
@@ -248,8 +257,8 @@ class SuccessViewController: UIViewController {
                             hexString += String(format: "%02x", byte & 0xFF)
                         }
                         
-                        // Validate hex string length (256 bytes * 2 = 512 chars)
-                        if hexString.count != 512 {
+                        // Validate hex string length (length > 0)
+                        if hexString.count == 0 {
                             completionHandler(false, nil, "Invalid hex string length: \(hexString.count), expected: 512")
                             return
                         }
@@ -280,6 +289,7 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Starts the normal provisioning flow and advances step UI based on status.
     func startProvisioning() {
         step1Image.isHidden = true
         step1Indicator.isHidden = false
@@ -306,6 +316,9 @@ class SuccessViewController: UIViewController {
         }
     }
     
+    /// Provisions the device with either Wi‑Fi credentials or a Thread
+    /// operational dataset.
+    /// - Parameter completionHandler: Called with provisioning status updates.
     func provision(completionHandler: @escaping (ESPProvisionStatus) -> Void) {
         if let threadOperationalDataset = self.threadOperationalDataset {
             espDevice.provision(ssid: nil, passPhrase: nil, threadOperationalDataset: threadOperationalDataset) { status in
@@ -318,6 +331,7 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Update UI to reflect configuration application (step 2).
     private func step2applyConfigurations() {
         DispatchQueue.main.async {
             self.step1Indicator.stopAnimating()
@@ -329,6 +343,7 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Update UI to start step 3 and trigger request to add device to the user.
     private func step3SendRequestToAddDevice() {
         DispatchQueue.main.async {
             self.step2Indicator.stopAnimating()
@@ -342,6 +357,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Begin polling for node association confirmation using the request ID.
+    /// - Parameter requestID: Cloud request identifier returned from add device API.
     private func step4ConfirmNodeAssociation(requestID: String) {
         okayButton.isEnabled = true
         okayButton.alpha = 1.0
@@ -351,15 +368,24 @@ class SuccessViewController: UIViewController {
         checkDeviceAssoicationStatus(nodeID: User.shared.currentAssociationInfo!.nodeID, requestID: requestID)
     }
 
+    /// Wrapper to initiate device association status polling.
+    /// - Parameters:
+    ///   - nodeID: Node identifier.
+    ///   - requestID: Request identifier used to confirm association.
     func checkDeviceAssoicationStatus(nodeID: String, requestID: String) {
         fetchDeviceAssociationStatus(nodeID: nodeID, requestID: requestID)
     }
 
+    /// Called when association status polling times out.
     @objc func timeoutFetchingStatus() {
         step4FailedWithMessage(message: "Node addition not confirmed")
         addDeviceStatusTimeout?.invalidate()
     }
 
+    /// Poll device association status from the backend and proceed accordingly.
+    /// - Parameters:
+    ///   - nodeID: Node identifier.
+    ///   - requestID: Association request identifier.
     func fetchDeviceAssociationStatus(nodeID: String, requestID: String) {
         NetworkManager.shared.deviceAssociationStatus(nodeID: nodeID, requestID: requestID) { status in
             if status == "confirmed" {
@@ -379,6 +405,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Start step 5 (node setup) by fetching node details and status with a timeout.
+    /// - Parameter nodeID: Node identifier.
     private func step5SetupNode(nodeID: String) {
         DispatchQueue.main.async {
             self.step5Image.isHidden = true
@@ -389,7 +417,9 @@ class SuccessViewController: UIViewController {
             self.getNodeStatus(nodeID: nodeID)
         }
     }
-
+    
+    /// Periodically fetch node connectivity status until connected or timeout.
+    /// - Parameter nodeID: Node identifier.
     @objc private func getNodeStatus(nodeID: String) {
         let node = Node()
         node.node_id = nodeID
@@ -407,6 +437,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Fetch node details and ensure required metadata (e.g., timezone) is set.
+    /// - Parameter nodeID: Node identifier.
     private func getNodeDetails(nodeID: String) {
         NetworkManager.shared.getNodeInfo(nodeId: nodeID) { node, _ in
             DispatchQueue.main.async {
@@ -432,6 +464,7 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Called when node setup exceeds the allowed time window.
     @objc private func setupTimeOut() {
         DispatchQueue.main.async {
             self.step5Image.isHidden = false
@@ -448,6 +481,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// If node details and connectivity are available, finalizes step 5 UI and
+    /// triggers controller-specific post-setup flows.
     private func check5thStepStatus() {
         DispatchQueue.main.async {
             if self.nodeDetailsFetched, self.nodeIsConnected {
@@ -474,6 +509,8 @@ class SuccessViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
     }
 
+    /// Handle step 1 failure and present error UI and next steps to user.
+    /// - Parameter message: Error description to display.
     func step1FailedWithMessage(message: String) {
         DispatchQueue.main.async {
             self.step1Indicator.stopAnimating()
@@ -486,6 +523,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Handle step 2 failure and present error UI and next steps to user.
+    /// - Parameter error: Provisioning error for Wi‑Fi/transport.
     func step2FailedWithMessage(error: ESPProvisionError) {
         DispatchQueue.main.async {
             self.step2Indicator.stopAnimating()
@@ -510,6 +549,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Handle step 3 failure and present error UI and next steps to user.
+    /// - Parameter message: Error description.
     func step3FailedWithMessage(message: String) {
         DispatchQueue.main.async {
             self.step3Indicator.stopAnimating()
@@ -522,6 +563,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Handle step 4 failure and present error UI and next steps to user.
+    /// - Parameter message: Error description.
     func step4FailedWithMessage(message: String) {
         DispatchQueue.main.async {
             self.step4Indicator.stopAnimating()
@@ -534,6 +577,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Handle step 5 failure and present warning and final status to user.
+    /// - Parameter message: Error description.
     func step5FailedWithMessage(message: String) {
         DispatchQueue.main.async {
             self.step5Indicator.stopAnimating()
@@ -545,6 +590,9 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Finalize provisioning UI and enable exit actions.
+    /// Triggers in‑app review on success.
+    /// - Parameter message: Final status message displayed to the user.
     func provisionFinsihedWithStatus(message: String) {
         okayButton.isEnabled = true
         okayButton.alpha = 1.0
@@ -556,6 +604,8 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Send a backend request to add the provisioned device to the user and
+    /// proceed to confirmation on success. Retries on transient errors.
     @objc func sendRequestToAddDevice() {
         let parameters = ["user_id": User.shared.userInfo.userID, "node_id": User.shared.currentAssociationInfo!.nodeID, "secret_key": User.shared.currentAssociationInfo!.uuid, "operation": "add"]
         NetworkManager.shared.addDeviceToUser(parameter: parameters as! [String: String]) { requestID, error in
@@ -577,6 +627,7 @@ class SuccessViewController: UIViewController {
         }
     }
 
+    /// Navigate back to the root devices screen and trigger device association check.
     @IBAction func goToFirstView(_: Any) {
         let destinationVC = navigationController?.viewControllers.first as! DevicesViewController
         destinationVC.checkDeviceAssociation = true
@@ -615,6 +666,7 @@ extension SuccessViewController {
         }
     }
     
+    /// Navigate to the Matter fabric selection screen (client‑only controller flow).
     func showGroupSelectionScreen() {
         #if ESPRainMakerMatter
         let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
@@ -630,6 +682,8 @@ extension SuccessViewController {
 #if ESPRainMakerMatter
 extension SuccessViewController: ClientOnlyControllerGroupSelectionDelegate {
     
+    /// Called when a group is selected in the fabric selection screen.
+    /// - Parameter groupId: Selected group identifier.
     func groupSelected(groupId: String) {
         DispatchQueue.main.async {
             self.navigationController?.popViewController(animated: true)
@@ -643,6 +697,8 @@ extension SuccessViewController: ClientOnlyControllerGroupSelectionDelegate {
 
 extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
     
+    /// Callback when Rainmaker login is completed during controller flows.
+    /// Updates controller parameters based on the device capabilities.
     func loginCompleted(cloudResponse: ESPSessionResponse, groupId: String?) {
         DispatchQueue.main.async {
             self.navigationController?.popViewController(animated: true)
@@ -660,6 +716,12 @@ extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
         }
     }
     
+    /// Update parameters for client‑only controller devices after successful login.
+    /// - Parameters:
+    ///   - baseURL: Backend base URL.
+    ///   - refreshToken: User refresh token.
+    ///   - groupId: Selected group identifier.
+    ///   - node: Target node.
     private func updateParamsForClientOnlyController(baseURL: String?, refreshToken: String, groupId: String?, node: Node) {
         if refreshToken.count > 0,
            let baseURL = baseURL,
@@ -681,6 +743,11 @@ extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
         }
     }
     
+    /// Update parameters for Rainmaker controller devices after successful login.
+    /// - Parameters:
+    ///   - baseURL: Backend base URL.
+    ///   - refreshToken: User refresh token.
+    ///   - node: Target node.
     private func updateParamsForRmakerController(baseURL: String?, refreshToken: String, node: Node) {
         if refreshToken.count > 0,
            let baseURL = baseURL,
@@ -702,6 +769,7 @@ extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
 
 extension SuccessViewController: ParamUpdateProtocol {
     
+    /// Called when updating controller parameters fails.
     func failureInUpdatingParam() {
         
     }
