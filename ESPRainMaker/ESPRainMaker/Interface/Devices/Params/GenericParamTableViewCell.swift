@@ -118,7 +118,7 @@ class GenericParamTableViewCell: GenericControlTableViewCell {
                     }
                 }
                 DeviceControlHelper.shared.updateParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [attributeKey: controlValue]], delegate: paramDelegate) { result in
-                    // Updates local storage in case parameter update is successfull.
+                    // Updates local storage in case parameter update is successful.
                     if result == .success {
                         DispatchQueue.main.async {
                             self.device.deviceName = value

@@ -160,7 +160,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     
     /// Gives list of devices under a scene.
     ///
-    /// - Returns: Comma seperated string of devices that are part of a scene
+    /// - Returns: Comma separated string of devices that are part of a scene
     func getActionList() -> String {
         return self.getActionList(availableDevices: availableDevices)
     }
@@ -171,7 +171,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - onView:UIView to show message in case of failure.
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func saveScene(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             var jsonString: [String: Any] = [:]
@@ -202,7 +202,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///   - key: scene ID
     ///   - onView: UIView to show message in case of failure.
     ///   - nodeIDs: List of node IDs to be deleted
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func deleteSceneNodes(key: String, onView: UIView, nodeIDs: [String], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             if let scene = scenes[key] {
@@ -226,7 +226,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     /// - Parameters:
     ///   - key: scene ID
     ///   - onView: UIView to show message in case of failure.
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func deleteSceneAt(key: String, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             currentScene = scenes[key]!
@@ -247,7 +247,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     /// - Parameters:
     ///   - scene: scene to be applied
     ///   - onView: UIView to show message in case of failure.
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func activateScene(scene: ESPScene, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             var jsonString: [String: Any] = [:]

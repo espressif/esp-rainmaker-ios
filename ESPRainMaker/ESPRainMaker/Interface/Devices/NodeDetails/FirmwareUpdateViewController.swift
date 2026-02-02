@@ -45,7 +45,7 @@ class FirmwareUpdateViewController: UIViewController {
     let updateInProgressGIF = "updateInProgress"
     let checkingUpdateLabelText = "Checking for update"
     let pushingOTAUpdateMsg = "Pushing OTA update..."
-    let checkForUpdateLabelText = "Click below to check for firmare update."
+    let checkForUpdateLabelText = "Click below to check for firmware update."
     let updateSuccessLabelText = "Firmware update is successful."
     let failOTAUpdateStatusMsg = "Failed to get OTA update status. Please try again."
     let updateRejectedMsg = "OTA update rejected."
@@ -60,7 +60,7 @@ class FirmwareUpdateViewController: UIViewController {
     var timer: Timer?
     var isFromNotification: Bool = false
 
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -287,7 +287,7 @@ extension FirmwareUpdateViewController: ESPOTAUpdateStatusPresentationLogic {
                 self.setOTAUpdatedView()
             // Unknown status. Check OTA update status again.
             case .unknown:
-                Utility.showToastMessage(view: self.view, message: "Some error occured while fetching OTA update status. Retrying..", duration: 2.0)
+                Utility.showToastMessage(view: self.view, message: "Some error occurred while fetching OTA update status. Retrying..", duration: 2.0)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     self.getOTAUpdateService?.getOTAUpdateStatusFor(nodeID: self.currentNode.node_id ?? "", otaJobID: self.currentOTAJob?.otaJobID ?? "")
                 }

@@ -1,0 +1,4 @@
+[codespell]
+skip = build,*.drawio,*.svg,*.pdf
+ignore-words-list = Nam,Nome,inout,te,unsecure,
+write-changes = true

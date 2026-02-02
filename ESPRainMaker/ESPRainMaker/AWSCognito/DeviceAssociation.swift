@@ -42,7 +42,7 @@ class DeviceAssociation {
     var device: ESPDevice
 
     /// Create DeviceAssociation object that sends configuration data
-    /// Required for sending data related to assoicating device with app user
+    /// Required for sending data related to associating device with app user
     ///
     /// - Parameters:
     ///   - session: Initialised session object
@@ -79,7 +79,7 @@ class DeviceAssociation {
     /// Info like userID and secretKey are sent from user to device
     ///
     /// - Parameters:
-    ///   - responseData: Response recieved from device after sending mapping payload
+    ///   - responseData: Response received from device after sending mapping payload
     func processResponse(responseData: Data) {
         do {
             let response = try Rainmaker_RMakerConfigPayload(serializedData: responseData)

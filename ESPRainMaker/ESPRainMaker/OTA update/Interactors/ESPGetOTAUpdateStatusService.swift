@@ -71,11 +71,11 @@ struct ESPGetOTAUpdateStatusService: ESPGetOTAUpdateStatusLogic {
                     data, error in
                     guard let responseData = data else {
                         if let serverError = error {
-                            // Error occured while sending the API request.
+                            // Error occurred while sending the API request.
                             self.presenter?.getOTAUpdateStatus(otaUpdateStatus: nil, error: .serverError(serverError))
                             return
                         }
-                        // No respose received.
+                        // No response received.
                         self.presenter?.getOTAUpdateStatus(otaUpdateStatus: nil, error: .noData)
                         return
                     }

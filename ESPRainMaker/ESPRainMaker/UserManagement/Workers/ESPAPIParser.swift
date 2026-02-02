@@ -122,8 +122,8 @@ class ESPAPIParser {
     }
     
     /// Parse request token for third party login
-    /// - Parameter url: redirect url from thrid party login
-    /// - Returns: thrid party code
+    /// - Parameter url: redirect url from third party login
+    /// - Returns: third party code
     func parseRequestToken(url: URL?) -> String? {
         if let responseURL = url?.absoluteString {
             let components = responseURL.components(separatedBy: "#")

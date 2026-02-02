@@ -39,7 +39,7 @@ enum ESPAlexaAPIStatus: Error {
     case unknownFormat
     case parsingError
     case serverError(Error)
-    case errorMessage(message: String = "Unkown Error")
+    case errorMessage(message: String = "Unknown Error")
     case httpError(statusCode: Int)
 }
 

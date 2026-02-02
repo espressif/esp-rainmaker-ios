@@ -137,7 +137,7 @@ struct ESPMatterConstants {
     static let updateMetadata = "updateMetadata"
     
     static let onOffCluster = "OnOff Cluster"
-    static let tempMeasurementCluster = "Termperature Measurement Cluster"
+    static let tempMeasurementCluster = "Temperature Measurement Cluster"
     
     static let lock = "lock"
     static let externalBlinds = "external_blinds"

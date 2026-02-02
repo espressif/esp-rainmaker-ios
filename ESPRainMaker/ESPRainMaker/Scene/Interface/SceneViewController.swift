@@ -53,7 +53,7 @@ class SceneViewController: UIViewController {
     
     weak var delegate: ServiceUpdateActionsDelegate?
     
-    /*Requried variables*/
+    /*Required variables*/
     var sceneKey: String = ""
 
     override func viewDidLoad() {
@@ -368,8 +368,8 @@ class SceneViewController: UIViewController {
     }
     
     /// Sort devices in the following order [allowed devices, max reached devices, offline devices]
-    /// - Parameter availableDevices: list of avaiable devices
-    /// - Returns: list of avaiable devices after sorting
+    /// - Parameter availableDevices: list of available devices
+    /// - Returns: list of available devices after sorting
     private func sortDevices(availableDevices: [Device]) -> [Device] {
         var devices = [Device]()
         var availableCount = 0

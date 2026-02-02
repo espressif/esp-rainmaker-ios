@@ -43,10 +43,10 @@ class VersionManager {
 
     private init() {}
 
-    /// Check App store if any new version of this app is avaiable for download.
+    /// Check App store if any new version of this app is available for download.
     ///
     /// - Parameters:
-    ///   - callback: handler called after response is recieved with version and status as argument
+    ///   - callback: handler called after response is received with version and status as argument
     private func checkAppStore(callback: ((_ versionAvailable: Bool?, _ version: String?) -> Void)? = nil) {
         let ourBundleId = Bundle.main.infoDictionary!["CFBundleIdentifier"] as! String
         AF.request("https://itunes.apple.com/lookup?bundleId=" + ourBundleId).responseJSON { response in
@@ -81,7 +81,7 @@ class VersionManager {
     /// Perform check if current api version is supported.
     ///
     /// - Parameters:
-    ///   - callback: handler called after response of supported api version is recieved
+    ///   - callback: handler called after response of supported api version is received
     private func checkIfAPIVersionIsSupported(callback: @escaping (Bool) -> Void) {
         AF.request(supportedVersionURL).responseJSON { response in
             switch response.result {
@@ -101,7 +101,7 @@ class VersionManager {
 
     /// Main method to check if new App store version of the app is available.
     /// Or if current api version is supported or not.
-    /// Show appropriate alert message acoording to the need of update.
+    /// Show appropriate alert message according to the need of update.
     ///
     func checkForAppUpdate() {
         checkAppStore { isAvailable, version in

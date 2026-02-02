@@ -50,7 +50,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - onView:UIView to show message in case of failure.
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func saveSchedule(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             var jsonString: [String: Any] = [:]
@@ -79,7 +79,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - onView:UIView to show message in case of failure.
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func shouldEnableSchedule(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             configureDeviceForCurrentSchedule()
@@ -105,7 +105,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///   - key: schedule ID
     ///   - onView: UIView to show message in case of failure.
     ///   - nodeIDs: List of node IDs to be deleted
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func deleteScheduleNodes(key: String, onView: UIView, nodeIDs: [String], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             if let schedule = ESPScheduler.shared.schedules[key] {
@@ -128,7 +128,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - onView:UIView to show message in case of failure.
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func deleteScheduleAt(key: String, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         if ESPNetworkMonitor.shared.isConnectedToNetwork {
             currentSchedule = ESPScheduler.shared.schedules[key]!
@@ -145,7 +145,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
         }
     }
 
-    // MARK: - Conifguration Methods
+    // MARK: - Configuration Methods
 
     /// Add a new schedule.
     func addSchedule() {
@@ -289,7 +289,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     
     /// Gives list of devices under a schedule
     ///
-    /// - Returns: Comma seperated string of devices that are part of a schedule
+    /// - Returns: Comma separated string of devices that are part of a schedule
     func getActionList() -> String {
         return self.getActionList(availableDevices: availableDevices)
     }

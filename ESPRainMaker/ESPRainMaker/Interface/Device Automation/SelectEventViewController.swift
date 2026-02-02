@@ -52,7 +52,7 @@ class SelectEventViewController: UIViewController {
     var editAutomationVC: EditAutomationViewController?
     var addAutomationDelegate: ESPAddAutomationDelegate?
     
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()

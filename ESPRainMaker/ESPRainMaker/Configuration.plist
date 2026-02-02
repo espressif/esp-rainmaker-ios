@@ -94,7 +94,7 @@
 		<string>PROV_</string>
 		<key>ESP Allow Prefix Search</key>
 		<true/>
-		<key>ESP Securtiy Mode</key>
+		<key>ESP Security Mode</key>
 		<string>Secure</string>
 		<key>ESP Scan Enabled</key>
 		<true/>

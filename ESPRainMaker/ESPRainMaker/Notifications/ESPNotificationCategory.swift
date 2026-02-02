@@ -24,7 +24,7 @@ enum ESPNotificationCategory: String {
     case addSharing = "ADD_SHARING"
 }
 
-// Add Sharing Catgory with actions.
+// Add Sharing Category with actions.
 enum ESPNotificationsAddSharingCategory: String {
     // Possible actions for this category.
     case accept

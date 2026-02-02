@@ -48,12 +48,12 @@ class ESPTimeSeriesAPIManager {
     ///   - nodeID: Node ID of device whose params data need to be fetched.
     ///   - paramName: Name of device parameter.
     ///   - dataType: Type of data (Integer & Float are currently supported.)
-    ///   - aggregate: Aggregate for a certain time duration like avgerage, minimum, maximum , etc.
+    ///   - aggregate: Aggregate for a certain time duration like average, minimum, maximum , etc.
     ///   - timeInterval: Time interval aggregate like hour, day, week , etc.
     ///   - startTime: Timestamp for start of duration.
     ///   - endTime: Timestamp for end of duration.
     ///   - weekStart: Day of week that will be considered as start of the week.
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func fetchTSDataFor(nodeID: String, paramName: String, dataType:String? = nil, aggregate: String? = nil, timeInterval: String? = nil, startTime: UInt? = nil, endTime: UInt? = nil, weekStart: String? = nil, completionHandler: @escaping (ESPTSData?, ESPNetworkError?) -> Void ) {
         
         var url = tsDataURL + "?node_id=\(nodeID)&param_name=\(paramName)"
@@ -104,12 +104,12 @@ class ESPTimeSeriesAPIManager {
     ///   - nodeID: Node ID of device whose params data need to be fetched.
     ///   - paramName: Name of device parameter.
     ///   - dataType: Type of data (Integer & Float are currently supported.)
-    ///   - aggregate: Aggregate for a certain time duration like avgerage, minimum, maximum , etc.
+    ///   - aggregate: Aggregate for a certain time duration like average, minimum, maximum , etc.
     ///   - timeInterval: Time interval aggregate like hour, day, week , etc.
     ///   - startTime: Timestamp for start of duration.
     ///   - endTime: Timestamp for end of duration.
     ///   - weekStart: Day of week that will be considered as start of the week.
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func fetchSimpleTSDataFor(nodeID: String, paramName: String, dataType:String? = nil, startTime: UInt? = nil, endTime: UInt? = nil, weekStart: String? = nil, completionHandler: @escaping (ESPTSData?, ESPNetworkError?) -> Void ) {
         
         var url = simpleTSDataURL + "?node_id=\(nodeID)&param_name=\(paramName)"

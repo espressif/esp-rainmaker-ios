@@ -25,7 +25,7 @@ extension ESPMTRCommissioner {
     
     /// Add matter device details locally
     /// - Parameters:
-    ///   - writeCatIdOperate: should wite catId
+    ///   - writeCatIdOperate: should write catId
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completionHandler: completion

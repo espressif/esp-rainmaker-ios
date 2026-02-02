@@ -175,8 +175,8 @@ extension ESPMTRCommissioner {
     ///   - completionHadnler: completion
     func getBasicInformationAttributes(groupID: String, deviceId: UInt64, completionHandler: @escaping ([UInt]?) -> Void) {
         self.getBasicInfomrationCluster(deviceId: deviceId) { cluster in
-            if let clutser = cluster {
-                clutser.readAttributeAttributeList { attributesList, _ in
+            if let cluster = cluster {
+                cluster.readAttributeAttributeList { attributesList, _ in
                     if let attributesList = attributesList as? [UInt] {
                         completionHandler(attributesList)
                     } else {

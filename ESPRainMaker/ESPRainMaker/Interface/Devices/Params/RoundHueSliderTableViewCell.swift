@@ -78,7 +78,7 @@ extension RoundHueSliderTableViewCell: RadialHueControlDelegate {
         }
     }
     
-    /// Callback that recieves value for currently selected color
+    /// Callback that receives value for currently selected color
     /// - Parameter value: current value of Hue
     func selectedColor(value: CGFloat) {
         // Skip param update if app does not support continuous updates

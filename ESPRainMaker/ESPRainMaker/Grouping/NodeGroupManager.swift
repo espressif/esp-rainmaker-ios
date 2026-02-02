@@ -61,7 +61,7 @@ class NodeGroupManager {
     /// Method to get node groups for the current user
     ///
     /// - Parameters:
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func getNodeGroups(partialNodeGroupList: [NodeGroup]? = nil, nextID: String? = nil, completionHandler: @escaping ([NodeGroup]?, ESPNetworkError?) -> Void) {
         var url = nodeGroupURL + "?node_list=true"
         if let nextID = nextID {
@@ -127,7 +127,7 @@ class NodeGroupManager {
     ///
     /// - Parameters:
     ///   - group: Group for which create request will be made.
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func createNodeGroup(group: NodeGroup, completionHandler: @escaping (NodeGroup?, ESPNetworkError?) -> Void) {
         // Initializing parameter for create group request
         var parameter: [String: Any] = ["group_name": group.group_name!]
@@ -147,7 +147,7 @@ class NodeGroupManager {
                     return
                 } else {
                     let createNodeGroup = try decoder.decode(CreateNodeGroupResponse.self, from: response)
-                    // Check if group ID is present before marking the response as successfull
+                    // Check if group ID is present before marking the response as successful
                     group.group_id = createNodeGroup.group_id
                     completionHandler(group, nil)
                     return
@@ -162,7 +162,7 @@ class NodeGroupManager {
     ///
     /// - Parameters:
     ///   - group: Group for which operation will be performed.
-    ///   - completionHandler: Callback method that is invoked in case request is succesfully processed or fails in between.
+    ///   - completionHandler: Callback method that is invoked in case request is successfully processed or fails in between.
     func performNodeGroupOperation(group: NodeGroup, parameter: [String: Any]?, method: HTTPMethod, completionHandler: @escaping (Bool, ESPNetworkError?) -> Void) {
         apiManager.genericAuthorizedDataRequest(url: nodeGroupURL + "?group_id=\(group.group_id!)", parameter: parameter, method: method) { result, error in
             guard let response = result else {

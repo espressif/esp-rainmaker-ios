@@ -23,7 +23,7 @@ import Foundation
 
 enum InputValidationError: String {
     case outOfBound = "Input value is out of bound"
-    case invalid = "Input value is inavlid"
+    case invalid = "Input value is invalid"
     case other = "Unrecognized error"
 }
 

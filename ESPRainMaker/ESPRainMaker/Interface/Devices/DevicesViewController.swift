@@ -96,7 +96,7 @@ class DevicesViewController: UIViewController {
         case localNetwork = "local_network"
     }
     
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -869,10 +869,10 @@ class DevicesViewController: UIViewController {
             // If scan is not enabled check supported transport
             switch Configuration.shared.espProvSetting.transport {
             case .ble:
-                // Go directly to BLE manual provisioing
+                // Go directly to BLE manual provisioning
                 goToBleProvision()
             case .softAp:
-                // Go directly to SoftAP manual provisioing
+                // Go directly to SoftAP manual provisioning
                 goToSoftAPProvision()
             default:
                 // If both BLE and SoftAP is supported. Present Action Sheet to give option to choose.

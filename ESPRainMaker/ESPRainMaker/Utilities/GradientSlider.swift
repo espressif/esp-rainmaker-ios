@@ -285,7 +285,7 @@ import UIKit
         updateThumbPosition(animated: false)
     }
 
-    // MARK: - Convienience Colors
+    // MARK: - Convenience Colors
 
     func setGradientVaryingHue(saturation: CGFloat, brightness: CGFloat) {
         minColor = UIColor(hue: 0.0, saturation: saturation, brightness: brightness, alpha: 1.0)

@@ -1,0 +1,5 @@
+stages:
+  - check
+
+include:
+  - '.gitlab/ci/pre_commit.yml'

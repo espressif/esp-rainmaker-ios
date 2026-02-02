@@ -38,12 +38,12 @@ extension ThreadSuccessViewController {
     /// Fetch device association status
     /// - Parameters:
     ///   - nodeID: node id
-    ///   - requestID: reuqest id
+    ///   - requestID: request id
     func checkDeviceAssoicationStatus(nodeID: String, requestID: String) {
         fetchDeviceAssociationStatus(nodeID: nodeID, requestID: requestID)
     }
     
-    /// Deivce association failed with error message
+    /// Device association failed with error message
     /// - Parameter message: error message
     func deviceAssociationFailedWithMessage(message: String) {
         DispatchQueue.main.async {

@@ -26,7 +26,7 @@ class KeychainOperations: NSObject {
     let service: String = "com.espressif.cognitoUserData"
 
     /**
-     Funtion to add an item to keychain
+     Function to add an item to keychain
      - parameters:
      - value: Value to save in `data` format (String, Int, Double, Float, etc)
      - account: Account name for keychain item
@@ -63,7 +63,7 @@ class KeychainOperations: NSObject {
      - parameters:
      - account: Account name for keychain item
      */
-    func retreive(account: String) throws -> Data? {
+    func retrieve(account: String) throws -> Data? {
         /// Result of getting the item
         var result: AnyObject?
         /// Status for the query

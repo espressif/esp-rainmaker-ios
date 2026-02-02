@@ -22,7 +22,7 @@ import Foundation
 @available(iOS 16.4, *)
 extension ESPMTRCommissioner {
     
-    /// Confirm node comissioning
+    /// Confirm node commissioning
     /// - Parameters:
     ///   - groupId: group id
     ///   - requestId: request id

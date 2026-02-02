@@ -270,7 +270,7 @@ struct ESPProvSettings {
         if let configDict = config {
             scanEnabled = configDict["ESP Scan Enabled"] as? Bool ?? true
             allowPrefixSearch = configDict["Enable Schedule"] as? Bool ?? true
-            if let securityModeVal = configDict["ESP Securtiy Mode"] as? String {
+            if let securityModeVal = configDict["ESP Security Mode"] as? String {
                 securityMode = securityModeVal.lowercased() == "unsecure" ? .unsecure : .secure
             }
             if let transportVal = configDict["ESP Transport"] as? String {

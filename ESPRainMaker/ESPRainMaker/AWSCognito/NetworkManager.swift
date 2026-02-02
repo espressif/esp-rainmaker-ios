@@ -53,7 +53,7 @@ class NetworkManager {
     /// Get node info like device list, param list and online/offline status
     ///
     /// - Parameters:
-    ///   - completionHandler: handler called when response to get node info is recieved
+    ///   - completionHandler: handler called when response to get node info is received
     func getNodeInfo(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
         if Configuration.shared.appConfiguration.supportLocalControl, let availableService = User.shared.localServices[nodeId] {
             availableService.getPropertyInfo { response, error in
@@ -96,7 +96,7 @@ class NetworkManager {
     /// Method to fetch online/offline status of associated nodes
     ///
     /// - Parameters:
-    ///   - completionHandler: handler called when response to get node status is recieved
+    ///   - completionHandler: handler called when response to get node status is received
     func getNodeStatus(node: Node, completionHandler: @escaping (Node?, Error?) -> Void) {
         apiManager.getNodeStatus(node: node, completionHandler: completionHandler)
     }
@@ -106,16 +106,16 @@ class NetworkManager {
     /// Method to send request of adding device to currently active user
     ///
     /// - Parameters:
-    ///   - completionHandler: handler called when response to add device to user is recieved with id of the request
+    ///   - completionHandler: handler called when response to add device to user is received with id of the request
     func addDeviceToUser(parameter: [String: String], completionHandler: @escaping (String?, ESPNetworkError?) -> Void) {
         apiManager.addDeviceToUser(parameter: parameter, completionHandler: completionHandler)
     }
 
-    /// Method to fetch device assoication staus
+    /// Method to fetch device association status
     ///
     /// - Parameters:
     ///   - nodeID: Id of the node for which association status is fetched
-    ///   - completionHandler: handler called when response to deviceAssociationStatus is recieved
+    ///   - completionHandler: handler called when response to deviceAssociationStatus is received
     func deviceAssociationStatus(nodeID: String, requestID: String, completionHandler: @escaping (String) -> Void) {
         apiManager.deviceAssociationStatus(nodeID: nodeID, requestID: requestID, completionHandler: completionHandler)
     }
@@ -126,7 +126,7 @@ class NetworkManager {
     ///
     /// - Parameters:
     ///   - device: Device for which get param is required
-    ///   - completionHandler: handler called when response to getDeviceParam is recieved
+    ///   - completionHandler: handler called when response to getDeviceParam is received
     func getDeviceParam(device: Device, completionHandler: @escaping (ESPNetworkError?) -> Void) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if Configuration.shared.appConfiguration.supportLocalControl {
@@ -180,7 +180,7 @@ class NetworkManager {
     ///
     /// - Parameters:
     ///   - nodeID: Id of the node for which thing shadow is updated
-    ///   - completionHandler: handler called when response to setDeviceParam is recieved
+    ///   - completionHandler: handler called when response to setDeviceParam is received
     func setDeviceParam(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (ESPCloudResponseStatus) -> Void) {
         NotificationCenter.default.post(Notification(name: Notification.Name(Constants.paramUpdateNotification)))
         if Configuration.shared.appConfiguration.supportLocalControl {
@@ -220,7 +220,7 @@ class NetworkManager {
     ///   - parameters: Parameter to be included in the api call
     ///   - encoding: ParameterEncoding
     ///   - header: HTTp headers
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func genericRequest(url: URLConvertible, method: HTTPMethod, parameters: Parameters, encoding: ParameterEncoding, headers: HTTPHeaders, completionHandler: @escaping ([String: Any]?) -> Void) {
         apiManager.genericRequest(url: url, method: method, parameters: parameters, encoding: encoding, headers: headers, completionHandler: completionHandler)
     }
@@ -230,7 +230,7 @@ class NetworkManager {
     /// - Parameters:
     ///   - url: URL of the api
     ///   - parameters: Parameter to be included in the api call
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func genericAuthorizedDataRequest(url: String, parameter: [String: Any]?, completionHandler: @escaping (Data?, ESPNetworkError?) -> Void) {
         apiManager.genericAuthorizedDataRequest(url: url, parameter: parameter, completionHandler: completionHandler)
     }

@@ -19,7 +19,7 @@
 import Foundation
 import ESPProvision
 
-// Sublcass of ESPDevice to manage device communication
+// Subclass of ESPDevice to manage device communication
 class ESPLocalDevice : ESPDevice {
     
     // Session path for local control
@@ -29,7 +29,7 @@ class ESPLocalDevice : ESPDevice {
     /// Method to send data to device available on WLAN.
     ///
     /// - Parameters:
-    ///   - path: Enpoint of device.
+    ///   - path: Endpoint of device.
     ///   - data: Data to be sent to device.
     ///   - completionHandler: The completion handler that is called when data transmission is successful.
     ///                          Parameter of block include response received from the HTTP request or error if any.

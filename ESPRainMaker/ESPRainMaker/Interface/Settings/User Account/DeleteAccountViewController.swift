@@ -66,7 +66,7 @@ class DeleteAccountViewController: UIViewController {
     }
     
     @IBAction func deleteAccountPressed(_ sender: Any) {
-        // Adds confirmation pop-up before intiating the delete request.
+        // Adds confirmation pop-up before initiating the delete request.
         let alertController = UIAlertController(title: "Warning!", message: "This will permanently delete your account and all information associated with it, including all the devices. Proceed with caution.", preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         let confirmAction = UIAlertAction(title: "Proceed", style: .destructive) { _ in

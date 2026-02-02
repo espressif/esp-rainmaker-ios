@@ -43,7 +43,7 @@ class ESPWeek: Codable {
         let paddedString = pad(string: binaryString, toSize: 8)
         // Reverse the 8 bit converted string to match with the position of days.
         let characters = Array(paddedString.reversed())
-        // If a bit is 1 that implies corrosponding day is selected, 0 for otherwise.
+        // If a bit is 1 that implies corresponding day is selected, 0 for otherwise.
         for i in 0 ... 6 {
             if characters[i] == "1" {
                 daysInWeek[i].selected = true

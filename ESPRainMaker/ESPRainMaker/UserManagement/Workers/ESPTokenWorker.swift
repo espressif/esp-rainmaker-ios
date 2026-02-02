@@ -124,7 +124,7 @@ class ESPTokenWorker: ESPTokenWorkerDelegate {
         }
     }
     
-    /// Save User detials response in keychain
+    /// Save User details response in keychain
     /// - Parameter data: session/login API response data
     func saveUserDetails(_ data: String?) {
         //Save token data

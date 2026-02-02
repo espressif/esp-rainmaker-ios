@@ -57,7 +57,7 @@ class NodeDetailsViewController: UIViewController {
     var bindingEndpointClusterId: [String: UInt]?
     var sourceNode: ESPNodeDetails?
 
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()

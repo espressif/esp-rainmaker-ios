@@ -81,7 +81,7 @@ extension CommonDeviceServicesProtocol {
     ///   - actions: dictionary of node ids and their devices
     ///   - onView: UIView to show message in case of failure.
     ///   - text: error text to be shown
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func callParamsAPIWithActions(apiManager: ESPAPIManager, list: [[String: Any]], actions: [String: [Device]], onView: UIView, text: String, availableDevices: [String: Device], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         apiManager.setMultipleDeviceParam(parameter: list) { cloudResponse, error in
             if error == nil {
@@ -99,7 +99,7 @@ extension CommonDeviceServicesProtocol {
     ///   - actions: dictionary of node ids and their devices
     ///   - onView: UIView to show message in case of failure.
     ///   - errorText: error text to be shown
-    ///   - completionHandler: Callback invoked after api response is recieved
+    ///   - completionHandler: Callback invoked after api response is received
     func handleResponse(cloudResponse: [ESPCloudResponse]?, actions: [String: [Device]], onView: UIView, errorText: String,  availableDevices: [String: Device], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         var failureString = ""
         if let response = cloudResponse, response.count > 0 {
@@ -125,7 +125,7 @@ extension CommonDeviceServicesProtocol {
     /// Gives list of devices under a schedule or scene.
     ///
     /// - Parameter availableDevices: available devices for schedule or scene
-    /// - Returns: Comma seperated string of devices that are part of a particular schedule or scene
+    /// - Returns: Comma separated string of devices that are part of a particular schedule or scene
     func getActionList(availableDevices: [String: Device]) -> String {
         var actionList: [String] = []
         for device in availableDevices.values {
@@ -141,7 +141,7 @@ extension CommonDeviceServicesProtocol {
         }
     }
     
-    /// Reset avaialble devices list
+    /// Reset available devices list
     ///
     /// - Parameter availableDevices: List of available devices
     func resetAvailableDeviceStatus(availableDevices: inout [String: Device]) {
@@ -170,7 +170,7 @@ extension CommonDeviceServicesProtocol {
     ///   - serviceType: device service type
     ///   - isSave: is save action invoked
     ///   - onView: UIView where error is to be displayed
-    ///   - completionHandler: callback to be invoked when API response is recevied
+    ///   - completionHandler: callback to be invoked when API response is received
     func invokeServiceAction(apiManager: ESPAPIManager, keys: [String], jsonString: [String: Any], text: String, nodeIdKey: String, payloadKey: String, actions: [String: [Device]], availableDevices: [String: Device], serviceType: DeviceServiceType, isSave: Bool, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
         var actionsList = [[String: Any]]()
         var json = jsonString

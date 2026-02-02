@@ -44,7 +44,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
     var espDevice: ESPDevice!
     var provisionCompletionHandler: (() -> Void)?
 
-    // MARK: - Overriden Methods
+    // MARK: - Overridden Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
