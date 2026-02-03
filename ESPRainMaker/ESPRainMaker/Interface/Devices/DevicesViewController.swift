@@ -67,7 +67,7 @@ class DevicesViewController: UIViewController {
     let fabricDetails = ESPMatterFabricDetails.shared
     
     // MARK: - UI Optimization Properties
-    /// 
+    ///
     /// COMPREHENSIVE UI OPTIMIZATION STRATEGY:
     /// 1. Smart API Calls: Only call getNodes when explicitly needed (login, pull-to-refresh, app launch, updateDeviceList=true)
     /// 2. Smart Collection View Reloads: Use targeted cell updates instead of full reloads when possible
@@ -182,6 +182,7 @@ class DevicesViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(refreshDeviceList), name: Notification.Name(Constants.refreshDeviceList), object: nil)
         #if ESPRainMakerMatter
         NotificationCenter.default.addObserver(self, selector: #selector(controllerParamUpdateReceived), name: Notification.Name(Constants.controllerParamUpdate), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(matterDeviceConnectivityUpdate), name: Notification.Name(Constants.matterDeviceConnectivityUpdate), object: nil)
         #endif
         tabBarController?.tabBar.isHidden = false
         
@@ -296,7 +297,7 @@ class DevicesViewController: UIViewController {
         // Allow full reload if:
         // 1. It's been more than 5 seconds since last reload, OR
         // 2. We have significant data changes that require full reload
-        let hasSignificantChanges = dataChangeFlags.contains(.nodeList) || 
+        let hasSignificantChanges = dataChangeFlags.contains(.nodeList) ||
                                   dataChangeFlags.contains(.matterController)
         
         return timeSinceLastReload < fullReloadCooldown && !hasSignificantChanges
@@ -373,40 +374,57 @@ class DevicesViewController: UIViewController {
         // Track the specific change type
         dataChangeFlags.insert(changeType)
         
-        // Use performBatchUpdates for smooth transitions
-        collectionView.performBatchUpdates({
-            // Find and update only cells that contain the affected nodes
-            for cell in collectionView.visibleCells {
-                if let deviceGroupCell = cell as? DeviceGroupCollectionViewCell {
-                    updateDeviceGroupCellIfNeeded(deviceGroupCell, nodeIds: nodeIds, changeType: changeType)
+        // Collect cells that need updates
+        var cellsToUpdate: [DeviceGroupCollectionViewCell] = []
+        for cell in collectionView.visibleCells {
+            if let deviceGroupCell = cell as? DeviceGroupCollectionViewCell {
+                let containsAffectedNodes = deviceGroupCell.datasource.contains { node in
+                    guard let nodeId = node.node_id else { return false }
+                    return nodeIds.contains(nodeId)
+                }
+                if containsAffectedNodes {
+                    cellsToUpdate.append(deviceGroupCell)
                 }
             }
-        }, completion: { _ in
-            // Clear change flags after successful update
-            self.dataChangeFlags.removeAll()
-        })
-    }
-    
-    /// Update specific device group cell if it contains affected nodes
-    /// This prevents unnecessary updates to cells that don't contain the changed nodes
-    private func updateDeviceGroupCellIfNeeded(_ cell: DeviceGroupCollectionViewCell, nodeIds: [String], changeType: DataChangeType) {
-        // Check if this cell contains any of the affected nodes
-        let containsAffectedNodes = cell.datasource.contains { node in
-            guard let nodeId = node.node_id else { return false }
-            return nodeIds.contains(nodeId)
         }
         
-        if containsAffectedNodes {
-            // Update the nested collection view for this cell
-            cell.collectionView.performBatchUpdates({
-                // Update only the specific items that contain affected nodes
-                for (index, node) in cell.datasource.enumerated() {
-                    if let nodeId = node.node_id, nodeIds.contains(nodeId) {
-                        let indexPath = IndexPath(item: index, section: 0)
-                        cell.collectionView.reloadItems(at: [indexPath])
+        // Update datasources first (outside batch updates to avoid conflicts)
+        for cell in cellsToUpdate {
+            if changeType == .connectionStatus || changeType == .localNetwork {
+                if let indexPath = collectionView.indexPath(for: cell) {
+                    if indexPath.item == 0 {
+                        cell.datasource = User.shared.associatedNodeList ?? []
+                    } else {
+                        if let nodeList = NodeGroupManager.shared.nodeGroups[indexPath.item - 1].nodeList, nodeList.count > 0 {
+                            var finalNodeLst = nodeList
+                            for index in 0..<nodeList.count {
+                                let indexNode = nodeList[index]
+                                if let indexNodeId = indexNode.node_id, let nodes = User.shared.associatedNodeList {
+                                    for node in nodes {
+                                        if let nodeId = node.node_id, indexNodeId == nodeId {
+                                            finalNodeLst[index] = node
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                            cell.datasource = finalNodeLst
+                        }
                     }
                 }
-            }, completion: nil)
+            }
+        }
+        
+        // CRITICAL: Always use reloadData() for nested collection views when datasource changes
+        // This is the safest approach and avoids all batch update conflicts
+        // The performance impact is minimal since we're only updating specific cells
+        DispatchQueue.main.async {
+            for cell in cellsToUpdate {
+                // Always reload when datasource is updated to avoid any index mismatches
+                cell.collectionView.reloadData()
+            }
+            // Clear change flags after successful update
+            self.dataChangeFlags.removeAll()
         }
     }
     
@@ -452,7 +470,7 @@ class DevicesViewController: UIViewController {
             updateConnectionStatusForNodes(nodeIds: nodeIds)
         }
     }
-    
+
     @objc func controllerParamUpdateReceived() {
         if let nodeId = ESPMatterEcosystemInfo.shared.getControllerNotificationNodeId() {
             ESPMatterEcosystemInfo.shared.removeControllerNotificationNodeId()
@@ -500,6 +518,25 @@ class DevicesViewController: UIViewController {
         }
     }
     
+    /// Handle Matter device connectivity updates (mDNS discovery changes)
+    /// When WiFi changes, Matter nodes are discovered/removed, so we need to update all Matter nodes
+    @objc func matterDeviceConnectivityUpdate() {
+        // When Matter discovery changes (WiFi change), include ALL Matter nodes
+        // because their connection status (local/offline) may have changed
+        guard let nodes = User.shared.associatedNodeList else { return }
+        
+        var matterNodeIds: [String] = []
+        for node in nodes {
+            if let nodeId = node.node_id, node.matter_node_id != nil {
+                matterNodeIds.append(nodeId)
+            }
+        }
+        
+        if !matterNodeIds.isEmpty {
+            updateConnectionStatusForNodes(nodeIds: matterNodeIds)
+        }
+    }
+    
     /// Identify which specific nodes changed connection status
     /// This allows us to update only the affected nodes instead of the entire collection view
     private func getNodesWithChangedConnectionStatus() -> [String] {
@@ -511,7 +548,6 @@ class DevicesViewController: UIViewController {
             guard let nodeId = node.node_id else { continue }
             
             // Check if this node's connection status has changed
-            // We can detect this by comparing current status with previous status
             let currentIsLocal = node.localNetwork
             let currentIsConnected = node.isConnected
             
@@ -524,10 +560,9 @@ class DevicesViewController: UIViewController {
                     changedNodeIds.append(nodeId)
                 }
             } else {
-                // For non-Matter nodes, check local network status
-                if currentIsLocal {
+                // For Rainmaker (non-Matter) nodes, the localNetworkUpdateNotification is only sent when status changes
+                // Include all Rainmaker nodes to ensure UI reflects current state
                     changedNodeIds.append(nodeId)
-                }
             }
         }
         
@@ -635,29 +670,6 @@ class DevicesViewController: UIViewController {
         }
     }
     
-    private func getNodes(_ completion: @escaping () -> Void) {
-        // Track API call timing to prevent excessive calls
-        lastAPICallTimestamp = Date().timeIntervalSince1970
-        
-        NetworkManager.shared.getNodes { nodes, error in
-            DispatchQueue.main.async {
-                self.loadingIndicator.isHidden = true
-                User.shared.associatedNodeList = nil
-                if error != nil {
-                    self.searchForDevicesOnWLAN()
-                    self.unhideInitialView(error: error)
-                    self.collectionView.isUserInteractionEnabled = true
-                    completion()
-                    return
-                }
-                User.shared.associatedNodeList = nodes
-                // Mark that node list has changed for appropriate UI updates
-                self.dataChangeFlags.insert(.nodeList)
-                completion()
-            }
-        }
-    }
-    
     #if ESPRainMakerMatter
     @available(iOS 16.4, *)
     /// Load Matter details in background without blocking UI
@@ -725,6 +737,7 @@ class DevicesViewController: UIViewController {
         }
     }
     
+
     
     /// Background version of getNodeGroupMatterFabricDetails - non-blocking
     private func getNodeGroupMatterFabricDetailsInBackground() {
@@ -741,6 +754,29 @@ class DevicesViewController: UIViewController {
         }
     }
     #endif
+    
+    private func getNodes(_ completion: @escaping () -> Void) {
+        // Track API call timing to prevent excessive calls
+        lastAPICallTimestamp = Date().timeIntervalSince1970
+        
+        NetworkManager.shared.getNodes { nodes, error in
+            DispatchQueue.main.async {
+                self.loadingIndicator.isHidden = true
+                User.shared.associatedNodeList = nil
+                if error != nil {
+                    self.searchForDevicesOnWLAN()
+                    self.unhideInitialView(error: error)
+                    self.collectionView.isUserInteractionEnabled = true
+                    completion()
+                    return
+                }
+                User.shared.associatedNodeList = nodes
+                // Mark that node list has changed for appropriate UI updates
+                self.dataChangeFlags.insert(.nodeList)
+                completion()
+            }
+        }
+    }
     
     #if ESPRainMakerMatter
     func searchForMatterDevicesOnLocalNetwork(completion: @escaping () -> Void) {
@@ -766,7 +802,7 @@ class DevicesViewController: UIViewController {
             commissioner.group = matterFabricData
             commissioner.initializeMTRControllerWithUserNOC(matterFabricData: matterFabricData, userNOCData: userNOCDetails)
         }
-    }    
+    }
     #endif
     
     private func discoverDevicesAndFormatUI(error: ESPNetworkError?) {
@@ -883,8 +919,12 @@ class DevicesViewController: UIViewController {
                 let softapAction = UIAlertAction(title: "SoftAP", style: .default) { _ in
                     self.goToSoftAPProvision()
                 }
+                let onNetworkAction = UIAlertAction(title: "On Network", style: .default) { _ in
+                    self.goToOnNetworkDiscovery()
+                }
                 actionSheet.addAction(bleAction)
                 actionSheet.addAction(softapAction)
+                actionSheet.addAction(onNetworkAction)
                 actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
                 
                 // Configure for iPad
@@ -919,6 +959,11 @@ class DevicesViewController: UIViewController {
         let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let softLandingVC = mainStoryboard.instantiateViewController(withIdentifier: "provisionLanding") as! ProvisionLandingViewController
         navigationController?.pushViewController(softLandingVC, animated: true)
+    }
+    
+    private func goToOnNetworkDiscovery() {
+        let onNetworkVC = OnNetworkDiscoveryViewController()
+        navigationController?.pushViewController(onNetworkVC, animated: true)
     }
 
     private func prepareView() {
@@ -1211,11 +1256,11 @@ extension DevicesViewController: UICollectionViewDataSource {
             // This ensures pull-to-refresh always makes API call as required
             self.forceAPIRefresh()
         }
-        // Only reload nested collection view if data actually changed
-        // This prevents unnecessary reloads during cell reuse
-        if dataChangeFlags.contains(.nodeList) || dataChangeFlags.contains(.deviceParameters) {
-            cell.collectionView.reloadData()
-        }
+        // CRITICAL: Always reload nested collection view when datasource is set in cellForItemAt
+        // This ensures the nested collection view matches the datasource, especially when switching groups
+        // Using reloadData() is safe here because cellForItemAt is called during cell configuration,
+        // not during batch updates, so there's no conflict
+        cell.collectionView.reloadData()
         return cell
     }
 }

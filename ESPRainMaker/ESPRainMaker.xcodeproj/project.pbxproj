@@ -679,6 +679,10 @@
 		F8D1CAD12E54561E00962FEF /* PairingModeMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D1CAD02E54561800962FEF /* PairingModeMessages.swift */; };
 		F8E994792DF16C06006F406C /* ClientOnlyControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E994782DF16C05006F406C /* ClientOnlyControllerConstants.swift */; };
 		F8E9947B2DF1733F006F406C /* Node+ClientOnlyControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */; };
+		F8FE30392F3211400004665A /* ESPOnNetworkDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FE30382F32113E0004665A /* ESPOnNetworkDevice.swift */; };
+		F8FE303B2F3211E50004665A /* ESPChallengeRespServiceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FE303A2F3211E30004665A /* ESPChallengeRespServiceDiscovery.swift */; };
+		F8FE303E2F3212450004665A /* OnNetworkDiscoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FE303D2F3212400004665A /* OnNetworkDiscoveryViewController.swift */; };
+		F8FE30402F3212620004665A /* OnNetworkDeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FE303F2F3212590004665A /* OnNetworkDeviceTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1391,6 +1395,10 @@
 		F8D1CAD02E54561800962FEF /* PairingModeMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingModeMessages.swift; sourceTree = "<group>"; };
 		F8E994782DF16C05006F406C /* ClientOnlyControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientOnlyControllerConstants.swift; sourceTree = "<group>"; };
 		F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+ClientOnlyControllerUtility.swift"; sourceTree = "<group>"; };
+		F8FE30382F32113E0004665A /* ESPOnNetworkDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPOnNetworkDevice.swift; sourceTree = "<group>"; };
+		F8FE303A2F3211E30004665A /* ESPChallengeRespServiceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPChallengeRespServiceDiscovery.swift; sourceTree = "<group>"; };
+		F8FE303D2F3212400004665A /* OnNetworkDiscoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnNetworkDiscoveryViewController.swift; sourceTree = "<group>"; };
+		F8FE303F2F3212590004665A /* OnNetworkDeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnNetworkDeviceTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2212,6 +2220,7 @@
 		F1072BBB256F9B2C00D7CE2C /* Provision */ = {
 			isa = PBXGroup;
 			children = (
+				F8FE303C2F3212350004665A /* OnNetwork */,
 				F8916C232EE2D4BF000F40F7 /* RainmakerController */,
 				F8E994752DF16BB5006F406C /* ClientOnlyController */,
 				F81063A82DE5E06B005BD8B6 /* ESPProvisionConstants.swift */,
@@ -2278,6 +2287,7 @@
 		F117CDED252C758800ADB856 /* LocalControl */ = {
 			isa = PBXGroup;
 			children = (
+				F8FE303A2F3211E30004665A /* ESPChallengeRespServiceDiscovery.swift */,
 				F117CDEE252C75CD00ADB856 /* ESPLocalControl.swift */,
 				F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */,
 				F1C352CF26DBC40900A88893 /* ESPLocalDevice.swift */,
@@ -2451,6 +2461,7 @@
 		F194B60622CDD79D00417347 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F8FE30382F32113E0004665A /* ESPOnNetworkDevice.swift */,
 				F1AC6D8A27AD54490051F6E7 /* ESPRMDeviceType.swift */,
 				F18EC5BF23BE0BF700F9188E /* AssociationConfig.swift */,
 				F13A01B923E98B680067F8B8 /* UserInfo.swift */,
@@ -3123,6 +3134,15 @@
 			path = ClientOnlyController;
 			sourceTree = "<group>";
 		};
+		F8FE303C2F3212350004665A /* OnNetwork */ = {
+			isa = PBXGroup;
+			children = (
+				F8FE303F2F3212590004665A /* OnNetworkDeviceTableViewCell.swift */,
+				F8FE303D2F3212400004665A /* OnNetworkDiscoveryViewController.swift */,
+			);
+			path = OnNetwork;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3431,9 +3451,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3629,6 +3653,7 @@
 				F1390F2527D86C5D00F80DFB /* AutomationSelectDeviceVC.swift in Sources */,
 				F84AD75B2EFA38B80040A3E5 /* DeviceViewController+MatterSubscriptions.swift in Sources */,
 				F1B1011C269EC627004B5537 /* Double+DateTimeString.swift in Sources */,
+				F8FE303B2F3211E50004665A /* ESPChallengeRespServiceDiscovery.swift in Sources */,
 				F1AFB25A2721F98D00418969 /* UserAccountViewController.swift in Sources */,
 				F81063A92DE5E075005BD8B6 /* ESPProvisionConstants.swift in Sources */,
 				F1A866AB27EBCDD400A9858B /* AutomationActionSummaryView.swift in Sources */,
@@ -3650,10 +3675,12 @@
 				0C38E60F283E279A0031C345 /* ActionTableViewCell.swift in Sources */,
 				F1EAACAC23E2A74300E9A6A8 /* ColorPickerViewDelegate.swift in Sources */,
 				F12261A022C61695004D049F /* DeviceAssociation.swift in Sources */,
+				F8FE303E2F3212450004665A /* OnNetworkDiscoveryViewController.swift in Sources */,
 				F1F4513A2328C5D40009DCE0 /* DevicesViewController.swift in Sources */,
 				0C1C7C82276162CC0062867A /* SceneSelectDevicesVC.swift in Sources */,
 				F1FA24B3276F82D400447050 /* ESPChartViewProvider.swift in Sources */,
 				F1EAACAE23E2A74300E9A6A8 /* DefaultValues.swift in Sources */,
+				F8FE30392F3211400004665A /* ESPOnNetworkDevice.swift in Sources */,
 				0CD359712A2D26010081017C /* ESPMatterFabricDetails+GroupsData.swift in Sources */,
 				F1CC3C23295D866D0000D6DC /* ESPOTAConstants.swift in Sources */,
 				0CE324BB2B90637000D6682E /* CustomActionCell.swift in Sources */,
@@ -3862,6 +3889,7 @@
 				0C387F762A2EC80700C5EFA4 /* RequestsReceivedCell.swift in Sources */,
 				0C6D23E92C8EC39A003773FD /* ESPNodeGroupAddedEvent.swift in Sources */,
 				F1BDFED127DCCF92005AF812 /* ESPAutomationParser.swift in Sources */,
+				F8FE30402F3212620004665A /* OnNetworkDeviceTableViewCell.swift in Sources */,
 				F164A30825824EC700B879BC /* Configuration.swift in Sources */,
 				0C71B9D82A360B8000978005 /* Node+MatterUtility.swift in Sources */,
 				F1390F3D27D8D6BB00F80DFB /* ESPUpdateAutomationService.swift in Sources */,

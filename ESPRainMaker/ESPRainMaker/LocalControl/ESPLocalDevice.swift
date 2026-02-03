@@ -38,57 +38,71 @@ class ESPLocalDevice : ESPDevice {
             self.sendUnsecureData(path: path, data: data, completionHandler: completionHandler)
             return
         }
-        // Checks whether session is established.
+        // Match Android EspLocalDevice: establish session first, then send (two-step).
+        // Android uses cookies so the second request (ch_resp) carries the session; we do the same.
         if !self.isSessionEstablished() {
-            // Initialises session with the device.
             self.initialiseSession(sessionPath: sessionPath) { status in
                 switch status {
-                    // Connection established. Sending data to device.
-                    case .connected:
-                        self.sendDataPrivate(path: path, data: data, retryOnce: true, completionHandler: completionHandler)                    default:
-                        completionHandler(nil,.sessionNotEstablished)
-
+                case .connected:
+                    self.sendDataPrivate(path: path, data: data, retryOnce: true, completionHandler: completionHandler)
+                default:
+                    completionHandler(nil, .sessionNotEstablished)
                 }
             }
-        } else {
-            // Session is already established, sending data.
-            sendDataPrivate(path: path, data: data, retryOnce: true, completionHandler: completionHandler)
+            return
         }
+        // Session is already established, sending data.
+        sendDataPrivate(path: path, data: data, retryOnce: true, completionHandler: completionHandler)
     }
     
     
-    func sendDataPrivate(path: String, data: Data, retryOnce:Bool, completionHandler: @escaping (Data?, ESPSessionError?) -> Void) {
-        // Encrypted data before sending.
+    func sendDataPrivate(path: String, data: Data, retryOnce: Bool, completionHandler: @escaping (Data?, ESPSessionError?) -> Void) {
+        guard self.isSessionEstablished() else {
+            // Re-establish session and retry
+            if retryOnce {
+                DispatchQueue.main.async {
+                    self.initialiseSession(sessionPath: self.sessionPath) { status in
+                        switch status {
+                        case .connected:
+                            self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
+                        default:
+                            completionHandler(nil, .sessionNotEstablished)
+                        }
+                    }
+                }
+                return
+            } else {
+                completionHandler(nil, .sessionNotEstablished)
+                return
+            }
+        }
+
         guard let encryptedData = securityLayer.encrypt(data: data) else {
-            completionHandler(nil,.securityMismatch)
+            completionHandler(nil, .securityMismatch)
             return
         }
-        // Using SoftAP transport layer to send data.
+
         espSoftApTransport.SendConfigData(path: path, data: encryptedData) { response, error in
             if error != nil, response == nil {
-                // Retry once in case of failure.
                 if retryOnce {
-                            DispatchQueue.main.async {
-                                self.initialiseSession(sessionPath: self.sessionPath) { status in
-                                    switch status {
-                                    case .connected:
-                                        self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
-                                        return
-                                    default:
-                                        completionHandler(nil,.sendDataError(error!))
-                                        return
-                                    }
-                                }
+                    DispatchQueue.main.async {
+                        self.initialiseSession(sessionPath: self.sessionPath) { status in
+                            switch status {
+                            case .connected:
+                                self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
+                            default:
+                                completionHandler(nil, .sendDataError(error!))
                             }
+                        }
                     }
-                else {
-                    completionHandler(nil,.sendDataError(error!))
+                } else {
+                    completionHandler(nil, .sendDataError(error!))
                 }
             } else {
                 if let responseData = self.securityLayer.decrypt(data: response!) {
                     completionHandler(responseData, nil)
                 } else {
-                    completionHandler(nil,.encryptionError)
+                    completionHandler(nil, .encryptionError)
                 }
             }
         }
@@ -107,10 +121,6 @@ class ESPLocalDevice : ESPDevice {
                 return
             }
 
-            let httpStatus = response as? HTTPURLResponse
-            if httpStatus?.statusCode != 200 {
-                print("statusCode should be 200, but is \(String(describing: httpStatus?.statusCode))")
-            }
             completionHandler(data, nil)
         }
         task.resume()

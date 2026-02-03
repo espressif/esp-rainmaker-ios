@@ -29,8 +29,19 @@ class ConnectViewController: UIViewController {
     var pop = ""
     var provisionCompletionHandler: (() -> Void)?
 
+    /// When set, this VC is used only to collect POP for on-network provisioning (no device connection).
+    var onNetworkDevice: ESPOnNetworkDevice?
+    var onNetworkPOPCompletion: ((String) -> Void)?
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        if let onNetwork = onNetworkDevice {
+            currentDeviceName = onNetwork.serviceName
+            headerLabel.text = "Enter your proof of possession PIN for \n" + currentDeviceName
+            nextButton.isHidden = false
+            return
+        }
 
         if espDevice == nil {
             ESPProvisionManager.shared.createESPDevice(deviceName: currentDeviceName, transport: .softap, completionHandler: { device, error in
@@ -58,11 +69,25 @@ class ConnectViewController: UIViewController {
     }
 
     @IBAction func cancelClicked(_: Any) {
+        if onNetworkDevice != nil {
+            navigationController?.popViewController(animated: true)
+            return
+        }
         navigationController?.popToRootViewController(animated: true)
     }
 
     @IBAction func nextBtnClicked(_: Any) {
         pop = popTextField.text ?? ""
+
+        if let device = onNetworkDevice, let completion = onNetworkPOPCompletion {
+            guard !pop.isEmpty else {
+                showErrorAlert(title: "Error", message: "Please enter Proof of Possession", buttonTitle: "OK") {}
+                return
+            }
+            completion(pop)
+            return
+        }
+
         Utility.showLoader(message: "Connecting to device", view: view)
         espDevice.connect(delegate: self) { status in
             DispatchQueue.main.async {

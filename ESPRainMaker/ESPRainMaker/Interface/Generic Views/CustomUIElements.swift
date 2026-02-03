@@ -19,8 +19,17 @@
 import UIKit
 
 class TopBarView: UIView {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        setupView()
+    }
+    
+    private func setupView() {
         borderWidth = 1.0
         borderColor = UIColor.lightGray
         changeTheme()
@@ -135,8 +144,17 @@ class BGImageView: UIImageView {
 }
 
 class BarButton: UIButton {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupButton()
+    }
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        setupButton()
+    }
+    
+    private func setupButton() {
         changeTheme()
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
     }
@@ -159,8 +177,17 @@ class BarButton: UIButton {
 }
 
 class BarTitle: UILabel {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupLabel()
+    }
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        setupLabel()
+    }
+    
+    private func setupLabel() {
         changeTheme()
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: Notification.Name(Constants.uiViewUpdateNotification), object: nil)
     }
