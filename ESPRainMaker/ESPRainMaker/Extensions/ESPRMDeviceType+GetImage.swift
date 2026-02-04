@@ -72,6 +72,8 @@ extension ESPRMDeviceType {
             return UIImage(named: "controller")
         case .threadBR:
             return UIImage(named: "thread_border_router")
+        case .aiagent:
+            return UIImage(named: "controller")
         }
     }
 }

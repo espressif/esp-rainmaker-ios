@@ -167,29 +167,23 @@ class DeviceTraitListViewController: UIViewController {
                     }
                 }
             }
+            var isFound = false
             if let service = node.getService(forServiceType: Constants.matterControllerServiceType), let params = service.params {
+                isFound = true
+                let param = Param()
+                param.type = ClientOnlyControllerConstants.defaultType
+                dataSource.append(param)
                 for param in params {
                     if let type = param.type, type == ClientOnlyControllerConstants.paramMatterCtlCmd {
                         dataSource.append(param)
+                        break
                     }
                 }
             }
-            if let service = node.getService(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType), let params = service.params {
-                var userTokenParamExists = false
-                var baseURLParamExists = false
-                var appendedParam: Param?
-                for param in params {
-                    if let type = param.type, type == RainmakerControllerConstants.paramUserToken {
-                        userTokenParamExists = true
-                    }
-                    if let type = param.type, type == RainmakerControllerConstants.paramBaseURL {
-                        baseURLParamExists = true
-                        appendedParam = param
-                    }
-                }
-                if userTokenParamExists, baseURLParamExists, let param = appendedParam {
-                    dataSource.append(param)
-                }
+            if let _ = node.getService(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType), !isFound  {
+                let param = Param()
+                param.type = RainmakerControllerConstants.defaultType
+                dataSource.append(param)
             }
         }
         // Remove hidden UI type parameters from list.
@@ -837,17 +831,23 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func getTableViewCellBasedOn(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
-        if dynamicAttribute.type == RainmakerControllerConstants.paramBaseURL {
+        if dynamicAttribute.type == RainmakerControllerConstants.paramBaseURL ||
+            dynamicAttribute.type == RainmakerControllerConstants.defaultType {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
                 return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
             configureCustomActionCell(cell, workflow: .launchRainmakerController, param: dynamicAttribute)
             return cell
-        } else if dynamicAttribute.type == ClientOnlyControllerConstants.paramMatterCtlCmd {
+        } else if dynamicAttribute.type == ClientOnlyControllerConstants.paramMatterCtlCmd ||
+                    dynamicAttribute.type == ClientOnlyControllerConstants.defaultType {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
                 return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
-            configureCustomActionCell(cell, workflow: .launchController, param: dynamicAttribute)
+            if dynamicAttribute.type == ClientOnlyControllerConstants.paramMatterCtlCmd {
+                configureCustomActionCell(cell, workflow: .updateDeviceList, param: dynamicAttribute)
+            } else {
+                configureCustomActionCell(cell, workflow: .launchController, param: dynamicAttribute)
+            }
             return cell
         } else if dynamicAttribute.type == Constants.threadPendingDataset || dynamicAttribute.type == Constants.threadActiveDataset {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
@@ -921,6 +921,9 @@ class DeviceTraitListViewController: UIViewController {
     
     /// Check if device is online (connected or on local network)
     private func isDeviceOnline(for param: Param) -> Bool {
+        if (param.type == ClientOnlyControllerConstants.defaultType || param.type == RainmakerControllerConstants.defaultType), let node = device.node {
+            return node.isConnected || node.localNetwork
+        }
         guard let properties = param.properties, properties.contains("write"),
               let node = device.node else { return false }
         return node.isConnected || node.localNetwork

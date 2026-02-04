@@ -83,6 +83,8 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     @IBOutlet weak var registrationLabel: UILabel!
     @IBOutlet weak var appVersionBottomConstraint: NSLayoutConstraint!
     
+    @IBOutlet weak var stackView: UIStackView!
+    
     var usernameText: String?
     var session: SFAuthenticationSession!
     var checked = false
@@ -624,7 +626,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
         }
     }
     
-    /// Set client only controller flow in the app
+    /// Set client only controller flow in tne app
     /// - Parameters:
     ///   - isRainmakerControllerFlow: is rainmaker controller
     ///   - isClientOnlyControllerFlow: is client only controller
@@ -658,18 +660,20 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     
     /// Set close button UI
     func setCloseButtonUI() {
-        self.closeButton.isHidden = !self.isRainmakerControllerFlow
-        self.controllerSigninButton.isHidden = !self.isRainmakerControllerFlow
-        self.signInButton.isHidden = self.isRainmakerControllerFlow
-        self.segmentControl.isHidden = self.isRainmakerControllerFlow
+        closeButton?.isHidden = !isRainmakerControllerFlow
+        controllerSigninButton?.isHidden = !isRainmakerControllerFlow
+        signInButton?.isHidden = isRainmakerControllerFlow
+        segmentControl?.isHidden = isRainmakerControllerFlow
+        forgotPasswordButton?.isHidden = isRainmakerControllerFlow
+        stackView?.isHidden = isRainmakerControllerFlow
     }
     #endif
     
     /// Set sign in button UI
     func setSigninButtonUI() {
-        self.closeButton.isHidden = true
-        self.controllerSigninButton.isHidden = true
-        self.signInButton.isHidden = false
+        closeButton?.isHidden = true
+        controllerSigninButton?.isHidden = true
+        signInButton?.isHidden = false
     }
     
     /// Reload timelines for widget
@@ -924,14 +928,26 @@ extension SignInViewController: ESPIdProviderLoginPresenter {
     }
     
     func loginSuccess(requestToken: RequestToken) {
+        if self.isClientOnlyControllerFlow {
+            var cloudResponse = ESPSessionResponse()
+            cloudResponse.accessToken = requestToken.accessToken
+            cloudResponse.idToken = requestToken.idToken
+            cloudResponse.refreshToken = requestToken.refreshToken
+            DispatchQueue.main.async {
+                self.clientOnlyControllerDelegate?.loginCompleted(cloudResponse: cloudResponse, groupId: self.groupId)
+                self.dismiss(animated: true)
+            }
+        }
         #if ESPRainMakerMatter
         if self.isRainmakerControllerFlow {
             var cloudResponse = ESPSessionResponse()
             cloudResponse.accessToken = requestToken.accessToken
             cloudResponse.idToken = requestToken.idToken
             cloudResponse.refreshToken = requestToken.refreshToken
-            self.rainmakerControllerDelegate?.cloudLoginConcluded(cloudResponse: cloudResponse, groupId: self.groupId, matterNodeId: self.matterNodeId)
-            self.dismiss(animated: true)
+            DispatchQueue.main.async {
+                self.rainmakerControllerDelegate?.cloudLoginConcluded(cloudResponse: cloudResponse, groupId: self.groupId, matterNodeId: self.matterNodeId)
+                self.dismiss(animated: true)
+            }
             return
         }
         #endif

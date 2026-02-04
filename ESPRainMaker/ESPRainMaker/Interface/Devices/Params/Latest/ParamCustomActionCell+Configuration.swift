@@ -34,6 +34,10 @@ extension ParamCustomActionCell {
             self.launchButton.setTitle("Update", for: .normal)
         case .launchController:
             self.headerLabel.text = "Controller"
+            self.descriptionLabel.text = "Update Params"
+            self.launchButton.setTitle("Update", for: .normal)
+        case .updateDeviceList:
+            self.headerLabel.text = "Controller"
             self.descriptionLabel.text = "Update Device List"
             self.launchButton.setTitle("Update", for: .normal)
         case .updateThreadDataset:

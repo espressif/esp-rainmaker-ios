@@ -716,6 +716,7 @@
                         <outlet property="signUpTopView" destination="GUK-6u-bDO" id="hsL-ad-rnE"/>
                         <outlet property="signUpView" destination="Bgz-Ln-xlQ" id="S2T-kn-E0v"/>
                         <outlet property="signupTextView" destination="aZh-0w-Mb7" id="azn-Ue-KNa"/>
+                        <outlet property="stackView" destination="xyD-97-MWg" id="Stk-Vw-Cnn"/>
                         <outlet property="useEmailLabel" destination="tYZ-aT-evD" id="IXY-93-3gI"/>
                         <outlet property="username" destination="QHG-X8-fcl" id="5sV-6x-HEF"/>
                         <segue destination="iUc-7H-19x" kind="show" identifier="confirmSignUpSegue" id="2R7-SN-dHT"/>

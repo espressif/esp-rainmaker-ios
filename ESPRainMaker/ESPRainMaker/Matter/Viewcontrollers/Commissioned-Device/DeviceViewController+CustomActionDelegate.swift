@@ -21,7 +21,7 @@ import Foundation
 import UIKit
 
 @available(iOS 16.4, *)
-extension DeviceViewController: ParamCustomActionDelegate {
+extension DeviceViewController: CustomActionDelegate, ParamCustomActionDelegate {
     
     func launchRainmakerController() {}
     func mergeThreadDataset() {}
@@ -74,19 +74,12 @@ extension DeviceViewController: ParamCustomActionDelegate {
         }
     }
     
-    /// Update thread dataset
+    func updateDeviceList() {}
+    
+    /// Update thread dataset (requires iOS 18.4+)
     func updateThreadDataset() {
-        guard #available(iOS 18.4, *) else {
-            DispatchQueue.main.async {
-                self.alertUser(title: ThreadBRMessages.failure.rawValue,
-                               message: "This feature requires iOS 18.4 or later.",
-                               buttonTitle: ThreadBRMessages.ok.rawValue) {}
-            }
-            return
-        }
-
-        if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
-            // Show loader
+        guard let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal else { return }
+        if #available(iOS 18.4, *) {
             DispatchQueue.main.async {
                 Utility.showLoader(message: "", view: self.view)
             }
@@ -100,7 +93,7 @@ extension DeviceViewController: ParamCustomActionDelegate {
                                        buttonTitle: ThreadBRMessages.ok.rawValue) {}
                     } else if let message = message {
                         if message == ThreadBRMessages.homepodDatasetNotAvailable.rawValue {
-                            commissioner.updateThreadDataLocally(groupId: groupId, deviceId: deviceId) { result, _ in
+                            commissioner.updateThreadDataLocally(tbrActiveDataset: nil, groupId: groupId, deviceId: deviceId) { result, _ in
                                 DispatchQueue.main.async {
                                     self.alertUser(title: result ? ThreadBRMessages.success.rawValue : ThreadBRMessages.failure.rawValue,
                                                    message: result ? ThreadBRMessages.setThreadCredsLocally.rawValue : ThreadBRMessages.failedToSetThreadCredsLocally.rawValue,
@@ -117,6 +110,10 @@ extension DeviceViewController: ParamCustomActionDelegate {
                     }
                 }
             }
+        } else {
+            alertUser(title: ThreadBRMessages.failure.rawValue,
+                      message: "Thread Border Router update requires iOS 18.4 or later.",
+                      buttonTitle: ThreadBRMessages.ok.rawValue) {}
         }
     }
     

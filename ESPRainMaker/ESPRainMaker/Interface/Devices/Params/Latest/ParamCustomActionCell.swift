@@ -25,6 +25,7 @@ import UIKit
 protocol ParamCustomActionDelegate: AnyObject {
     func launchRainmakerController()
     func launchController()
+    func updateDeviceList()
     func updateThreadDataset()
     func setActiveThreadDataset()
     func mergeThreadDataset()

@@ -553,9 +553,16 @@ class SuccessViewController: UIViewController {
                 
                 //Client-Only-Controller - Only call for devices that support this flow
                 if let finalNode = self.finalNode {
-                    if finalNode.isClientOnlyControllerFlowSupported, let _ = finalNode.clientOnlyControllerGroupParam {
+                    // Prefer Rainmaker user-auth with group-id to follow the group-aware flow
+                    if finalNode.isRmakerControllerSupported, let _ = finalNode.rmakerControllerGroupParam {
+                        self.handleRainmakerControllerGroupFlow()
+                    } else if finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerRmakerGroupParam {
+                        
                         self.handleClientOnlyControllerFlow()
-                    } else if finalNode.isRmakerControllerSupported {
+                    } else if finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerGroupParam {
+                        self.handleClientOnlyControllerFlow()
+                    } else if finalNode.isRmakerControllerSupported || finalNode.isClientOnlyControllerSupported {
+                        
                         self.showRainmakerLoginScreen()
                     }
                 }
@@ -1080,14 +1087,42 @@ class SuccessViewController: UIViewController {
 // MARK: Controller service utility methods
 extension SuccessViewController {
     
+    /// Handle workflow for Rainmaker controller devices that expose group id
+    private func handleRainmakerControllerGroupFlow() {
+        if let finalNode = self.finalNode, finalNode.isRmakerControllerSupported, let _ = finalNode.rmakerControllerGroupParam {
+            NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
+                DispatchQueue.main.async {
+                    if let nodeGroups = nodeGroups, nodeGroups.count > 0 {
+                        self.showGroupSelectionScreen()
+                    } else {
+                        self.showRainmakerLoginScreen()
+                    }
+                }
+            }
+        }
+    }
+    
     /// Handle workflow for client only controller device type
     private func handleClientOnlyControllerFlow() {
-        if let finalNode = self.finalNode, finalNode.isClientOnlyControllerFlowSupported {
+        if let finalNode = self.finalNode, finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerRmakerGroupParam {
             NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
-                if let nodeGroups = nodeGroups, nodeGroups.count > 0 {
-                    self.showGroupSelectionScreen()
-                } else {
-                    self.showErrorAlert(title: "Warning", message: "You don't have a single group created. Please create a group so that this controller device can be associated to it.", buttonTitle: "OK") {}
+                DispatchQueue.main.async {
+                    if let nodeGroups = nodeGroups, nodeGroups.count > 0 {
+                        self.showGroupSelectionScreen()
+                    } else {
+                        self.showRainmakerLoginScreen()
+                    }
+                }
+            }
+        } else if let finalNode = self.finalNode, finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerGroupParam {
+            NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
+                DispatchQueue.main.async {
+                    if let nodeGroups = nodeGroups, nodeGroups.count > 0 {
+                        self.showGroupSelectionScreen()
+                    } else {
+                        self.showRainmakerLoginScreen()
+                    }
+                    
                 }
             }
         }
@@ -1145,64 +1180,16 @@ extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
             self.navigationController?.popViewController(animated: true)
         }
         
-        let baseURL = Configuration.shared.awsConfiguration.baseURL
+        let baseURL = Configuration.shared.awsConfiguration.baseURL ?? ""
         let refreshToken = cloudResponse.refreshToken ?? ""
         
         if let node = self.finalNode {
-            if node.isClientOnlyControllerFlowSupported {
-                self.updateParamsForClientOnlyController(baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, node: node)
-            } else if node.isRmakerControllerSupported {
-                self.updateParamsForRmakerController(baseURL: baseURL, refreshToken: refreshToken, node: node)
+            if node.isRmakerControllerSupported {
+                NodeControllerParamUpdater.updateRmakerControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
             }
-        }
-    }
-    
-    /// Update parameters for client‑only controller devices after successful login.
-    /// - Parameters:
-    ///   - baseURL: Backend base URL.
-    ///   - refreshToken: User refresh token.
-    ///   - groupId: Selected group identifier.
-    ///   - node: Target node.
-    private func updateParamsForClientOnlyController(baseURL: String?, refreshToken: String, groupId: String?, node: Node) {
-        if refreshToken.count > 0,
-           let baseURL = baseURL,
-           let serviceName = node.getServiceName(forServiceType: Constants.matterControllerServiceType),
-           let nodeId = node.node_id,
-           let grpIdParamName = node.clientOnlyControllerGroupParam?.name,
-           let baseURLParamName = node.clientOnlyControllerBaseURLParam?.name,
-           let userTokenName = node.clientOnlyControllerUserTokenParam?.name,
-           let groupId = groupId {
-            
-            let params: [String: Any] = [serviceName : [baseURLParamName: baseURL,
-                                                           userTokenName: refreshToken,
-                                                          grpIdParamName: groupId] as Any]
-            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
-                if status == .success {
-                    //Client-Only-Controller
-                }
-            }
-        }
-    }
-    
-    /// Update parameters for Rainmaker controller devices after successful login.
-    /// - Parameters:
-    ///   - baseURL: Backend base URL.
-    ///   - refreshToken: User refresh token.
-    ///   - node: Target node.
-    private func updateParamsForRmakerController(baseURL: String?, refreshToken: String, node: Node) {
-        if refreshToken.count > 0,
-           let baseURL = baseURL,
-           let serviceName = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType),
-           let nodeId = node.node_id,
-           let baseURLParamName = node.rmakerControllerBaseURLParam?.name,
-           let userTokenName = node.rmakerControllerUserTokenParam?.name {
-            
-            let params: [String: Any] = [serviceName : [baseURLParamName: baseURL,
-                                            userTokenName: refreshToken] as Any]
-            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
-                if status == .success {
-                    //Rainmaker-Controller
-                }
+            if node.isClientOnlyControllerSupported {
+                NodeControllerParamUpdater.updateClientOnlyControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
+                
             }
         }
     }

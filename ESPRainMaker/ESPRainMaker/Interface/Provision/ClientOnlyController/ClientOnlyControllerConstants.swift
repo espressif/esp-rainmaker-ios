@@ -18,6 +18,8 @@
 
 struct ClientOnlyControllerConstants {
     
+    static let defaultType = "matter-controller"
+    
     static let serviceType = "esp.service.matter-controller"
     
     static let paramBaseURL = "esp.param.base-url"
@@ -26,4 +28,6 @@ struct ClientOnlyControllerConstants {
     static let paramMatterCtlCmd = "esp.param.matter-ctl-cmd"
     static let paramMatterCtlStatus = "esp.param.matter-ctl-status"
     static let paramMatterNodeId = "esp.param.matter-node-id"
+    
+    static let paramGroupId = "esp.param.rmaker-group-id"
 }

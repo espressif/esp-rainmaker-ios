@@ -18,6 +18,8 @@
 
 struct RainmakerControllerConstants {
     
+    static let defaultType = "rmaker-user-auth"
+    
     /// Service type identifier for Rainmaker controller functionality
     /// Used to identify nodes that support Rainmaker controller services
     static let rmakerControllerServiceType = "esp.service.rmaker-user-auth"
@@ -29,4 +31,6 @@ struct RainmakerControllerConstants {
     /// Parameter name for user authentication token in Rainmaker controller service
     /// Used to store the user's authentication token for accessing Rainmaker controller features
     static let paramUserToken = "esp.param.user-token"
+    
+    static let paramRainmakerGroupId = "esp.param.rmaker-group-id"
 }

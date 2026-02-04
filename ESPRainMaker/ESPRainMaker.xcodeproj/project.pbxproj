@@ -674,6 +674,7 @@
 		F87C31E02DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */; };
 		F8916C242EE2D4BF000F40F7 /* RainmakerControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */; };
 		F8916C262EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */; };
+		F8916C2A2EE2F001000F40F7 /* NodeControllerParamUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */; };
 		F8916C282EE2EBE8000F40F7 /* ESPReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C272EE2EBE8000F40F7 /* ESPReviewManager.swift */; };
 		F8A9418A2E438BED00E669AE /* ESPMTRCommissionerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A941892E438BED00E669AE /* ESPMTRCommissionerManager.swift */; };
 		F8D1CAD12E54561E00962FEF /* PairingModeMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D1CAD02E54561800962FEF /* PairingModeMessages.swift */; };
@@ -1390,6 +1391,7 @@
 		F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = esp_rmaker_chal_resp.pb.swift; sourceTree = "<group>"; };
 		F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainmakerControllerConstants.swift; sourceTree = "<group>"; };
 		F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+RmakerControllerUtility.swift"; sourceTree = "<group>"; };
+		F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeControllerParamUpdater.swift; sourceTree = "<group>"; };
 		F8916C272EE2EBE8000F40F7 /* ESPReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPReviewManager.swift; sourceTree = "<group>"; };
 		F8A941892E438BED00E669AE /* ESPMTRCommissionerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRCommissionerManager.swift; sourceTree = "<group>"; };
 		F8D1CAD02E54561800962FEF /* PairingModeMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingModeMessages.swift; sourceTree = "<group>"; };
@@ -1518,6 +1520,7 @@
 			isa = PBXGroup;
 			children = (
 				F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */,
+				F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */,
 				F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */,
 				F809FF422E09B974008BD38D /* Node+CameraUtility.swift */,
 				0C71B9D72A360B8000978005 /* Node+MatterUtility.swift */,
@@ -3572,6 +3575,7 @@
 				0CD3596B2A2D26010081017C /* ESPMatterDeviceFormat.swift in Sources */,
 				F1CE295D2861D015009EFC8E /* Double+TimeString.swift in Sources */,
 				F8916C262EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift in Sources */,
+				F8916C2A2EE2F001000F40F7 /* NodeControllerParamUpdater.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
 				F1CE295C2861D015009EFC8E /* Date+DayOfWeek.swift in Sources */,
 				0C17D20F2CCF89A200D0FDA7 /* MatterControllerDataModels.swift in Sources */,
@@ -4381,7 +4385,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.5.2;
+				MARKETING_VERSION = 3.6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -4781,7 +4785,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.5.2;
+				MARKETING_VERSION = 3.6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

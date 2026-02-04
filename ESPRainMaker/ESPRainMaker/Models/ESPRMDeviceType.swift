@@ -46,4 +46,5 @@ enum ESPRMDeviceType: String {
     case zigbeeGateway = "esp.device.zigbee_gateway"
     case threadBR = "esp.device.thread-br"
     case controller = "esp.device.matter-controller"
+    case aiagent = "AI Assistant"
 }
