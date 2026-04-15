@@ -53,6 +53,7 @@ extension ESPMatterCommissioningVC {
     /// - Parameters:
     ///   - groupId: group id
     ///   - deviceId: device id
+    @available(iOS 18.4, *)
     func performThreadOperations(groupId: String, deviceId: UInt64) {
         let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: groupId)
         commissioner.updateThreadDataset(groupId: groupId, deviceId: deviceId) { status, message in
@@ -86,6 +87,7 @@ extension ESPMatterCommissioningVC {
     /// - Parameters:
     ///   - groupId: group id
     ///   - deviceId: device id
+    @available(iOS 18.4, *)
     func performTBRActionAndNavigate(groupId: String, deviceId: UInt64, hideLoader: Bool = true) {
         if ESPMatterClusterUtil.shared.isTBRMSupported(groupId: groupId, deviceId: deviceId).0 {
             self.performThreadOperations(groupId: groupId, deviceId: deviceId)

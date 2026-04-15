@@ -96,6 +96,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: TBR Management cluster endpoint
     ///   - completion: completion handler with cluster instance if available
+    @available(iOS 18.4, *)
     func getTBRThreadBRManagementCluster(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (MTRBaseClusterThreadBorderRouterManagement?) -> Void) {
         if let controller = sController {
             let device = MTRBaseDevice(nodeID: NSNumber(value: deviceId), controller: controller)
@@ -112,6 +113,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint
     ///   - completion: completion handler
+    @available(iOS 18.4, *)
     func getTBRActiveOperationalDataset(deviceId: UInt64, endpoint: UInt16, completion: @escaping (Data?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -135,6 +137,7 @@ extension ESPMTRCommissioner {
     ///   - endpoint: cluster endpoint
     ///   - activeDataset: active operational dataset
     ///   - completion: completion handler
+    @available(iOS 18.4, *)
     func setTBRActiveOperationalDataset(deviceId: UInt64, endpoint: UInt16, activeDataset: Data, _ completion: @escaping (Bool) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -156,6 +159,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint id
     ///   - completion: completion handler with border agent id
+    @available(iOS 18.4, *)
     func readTBRAttributeBorderAgentId(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (Data?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -173,6 +177,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint
     ///   - completion: completion handler with dataset if available
+    @available(iOS 18.4, *)
     func getTBRPendingOperationalDataset(deviceId: UInt64, endpoint: UInt16, completion: @escaping (Data?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -195,6 +200,7 @@ extension ESPMTRCommissioner {
     ///   - endpoint: cluster endpoint
     ///   - pendingDataset: pending operational dataset
     ///   - completion: completion handler with success status
+    @available(iOS 18.4, *)
     func setTBRPendingOperationalDataset(deviceId: UInt64, endpoint: UInt16, pendingDataset: Data, _ completion: @escaping (Bool) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -214,6 +220,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint
     ///   - completion: completion handler with router name if available
+    @available(iOS 18.4, *)
     func readTBRBorderRouterName(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (String?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -231,6 +238,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint
     ///   - completion: completion handler with version if available
+    @available(iOS 18.4, *)
     func readTBRThreadVersion(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (NSNumber?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -248,6 +256,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint
     ///   - completion: completion handler with enabled status if available
+    @available(iOS 18.4, *)
     func readTBRInterfaceEnabled(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (NSNumber?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -265,6 +274,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: matter device id
     ///   - endpoint: cluster endpoint
     ///   - completion: completion handler with timestamp if available
+    @available(iOS 18.4, *)
     func readTBRActiveDatasetTimestamp(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (NSNumber?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -277,6 +287,7 @@ extension ESPMTRCommissioner {
         }
     }
     
+    @available(iOS 18.4, *)
     func readFeatureMap(deviceId: UInt64, endpoint: UInt16, _ completion: @escaping (NSNumber?) -> Void) {
         getTBRThreadBRManagementCluster(deviceId: deviceId, endpoint: endpoint) { tbrManagementCluster in
             guard let tbrManagementCluster = tbrManagementCluster else {
@@ -294,6 +305,7 @@ extension ESPMTRCommissioner {
     ///   - groupId: group identifier
     ///   - deviceId: matter device id
     ///   - completion: completion handler with success status
+    @available(iOS 18.4, *)
     func updateThreadDataset(groupId: String, deviceId: UInt64, completion: @escaping (Bool, String?) -> Void) {
         
         // Get endpoint for TBRM cluster
@@ -356,6 +368,7 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion
+    @available(iOS 18.4, *)
     func setLocaliOSDatasetToTBRActive(credentials: THCredentials?, dataset: Data, groupId: String, deviceId: UInt64, endpoint: UInt16, completion: @escaping (Bool, String?) -> Void) {
         // Check if general commissioning cluster is supported
         let result = ESPMatterClusterUtil.shared.isGeneralCommissioningSupported(groupId: groupId, deviceId: deviceId)
@@ -395,6 +408,7 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion
+    @available(iOS 18.4, *)
     func setLocaliOSDatasetToTBRPending(credentials: THCredentials, tbrActiveDataset: Data, iOSDataset: Data, groupId: String, deviceId: UInt64, endpoint: UInt16, completion: @escaping (Bool, String?) -> Void) {
         
         self.readFeatureMap(deviceId: deviceId, endpoint: endpoint) { featureMap in
@@ -464,6 +478,7 @@ extension ESPMTRCommissioner {
     ///   - deviceId: device id
     ///   - endpoint: endpoint
     ///   - completion: completion
+    @available(iOS 18.4, *)
     func generateTBRDataLocallyAndSet(groupId: String, deviceId: UInt64, endpoint: UInt16, completion: @escaping (Bool, String?) -> Void) {
         
         // Try to generate thread dataset locally on iOS
@@ -527,6 +542,7 @@ extension ESPMTRCommissioner {
     ///   - groupId: group id
     ///   - deviceId: device id
     ///   - completion: completion handler
+    @available(iOS 18.4, *)
     func updateThreadDataLocally(tbrActiveDataset: Data? = nil, groupId: String, deviceId: UInt64, completion: @escaping (Bool, String) -> Void) {
         let clusterInfo = ESPMatterClusterUtil.shared.isTBRMSupported(groupId: groupId, deviceId: deviceId)
         guard let key = clusterInfo.1, let endpoint = UInt16(key) else {
@@ -561,6 +577,7 @@ extension ESPMTRCommissioner {
     
     /// Create a sample thread active dataset locally on iOS (network name: Espressif-BR)
     /// - Returns: thread active dataswet
+    @available(iOS 18.4, *)
     func generateTBRActiveDataset() -> Data? {
         guard let networkName = "Espressif-TBR".data(using: .utf8) else {
             return nil

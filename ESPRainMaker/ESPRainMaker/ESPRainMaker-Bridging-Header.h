@@ -20,6 +20,5 @@
 #import "MTRCSRKeys.h"
 #import "GitVersion.h"
 #import "JPushService.h"
-#import "WeChatAuthSDK.h"
-#import "WXApi.h"
-#import "WXApiObject.h"
+#import <WechatOpenSDK/WXApi.h>
+#import <WechatOpenSDK/WXApiObject.h>

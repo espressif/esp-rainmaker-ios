@@ -208,14 +208,26 @@ class ESPMatterCommissioningVC: UIViewController {
                         // Update device name
                         self.updateDeviceName(nodeId: nodeID) {
                             // Finally perform TBR action and navigate
-                            self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
+                            if #available(iOS 18.4, *) {
+                                self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
+                            } else {
+                                self.navigateToDevicesScreen()
+                            }
                         }
                     }
                 } else {
-                    self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
+                    if #available(iOS 18.4, *) {
+                        self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId)
+                    } else {
+                        self.navigateToDevicesScreen()
+                    }
                 }
             } else {
-                self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId, hideLoader: false)
+                if #available(iOS 18.4, *) {
+                    self.performTBRActionAndNavigate(groupId: groupId, deviceId: deviceId, hideLoader: false)
+                } else {
+                    self.navigateToDevicesScreen(hideLoader: false)
+                }
             }
         } else {
             self.navigateToDevicesScreen(hideLoader: false)

@@ -76,6 +76,15 @@ extension DeviceViewController: CustomActionDelegate {
     
     /// Update thread dataset
     func updateThreadDataset() {
+        guard #available(iOS 18.4, *) else {
+            DispatchQueue.main.async {
+                self.alertUser(title: ThreadBRMessages.failure.rawValue,
+                               message: "This feature requires iOS 18.4 or later.",
+                               buttonTitle: ThreadBRMessages.ok.rawValue) {}
+            }
+            return
+        }
+
         if let groupId = self.group?.groupID, let node = self.rainmakerNode, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
             // Show loader
             DispatchQueue.main.async {
