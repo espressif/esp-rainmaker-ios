@@ -34,6 +34,7 @@ class Node: Codable {
     var localNetwork = false
     var supportsEncryption = false
     var pop = ""
+    var localControlUsername = ""
     var fromLocalStorage = false
     var maxSchedulesCount = -1
     var currentSchedulesCount = 0
@@ -66,6 +67,7 @@ class Node: Codable {
         case currentSchedulesCount
         case supportsEncryption
         case pop
+        case localControlUsername
         case timestamp
         case isConnected
         case isMatter
@@ -97,6 +99,7 @@ class Node: Codable {
         try container.encode(currentSchedulesCount, forKey: .currentSchedulesCount)
         try container.encode(supportsEncryption, forKey: .supportsEncryption)
         try container.encode(pop, forKey: .pop)
+        try container.encode(localControlUsername, forKey: .localControlUsername)
         try container.encode(timestamp, forKey: .timestamp)
         try container.encode(isConnected, forKey: .isConnected)
         try container.encode(isMatter, forKey: .isMatter)
@@ -177,6 +180,9 @@ class Node: Codable {
         }
         if let pop = try? container.decode(String.self, forKey: .pop) {
             self.pop = pop
+        }
+        if let localControlUsername = try? container.decode(String.self, forKey: .localControlUsername) {
+            self.localControlUsername = localControlUsername
         }
         if let isConnected = try? container.decode(Bool.self, forKey: .isConnected) {
             self.isConnected = isConnected

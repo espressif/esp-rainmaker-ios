@@ -24,6 +24,7 @@ class ESPLocalDevice : ESPDevice {
     
     // Session path for local control
     private let sessionPath = "esp_local_ctrl/session"
+    private let versionPath = "esp_local_ctrl/version"
     var hostname = ""
     
     /// Method to send data to device available on WLAN.
@@ -41,7 +42,7 @@ class ESPLocalDevice : ESPDevice {
         // Match Android EspLocalDevice: establish session first, then send (two-step).
         // Android uses cookies so the second request (ch_resp) carries the session; we do the same.
         if !self.isSessionEstablished() {
-            self.initialiseSession(sessionPath: sessionPath) { status in
+            self.initialiseLocalControlSession { status in
                 switch status {
                 case .connected:
                     self.sendDataPrivate(path: path, data: data, retryOnce: true, completionHandler: completionHandler)
@@ -61,7 +62,7 @@ class ESPLocalDevice : ESPDevice {
             // Re-establish session and retry
             if retryOnce {
                 DispatchQueue.main.async {
-                    self.initialiseSession(sessionPath: self.sessionPath) { status in
+                    self.initialiseLocalControlSession { status in
                         switch status {
                         case .connected:
                             self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
@@ -86,7 +87,7 @@ class ESPLocalDevice : ESPDevice {
             if error != nil, response == nil {
                 if retryOnce {
                     DispatchQueue.main.async {
-                        self.initialiseSession(sessionPath: self.sessionPath) { status in
+                        self.initialiseLocalControlSession { status in
                             switch status {
                             case .connected:
                                 self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
@@ -124,5 +125,40 @@ class ESPLocalDevice : ESPDevice {
             completionHandler(data, nil)
         }
         task.resume()
+    }
+
+    /// Initializes local control session.
+    /// For sec2, probes `esp_local_ctrl/version` and forwards `local_ctrl.sec_patch_ver`
+    /// to ESPProvision via `versionInfo` so IV mode matches firmware.
+    private func initialiseLocalControlSession(completionHandler: @escaping (ESPSessionStatus) -> Void) {
+        guard self.security == .secure2 else {
+            self.initialiseSession(sessionPath: sessionPath, completionHandler: completionHandler)
+            return
+        }
+        fetchLocalControlSecPatchVersion { patchVersion in
+            var provInfo: [String: Any] = ["sec_ver": ESPSecurity.secure2.rawValue]
+            if let patchVersion = patchVersion {
+                provInfo["sec_patch_ver"] = patchVersion
+            }
+            self.versionInfo = ["prov": provInfo] as NSDictionary
+            self.initialiseSession(sessionPath: self.sessionPath, completionHandler: completionHandler)
+        }
+    }
+
+    /// Reads sec patch version from local control version endpoint.
+    /// Mirrors Android behavior: sends dummy payload (`---`) as body.
+    private func fetchLocalControlSecPatchVersion(completion: @escaping (Int?) -> Void) {
+        let payload = Data("---".utf8)
+        self.espSoftApTransport.SendConfigData(path: versionPath, data: payload) { response, _ in
+            guard
+                let response = response,
+                let json = try? JSONSerialization.jsonObject(with: response, options: []) as? [String: Any],
+                let localCtrl = json["local_ctrl"] as? [String: Any]
+            else {
+                completion(nil)
+                return
+            }
+            completion(localCtrl["sec_patch_ver"] as? Int)
+        }
     }
 }
