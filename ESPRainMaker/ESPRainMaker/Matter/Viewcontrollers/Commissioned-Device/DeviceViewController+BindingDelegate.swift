@@ -29,17 +29,16 @@ extension DeviceViewController: BindingDelegate {
     
     /// Binding invoked
     func bindingInvoked(endpointClusterId: [String: UInt]?) {
-        if let node = self.node {
-            let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
-            let devicesBindingVC = storyboard.instantiateViewController(withIdentifier: DevicesBindingViewController.storyboardId) as! DevicesBindingViewController
-            devicesBindingVC.group = self.group
-            devicesBindingVC.nodes = self.allNodes
-            devicesBindingVC.sourceNode = node
-            devicesBindingVC.bindingEndpointClusterId = endpointClusterId
-            devicesBindingVC.switchIndex = self.switchIndex
-            DispatchQueue.main.async {
-                self.navigationController?.pushViewController(devicesBindingVC, animated: true)
-            }
+        guard let node = self.node else { return }
+        let storyboard = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
+        guard let devicesBindingVC = storyboard.instantiateViewController(withIdentifier: DevicesBindingViewController.storyboardId) as? DevicesBindingViewController else { return }
+        devicesBindingVC.group = self.group
+        devicesBindingVC.nodes = self.allNodes
+        devicesBindingVC.sourceNode = node
+        devicesBindingVC.bindingEndpointClusterId = endpointClusterId
+        devicesBindingVC.switchIndex = self.switchIndex
+        DispatchQueue.main.async {
+            self.navigationController?.pushViewController(devicesBindingVC, animated: true)
         }
     }
 }

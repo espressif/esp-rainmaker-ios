@@ -1,4 +1,4 @@
-// Copyright 2021 Espressif Systems
+// Copyright 2025 Espressif Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//  KeychainConstants.swift
+//  ParamActionCell+Actions.swift
 //  ESPRainMaker
 //
+//  Component: Action Handling
+//  Handles: Action invocation, delegate communication
 
-import Foundation
+import UIKit
 
-/**
- Private enum to return possible errors
- */
-enum KeychainErrors: Error {
-    /// Error with the keychain creting and checking
-    case creatingError
-    /// Error for setting
-    case setOperationError
-    /// Error for getting
-    case getOperationError
-    /// Error for deleting
-    case deleteOperationError
+extension ParamActionCell {
+    
+    // MARK: - Invoke Action
+    @objc func invokeAction(_ sender: Any) {
+        guard let paramNameToUse = paramName.isEmpty ? param?.name : paramName, !paramNameToUse.isEmpty else { return }
+        delegate?.actionInvoked(device: device, param: param, paramName: paramNameToUse)
+    }
 }
-
 

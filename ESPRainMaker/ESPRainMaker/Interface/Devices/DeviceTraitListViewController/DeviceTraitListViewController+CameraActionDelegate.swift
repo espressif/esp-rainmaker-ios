@@ -97,7 +97,17 @@ extension DeviceTraitListViewController {
         // Configure Kinesis Video Client
         let configuration = AWSServiceConfiguration(region: awsRegionType,
                                                     credentialsProvider: ESPAssumeRoleCredentialsProvider.shared)
-        AWSKinesisVideo.register(with: configuration!, forKey: ESPAWSConstants.awsKinesisVideoKey)
+        guard let config = configuration else {
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error",
+                                  message: "Failed to configure AWS service",
+                                  buttonTitle: "OK",
+                                  callback: {})
+            }
+            return
+        }
+        AWSKinesisVideo.register(with: config, forKey: ESPAWSConstants.awsKinesisVideoKey)
         
         // Get or create channel ARN
         var channelARN = retrieveChannelARN(channelName: channelName)
@@ -116,7 +126,18 @@ extension DeviceTraitListViewController {
         }
         
         // Get signaling endpoints for viewer role
-        let endpoints = getSignallingEndpoints(channelARN: channelARN!,
+        guard let channelARN = channelARN else {
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error",
+                                  message: "Channel ARN is required",
+                                  buttonTitle: "OK",
+                                  callback: {})
+            }
+            return
+        }
+        
+        let endpoints = getSignallingEndpoints(channelARN: channelARN,
                                              region: awsRegionValue,
                                              isMaster: false,
                                              useMediaServer: sendAudioEnabled)
@@ -132,19 +153,40 @@ extension DeviceTraitListViewController {
             return
         }
         
-        let wssURL = createSignedWSSUrl(channelARN: channelARN!,
+        guard let wssURL = createSignedWSSUrl(channelARN: channelARN,
                                        region: awsRegionValue,
                                        wssEndpoint: wssEndpoint,
-                                        isMaster: false,
-                                        clientId: localSenderClientID)
+                                       isMaster: false,
+                                       clientId: localSenderClientID) else {
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error",
+                                  message: "Failed to create signed WSS URL",
+                                  buttonTitle: "OK",
+                                  callback: {})
+            }
+            return
+        }
         
         // Get ICE server configuration
+        guard let httpsEndpointString = endpoints["HTTPS"] as? String,
+              let httpsURL = URL(string: httpsEndpointString) else {
+            DispatchQueue.main.async {
+                Utility.hideLoader(view: self.view)
+                self.showErrorAlert(title: "Error",
+                                  message: "Failed to get HTTPS endpoint",
+                                  buttonTitle: "OK",
+                                  callback: {})
+            }
+            return
+        }
+        
         let httpsEndpoint = AWSEndpoint(region: awsRegionType,
                                       service: .KinesisVideo,
-                                      url: URL(string: endpoints["HTTPS"]!!))
+                                      url: httpsURL)
         
-        let RTCIceServersList = getIceCandidates(channelARN: channelARN!,
-                                                endpoint: httpsEndpoint!,
+        let RTCIceServersList = getIceCandidates(channelARN: channelARN,
+                                                endpoint: httpsEndpoint,
                                                 regionType: awsRegionType,
                                                 clientId: localSenderClientID)
         
@@ -152,7 +194,7 @@ extension DeviceTraitListViewController {
         let webRTCClient = WebRTCClient(iceServers: RTCIceServersList, isAudioOn: sendAudioEnabled)
         
         // Initialize signaling client
-        let signalingClient = SignalingClient(serverUrl: wssURL!)
+        let signalingClient = SignalingClient(serverUrl: wssURL)
         
         // Create and present the new ESPVideoViewController
         let espVideoViewer = ESPVideoViewController(webRTCClient: webRTCClient,
@@ -185,9 +227,7 @@ extension DeviceTraitListViewController {
         
         let kvsClient = AWSKinesisVideo(forKey: ESPAWSConstants.awsKinesisVideoKey)
         kvsClient.describeSignalingChannel(describeInput!).continueWith(block: { (task) -> Void in
-            if let error = task.error {
-                print("Error describing channel: \(error)")
-            } else {
+            if task.error == nil {
                 channelARN = task.result?.channelInfo?.channelARN
             }
         }).waitUntilFinished()
@@ -201,9 +241,7 @@ extension DeviceTraitListViewController {
         createSignalingChannelInput?.channelName = channelName
         
         kvsClient.createSignalingChannel(createSignalingChannelInput!).continueWith(block: { (task) -> Void in
-            if let error = task.error {
-                print("Error creating channel \(error)")
-            } else {
+            if task.error == nil {
                 channelARN = task.result?.channelARN
             }
         }).waitUntilFinished()
@@ -227,10 +265,7 @@ extension DeviceTraitListViewController {
         signalingEndpointInput?.singleMasterChannelEndpointConfiguration = singleMasterChannelEndpointConfiguration
         
         kvsClient.getSignalingChannelEndpoint(signalingEndpointInput!).continueWith(block: { (task) -> Void in
-            if let error = task.error {
-                print("Error to get channel endpoint: \(error)")
-            } else {
-                
+            if task.error == nil {
                 for endpoint in task.result!.resourceEndpointList! {
                     switch endpoint.protocols {
                     case .https:
@@ -248,14 +283,16 @@ extension DeviceTraitListViewController {
         return endpoints
     }
 
-    private func getIceCandidates(channelARN: String, endpoint: AWSEndpoint, regionType: AWSRegionType, clientId: String) -> [RTCIceServer] {
+    private func getIceCandidates(channelARN: String, endpoint: AWSEndpoint?, regionType: AWSRegionType, clientId: String) -> [RTCIceServer] {
         var RTCIceServersList = [RTCIceServer]()
         let kvsStunUrlStrings = ["stun:stun.kinesisvideo.\(regionType.rawValue).amazonaws.com:443"]
         
+        guard let endpoint = endpoint else { return [] }
         let configuration = AWSServiceConfiguration(region: regionType,
                                                   endpoint: endpoint,
                                                   credentialsProvider: ESPAssumeRoleCredentialsProvider.shared)
-        AWSKinesisVideoSignaling.register(with: configuration!, forKey: ESPAWSConstants.awsKinesisVideoKey)
+        guard let config = configuration else { return [] }
+        AWSKinesisVideoSignaling.register(with: config, forKey: ESPAWSConstants.awsKinesisVideoKey)
         let kvsSignalingClient = AWSKinesisVideoSignaling(forKey: ESPAWSConstants.awsKinesisVideoKey)
         
         let iceServerConfigRequest = AWSKinesisVideoSignalingGetIceServerConfigRequest.init()
@@ -266,6 +303,7 @@ extension DeviceTraitListViewController {
             if let error = task.error {
                 print("Error to get ice server config: \(error)")
             } else {
+                print("ICE Server List: ", task.result!.iceServerList!)
                 
                 for iceServer in task.result!.iceServerList! {
                     RTCIceServersList.append(RTCIceServer(urlStrings: iceServer.uris!,
@@ -298,21 +336,25 @@ extension DeviceTraitListViewController {
             return nil
         }
         
-        var httpUrlString = wssEndpoint!
+        guard let wssEndpoint = wssEndpoint else { return nil }
+        
+        var httpUrlString = wssEndpoint
             + "?X-Amz-ChannelARN=" + channelARN
         if !isMaster {
             httpUrlString += "&X-Amz-ClientId=" + clientId
         }
         
-        let httpRequestURL = URL(string: httpUrlString)
-        let wssRequestURL = URL(string: wssEndpoint!)
+        guard let httpRequestURL = URL(string: httpUrlString),
+              let wssRequestURL = URL(string: wssEndpoint) else {
+            return nil
+        }
         
         let wssURL = KVSSigner.sign(
-            signRequest: httpRequestURL!,
+            signRequest: httpRequestURL,
             secretKey: credentials.secretKey,
             accessKey: credentials.accessKey,
             sessionToken: credentials.sessionKey ?? "",
-            wssRequest: wssRequestURL!,
+            wssRequest: wssRequestURL,
             region: region
         )
         return wssURL
@@ -330,6 +372,7 @@ extension DeviceTraitListViewController {
 // MARK: - ESPVideoViewerDelegate
 extension DeviceTraitListViewController: ESPVideoViewerDelegate {
     func videoViewerDidClose(_ viewer: ESPVideoViewController) {
+        print("Video viewer closed")
         // Any cleanup if needed
     }
 }

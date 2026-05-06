@@ -57,7 +57,6 @@ extension SelectDeviceActionCellDelegate {
                             let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
                             object_setClass(sliderCell, ScheduleSliderTableViewCell.self)
                             let cell = sliderCell as! ScheduleSliderTableViewCell
-                            cell.setSliderThumbUI()
                             cell.cellType = serviceType
                             cell.hueSlider.isHidden = true
                             cell.slider.isHidden = false
@@ -76,6 +75,8 @@ extension SelectDeviceActionCellDelegate {
                                 cell.maxLabel.text = "\(cell.slider.maximumValue)"
                                 cell.slider.value = param.value as! Float
                             }
+                            // CRITICAL: Set thumb UI AFTER slider value is set so thumb is sized correctly
+                            cell.setSliderThumbUI()
                             cell.param = param
                             cell.title.text = param.name ?? ""
                             if param.selected {

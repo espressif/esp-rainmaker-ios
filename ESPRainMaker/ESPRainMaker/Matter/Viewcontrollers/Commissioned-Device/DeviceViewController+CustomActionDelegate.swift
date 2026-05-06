@@ -21,7 +21,7 @@ import Foundation
 import UIKit
 
 @available(iOS 16.4, *)
-extension DeviceViewController: CustomActionDelegate {
+extension DeviceViewController: ParamCustomActionDelegate {
     
     func launchRainmakerController() {}
     func mergeThreadDataset() {}

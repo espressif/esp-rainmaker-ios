@@ -47,6 +47,14 @@ class ESPLocalControl: NSObject {
     ///   - type: Service type.
     ///   - domain: Domain type.
     func searchForServicesOfType(type: String, domain: String) {
+        // Invalidate any existing timer before creating a new one
+        serviceTimeout.invalidate()
+        
+        servicesBeingResolved.removeAll()
+        services.removeAll()
+        serviceBrowser.stop()
+        
+        // Create new timer on main run loop to ensure it fires correctly
         serviceTimeout = Timer.scheduledTimer(
             timeInterval: timeout,
             target: self,
@@ -55,15 +63,21 @@ class ESPLocalControl: NSObject {
             repeats: false
         )
 
+        serviceBrowser.searchForServices(ofType: type, inDomain: domain)
+    }
+    
+    /// Stop service discovery and invalidate timeout timer
+    func stopService() {
+        serviceTimeout.invalidate()
+        serviceBrowser.stop()
         servicesBeingResolved.removeAll()
         services.removeAll()
-        serviceBrowser.stop()
-        serviceBrowser.searchForServices(ofType: type, inDomain: domain)
     }
     
     /// Method invoked if search is taking longer than expected.
     ///
     @objc private func noServicesFound() {
+        serviceTimeout.invalidate()
         serviceBrowser.stop()
         services.removeAll()
         updateServiceList()
@@ -96,6 +110,19 @@ extension ESPLocalControl: NetServiceBrowserDelegate {
         serviceTimeout.invalidate()
         servicesBeingResolved.append(service)
         service.resolve(withTimeout: 5.0)
+    }
+    
+    func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+        self.servicesBeingResolved.append(service)
+        if let serviceName = service.name as String? {
+            for key in services.keys {
+                if key.hasPrefix(serviceName) {
+                    services[key] = nil
+                    break
+                }
+            }
+        }
+        self.removeServiceFromResolveQueue(service: service)
     }
 }
 

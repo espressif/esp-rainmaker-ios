@@ -39,8 +39,17 @@ class TopBarView: UIView {
 }
 
 class PrimaryButton: UIButton {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupButton()
+    }
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        setupButton()
+    }
+    
+    private func setupButton() {
         cornerRadius = 10.0
         borderWidth = 1.0
         borderColor = UIColor.lightGray

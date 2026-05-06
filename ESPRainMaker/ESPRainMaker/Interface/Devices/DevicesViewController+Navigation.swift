@@ -216,7 +216,6 @@ extension DevicesViewController: DeviceGroupCollectionViewCellDelegate {
                         }
                     }
                 }
-                self.stopMatterDiscovery()
                 self.navigationController?.pushViewController(deviceScreen, animated: true)
             }
         }

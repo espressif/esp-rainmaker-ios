@@ -19,7 +19,7 @@
 import Foundation
 
 ///  Protocol to update listeners about failure in updating params
-protocol ParamUpdateProtocol {
+protocol ParamUpdateProtocol: AnyObject {
     func failureInUpdatingParam()
     
 }

@@ -34,8 +34,8 @@ class DeviceTraitListViewController: UIViewController {
     // NEW: Notification-aware polling system
     private var isNotificationUpdateInProgress = false
     private var pendingPollingUpdate = false
-    private var lastNotificationTimestamp: Date = Date()
-    private let notificationUpdateTimeout: TimeInterval = 2.0 // 2 seconds timeout for notification updates
+    private var lastNotificationTimestamp: Date = Date.distantPast // Initialize to distant past so polling works immediately
+    private let notificationUpdateTimeout: TimeInterval = 3.0 // 2 seconds timeout for notification updates
 
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var tableView: UITableView!
@@ -67,23 +67,18 @@ class DeviceTraitListViewController: UIViewController {
         self.setupBetaView()
         #endif
         tableView.tableFooterView = UIView()
-        tableView.register(UINib(nibName: "ActionTableViewCell", bundle: nil), forCellReuseIdentifier: "ActionTableViewCell")
-        tableView.register(UINib(nibName: "SwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "SwitchTableViewCell")
-        tableView.register(UINib(nibName: "SliderTableViewCell", bundle: nil), forCellReuseIdentifier: "SliderTableViewCell")
-        tableView.register(UINib(nibName: "StaticControlTableViewCell", bundle: nil), forCellReuseIdentifier: "staticControlTableViewCell")
-        tableView.register(UINib(nibName: "GenericControlTableViewCell", bundle: nil), forCellReuseIdentifier: "genericControlCell")
-        tableView.register(UINib(nibName: "DropDownTableViewCell", bundle: nil), forCellReuseIdentifier: "dropDownTableViewCell")
-        tableView.register(UINib(nibName: "CentralSwitchTableViewCell", bundle: nil), forCellReuseIdentifier: "centralSwitchTVC")
-        tableView.register(UINib(nibName: "RoundHueSliderTableViewCell", bundle: nil), forCellReuseIdentifier: "roundHueSliderTVC")
-        tableView.register(UINib(nibName: String(describing: TriggerTableViewCell.self), bundle: nil), forCellReuseIdentifier: TriggerTableViewCell.reuseIdentifier)
-        tableView.register(UINib(nibName: String(describing: CustomActionCell.self), bundle: nil), forCellReuseIdentifier: CustomActionCell.reuseIdentifier)
-        tableView.register(ParamSwitchTableViewCell.self, forCellReuseIdentifier: "switchParamTableViewCell")
+        
+        // Register ALL new programmatic cells (no XIB, no runtime class swizzling)
+        registerProgrammaticCells()
 
         titleLabel.text = device?.getDeviceName() ?? "Details"
         tableView.estimatedRowHeight = 70.0
         tableView.rowHeight = UITableView.automaticDimension
         let insets = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
         tableView.contentInset = insets
+        
+        // Setup pull to refresh
+        setupPullToRefresh()
 
         // Check if device data already exists before showing loader
         if device?.isReachable() ?? false {
@@ -204,6 +199,7 @@ class DeviceTraitListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         checkNetworkUpdate()
+        checkOfflineStatus() // Update connection status when view appears
         tabBarController?.tabBar.isHidden = true
         
         // Start polling only after UI is ready
@@ -217,6 +213,7 @@ class DeviceTraitListViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(paramUpdated), name: Notification.Name(Constants.paramUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkOfflineStatus), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(localNetworkUpdateReceived), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadParamTableView), name: Notification.Name(Constants.reloadParamTableView), object: nil)
         self.setupCamera()
     }
@@ -236,10 +233,22 @@ class DeviceTraitListViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
+    @objc func localNetworkUpdateReceived() {
+    }
+    
     @objc func reloadParamTableView() {
-        // Force immediate reload for silent notification updates
+        // Mark notification update as in progress
+        isNotificationUpdateInProgress = true
+        lastNotificationTimestamp = Date()
+        
         // Update local device object with latest parameter values from global node list
+        // The notification handler has already updated param.value in the global node list
         updateLocalDeviceFromGlobalNodeList()
+        
+        // CRITICAL: Update connection status when reloadParamTableView is received
+        // This handles cases where device goes offline (nodeDisconnected notification)
+        // which posts reloadParamTableView but not localNetworkUpdateNotification
+        checkOfflineStatus()
         
         // Refresh the dataSource array with updated parameter values
         checkForCentralParam()
@@ -248,27 +257,115 @@ class DeviceTraitListViewController: UIViewController {
         skipNextAttributeUpdate = true
         
         // Check if alert view is presented before trying to reload the param values.
-        if self.presentedViewController == nil {
-            self.tableView.reloadData()
+        guard self.presentedViewController == nil else { return }
+        
+        // CRITICAL: Update visible cells directly
+        // The notification handler has already updated param.value in the global node list
+        // The cell's param property points to the same param object, so param.value is already updated
+        // We just need to refresh the UI by calling updateUI() on all visible cells
+        var sectionsToReload: IndexSet = []
+        
+        // Update all visible cells - their param.value is already updated by notification handler
+        for (index, param) in dataSource.enumerated() {
+            let paramName = param.name ?? ""
+            let indexPath = IndexPath(row: 0, section: index)
+            
+            // Try to update the visible cell directly if it exists
+            if let cell = tableView.cellForRow(at: indexPath) {
+                // Update the cell - param.value is already updated, just refresh UI
+                if let sliderCell = cell as? ParamSliderCell {
+                    // Set param to trigger didSet, then updateUI to ensure UI reflects current param.value
+                    sliderCell.param = param
+                    sliderCell.updateUI()
+                } else if let hueSliderCell = cell as? ParamHueSliderCell {
+                    hueSliderCell.param = param
+                    hueSliderCell.updateUI()
+                } else if let switchCell = cell as? ParamSwitchCell {
+                    switchCell.param = param
+                    switchCell.updateUI()
+                } else if let genericCell = cell as? ParamGenericCell {
+                    genericCell.param = param
+                    genericCell.updateUI()
+                } else if let staticCell = cell as? ParamStaticCell {
+                    staticCell.attribute = device?.attributes?.first(where: { $0.name == paramName })
+                    staticCell.updateUI()
+                } else if let dropdownCell = cell as? ParamDropDownCell {
+                    dropdownCell.param = param
+                    dropdownCell.updateUI()
+                } else if let triggerCell = cell as? ParamTriggerCell {
+                    triggerCell.param = param
+                    triggerCell.updateUI()
+                } else if let actionCell = cell as? ParamActionCell {
+                    actionCell.param = param
+                    actionCell.updateUI()
+                } else if let customActionCell = cell as? ParamCustomActionCell {
+                    customActionCell.param = param
+                    customActionCell.device = device
+                    // Custom action cell workflow is determined by param.type during configuration, not by param.value
+                } else if let roundHueSliderCell = cell as? ParamRoundHueSliderCell {
+                    roundHueSliderCell.param = param
+                    roundHueSliderCell.updateUI()
+                }
+            } else {
+                // Cell is not visible, mark section for reload when it becomes visible
+                sectionsToReload.insert(index)
+            }
         }
+        
+        // Only reload sections for cells that aren't visible (they'll be updated when scrolled into view)
+        // This prevents flickering from unnecessary reloads
+        if !sectionsToReload.isEmpty {
+            self.tableView.reloadSections(sectionsToReload, with: .none)
+        }
+        
+        // Mark notification update as complete
+        isNotificationUpdateInProgress = false
+        
+        // Resume polling if there was a pending update
+        if pendingPollingUpdate {
+            pendingPollingUpdate = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.fetchNodeInfo()
+            }
+        }
+    }
+    
+    /// Helper to compare param values of different types
+    private func areValuesEqual(_ value1: Any?, _ value2: Any?) -> Bool {
+        // Both nil
+        if value1 == nil && value2 == nil {
+            return true
+        }
+        
+        // One is nil, other isn't
+        guard let val1 = value1, let val2 = value2 else {
+            return false
+        }
+        
+        // Same type comparison
+        if let int1 = val1 as? Int, let int2 = val2 as? Int {
+            return int1 == int2
+        }
+        if let float1 = val1 as? Float, let float2 = val2 as? Float {
+            return abs(float1 - float2) < 0.001 // Small epsilon for float comparison
+        }
+        if let double1 = val1 as? Double, let double2 = val2 as? Double {
+            return abs(double1 - double2) < 0.001
+        }
+        if let bool1 = val1 as? Bool, let bool2 = val2 as? Bool {
+            return bool1 == bool2
+        }
+        if let str1 = val1 as? String, let str2 = val2 as? String {
+            return str1 == str2
+        }
+        
+        // Fallback: convert to string and compare
+        return "\(val1)" == "\(val2)"
     }
 
     /// Update local device object with latest parameter values from global node list
     private func updateLocalDeviceFromGlobalNodeList() {
-        if let nodes = User.shared.associatedNodeList {
-            for node in nodes {
-                if let associatedNodeId = node.node_id, let nodeId = device.node?.node_id, associatedNodeId == nodeId {
-                    // Update the node reference
-                    device.node = node
-                    
-                    // Find and update the device with latest parameter values
-                    if let updatedDevice = node.devices?.first(where: { $0.name == device.name }) {
-                        self.device = updatedDevice
-                    }
-                    break
-                }
-            }
-        }
+        updateDeviceNodeFromGlobalList()
     }
 
     @objc func appEnterForeground() {
@@ -279,24 +376,23 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     @objc func appEnterBackground() {
-        pollingTimer.invalidate()
+        if let timer = pollingTimer, timer.isValid {
+            timer.invalidate()
+            pollingTimer = nil
+        }
     }
 
     @objc func fetchNodeInfo() {
-        // NEW: Smart polling that respects notification updates
-        // Check if notification update is in progress
+        // Smart polling that respects notification updates
         if isNotificationUpdateInProgress {
             pendingPollingUpdate = true
             return
         }
         
-        // Check if notification was received recently (within timeout)
-        let timeSinceLastNotification = Date().timeIntervalSince(lastNotificationTimestamp)
-        if timeSinceLastNotification < notificationUpdateTimeout {
+        if shouldSkipUpdate() {
             return
         }
         
-        // Proceed with polling update
         if device?.isReachable() ?? false {
             updateDeviceAttributesSilently()
         }
@@ -318,30 +414,14 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func refreshDeviceAttributes() {
-        // FIX: Remove the isInitialLoadingComplete check that was blocking updates
-        // Also ensure we're updating the UI properly
-        if device?.isReachable() ?? false {
-            // Check if notification was received recently
-            let timeSinceLastNotification = Date().timeIntervalSince(lastNotificationTimestamp)
-            if timeSinceLastNotification < notificationUpdateTimeout {
-                return
-            }
-            
-            NetworkManager.shared.getDeviceParam(device: device) { error in
-                if error != nil {
-                    return
-                }
-                DispatchQueue.main.async {
-                    // Double-check notification status before updating UI
-                    let currentTimeSinceNotification = Date().timeIntervalSince(self.lastNotificationTimestamp)
-                    if currentTimeSinceNotification < self.notificationUpdateTimeout {
-                        return
-                    }
-                    
-                    // Update the UI with fresh data
-                    self.checkForCentralParam()
-                    self.tableView.reloadData()
-                }
+        guard device?.isReachable() ?? false, !shouldSkipUpdate() else { return }
+        
+        NetworkManager.shared.getDeviceParam(device: device) { [weak self] error in
+            guard let self = self, error == nil else { return }
+            DispatchQueue.main.async {
+                guard !self.shouldSkipUpdate() else { return }
+                self.checkForCentralParam()
+                self.tableView.reloadData()
             }
         }
     }
@@ -357,76 +437,151 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     func updateDeviceAttributes() {
-        NetworkManager.shared.getNodeInfo(nodeId: (device?.node?.node_id)!) { node, error in
-            if error != nil {
+        updateDeviceAttributes(completion: nil)
+    }
+    
+    func updateDeviceAttributes(completion: (() -> Void)?) {
+        guard let nodeId = device?.node?.node_id else {
+            completion?()
+            return
+        }
+        
+        NetworkManager.shared.getNodeInfo(nodeId: nodeId) { node, error in
+            if let error = error {
                 DispatchQueue.main.async {
                     let alertController = UIAlertController(title: "Error!!",
-                                                            message: error?.description,
+                                                            message: error.description,
                                                             preferredStyle: .alert)
                     let retryAction = UIAlertAction(title: "Ok", style: .default) { _ in
                         Utility.hideLoader(view: self.view)
+                        completion?()
                     }
                     alertController.addAction(retryAction)
                     self.present(alertController, animated: true, completion: nil)
                 }
-            } else {
-                if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
-                    node.node_id == (self.device?.node?.node_id)!
-                }) {
-                    let oldNode = User.shared.associatedNodeList![index]
-                    node?.localNetwork = oldNode.localNetwork
-                    User.shared.associatedNodeList![index] = node!
-                    if let currentDevice = node!.devices?.first(where: { nodeDevice -> Bool in
-                        nodeDevice.name == self.device?.name
-                    }) {
-                        self.device = currentDevice
-                    }
+            } else if let node = node, let nodeList = User.shared.associatedNodeList,
+                      let index = nodeList.firstIndex(where: { $0.node_id == nodeId }) {
+                let oldNode = nodeList[index]
+                node.localNetwork = oldNode.localNetwork
+                User.shared.associatedNodeList?[index] = node
+                if let currentDevice = node.devices?.first(where: { $0.name == self.device?.name }) {
+                    self.device = currentDevice
                 }
             }
             self.checkForCentralParam()
             DispatchQueue.main.async {
                 Utility.hideLoader(view: self.view)
                 self.tableView.reloadData()
+                completion?()
+            }
+        }
+    }
+    
+    /// Setup pull to refresh control
+    private func setupPullToRefresh() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(handlePullToRefresh(_:)), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        updateRefreshControlState()
+    }
+    
+    /// Update refresh control enabled state based on device connectivity
+    private func updateRefreshControlState() {
+        let isOnline = isDeviceAccessible()
+        tableView.refreshControl?.isEnabled = isOnline
+    }
+    
+    /// Check if device is accessible (remotely or locally)
+    private func isDeviceAccessible() -> Bool {
+        guard let device = device else { return false }
+        
+        // Check if device is reachable
+        if device.isReachable() {
+            return true
+        }
+        
+        // Check if device is connected remotely or on local network
+        if let node = device.node {
+            return node.isConnected || node.localNetwork
+        }
+        
+        return false
+    }
+    
+    /// Handle pull to refresh action
+    @objc private func handlePullToRefresh(_ refreshControl: UIRefreshControl) {
+        // Double-check device is accessible before refreshing
+        guard isDeviceAccessible() else {
+            refreshControl.endRefreshing()
+            return
+        }
+        
+        updateDeviceAttributes {
+            DispatchQueue.main.async {
+                refreshControl.endRefreshing()
             }
         }
     }
 
     @objc func checkOfflineStatus() {
         updateNwChangeDeviceNode()
-        if device?.node?.localNetwork ?? false {
-            if device.node?.supportsEncryption ?? false {
-                offlineLabel.text = "🔒 Reachable on WLAN"
+        DispatchQueue.main.async {
+            let nodeId = self.device?.node?.node_id ?? "unknown"
+            let localNetwork = self.device?.node?.localNetwork ?? false
+            let isConnected = self.device?.node?.isConnected ?? false
+            let isMatter = (self.device?.node as? Node)?.isMatter ?? false
+            
+            // Check if this is a Matter device and use Node.connectionStatus
+            if let node = self.device?.node as? Node, node.isMatter {
+                // Use Node.connectionStatus for Matter devices
+                let connectionStatus = node.connectionStatus
+                switch connectionStatus {
+                case .local:
+                    if node.supportsEncryption {
+                        self.offlineLabel.text = "🔒 Reachable on WLAN"
+                    } else {
+                        self.offlineLabel.text = "Reachable on WLAN"
+                    }
+                    self.offlineLabel.isHidden = false
+                case .remote:
+                    self.offlineLabel.text = "Remote"
+                    self.offlineLabel.isHidden = false
+                case .controller:
+                    self.offlineLabel.text = "Controller"
+                    self.offlineLabel.isHidden = false
+                case .offline:
+                    let statusText = node.nodeStatus
+                    self.offlineLabel.text = statusText.isEmpty ? "Offline" : statusText
+                    self.offlineLabel.isHidden = false
+                }
             } else {
-                offlineLabel.text = "Reachable on WLAN"
+                // For non-Matter devices, use existing logic
+                if localNetwork {
+                    if self.device.node?.supportsEncryption ?? false {
+                        self.offlineLabel.text = "🔒 Reachable on WLAN"
+                    } else {
+                        self.offlineLabel.text = "Reachable on WLAN"
+                    }
+                    self.offlineLabel.isHidden = false
+                } else if isConnected {
+                    // Regular Rainmaker device - hide label when connected
+                    self.offlineLabel.text = ""
+                    self.offlineLabel.isHidden = true
+                } else {
+                    // Device is offline - always show the label
+                    let statusText = self.device?.node?.nodeStatus ?? ""
+                    self.offlineLabel.text = statusText.isEmpty ? "Offline" : statusText
+                    self.offlineLabel.isHidden = false
+                }
             }
-        } else if device?.node?.isConnected ?? true {
-            // Check if this is a Rainmaker+Matter device connected remotely
-            if let node = device?.node, node.isMatter, node.isRainmakerMatter {
-                offlineLabel.text = "Remote"
-            } else {
-                offlineLabel.text = ""
-            }
-        } else {
-            offlineLabel.text = device?.node?.nodeStatus ?? ""
+            // Update refresh control state when connection status changes
+            self.updateRefreshControlState()
         }
     }
     
     /// Update device node on network change
     func updateNwChangeDeviceNode() {
-        if let nodes = User.shared.associatedNodeList {
-            for node in nodes {
-                if let associatedNodeId = node.node_id, let nodeId = device.node?.node_id, associatedNodeId == nodeId {
-                    // Update the node reference
-                    device.node = node
-                    
-                    // Find and update the device with latest parameter values
-                    if let updatedDevice = node.devices?.first(where: { $0.name == device.name }) {
-                        self.device = updatedDevice
-                    }
-                    break
-                }
-            }
-        }
+        updateDeviceNodeFromGlobalList()
     }
     
     /// Start background data refresh without showing loader
@@ -479,33 +634,94 @@ class DeviceTraitListViewController: UIViewController {
     
     /// Update device attributes silently (no loader, no UI blocking)
     private func updateDeviceAttributesSilently() {
+        guard !shouldSkipUpdate(), let nodeId = device?.node?.node_id else { return }
         
-        // Check if notification was received recently (within timeout)
-        let timeSinceLastNotification = Date().timeIntervalSince(lastNotificationTimestamp)
-        if timeSinceLastNotification < notificationUpdateTimeout {
-            return
-        }
-        
-        NetworkManager.shared.getNodeInfo(nodeId: (self.device?.node?.node_id)!) { node, error in
-            if error == nil, let node = node {
-                DispatchQueue.main.async {
-                    // Double-check notification status before updating UI
-                    let currentTimeSinceNotification = Date().timeIntervalSince(self.lastNotificationTimestamp)
-                    if currentTimeSinceNotification < self.notificationUpdateTimeout {
-                        return
-                    }
+        NetworkManager.shared.getNodeInfo(nodeId: nodeId) { [weak self] node, error in
+            guard let self = self, error == nil, let node = node else { return }
+            DispatchQueue.main.async {
+                guard !self.shouldSkipUpdate(),
+                      let nodeList = User.shared.associatedNodeList,
+                      let index = nodeList.firstIndex(where: { $0.node_id == nodeId }) else { return }
+                let oldNode = nodeList[index]
+                node.localNetwork = oldNode.localNetwork
+                User.shared.associatedNodeList?[index] = node
+                
+                if let currentDevice = node.devices?.first(where: { $0.name == self.device?.name }) {
+                    // Store old dataSource to detect structural changes (params added/removed)
+                    let oldDataSource = self.dataSource.map { ($0.name ?? "", $0.value) }
+                    let oldParamNames = Set(self.dataSource.compactMap { $0.name })
                     
-                    // Update the device data silently
-                    if let index = User.shared.associatedNodeList?.firstIndex(where: { $0.node_id == (self.device?.node?.node_id)! }) {
-                        let oldNode = User.shared.associatedNodeList![index]
-                        node.localNetwork = oldNode.localNetwork
-                        User.shared.associatedNodeList![index] = node
+                    // Update device
+                    self.device = currentDevice
+                    
+                    // Rebuild dataSource
+                    self.checkForCentralParam()
+                    
+                    // Check for structural changes (params added/removed)
+                    let newParamNames = Set(self.dataSource.compactMap { $0.name })
+                    let hasStructuralChanges = oldParamNames != newParamNames
+                    
+                    // Check if alert view is presented before trying to reload the param values.
+                    guard self.presentedViewController == nil else { return }
+                    
+                    if hasStructuralChanges {
+                        // Structural change detected - need full reload
+                        // This handles cases where params are added/removed from device config
+                        self.tableView.reloadData()
+                    } else {
+                        // No structural changes - use smart update logic (same as notifications)
+                        // This prevents flickering and preserves dragEndTimestamp
+                        var sectionsToReload: IndexSet = []
                         
-                        if let currentDevice = node.devices?.first(where: { $0.name == self.device?.name }) {
-                            self.device = currentDevice
-                            // Refresh UI with updated data
-                            self.checkForCentralParam()
-                            self.tableView.reloadData()
+                        // First, try to update visible cells directly
+                        for (index, param) in self.dataSource.enumerated() {
+                            let paramName = param.name ?? ""
+                            let indexPath = IndexPath(row: 0, section: index)
+                            
+                            // Check if this param's value changed
+                            var valueChanged = false
+                            if let oldParam = oldDataSource.first(where: { $0.0 == paramName }) {
+                                let oldValue = oldParam.1
+                                let newValue = param.value
+                                valueChanged = !self.areValuesEqual(oldValue, newValue)
+                            } else {
+                                // New param (shouldn't happen if no structural changes, but handle it)
+                                valueChanged = true
+                            }
+                            
+                            if valueChanged {
+                                // Try to update the visible cell directly if it exists
+                                if let cell = self.tableView.cellForRow(at: indexPath) {
+                                    // Update the cell directly without reloading
+                                    if let sliderCell = cell as? ParamSliderCell {
+                                        sliderCell.param = param
+                                    } else if let hueSliderCell = cell as? ParamHueSliderCell {
+                                        hueSliderCell.param = param
+                                    } else if let switchCell = cell as? ParamSwitchCell {
+                                        switchCell.param = param
+                                    } else if let genericCell = cell as? ParamGenericCell {
+                                        genericCell.param = param
+                                    } else if let staticCell = cell as? ParamStaticCell {
+                                        staticCell.attribute = self.device?.attributes?.first(where: { $0.name == paramName })
+                                    } else if let dropdownCell = cell as? ParamDropDownCell {
+                                        dropdownCell.param = param
+                                    } else if let triggerCell = cell as? ParamTriggerCell {
+                                        triggerCell.param = param
+                                    } else if let actionCell = cell as? ParamActionCell {
+                                        actionCell.param = param
+                                    } else if let customActionCell = cell as? ParamCustomActionCell {
+                                        customActionCell.param = param
+                                    }
+                                } else {
+                                    // Cell is not visible, mark section for reload when it becomes visible
+                                    sectionsToReload.insert(index)
+                                }
+                            }
+                        }
+                        
+                        // Only reload sections for cells that aren't visible
+                        if !sectionsToReload.isEmpty {
+                            self.tableView.reloadSections(sectionsToReload, with: .none)
                         }
                     }
                 }
@@ -531,15 +747,16 @@ class DeviceTraitListViewController: UIViewController {
 
     @IBAction func infoButtonPressed(_: Any) {
         // Get current node by node ID
-        if let i = User.shared.associatedNodeList!.firstIndex(where: { $0.node_id == self.device?.node?.node_id }) {
-            let currentNode = User.shared.associatedNodeList![i]
-            goToNodeDetails(node: currentNode)
-        }
+        guard let nodeList = User.shared.associatedNodeList,
+              let nodeId = device?.node?.node_id,
+              let index = nodeList.firstIndex(where: { $0.node_id == nodeId }) else { return }
+        let currentNode = nodeList[index]
+        goToNodeDetails(node: currentNode)
     }
 
     func goToNodeDetails(node: Node) {
         let deviceStoryboard = UIStoryboard(name: "DeviceDetail", bundle: nil)
-        let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as! NodeDetailsViewController
+        guard let destination = deviceStoryboard.instantiateViewController(withIdentifier: "nodeDetailsVC") as? NodeDetailsViewController else { return }
         destination.currentNode = node
         destination.group = self.group
         destination.allNodes = self.allNodes
@@ -549,42 +766,56 @@ class DeviceTraitListViewController: UIViewController {
         navigationController?.pushViewController(destination, animated: true)
     }
 
-    func getTableViewGenericCell(attribute: Param, indexPath: IndexPath) -> GenericControlTableViewCell {
-        let genericCell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
-        object_setClass(genericCell, GenericParamTableViewCell.self)
-        let cell = genericCell as! GenericParamTableViewCell
+    func getTableViewGenericCell(attribute: Param, indexPath: IndexPath) -> UITableViewCell {
+        // Use new programmatic ParamGenericCell - no runtime class swizzling
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamGenericCell.reuseIdentifier, for: indexPath) as? ParamGenericCell else {
+            return UITableViewCell() // Fallback cell if dequeue fails
+        }
         
-        // CRITICAL: Always reset attributeKey first to prevent cell reuse issues
+        // CRITICAL: Set properties DIRECTLY in the same order as old implementation
+        // This ensures synchronous property setting, not relying on didSet/updateUI() timing
+        
+        // 1. Set attributeKey FIRST (critical for cell reuse protection - matches old implementation)
         cell.attributeKey = attribute.name ?? ""
         
-        cell.controlName.text = attribute.name
+        // 2. Set controlName label DIRECTLY (matches old implementation)
+        cell.controlNameLabel.text = attribute.name
+        
+        // 3. Set paramDelegate
         cell.paramDelegate = self
+        
+        // 4. Set controlValue property DIRECTLY (matches old implementation)
         if let value = attribute.value {
             cell.controlValue = "\(value)"
         }
+        
+        // 5. Set controlValueLabel DIRECTLY from controlValue (matches old implementation)
         cell.controlValueLabel.text = cell.controlValue
-        // Safe optional handling: check device exists before accessing properties
-        if attribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false {
+        
+        // 6. Set editButton visibility DIRECTLY (matches old implementation)
+        // Check both isConnected AND localNetwork (matches old GenericParamTableViewCell logic)
+        if let properties = attribute.properties, properties.contains("write"),
+           let currentDevice = device,
+           let node = currentDevice.node,
+           (node.isConnected || node.localNetwork) {
             cell.editButton.isHidden = false
-            cell.editButton.setTitleColor(UIColor(hexString: Constants.customColor), for: .normal)
+            cell.editButton.setTitleColor(UIColor(hexString: Constants.customColor), for: .normal) // Matches old implementation
         } else {
             cell.editButton.isHidden = true
         }
         
-        if let properties = attribute.properties, properties.contains(timeSeriesProperty) || properties.contains(simpleTimeSeriesProperty) {
-            cell.tapButton.isHidden = false
-            cell.isSimpleTimeSeries = properties.contains(simpleTimeSeriesProperty)
-            if properties.contains(timeSeriesProperty) {
-                cell.isSimpleTimeSeries = false
-            }
-        } else {
-            cell.tapButton.isHidden = true
-        }
+        // 7. Set tapButton visibility DIRECTLY (matches old implementation)
+        configureTimeSeriesButton(cell, for: attribute)
         
+        // 8. Set dataType DIRECTLY (matches old implementation)
         if let data_type = attribute.dataType {
             cell.dataType = data_type
         }
+        
+        // 9. Set device
         cell.device = device
+        
+        // 10. Set param LAST (triggers updateUI() but properties are already set directly above)
         cell.param = attribute
         
         return cell
@@ -592,333 +823,255 @@ class DeviceTraitListViewController: UIViewController {
 
     func getTableViewCellOfCentralParam(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
         if dynamicAttribute.uiType == Constants.hueCircle {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "roundHueSliderTVC", for: indexPath) as! RoundHueSliderTableViewCell
-            cell.device = device
-            cell.param = dynamicAttribute
-            cell.paramDelegate = self
-            let hueValue = CGFloat(dynamicAttribute.value as? Int ?? 0)
-            let currentColor = HSBColor(hue: hueValue / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
-
-            cell.hueSlider.setInitialHSBColor(currentColor, isInteractive: true)
-            cell.selectedColor.setSelectedHSBColor(currentColor, isInteractive: true)
-            if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected || node.localNetwork {
-                cell.hueSlider.isEnabled = true
-                cell.hueSlider.alpha = 1.0
-            } else {
-                cell.hueSlider.isEnabled = false
-                cell.hueSlider.alpha = 0.3
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamRoundHueSliderCell.reuseIdentifier, for: indexPath) as? ParamRoundHueSliderCell else {
+                return UITableViewCell()
             }
+            configureParamUpdateCell(cell, param: dynamicAttribute)
             return cell
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "centralSwitchTVC", for: indexPath) as! CentralSwitchTableViewCell
-        cell.device = device
-        cell.param = dynamicAttribute
-        cell.paramDelegate = self
-        let switchState = dynamicAttribute.value as? Bool ?? false
-        if switchState {
-            cell.powerButton.setBackgroundImage(UIImage(named: "central_switch_on"), for: .normal)
-        } else {
-            cell.powerButton.setBackgroundImage(UIImage(named: "central_switch_off"), for: .normal)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCentralSwitchCell.reuseIdentifier, for: indexPath) as? ParamCentralSwitchCell else {
+            return UITableViewCell()
         }
+        configureParamUpdateCell(cell, param: dynamicAttribute)
         return cell
     }
 
     func getTableViewCellBasedOn(dynamicAttribute: Param, indexPath: IndexPath) -> UITableViewCell {
         if dynamicAttribute.type == RainmakerControllerConstants.paramBaseURL {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
-                cell.delegate = self
-                cell.topSpaceConstraint.constant = 0
-                cell.bottomSpaceConstraint.constant = 0
-                cell.setupWorkflow(workflow: .launchRainmakerController)
-                self.setAutoresizingMask(cell)
-                if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected || node.localNetwork {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: false)
-                } else {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: true)
-                }
-                return cell
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
+            configureCustomActionCell(cell, workflow: .launchRainmakerController, param: dynamicAttribute)
+            return cell
         } else if dynamicAttribute.type == ClientOnlyControllerConstants.paramMatterCtlCmd {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
-                cell.delegate = self
-                cell.topSpaceConstraint.constant = 0
-                cell.bottomSpaceConstraint.constant = 0
-                cell.setupWorkflow(workflow: .launchController)
-                self.setAutoresizingMask(cell)
-                if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected || node.localNetwork {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: false)
-                } else {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: true)
-                }
-                return cell
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
+            configureCustomActionCell(cell, workflow: .launchController, param: dynamicAttribute)
+            return cell
         } else if dynamicAttribute.type == Constants.threadPendingDataset || dynamicAttribute.type == Constants.threadActiveDataset {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
-                cell.delegate = self
-                cell.topSpaceConstraint.constant = 0
-                cell.bottomSpaceConstraint.constant = 0
-                if dynamicAttribute.type == Constants.threadPendingDataset {
-                    cell.setupWorkflow(workflow: .mergeThreadDataset)
-                } else {
-                    cell.setupWorkflow(workflow: .setActiveThreadDataset)
-                }
-                self.setAutoresizingMask(cell)
-                if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected || node.localNetwork {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: false)
-                } else {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: true)
-                }
-                return cell
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
+            let workflow: CustomAction = dynamicAttribute.type == Constants.threadPendingDataset ? .mergeThreadDataset : .setActiveThreadDataset
+            configureCustomActionCell(cell, workflow: workflow, param: dynamicAttribute)
+            return cell
         } else if dynamicAttribute.uiType == Constants.scanQRCode {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: ActionTableViewCell.reuseIdentifier) as? ActionTableViewCell {
-                cell.controlValueLabel.text = "Scanner"
-                if let name = dynamicAttribute.name {
-                    cell.controlValueLabel.text = name
-                }
-                cell.delegate = self
-                cell.device = device
-                cell.param = dynamicAttribute
-                if let attributeName = dynamicAttribute.name {
-                    cell.paramName = attributeName
-                }
-                if dynamicAttribute.properties?.contains("write") ?? false, let node = device.node, node.isConnected {
-                    cell.invokeActionButton.isEnabled = true
-                } else {
-                    cell.invokeActionButton.isEnabled = false
-                }
-                return cell
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamActionCell.reuseIdentifier, for: indexPath) as? ParamActionCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
-        } else if dynamicAttribute.uiType == Constants.slider {
-            if let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "int" || dataType == "float" {
-                if let bounds = dynamicAttribute.bounds {
-                    let maxValue = bounds["max"] as? Float ?? 100
-                    let minValue = bounds["min"] as? Float ?? 0
-                    if minValue < maxValue {
-                        let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
-                        object_setClass(sliderCell, ParamSliderTableViewCell.self)
-                        let cell = sliderCell as! ParamSliderTableViewCell
-                        
-                        cell.paramDelegate = self
-                        cell.hueSlider.isHidden = true
-                        cell.slider.isHidden = false
-                        cell.setupParam(dynamicAttribute, .slider)
-                        if dynamicAttribute.dataType!.lowercased() == "int" {
-                            let value = Int(dynamicAttribute.value as? Float ?? 100)
-                            cell.minLabel.text = "\(Int(cell.slider.minimumValue))"
-                            cell.maxLabel.text = "\(Int(cell.slider.maximumValue))"
-                            cell.slider.value = Float(value)
-                        } else {
-                            cell.minLabel.text = "\(cell.slider.minimumValue)"
-                            cell.maxLabel.text = "\(cell.slider.maximumValue)"
-                            cell.slider.value = dynamicAttribute.value as? Float ?? 100
-                        }
-                        cell.device = device
-                        cell.dataType = dynamicAttribute.dataType
-                        if let attributeName = dynamicAttribute.name {
-                            cell.paramName = attributeName
-                        }
-                        if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
-                            cell.slider.isEnabled = true
-                        } else {
-                            cell.slider.isEnabled = false
-                        }
-                        cell.title.text = dynamicAttribute.name ?? ""
-                        setIconsForSliderCell(cell: cell, param: dynamicAttribute)
-                        cell.setSliderThumbUI()
-                        // Check for continuous update setting from app configuration
-                        cell.slider.isContinuous = Configuration.shared.appConfiguration.supportContinuousUpdate
-                        return cell
-                    }
-                }
-            }
-        } else if dynamicAttribute.uiType == Constants.toggle || dynamicAttribute.uiType == Constants.bigSwitch, dynamicAttribute.dataType?.lowercased() == "bool" {
-            let switchCell = tableView.dequeueReusableCell(withIdentifier: "SwitchTableViewCell", for: indexPath) as! SwitchTableViewCell
-            object_setClass(switchCell, ParamSwitchTableViewCell.self)
-            let cell = switchCell as! ParamSwitchTableViewCell
-            cell.paramDelegate = self
-            if let deviceName = device?.name, let attributeName = dynamicAttribute.name {
-                cell.controlName.text = attributeName.deletingPrefix(deviceName)
-            } else {
-                cell.controlName.text = dynamicAttribute.name
-            }
+            cell.delegate = self
             cell.device = device
             cell.param = dynamicAttribute
-            if let attributeName = dynamicAttribute.name {
-                cell.attributeKey = attributeName
+            return cell
+        } else if dynamicAttribute.uiType == Constants.slider {
+            if let cell = createSliderCell(for: dynamicAttribute, indexPath: indexPath) {
+                return cell
             }
-            if let switchState = dynamicAttribute.value as? Bool {
-                if switchState {
-                    cell.controlStateLabel.text = "On"
-                } else {
-                    cell.controlStateLabel.text = "Off"
-                }
-                cell.toggleSwitch.setOn(switchState, animated: true)
+        } else if dynamicAttribute.uiType == Constants.toggle || dynamicAttribute.uiType == Constants.bigSwitch, dynamicAttribute.dataType?.lowercased() == "bool" {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamSwitchCell.reuseIdentifier, for: indexPath) as? ParamSwitchCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
-            if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
-                cell.toggleSwitch.isEnabled = true
-            } else {
-                cell.toggleSwitch.isEnabled = false
-            }
+            configureParamUpdateCell(cell, param: dynamicAttribute)
             return cell
         } else if dynamicAttribute.uiType == Constants.hue || dynamicAttribute.uiType == Constants.hueCircle {
-            var minValue = 0
-            var maxValue = 360
-            var stepValue: Float?
-            if let bounds = dynamicAttribute.bounds {
-                minValue = bounds["min"] as? Int ?? 0
-                maxValue = bounds["max"] as? Int ?? 360
-                if let step = bounds["step"] as? Float {
-                    stepValue = step
-                }
-            }
-            if minValue < maxValue {
-                let sliderCell = tableView.dequeueReusableCell(withIdentifier: "SliderTableViewCell", for: indexPath) as! SliderTableViewCell
-                object_setClass(sliderCell, ParamSliderTableViewCell.self)
-                let cell = sliderCell as! ParamSliderTableViewCell
-                cell.paramDelegate = self
-                cell.param = dynamicAttribute
-                cell.slider.isHidden = true
-                cell.hueSlider.isHidden = false
-                cell.hueSlider.minimumValue = CGFloat(minValue)
-                cell.hueSlider.maximumValue = CGFloat(maxValue)
-                cell.sliderStepValue = stepValue
-                if minValue == 0 && maxValue == 360 {
-                    cell.hueSlider.hasRainbow = true
-                    cell.hueSlider.setGradientVaryingHue(saturation: 1.0, brightness: 1.0)
-                } else {
-                    cell.hueSlider.hasRainbow = false
-                    cell.hueSlider.minColor = UIColor(hue: CGFloat(minValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                    cell.hueSlider.maxColor = UIColor(hue: CGFloat(maxValue / 360), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                }
-                let value = CGFloat(dynamicAttribute.value as? Int ?? 0)
-                cell.hueSlider.value = CGFloat(value)
-                cell.sliderInitialValue = Float(value)
-                cell.minLabel.text = "\(minValue)"
-                cell.maxLabel.text = "\(maxValue)"
-                cell.hueSlider.thumbColor = UIColor(hue: value / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                cell.device = device
-                cell.dataType = dynamicAttribute.dataType
-                if let attributeName = dynamicAttribute.name {
-                    cell.paramName = attributeName
-                }
-                if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
-                    cell.hueSlider.isEnabled = true
-                    cell.hueSlider.alpha = 1.0
-                } else {
-                    cell.hueSlider.isEnabled = false
-                    cell.hueSlider.alpha = 0.3
-                }
-                cell.title.text = dynamicAttribute.name ?? ""
-                cell.minImage.image = nil
-                cell.maxImage.image = nil
+            if let cell = createHueSliderCell(for: dynamicAttribute, indexPath: indexPath) {
                 return cell
             }
         } else if dynamicAttribute.uiType == Constants.dropdown {
-            if let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "int" || dataType == "string" {
-                let dropDownCell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
-                object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
-                let cell = dropDownCell as! ParamDropDownTableViewCell
-                if let deviceName = device?.name, let attributeName = dynamicAttribute.name {
-                    cell.controlName.text = attributeName.deletingPrefix(deviceName)
-                } else {
-                    cell.controlName.text = dynamicAttribute.name
-                }
-                cell.device = device
-                cell.param = dynamicAttribute
-                cell.paramDelegate = self
-
-                var currentValue = ""
-                if dataType == "string" {
-                    currentValue = dynamicAttribute.value as? String ?? ""
-                } else {
-                    currentValue = String(dynamicAttribute.value as? Int ?? 0)
-                }
-                cell.controlValueLabel.text = currentValue
-                cell.currentValue = currentValue
-
-                var datasource: [String] = []
-                if dataType == "int" {
-                    guard let bounds = dynamicAttribute.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int, let step = bounds["step"] as? Int, max > min else {
-                        return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
-                    }
-                    for item in stride(from: min, to: max + 1, by: step) {
-                        datasource.append(String(item))
-                    }
-                } else if dynamicAttribute.dataType?.lowercased() == "string" {
-                    datasource.append(contentsOf: dynamicAttribute.valid_strs ?? [])
-                }
-                cell.datasource = datasource
-
-                if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false {
-                    cell.dropDownButton.isHidden = false
-                } else {
-                    cell.dropDownButton.isHidden = true
-                }
-
-                if !cell.datasource.contains(currentValue) {
-                    cell.controlValueLabel.text = currentValue + " (Invalid)"
-                }
+            if let cell = createDropDownCell(for: dynamicAttribute, indexPath: indexPath) {
                 return cell
             }
-        } else if dynamicAttribute.uiType == Constants.trigger, let dataType = dynamicAttribute.dataType?.lowercased(), dataType == "bool" {
-            let triggerCell = tableView.dequeueReusableCell(withIdentifier: "triggerTVC", for: indexPath) as! TriggerTableViewCell
-            object_setClass(triggerCell, ParamTriggerTableViewCell.self)
-            let cell = triggerCell as! ParamTriggerTableViewCell
-            if let deviceName = device?.name, let attributeName = dynamicAttribute.name {
-                cell.controlName.text = attributeName.deletingPrefix(deviceName)
-            } else {
-                cell.controlName.text = dynamicAttribute.name
+        } else if dynamicAttribute.uiType == Constants.trigger, dynamicAttribute.dataType?.lowercased() == "bool" {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamTriggerCell.reuseIdentifier, for: indexPath) as? ParamTriggerCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
-            cell.device = device
-            cell.param = dynamicAttribute
-            cell.paramDelegate = self
-            if let attributeName = dynamicAttribute.name {
-                cell.paramName = attributeName
-            }
-            if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
-                cell.triggerButton.isEnabled = true
-                cell.triggerButton.alpha = 1.0
-            } else {
-                cell.triggerButton.isEnabled = false
-                cell.triggerButton.alpha = 0.5
-            }
+            configureParamUpdateCell(cell, param: dynamicAttribute)
             return cell
         } else if dynamicAttribute.type == Constants.channelParamType {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: CustomActionCell.reuseIdentifier) as? CustomActionCell {
-                if let channel = dynamicAttribute.value as? String {
-                    cell.channel = channel
-                }
-                cell.delegate = self
-                cell.topSpaceConstraint.constant = 0
-                cell.bottomSpaceConstraint.constant = 0
-                cell.setupWorkflow(workflow: .launchKinesisVideo)
-                self.setAutoresizingMask(cell)
-                if dynamicAttribute.properties?.contains("read") ?? false, let node = device.node, node.isConnected || node.localNetwork {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: false)
-                } else {
-                    cell.setLaunchButtonConnectedStatus(isDeviceOffline: true)
-                }
-                return cell
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParamCustomActionCell.reuseIdentifier, for: indexPath) as? ParamCustomActionCell else {
+                return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
             }
+            cell.channel = dynamicAttribute.value as? String
+            configureCustomActionCell(cell, workflow: .launchKinesisVideo, param: dynamicAttribute, isReadOperation: true)
+            return cell
         }
 
         return getTableViewGenericCell(attribute: dynamicAttribute, indexPath: indexPath)
     }
 
-    private func setIconsForSliderCell(cell: ParamSliderTableViewCell, param: Param) {
-        if param.type?.lowercased() == Constants.deviceBrightnessParam {
-            cell.minImage.image = UIImage(named: "brightness_low")
-            cell.maxImage.image = UIImage(named: "brightness_high")
-        } else if param.type?.lowercased() == Constants.deviceSaturationParam {
-            cell.minImage.image = UIImage(named: "saturation_low")
-            cell.maxImage.image = UIImage(named: "saturation_high")
-        } else if param.type?.lowercased() == Constants.deviceCCTParam {
-            cell.minImage.image = UIImage(named: "cct_low")
-            cell.maxImage.image = UIImage(named: "cct_high")
+    // Note: setIconsForSliderCell removed - icons are now handled in ParamSliderCell.setIconsForParam()
+    
+    // MARK: - Helper Methods
+    
+    /// Register all programmatic cells
+    private func registerProgrammaticCells() {
+        tableView.register(ParamSliderCell.self, forCellReuseIdentifier: ParamSliderCell.reuseIdentifier)
+        tableView.register(ParamHueSliderCell.self, forCellReuseIdentifier: ParamHueSliderCell.reuseIdentifier)
+        tableView.register(ParamRoundHueSliderCell.self, forCellReuseIdentifier: ParamRoundHueSliderCell.reuseIdentifier)
+        tableView.register(ParamSwitchCell.self, forCellReuseIdentifier: ParamSwitchCell.reuseIdentifier)
+        tableView.register(ParamDropDownCell.self, forCellReuseIdentifier: ParamDropDownCell.reuseIdentifier)
+        tableView.register(ParamGenericCell.self, forCellReuseIdentifier: ParamGenericCell.reuseIdentifier)
+        tableView.register(ParamCentralSwitchCell.self, forCellReuseIdentifier: ParamCentralSwitchCell.reuseIdentifier)
+        tableView.register(ParamStaticCell.self, forCellReuseIdentifier: ParamStaticCell.reuseIdentifier)
+        tableView.register(ParamTriggerCell.self, forCellReuseIdentifier: ParamTriggerCell.reuseIdentifier)
+        tableView.register(ParamActionCell.self, forCellReuseIdentifier: ParamActionCell.reuseIdentifier)
+        tableView.register(ParamCustomActionCell.self, forCellReuseIdentifier: ParamCustomActionCell.reuseIdentifier)
+    }
+    
+    /// Check if device is online (connected or on local network)
+    private func isDeviceOnline(for param: Param) -> Bool {
+        guard let properties = param.properties, properties.contains("write"),
+              let node = device.node else { return false }
+        return node.isConnected || node.localNetwork
+    }
+    
+    /// Check if device is online for read operations
+    private func isDeviceOnlineForRead(for param: Param) -> Bool {
+        guard let properties = param.properties, properties.contains("read"),
+              let node = device.node else { return false }
+        return node.isConnected || node.localNetwork
+    }
+    
+    /// Configure common cell properties (device, param, paramDelegate) - overloaded for each cell type
+    private func configureParamUpdateCell(_ cell: ParamSliderCell, param: Param) {
+        cell.device = device
+        cell.param = param
+        cell.paramDelegate = self
+    }
+    private func configureParamUpdateCell(_ cell: ParamSwitchCell, param: Param) {
+        cell.device = device
+        cell.param = param
+        cell.paramDelegate = self
+    }
+    private func configureParamUpdateCell(_ cell: ParamDropDownCell, param: Param) {
+        cell.device = device
+        cell.param = param
+        cell.paramDelegate = self
+    }
+    private func configureParamUpdateCell(_ cell: ParamTriggerCell, param: Param) {
+        cell.device = device
+        cell.param = param
+        cell.paramDelegate = self
+    }
+    private func configureParamUpdateCell(_ cell: ParamRoundHueSliderCell, param: Param) {
+        cell.device = device
+        cell.param = param
+        cell.paramDelegate = self
+    }
+    private func configureParamUpdateCell(_ cell: ParamCentralSwitchCell, param: Param) {
+        cell.device = device
+        cell.param = param
+        cell.paramDelegate = self
+    }
+    private func configureParamUpdateCell(_ cell: ParamHueSliderCell, param: Param) {
+        cell.device = device
+        cell.param = param
+        cell.paramDelegate = self
+    }
+    
+    /// Configure ParamCustomActionCell with workflow and offline status
+    private func configureCustomActionCell(_ cell: ParamCustomActionCell, workflow: CustomAction, param: Param, isReadOperation: Bool = false) {
+        cell.delegate = self
+        cell.topSpaceConstraint.constant = 0
+        cell.bottomSpaceConstraint.constant = 0
+        cell.setupWorkflow(workflow: workflow)
+        let isOffline = isReadOperation ? !isDeviceOnlineForRead(for: param) : !isDeviceOnline(for: param)
+        cell.setLaunchButtonConnectedStatus(isDeviceOffline: isOffline)
+    }
+    
+    /// Create and configure slider cell
+    private func createSliderCell(for param: Param, indexPath: IndexPath) -> ParamSliderCell? {
+        guard let dataType = param.dataType?.lowercased(), (dataType == "int" || dataType == "float"),
+              let bounds = param.bounds,
+              let cell = tableView.dequeueReusableCell(withIdentifier: ParamSliderCell.reuseIdentifier, for: indexPath) as? ParamSliderCell else { return nil }
+        
+        let maxValue = bounds["max"] as? Float ?? 100
+        let minValue = bounds["min"] as? Float ?? 0
+        guard minValue < maxValue else { return nil }
+        
+        configureParamUpdateCell(cell, param: param)
+        cell.isRainmaker = true
+        cell.configuration = .standard(min: minValue, max: maxValue, step: bounds["step"] as? Float)
+        return cell
+    }
+    
+    /// Create and configure hue slider cell
+    private func createHueSliderCell(for param: Param, indexPath: IndexPath) -> ParamHueSliderCell? {
+        var minValue = 0
+        var maxValue = 360
+        if let bounds = param.bounds {
+            minValue = bounds["min"] as? Int ?? 0
+            maxValue = bounds["max"] as? Int ?? 360
+        }
+        guard minValue < maxValue,
+              let cell = tableView.dequeueReusableCell(withIdentifier: ParamHueSliderCell.reuseIdentifier, for: indexPath) as? ParamHueSliderCell else { return nil }
+        
+        configureParamUpdateCell(cell, param: param)
+        cell.isRainmaker = true
+        return cell
+    }
+    
+    /// Create and configure dropdown cell
+    private func createDropDownCell(for param: Param, indexPath: IndexPath) -> ParamDropDownCell? {
+        guard let dataType = param.dataType?.lowercased(), dataType == "int" || dataType == "string",
+              let cell = tableView.dequeueReusableCell(withIdentifier: ParamDropDownCell.reuseIdentifier, for: indexPath) as? ParamDropDownCell else { return nil }
+        
+        configureParamUpdateCell(cell, param: param)
+        cell.isRainmaker = true
+        cell.type = .rainmaker
+        
+        var datasource: [String] = []
+        if dataType == "int" {
+            guard let bounds = param.bounds, let max = bounds["max"] as? Int, let min = bounds["min"] as? Int,
+                  let step = bounds["step"] as? Int, max > min else {
+                return nil
+            }
+            datasource = stride(from: min, to: max + 1, by: step).map { String($0) }
         } else {
-            cell.maxImage.image = nil
-            cell.minImage.image = nil
+            datasource = param.valid_strs ?? []
+        }
+        cell.datasource = datasource
+        return cell
+    }
+    
+    /// Configure time series button visibility and type
+    private func configureTimeSeriesButton(_ cell: ParamGenericCell, for attribute: Param) {
+        guard let properties = attribute.properties else {
+            cell.tapButton.isHidden = true
+            return
+        }
+        
+        let hasTimeSeries = properties.contains(timeSeriesProperty)
+        let hasSimpleTimeSeries = properties.contains(simpleTimeSeriesProperty)
+        
+        if hasTimeSeries || hasSimpleTimeSeries {
+            cell.tapButton.isHidden = false
+            cell.isSimpleTimeSeries = hasSimpleTimeSeries && !hasTimeSeries
+        } else {
+            cell.tapButton.isHidden = true
+        }
+    }
+    
+    /// Check if notification update is in progress or was recent
+    private func shouldSkipUpdate() -> Bool {
+        if isNotificationUpdateInProgress {
+            return true
+        }
+        let timeSinceLastNotification = Date().timeIntervalSince(lastNotificationTimestamp)
+        return timeSinceLastNotification < notificationUpdateTimeout
+    }
+    
+    /// Update device node from global node list (consolidates duplicate logic)
+    private func updateDeviceNodeFromGlobalList() {
+        guard let nodes = User.shared.associatedNodeList,
+              let nodeId = device.node?.node_id else { return }
+        
+        if let node = nodes.first(where: { $0.node_id == nodeId }) {
+            device.node = node
+            if let updatedDevice = node.devices?.first(where: { $0.name == device.name }) {
+                self.device = updatedDevice
+            }
         }
     }
 }
@@ -928,31 +1081,16 @@ extension DeviceTraitListViewController: UITableViewDelegate {
         if section == 0 {
             return 0.0
         }
-        return 10.0
+        return 5.0
     }
 
     func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let sectionHeaderView = SectionHeaderView.instanceFromNib()
-        if section >= dataSource.count {
-            if let attributes = device?.attributes, section - dataSource.count < attributes.count {
-                let staticControl = attributes[section - dataSource.count]
-                if let controlName = staticControl.name, let deviceName = device?.name {
-                    sectionHeaderView.sectionTitle.text = controlName.deletingPrefix(deviceName)
-                } else {
-                    sectionHeaderView.sectionTitle.text = staticControl.name
-                }
-            } else {
-                sectionHeaderView.sectionTitle.text = ""
-            }
-        } else {
-            let control = dataSource[section]
-            if let controlName = control.name, let deviceName = device?.name {
-                sectionHeaderView.sectionTitle.text = controlName.deletingPrefix(deviceName)
-            } else {
-                sectionHeaderView.sectionTitle.text = control.name
-            }
-        }
-        return sectionHeaderView
+        // Use a plain transparent view so the 10pt header height acts purely as vertical spacing
+        // between the visible card areas of cells. All per-cell top/bottom padding is 0, so
+        // this makes the gap between every pair of cards identical.
+        let spacer = UIView()
+        spacer.backgroundColor = .clear
+        return spacer
     }
 
     func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -975,22 +1113,26 @@ extension DeviceTraitListViewController: UITableViewDataSource {
     }
 
     func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var paramCell: UITableViewCell!
         if indexPath.section == 0, foundCentralParam {
             return getTableViewCellOfCentralParam(dynamicAttribute: dataSource[indexPath.section], indexPath: indexPath)
         }
+        
         if indexPath.section >= dataSource.count {
-            let staticControl = device?.attributes![indexPath.section - dataSource.count]
-            let cell = tableView.dequeueReusableCell(withIdentifier: "staticControlTableViewCell", for: indexPath) as! StaticControlTableViewCell
-            cell.controlNameLabel.text = staticControl?.name ?? ""
-            cell.controlValueLabel.text = staticControl?.value as? String ?? ""
-            paramCell = cell as UITableViewCell
+            // Use new programmatic ParamStaticCell - no runtime class swizzling
+            let index = indexPath.section - dataSource.count
+            guard let attributes = device?.attributes, index < attributes.count,
+                  let cell = tableView.dequeueReusableCell(withIdentifier: ParamStaticCell.reuseIdentifier, for: indexPath) as? ParamStaticCell else {
+                return UITableViewCell()
+            }
+            cell.attribute = attributes[index]
+            cell.isUserInteractionEnabled = true
+            return cell
         } else {
             let control = dataSource[indexPath.section]
-            paramCell = getTableViewCellBasedOn(dynamicAttribute: control, indexPath: indexPath)
+            let paramCell = getTableViewCellBasedOn(dynamicAttribute: control, indexPath: indexPath)
+            paramCell.isUserInteractionEnabled = true
+            return paramCell
         }
-        paramCell.isUserInteractionEnabled = true
-        return paramCell
     }
 }
 
@@ -1006,7 +1148,10 @@ class SectionHeaderView: UIView {
     @IBOutlet var sectionTitle: UILabel!
 
     class func instanceFromNib() -> SectionHeaderView {
-        return UINib(nibName: "ControlSectionHeaderView", bundle: nil).instantiate(withOwner: nil, options: nil)[0] as! SectionHeaderView
+        guard let view = UINib(nibName: "ControlSectionHeaderView", bundle: nil).instantiate(withOwner: nil, options: nil).first as? SectionHeaderView else {
+            return SectionHeaderView() // Return empty view if instantiation fails
+        }
+        return view
     }
 }
 
@@ -1017,7 +1162,7 @@ extension String {
     }
 }
 
-extension DeviceTraitListViewController: ActionTableViewCellDelegate {
+extension DeviceTraitListViewController: ParamActionCellDelegate {
     func actionInvoked(device: Device?, param: Param?, paramName: String) {
         let storyboard = UIStoryboard(name: "Scanner", bundle: nil)
         if let svc = storyboard.instantiateViewController(withIdentifier: String(describing: ESPScannerViewController.self)) as? ESPScannerViewController {

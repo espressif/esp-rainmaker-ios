@@ -128,7 +128,9 @@ extension DeviceViewController: DeviceNameDelegate {
     func addHeightConstraint(textField: UITextField) {
         let heightConstraint = NSLayoutConstraint(item: textField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)
         textField.addConstraint(heightConstraint)
-        textField.font = UIFont(name: textField.font!.fontName, size: 18)
+        if let font = textField.font {
+            textField.font = UIFont(name: font.fontName, size: 18)
+        }
     }
     
     /// Get name param if present
@@ -152,28 +154,29 @@ extension DeviceViewController: DeviceNameDelegate {
     /// - Parameter rainmakerNode: rainmaker node
     /// - Parameter completion: completion handler
     func editNamePressed(rainmakerNode: Node?, completion: @escaping (String?) -> Void) {
-        var input: UIAlertController!
-        if let param = self.getNameParam(node: rainmakerNode), let attributeKey = param.name, let value = param.value as? String {
-            input = UIAlertController(title: attributeKey, message: ESPMatterConstants.enterDeviceNameMsg, preferredStyle: .alert)
+        guard let param = self.getNameParam(node: rainmakerNode),
+              let attributeKey = param.name,
+              let value = param.value as? String else { return }
+        let input = UIAlertController(title: attributeKey, message: ESPMatterConstants.enterDeviceNameMsg, preferredStyle: .alert)
             input.addTextField { textField in
                 textField.text = value
                 self.addHeightConstraint(textField: textField)
             }
             input.addAction(UIAlertAction(title: "Cancel", style: .destructive))
             input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
-                let valueTextField = input?.textFields![0]
-                if let text = valueTextField?.text, text.count > 0, text.count <= 32 {
-                    self.deviceName = valueTextField?.text
-                    self.doneButtonAction(rainmakerNode: rainmakerNode, param: param, completion: completion)
-                } else {
+                guard let textFields = input?.textFields, textFields.count > 0,
+                      let valueTextField = textFields.first,
+                      let text = valueTextField.text, text.count > 0, text.count <= 32 else {
                     self.alertUser(title: ESPMatterConstants.failureTxt,
                                    message: ESPMatterConstants.enterValidDeviceNameMsg,
                                    buttonTitle: ESPMatterConstants.okTxt,
                                    callback: {})
+                    return
                 }
+                self.deviceName = text
+                self.doneButtonAction(rainmakerNode: rainmakerNode, param: param, completion: completion)
             }))
             self.present(input, animated: true, completion: nil)
-        }
     }
     
     /// Done action button pressed
@@ -218,27 +221,33 @@ extension DeviceViewController: DeviceNameDelegate {
             }
             input.addAction(UIAlertAction(title: "Cancel", style: .destructive))
             input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
-                let valueTextField = input?.textFields![0]
-                if let text = valueTextField?.text, text.replacingOccurrences(of: " ", with: "").count > 0, text.count <= 32 {
-                    let finalTxt = text.replacingOccurrences(of: " ", with: "")
-                    if finalTxt.count > 0 {
-                        self.deviceName = valueTextField?.text
-                        self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId) { matterDeviceName in
-                            if let param = self.getNameParam(node: rainmakerNode) {
-                                self.updateMTRRainmakerParamName(rainmakerNode: rainmakerNode, param: param) { _, _ in
-                                    completion(matterDeviceName)
-                                }
-                            } else {
-                                completion(matterDeviceName)
-                            }
+                guard let textFields = input?.textFields, textFields.count > 0,
+                      let valueTextField = textFields.first,
+                      let text = valueTextField.text else {
+                    self.alertUser(title: ESPMatterConstants.failureTxt,
+                                   message: ESPMatterConstants.enterValidDeviceNameMsg,
+                                   buttonTitle: ESPMatterConstants.okTxt,
+                                   callback: {})
+                    return
+                }
+                let trimmedText = text.replacingOccurrences(of: " ", with: "")
+                guard trimmedText.count > 0, text.count <= 32 else {
+                    self.alertUser(title: ESPMatterConstants.failureTxt,
+                                   message: ESPMatterConstants.enterValidDeviceNameMsg,
+                                   buttonTitle: ESPMatterConstants.okTxt,
+                                   callback: {})
+                    return
+                }
+                self.deviceName = text
+                self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId) { matterDeviceName in
+                    if let param = self.getNameParam(node: rainmakerNode) {
+                        self.updateMTRRainmakerParamName(rainmakerNode: rainmakerNode, param: param) { _, _ in
+                            completion(matterDeviceName)
                         }
-                        return
+                    } else {
+                        completion(matterDeviceName)
                     }
                 }
-                self.alertUser(title: ESPMatterConstants.failureTxt,
-                               message: ESPMatterConstants.enterValidDeviceNameMsg,
-                               buttonTitle: ESPMatterConstants.okTxt,
-                               callback: {})
             }))
             self.present(input, animated: true, completion: nil)
         }
@@ -285,27 +294,33 @@ extension DeviceViewController: DeviceNameDelegate {
             }
             input.addAction(UIAlertAction(title: "Cancel", style: .destructive))
             input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
-                let valueTextField = input?.textFields![0]
-                if let text = valueTextField?.text, text.replacingOccurrences(of: " ", with: "").count > 0, text.count <= 32 {
-                    let finalTxt = text.replacingOccurrences(of: " ", with: "")
-                    if finalTxt.count > 0 {
-                        self.deviceName = valueTextField?.text
-                        self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId) { matterDeviceName in
-                            if let param = self.getNameParam(node: rainmakerNode) {
-                                self.updateMTRRainmakerParamName(rainmakerNode: rainmakerNode, param: param) { _, _ in
-                                    completion(matterDeviceName)
-                                }
-                            } else {
-                                completion(matterDeviceName)
-                            }
+                guard let textFields = input?.textFields, textFields.count > 0,
+                      let valueTextField = textFields.first,
+                      let text = valueTextField.text else {
+                    self.alertUser(title: ESPMatterConstants.failureTxt,
+                                   message: ESPMatterConstants.enterValidDeviceNameMsg,
+                                   buttonTitle: ESPMatterConstants.okTxt,
+                                   callback: {})
+                    return
+                }
+                let trimmedText = text.replacingOccurrences(of: " ", with: "")
+                guard trimmedText.count > 0, text.count <= 32 else {
+                    self.alertUser(title: ESPMatterConstants.failureTxt,
+                                   message: ESPMatterConstants.enterValidDeviceNameMsg,
+                                   buttonTitle: ESPMatterConstants.okTxt,
+                                   callback: {})
+                    return
+                }
+                self.deviceName = text
+                self.updateMatterNodeLabel(nodeLabel: text, node: node, groupId: groupId, deviceId: deviceId) { matterDeviceName in
+                    if let param = self.getNameParam(node: rainmakerNode) {
+                        self.updateMTRRainmakerParamName(rainmakerNode: rainmakerNode, param: param) { _, _ in
+                            completion(matterDeviceName)
                         }
-                        return
+                    } else {
+                        completion(matterDeviceName)
                     }
                 }
-                self.alertUser(title: ESPMatterConstants.failureTxt,
-                               message: ESPMatterConstants.enterValidDeviceNameMsg,
-                               buttonTitle: ESPMatterConstants.okTxt,
-                               callback: {})
             }))
             self.present(input, animated: true, completion: nil)
         }

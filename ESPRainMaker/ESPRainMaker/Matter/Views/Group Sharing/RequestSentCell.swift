@@ -43,8 +43,6 @@ class RequestSentCell: UITableViewCell {
         if let request = self.request, let sharedWith = request.sharedWith {
             self.sharedWithText.text = "Group shared with \(sharedWith)."
         }
-        self.cancelRequestButton.backgroundColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
-        self.cancelRequestButton.tintColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -76,8 +74,6 @@ class RequestSentCell: UITableViewCell {
                 }
                 self.cancelRequestButton.setTitle(ESPMatterConstants.revoke, for: .normal)
             }
-            self.cancelRequestButton.backgroundColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
-            self.cancelRequestButton.tintColor = UIColor(hexString: ESPMatterConstants.customBackgroundColor)
         }
     }
 }
