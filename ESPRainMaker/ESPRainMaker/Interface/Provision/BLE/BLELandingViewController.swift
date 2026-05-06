@@ -147,7 +147,10 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
             //Check the "rmaker"/"cap" to see if assisted claiming is supported.
             //If yes navigagte user to assisted claiming screen.
             //Else show error.
-            if versionInfo.isAssistedClaimingSupported() {
+            if versionInfo.isAssistedCameraClaimSupported() {
+                goToClaimVC(device: device, isCameraDevice: true)
+                return
+            } else if versionInfo.isAssistedClaimingSupported() {
                 goToClaimVC(device: device)
                 return
             }
@@ -201,9 +204,10 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
         self.navigationController?.pushViewController(joinNetworkVC, animated: true)
     }
 
-    func goToClaimVC(device: ESPDevice) {
+    func goToClaimVC(device: ESPDevice, isCameraDevice: Bool = false) {
         let claimVC = storyboard?.instantiateViewController(withIdentifier: "claimVC") as! ClaimViewController
         claimVC.device = device
+        claimVC.isCameraDevice = isCameraDevice
         navigationController?.pushViewController(claimVC, animated: true)
     }
 

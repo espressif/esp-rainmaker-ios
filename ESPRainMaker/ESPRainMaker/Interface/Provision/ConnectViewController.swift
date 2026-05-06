@@ -100,7 +100,16 @@ class ConnectViewController: UIViewController {
             //Check the "rmaker"/"cap" to see if assisted claiming is supported.
             //If yes navigagte user to assisted claiming screen.
             //Else show error.
-            if versionInfo.isAssistedClaimingSupported() {
+            if versionInfo.isAssistedCameraClaimSupported() {
+                if device.transport == .ble {
+                    DispatchQueue.main.async {
+                        self.goToClaimVC(device: device, isCameraDevice: true)
+                    }
+                } else {
+                    self.showErrorAlert(title: "", message: "Assisted Claiming not supported for SoftAP. Cannot Proceed.", buttonTitle: "OK") {}
+                }
+                return
+            } else if versionInfo.isAssistedClaimingSupported() {
                 if device.transport == .ble {
                     DispatchQueue.main.async {
                         self.goToClaimVC(device: device)
@@ -166,9 +175,10 @@ class ConnectViewController: UIViewController {
         self.navigationController?.pushViewController(joinNetworkVC, animated: true)
     }
 
-    func goToClaimVC(device: ESPDevice) {
+    func goToClaimVC(device: ESPDevice, isCameraDevice: Bool = false) {
         let claimVC = storyboard?.instantiateViewController(withIdentifier: "claimVC") as! ClaimViewController
         claimVC.device = device
+        claimVC.isCameraDevice = isCameraDevice
         navigationController?.pushViewController(claimVC, animated: true)
     }
 

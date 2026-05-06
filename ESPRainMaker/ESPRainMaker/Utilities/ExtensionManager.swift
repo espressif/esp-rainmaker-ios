@@ -780,6 +780,13 @@ extension NSDictionary {
         return false
     }
     
+    func isAssistedCameraClaimSupported() -> Bool {
+        if let rmakerInfo = self[ESPScanConstants.rmaker] as? NSDictionary, let rmakerCapabilities = rmakerInfo[ESPScanConstants.capabilities] as? [String], rmakerCapabilities.contains(ESPScanConstants.cameraCalim) {
+            return true
+        }
+        return false
+    }
+    
     /// Check thread prov capabilities
     /// - Returns: (can prov thread device, should scan thread networks)
     func checkThreadCapabilities() -> (canProvisionOverThread: Bool, shouldScanThreadNetworks: Bool) {

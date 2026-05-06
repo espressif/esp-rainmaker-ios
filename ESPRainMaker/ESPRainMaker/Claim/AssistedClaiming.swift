@@ -24,6 +24,7 @@ class AssistedClaiming {
     var csrData: Data!
     var certificateData: Data!
     var datacount = 1
+    var isCameraDevice: Bool = false
 
     init(espDevice: ESPDevice) {
         device = espDevice
@@ -35,7 +36,8 @@ class AssistedClaiming {
     ///
     /// - Parameters:
     ///   - completionHandler: block invoked will contain the result of claiming process and error if claim process fails.
-    func initiateAssistedClaiming(completionHandler: @escaping (Bool, String?) -> Void) {
+    func initiateAssistedClaiming(isCameraDevice: Bool, completionHandler: @escaping (Bool, String?) -> Void) {
+        self.isCameraDevice = isCameraDevice
         do {
             let payloadData = try createClaimStartRequest()
             if let data = payloadData {
@@ -161,7 +163,10 @@ class AssistedClaiming {
 
     private func sendCSRToAPI(completionHandler: @escaping (Bool, String?) -> Void) {
         do {
-            let response = try JSONSerialization.jsonObject(with: csrData, options: .allowFragments) as? [String: Any] ?? [:]
+            var response = try JSONSerialization.jsonObject(with: csrData, options: .allowFragments) as? [String: Any] ?? [:]
+            if self.isCameraDevice {
+                response[ESPScanConstants.nodePolicies] = ESPScanConstants.videoStream
+            }
             NetworkManager.shared.genericAuthorizedDataRequest(url: Constants.claimVerifyPath, parameter: response) { data, error in
                 if data == nil {
                     completionHandler(false, "Error while sending CSR to cloud:\(error!.description)")
@@ -197,7 +202,11 @@ class AssistedClaiming {
         do {
             let response = try RmakerClaim_RMakerClaimPayload(serializedData: responseData)
             if response.respPayload.status == .success {
-                sendDeviceInfoToCloud(response: try (JSONSerialization.jsonObject(with: response.respPayload.buf.payload, options: .allowFragments) as? [String: Any] ?? [:]), completionHandler: completionHandler)
+                var payload: [String: Any] = [:]
+                if let resp = try? JSONSerialization.jsonObject(with: response.respPayload.buf.payload, options: .allowFragments) as? [String: Any] {
+                    payload = resp
+                }
+                sendDeviceInfoToCloud(response: payload, completionHandler: completionHandler)
             } else {
                 completionHandler(false, "Failure sending claim start request to device with status:\(response.respPayload.status)")
             }
