@@ -40,8 +40,12 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
         input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
         }))
         input.addAction(UIAlertAction(title: "Update", style: .default, handler: { [weak input] _ in
-            let valueTextField = input?.textFields![0]
-            self.controlValue = valueTextField?.text
+            // Safe array access: use first instead of force unwrap
+            guard let valueTextField = input?.textFields?.first,
+                  let value = valueTextField.text else {
+                return
+            }
+            self.controlValue = value
             self.doneButtonAction()
         }))
         parentViewController?.present(input, animated: true, completion: nil)
@@ -82,8 +86,8 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
                     showAlert(message: "Please enter a valid float value.")
                 }
             } else if dataType.lowercased() == "bool" {
-                if boolTypeValidValues.keys.contains(value) {
-                    let validValue = boolTypeValidValues[value]!
+                // Safe dictionary access: use optional binding instead of force unwrap
+                if let validValue = boolTypeValidValues[value] {
                     if validValue == 0 {
                         param?.value = false
                         controlValueLabel.text = value
@@ -102,15 +106,22 @@ class ScheduleGenericTableViewCell: GenericControlTableViewCell {
     }
 
     @IBAction override func checkBoxPressed(_: Any) {
-        if param!.selected {
+        // Safe optional handling: guard against nil param to prevent crashes
+        guard let currentParam = param else {
+            return
+        }
+        
+        if currentParam.selected {
+            // Param is being deselected - hide edit button since it's no longer part of schedule/scene
             editButton.isHidden = true
             checkButton.setImage(UIImage(named: "checkbox_empty"), for: .normal)
-            param!.selected = false
+            currentParam.selected = false
             device.selectedParams -= 1
         } else {
+            // Param is being selected - show edit button so user can set the value for schedule/scene
             editButton.isHidden = false
             checkButton.setImage(UIImage(named: "selected"), for: .normal)
-            param!.selected = true
+            currentParam.selected = true
             device.selectedParams += 1
         }
         scheduleDelegate?.paramStateChangedat(indexPath: indexPath)
@@ -123,7 +134,9 @@ extension ScheduleGenericTableViewCell: ScheduleSceneActionAllowedProtocol {
         if isAllowed {
             self.alpha = 1.0
             checkButton.isEnabled = true
-            editButton.isHidden = param?.selected ?? false
+            // Show edit button when param is selected (so user can edit the value for schedule/scene)
+            // Hide edit button when param is not selected (not part of schedule/scene)
+            editButton.isHidden = !(param?.selected ?? false)
         } else {
             self.alpha = 0.6
             checkButton.isEnabled = false

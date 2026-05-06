@@ -553,13 +553,18 @@ class DeviceTraitListViewController: UIViewController {
         let genericCell = tableView.dequeueReusableCell(withIdentifier: "genericControlCell", for: indexPath) as! GenericControlTableViewCell
         object_setClass(genericCell, GenericParamTableViewCell.self)
         let cell = genericCell as! GenericParamTableViewCell
+        
+        // CRITICAL: Always reset attributeKey first to prevent cell reuse issues
+        cell.attributeKey = attribute.name ?? ""
+        
         cell.controlName.text = attribute.name
         cell.paramDelegate = self
         if let value = attribute.value {
             cell.controlValue = "\(value)"
         }
         cell.controlValueLabel.text = cell.controlValue
-        if attribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false {
+        // Safe optional handling: check device exists before accessing properties
+        if attribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false {
             cell.editButton.isHidden = false
             cell.editButton.setTitleColor(UIColor(hexString: Constants.customColor), for: .normal)
         } else {
@@ -581,9 +586,7 @@ class DeviceTraitListViewController: UIViewController {
         }
         cell.device = device
         cell.param = attribute
-        if let attributeName = attribute.name {
-            cell.attributeKey = attributeName
-        }
+        
         return cell
     }
 
@@ -593,7 +596,8 @@ class DeviceTraitListViewController: UIViewController {
             cell.device = device
             cell.param = dynamicAttribute
             cell.paramDelegate = self
-            let currentColor = HSBColor(hue: CGFloat(dynamicAttribute.value as! Int) / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+            let hueValue = CGFloat(dynamicAttribute.value as? Int ?? 0)
+            let currentColor = HSBColor(hue: hueValue / 360.0, saturation: 1.0, brightness: 1.0, alpha: 1.0)
 
             cell.hueSlider.setInitialHSBColor(currentColor, isInteractive: true)
             cell.selectedColor.setSelectedHSBColor(currentColor, isInteractive: true)
@@ -714,7 +718,7 @@ class DeviceTraitListViewController: UIViewController {
                         if let attributeName = dynamicAttribute.name {
                             cell.paramName = attributeName
                         }
-                        if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
+                        if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
                             cell.slider.isEnabled = true
                         } else {
                             cell.slider.isEnabled = false
@@ -733,7 +737,11 @@ class DeviceTraitListViewController: UIViewController {
             object_setClass(switchCell, ParamSwitchTableViewCell.self)
             let cell = switchCell as! ParamSwitchTableViewCell
             cell.paramDelegate = self
-            cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
+            if let deviceName = device?.name, let attributeName = dynamicAttribute.name {
+                cell.controlName.text = attributeName.deletingPrefix(deviceName)
+            } else {
+                cell.controlName.text = dynamicAttribute.name
+            }
             cell.device = device
             cell.param = dynamicAttribute
             if let attributeName = dynamicAttribute.name {
@@ -747,7 +755,7 @@ class DeviceTraitListViewController: UIViewController {
                 }
                 cell.toggleSwitch.setOn(switchState, animated: true)
             }
-            if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
+            if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
                 cell.toggleSwitch.isEnabled = true
             } else {
                 cell.toggleSwitch.isEnabled = false
@@ -794,7 +802,7 @@ class DeviceTraitListViewController: UIViewController {
                 if let attributeName = dynamicAttribute.name {
                     cell.paramName = attributeName
                 }
-                if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
+                if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
                     cell.hueSlider.isEnabled = true
                     cell.hueSlider.alpha = 1.0
                 } else {
@@ -811,16 +819,20 @@ class DeviceTraitListViewController: UIViewController {
                 let dropDownCell = tableView.dequeueReusableCell(withIdentifier: "dropDownTableViewCell", for: indexPath) as! DropDownTableViewCell
                 object_setClass(dropDownCell, ParamDropDownTableViewCell.self)
                 let cell = dropDownCell as! ParamDropDownTableViewCell
-                cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
+                if let deviceName = device?.name, let attributeName = dynamicAttribute.name {
+                    cell.controlName.text = attributeName.deletingPrefix(deviceName)
+                } else {
+                    cell.controlName.text = dynamicAttribute.name
+                }
                 cell.device = device
                 cell.param = dynamicAttribute
                 cell.paramDelegate = self
 
                 var currentValue = ""
                 if dataType == "string" {
-                    currentValue = dynamicAttribute.value as! String
+                    currentValue = dynamicAttribute.value as? String ?? ""
                 } else {
-                    currentValue = String(dynamicAttribute.value as! Int)
+                    currentValue = String(dynamicAttribute.value as? Int ?? 0)
                 }
                 cell.controlValueLabel.text = currentValue
                 cell.currentValue = currentValue
@@ -838,7 +850,7 @@ class DeviceTraitListViewController: UIViewController {
                 }
                 cell.datasource = datasource
 
-                if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false {
+                if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false {
                     cell.dropDownButton.isHidden = false
                 } else {
                     cell.dropDownButton.isHidden = true
@@ -853,14 +865,18 @@ class DeviceTraitListViewController: UIViewController {
             let triggerCell = tableView.dequeueReusableCell(withIdentifier: "triggerTVC", for: indexPath) as! TriggerTableViewCell
             object_setClass(triggerCell, ParamTriggerTableViewCell.self)
             let cell = triggerCell as! ParamTriggerTableViewCell
-            cell.controlName.text = dynamicAttribute.name?.deletingPrefix(device!.name!)
+            if let deviceName = device?.name, let attributeName = dynamicAttribute.name {
+                cell.controlName.text = attributeName.deletingPrefix(deviceName)
+            } else {
+                cell.controlName.text = dynamicAttribute.name
+            }
             cell.device = device
             cell.param = dynamicAttribute
             cell.paramDelegate = self
             if let attributeName = dynamicAttribute.name {
                 cell.paramName = attributeName
             }
-            if dynamicAttribute.properties?.contains("write") ?? false, device!.node?.isConnected ?? false || device!.node?.localNetwork ?? false {
+            if dynamicAttribute.properties?.contains("write") ?? false, let currentDevice = device, currentDevice.node?.isConnected ?? false || currentDevice.node?.localNetwork ?? false {
                 cell.triggerButton.isEnabled = true
                 cell.triggerButton.alpha = 1.0
             } else {
@@ -918,11 +934,23 @@ extension DeviceTraitListViewController: UITableViewDelegate {
     func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let sectionHeaderView = SectionHeaderView.instanceFromNib()
         if section >= dataSource.count {
-            let staticControl = device?.attributes![section - dataSource.count]
-            sectionHeaderView.sectionTitle.text = staticControl?.name!.deletingPrefix(device!.name!)
+            if let attributes = device?.attributes, section - dataSource.count < attributes.count {
+                let staticControl = attributes[section - dataSource.count]
+                if let controlName = staticControl.name, let deviceName = device?.name {
+                    sectionHeaderView.sectionTitle.text = controlName.deletingPrefix(deviceName)
+                } else {
+                    sectionHeaderView.sectionTitle.text = staticControl.name
+                }
+            } else {
+                sectionHeaderView.sectionTitle.text = ""
+            }
         } else {
             let control = dataSource[section]
-            sectionHeaderView.sectionTitle.text = control.name!.deletingPrefix(device!.name!)
+            if let controlName = control.name, let deviceName = device?.name {
+                sectionHeaderView.sectionTitle.text = controlName.deletingPrefix(deviceName)
+            } else {
+                sectionHeaderView.sectionTitle.text = control.name
+            }
         }
         return sectionHeaderView
     }
