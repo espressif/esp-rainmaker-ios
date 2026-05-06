@@ -970,7 +970,7 @@ class ESPVideoViewController: UIViewController {
     // Helper method for setting remote sender client ID
     private func setRemoteSenderClientId() {
         if self.remoteSenderClientId == nil {
-            remoteSenderClientId = ESPAWSConstants.connectAsViewClientId
+            remoteSenderClientId = UUID().uuidString
         }
     }
     
