@@ -30,6 +30,7 @@ class ProvisionLandingViewController: UIViewController {
     var capabilities: [String]?
     var espDevice: ESPDevice!
     var provisionCompletionHandler: (() -> Void)?
+    private var didHandleDeviceConnection = false
 
     @IBOutlet var connectButton: UIButton!
 
@@ -160,17 +161,17 @@ class ProvisionLandingViewController: UIViewController {
     }
 
     func connectDevice(espDevice: ESPDevice) {
+        didHandleDeviceConnection = false
         espDevice.connect(delegate: self) { status in
             DispatchQueue.main.async {
+                guard !self.didHandleDeviceConnection else { return }
                 Utility.hideLoader(view: self.view)
-            }
-            switch status {
-            case .connected:
-                DispatchQueue.main.async {
+                switch status {
+                case .connected:
+                    self.didHandleDeviceConnection = true
                     self.checkForAssistedClaiming(device: espDevice)
-                }
-            default:
-                DispatchQueue.main.async {
+                default:
+                    self.didHandleDeviceConnection = true
                     self.retry(message: "Device could not be connected. Please try again")
                 }
             }
