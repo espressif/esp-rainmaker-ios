@@ -130,7 +130,7 @@ class SelectEventViewController: UIViewController {
     
     // MARK: - Private Methods
     
-    private func showParamSelectionFor(device: Device) {
+    private func showParamSelectionFor(device: Device, sourceView: UIView? = nil) {
         let actionSheet = UIAlertController(title: "", message: "Choose Parameter", preferredStyle: .actionSheet)
         if let params = device.params?.filter({  $0.type != Constants.deviceNameParam }) {
             for param in params {
@@ -144,15 +144,7 @@ class SelectEventViewController: UIViewController {
             }
         }
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
-        // Configure for iPad
-        if let popover = actionSheet.popoverPresentationController {
-            popover.sourceView = self.view
-            popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-            popover.permittedArrowDirections = []
-        }
-        
-        self.present(actionSheet, animated: true, completion: nil)
+        presentActionSheet(actionSheet, from: sourceView)
     }
     
     private func setConditionForParam(param: Param) {
@@ -317,7 +309,8 @@ extension SelectEventViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        showParamSelectionFor(device: eventDevices[indexPath.section])
+        let sourceView = tableView.cellForRow(at: indexPath)
+        showParamSelectionFor(device: eventDevices[indexPath.section], sourceView: sourceView)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

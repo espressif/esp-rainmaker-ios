@@ -43,6 +43,11 @@ class DeviceTraitListViewController: UIViewController {
     @IBOutlet var networkIndicator: UIView!
     @IBOutlet weak var betaLabel: UILabel!
     @IBOutlet weak var betaLabelHeightConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var topBarView: UIView!
+    @IBOutlet private weak var nodeInfoButton: UIButton!
+
+    private var bleOverflowMenuButton: UIButton?
+    private var bleOverflowLegacyActions: [BleOverflowMenuAction] = []
     
     var deviceName: String?
     var group: ESPNodeGroup?
@@ -101,6 +106,7 @@ class DeviceTraitListViewController: UIViewController {
             checkForCentralParam()
         }
         checkOfflineStatus()
+        updateBleScheduleSceneOverflowMenu()
     }
     
     func setupCamera() {
@@ -214,6 +220,19 @@ class DeviceTraitListViewController: UIViewController {
         checkNetworkUpdate()
         checkOfflineStatus() // Update connection status when view appears
         tabBarController?.tabBar.isHidden = true
+
+        if let nodeId = device?.node?.node_id,
+           User.shared.bleLocalControl.isDiscovered(nodeId: nodeId),
+           !User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            User.shared.bleLocalControl.connectDevice(nodeId: nodeId) { [weak self] _ in
+                DispatchQueue.main.async {
+                    self?.checkOfflineStatus()
+                    self?.updateBleScheduleSceneOverflowMenu()
+                }
+            }
+        }
+
+        updateBleScheduleSceneOverflowMenu()
         
         // Start polling only after UI is ready
         // This ensures UI renders first, then polling begins
@@ -476,6 +495,8 @@ class DeviceTraitListViewController: UIViewController {
                       let index = nodeList.firstIndex(where: { $0.node_id == nodeId }) {
                 let oldNode = nodeList[index]
                 node.localNetwork = oldNode.localNetwork
+                node.bleLocalNetwork = oldNode.bleLocalNetwork
+                node.bleLocalControlConnected = oldNode.bleLocalControlConnected
                 User.shared.associatedNodeList?[index] = node
                 if let currentDevice = node.devices?.first(where: { $0.name == self.device?.name }) {
                     self.device = currentDevice
@@ -507,17 +528,18 @@ class DeviceTraitListViewController: UIViewController {
     /// Check if device is accessible (remotely or locally)
     private func isDeviceAccessible() -> Bool {
         guard let device = device else { return false }
-        
-        // Check if device is reachable
+
         if device.isReachable() {
             return true
         }
-        
-        // Check if device is connected remotely or on local network
+
         if let node = device.node {
-            return node.isConnected || node.localNetwork
+            if let nodeId = node.node_id, User.shared.bleLocalControl.isAvailable(nodeId: nodeId) {
+                return true
+            }
+            return node.isConnected || node.localNetwork || node.bleLocalNetwork
         }
-        
+
         return false
     }
     
@@ -569,11 +591,20 @@ class DeviceTraitListViewController: UIViewController {
                 }
             } else {
                 // For non-Matter devices, use existing logic
+                let bleLocalNetwork = self.device?.node?.bleLocalNetwork ?? false
                 if localNetwork {
                     if self.device.node?.supportsEncryption ?? false {
                         self.offlineLabel.text = "🔒 Reachable on WLAN"
                     } else {
                         self.offlineLabel.text = "Reachable on WLAN"
+                    }
+                    self.offlineLabel.isHidden = false
+                } else if bleLocalNetwork {
+                    if self.device?.node?.bleLocalControlConnected == true
+                        || User.shared.bleLocalControl.isConnected(nodeId: self.device?.node?.node_id ?? "") {
+                        self.offlineLabel.text = "Connected on BLE"
+                    } else {
+                        self.offlineLabel.text = "Reachable on BLE"
                     }
                     self.offlineLabel.isHidden = false
                 } else if isConnected {
@@ -589,6 +620,7 @@ class DeviceTraitListViewController: UIViewController {
             }
             // Update refresh control state when connection status changes
             self.updateRefreshControlState()
+            self.updateBleScheduleSceneOverflowMenu()
         }
     }
     
@@ -657,6 +689,8 @@ class DeviceTraitListViewController: UIViewController {
                       let index = nodeList.firstIndex(where: { $0.node_id == nodeId }) else { return }
                 let oldNode = nodeList[index]
                 node.localNetwork = oldNode.localNetwork
+                node.bleLocalNetwork = oldNode.bleLocalNetwork
+                node.bleLocalControlConnected = oldNode.bleLocalControlConnected
                 User.shared.associatedNodeList?[index] = node
                 
                 if let currentDevice = node.devices?.first(where: { $0.name == self.device?.name }) {
@@ -810,7 +844,7 @@ class DeviceTraitListViewController: UIViewController {
         if let properties = attribute.properties, properties.contains("write"),
            let currentDevice = device,
            let node = currentDevice.node,
-           (node.isConnected || node.localNetwork) {
+           node.isParamReachable() {
             cell.editButton.isHidden = false
             cell.editButton.setTitleColor(UIColor(hexString: Constants.customColor), for: .normal) // Matches old implementation
         } else {
@@ -950,18 +984,18 @@ class DeviceTraitListViewController: UIViewController {
             || param.type == RainmakerControllerConstants.defaultType
             || param.type == RainmakerControllerConstants.groupsServiceDefaultType),
            let node = device.node {
-            return node.isConnected || node.localNetwork
+            return node.isParamReachable()
         }
         guard let properties = param.properties, properties.contains("write"),
               let node = device.node else { return false }
-        return node.isConnected || node.localNetwork
+        return node.isParamReachable()
     }
     
     /// Check if device is online for read operations
     private func isDeviceOnlineForRead(for param: Param) -> Bool {
         guard let properties = param.properties, properties.contains("read"),
               let node = device.node else { return false }
-        return node.isConnected || node.localNetwork
+        return node.isParamReachable()
     }
     
     /// Configure common cell properties (device, param, paramDelegate) - overloaded for each cell type
@@ -1172,6 +1206,309 @@ extension DeviceTraitListViewController: ParamUpdateProtocol {
         DispatchQueue.main.async {
             Utility.showToastMessage(view: self.view, message: "Fail to update parameter. Please check you network connection!!")
         }
+    }
+}
+
+// MARK: - BLE schedule/scene overflow menu
+
+private enum BleOverflowMenuAction {
+    case schedule
+    case scene
+}
+
+extension DeviceTraitListViewController {
+
+    func updateBleScheduleSceneOverflowMenu() {
+        bleOverflowMenuButton?.removeFromSuperview()
+        bleOverflowMenuButton = nil
+        bleOverflowLegacyActions = []
+
+        guard let topBar = topBarView, let infoButton = nodeInfoButton else {
+            return
+        }
+
+        var actions: [BleOverflowMenuAction] = []
+        if shouldOfferBleScheduleMenu() {
+            actions.append(.schedule)
+        }
+        if shouldOfferBleSceneMenu() {
+            actions.append(.scene)
+        }
+        if actions.isEmpty {
+            return
+        }
+
+        bleOverflowLegacyActions = actions
+
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let overflowTintColor = topBarActionTintColor()
+        button.tintColor = overflowTintColor
+        if #available(iOS 13.0, *) {
+            button.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
+        } else {
+            button.setTitle("•••", for: .normal)
+            button.setTitleColor(overflowTintColor, for: .normal)
+        }
+        topBar.addSubview(button)
+        NSLayoutConstraint.activate([
+            button.centerYAnchor.constraint(equalTo: infoButton.centerYAnchor),
+            button.trailingAnchor.constraint(equalTo: infoButton.leadingAnchor, constant: -8),
+            button.widthAnchor.constraint(equalToConstant: 36),
+            button.heightAnchor.constraint(equalToConstant: 36)
+        ])
+
+        if #available(iOS 14.0, *), UIDevice.current.userInterfaceIdiom != .pad {
+            button.showsMenuAsPrimaryAction = true
+            button.menu = UIMenu(children: actions.map { menuAction(for: $0) })
+        } else {
+            button.addTarget(self, action: #selector(bleOverflowLegacyButtonTapped), for: .touchUpInside)
+        }
+
+        bleOverflowMenuButton = button
+    }
+
+    /// Matches `BarButton` theme: purple on white top bar, white on colored top bar.
+    private func topBarActionTintColor() -> UIColor {
+        var currentBGColor: UIColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        if let color = AppConstants.shared.appThemeColor {
+            currentBGColor = color
+        } else if let bgColor = Constants.backgroundColor {
+            currentBGColor = UIColor(hexString: bgColor)
+        }
+        if currentBGColor == #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1) {
+            return UIColor(hexString: "#8265E3")
+        }
+        return .white
+    }
+
+    private func isBleMenuEligible(nodeId: String) -> Bool {
+        User.shared.bleLocalControl.isConnected(nodeId: nodeId)
+    }
+
+    private func nodeSupportsScheduleService(_ node: Node?) -> Bool {
+        guard let node = node else { return false }
+        if node.isSchedulingSupported { return true }
+        return node.services?.contains(where: { $0.type == Constants.scheduleServiceType }) == true
+    }
+
+    private func nodeSupportsSceneService(_ node: Node?) -> Bool {
+        guard let node = node else { return false }
+        if node.isSceneSupported { return true }
+        return node.services?.contains(where: { $0.type == Constants.sceneServiceType }) == true
+    }
+
+    private func paramSupportsScheduleOrScene(_ param: Param) -> Bool {
+        if param.canUseDeviceServices { return true }
+        return param.properties?.contains("write") == true
+            && param.type != Constants.deviceNameParam
+            && param.uiType != Constants.hidden
+    }
+
+    private func shouldOfferBleScheduleMenu() -> Bool {
+        guard let nodeId = device?.node?.node_id,
+              isBleMenuEligible(nodeId: nodeId),
+              nodeSupportsScheduleService(device?.node) else {
+            return false
+        }
+        return scheduleCapableDeviceCopy(from: device) != nil
+    }
+
+    private func shouldOfferBleSceneMenu() -> Bool {
+        guard let nodeId = device?.node?.node_id,
+              isBleMenuEligible(nodeId: nodeId),
+              nodeSupportsSceneService(device?.node) else {
+            return false
+        }
+        return sceneCapableDeviceCopy(from: device) != nil
+    }
+
+    private func ensureBleConnectedThen(_ action: @escaping () -> Void) {
+        guard let nodeId = device?.node?.node_id else { return }
+        if User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            action()
+            return
+        }
+        User.shared.bleLocalControl.connectDevice(nodeId: nodeId) { [weak self] success in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.checkOfflineStatus()
+                self.updateBleScheduleSceneOverflowMenu()
+                if success {
+                    action()
+                } else {
+                    Utility.showToastMessage(view: self.view, message: "BLE connection failed. Cannot open editor.")
+                }
+            }
+        }
+    }
+
+    @available(iOS 14.0, *)
+    private func menuAction(for action: BleOverflowMenuAction) -> UIAction {
+        switch action {
+        case .schedule:
+            return UIAction(title: "Add Schedule") { [weak self] _ in
+                self?.promptBleScheduleName()
+            }
+        case .scene:
+            return UIAction(title: "Add Scene") { [weak self] _ in
+                self?.promptBleSceneName()
+            }
+        }
+    }
+
+    @objc private func bleOverflowLegacyButtonTapped() {
+        let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        for action in bleOverflowLegacyActions {
+            switch action {
+            case .schedule:
+                sheet.addAction(UIAlertAction(title: "Add Schedule", style: .default) { [weak self] _ in
+                    self?.promptBleScheduleName()
+                })
+            case .scene:
+                sheet.addAction(UIAlertAction(title: "Add Scene", style: .default) { [weak self] _ in
+                    self?.promptBleSceneName()
+                })
+            }
+        }
+        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        presentActionSheet(sheet, from: bleOverflowMenuButton)
+    }
+
+    private func promptBleScheduleName() {
+        ensureBleConnectedThen { [weak self] in
+            self?.presentBleNamePrompt(
+                title: ESPScheduleConstants.addScheduleNameTitle,
+                message: ESPScheduleConstants.addScheduleNameMessage,
+                emptyNameError: ESPScheduleConstants.nameNotAddedErrorMessage
+            ) { [weak self] name in
+                self?.launchBleScheduleEditor(name: name)
+            }
+        }
+    }
+
+    private func promptBleSceneName() {
+        ensureBleConnectedThen { [weak self] in
+            self?.presentBleNamePrompt(
+                title: ESPSceneConstants.addSceneNameTitle,
+                message: ESPSceneConstants.addSceneNameMessage,
+                emptyNameError: ESPSceneConstants.nameNotAddedErrorMessage
+            ) { [weak self] name in
+                self?.launchBleSceneEditor(name: name)
+            }
+        }
+    }
+
+    private func presentBleNamePrompt(
+        title: String,
+        message: String,
+        emptyNameError: String,
+        onName: @escaping (String) -> Void
+    ) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .sentences
+            textField.clearButtonMode = .whileEditing
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak alert] _ in
+            let raw = alert?.textFields?.first?.text ?? ""
+            let name = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !name.isEmpty else {
+                Utility.showToastMessage(view: self.view, message: emptyNameError)
+                return
+            }
+            onName(String(name.prefix(32)))
+        })
+        present(alert, animated: true)
+    }
+
+    private func launchBleScheduleEditor(name: String) {
+        guard let sourceDevice = device,
+              let deviceCopy = scheduleCapableDeviceCopy(from: sourceDevice),
+              let nodeId = deviceCopy.node?.node_id,
+              let deviceKey = deviceCopy.name else {
+            return
+        }
+        guard let nav = navigationController else {
+            return
+        }
+
+        let key = [nodeId, deviceKey].joined(separator: ".")
+        ESPScheduler.shared.addSchedule()
+        ESPScheduler.shared.currentSchedule.name = name
+        ESPScheduler.shared.setAvailableDevicesForBleNode(nodeId: nodeId)
+        guard ESPScheduler.shared.availableDevices[key] != nil else {
+            return
+        }
+
+        let storyboard = UIStoryboard(name: "Schedule", bundle: nil)
+        guard let scheduleVC = storyboard.instantiateViewController(withIdentifier: "scheduleVC") as? ScheduleViewController else {
+            return
+        }
+        scheduleVC.isBleSingleDeviceFlow = true
+        scheduleVC.isNewSchedule = true
+        nav.pushViewController(scheduleVC, animated: true)
+    }
+
+    private func launchBleSceneEditor(name: String) {
+        guard let sourceDevice = device,
+              let deviceCopy = sceneCapableDeviceCopy(from: sourceDevice),
+              let nodeId = deviceCopy.node?.node_id,
+              let deviceKey = deviceCopy.name else {
+            return
+        }
+        guard let nav = navigationController else {
+            return
+        }
+
+        let key = [nodeId, deviceKey].joined(separator: ".")
+        let scene = ESPScene()
+        scene.name = name
+        ESPSceneManager.shared.currentScene = scene
+        ESPSceneManager.shared.setAvailableDevicesForBleNode(nodeId: nodeId)
+        guard ESPSceneManager.shared.availableDevices[key] != nil else {
+            return
+        }
+
+        let sceneVC = SceneViewController.getVC(isNewScene: true)
+        sceneVC.sceneName = name
+        sceneVC.isBleSingleDeviceFlow = true
+        nav.pushViewController(sceneVC, animated: true)
+    }
+
+    private func scheduleCapableDeviceCopy(from sourceDevice: Device?) -> Device? {
+        guard let sourceDevice = sourceDevice,
+              let node = sourceDevice.node,
+              nodeSupportsScheduleService(node) else {
+            return nil
+        }
+        let copyDevice = Device(device: sourceDevice)
+        copyDevice.params = []
+        if let params = sourceDevice.params {
+            for param in params where paramSupportsScheduleOrScene(param) {
+                copyDevice.params?.append(Param(param: param))
+            }
+        }
+        guard copyDevice.params?.isEmpty == false else { return nil }
+        return copyDevice
+    }
+
+    private func sceneCapableDeviceCopy(from sourceDevice: Device?) -> Device? {
+        guard let sourceDevice = sourceDevice,
+              let node = sourceDevice.node,
+              nodeSupportsSceneService(node) else {
+            return nil
+        }
+        let copyDevice = Device(device: sourceDevice)
+        copyDevice.params = []
+        if let params = sourceDevice.params {
+            for param in params where paramSupportsScheduleOrScene(param) {
+                copyDevice.params?.append(Param(param: param))
+            }
+        }
+        guard copyDevice.params?.isEmpty == false else { return nil }
+        return copyDevice
     }
 }
 

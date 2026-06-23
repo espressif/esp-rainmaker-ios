@@ -38,6 +38,8 @@ class ScheduleViewController: UIViewController {
     @IBOutlet weak var nameViewHeight: NSLayoutConstraint!
     
     var isNewSchedule = false
+    /// When true, only the launching BLE node is available (Android `KEY_IS_BLE_SINGLE_DEVICE`).
+    var isBleSingleDeviceFlow = false
 
     var isCollapsed = true
     var scheduleKey = ""
@@ -54,31 +56,41 @@ class ScheduleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        guard let schedule = ESPScheduler.shared.currentSchedule else {
+            return
+        }
+        
+        if !isBleSingleDeviceFlow {
+            isBleSingleDeviceFlow = ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: schedule)
+        }
         // Update list of available devices for schedule
-        if let nodeList = User.shared.associatedNodeList {
+        if !isBleSingleDeviceFlow, let nodeList = User.shared.associatedNodeList {
             ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
         }
         
         // Configure view for current schedule
         ESPScheduler.shared.configureDeviceForCurrentSchedule()
         
-        failedSchedule = getFailedSchedule(schedule: ESPScheduler.shared.currentSchedule)
+        failedSchedule = getFailedSchedule(schedule: schedule)
         
         //Get devices already selected for scheduling
         selectedNodeIDs = getSelectedNodeIDs()
 
         // Configure time of date picker based on the value of schedule minute field.
         datePicker.backgroundColor = UIColor.white
-        if ESPScheduler.shared.currentSchedule.id != nil {
-            scheduleNameLabel.text = ESPScheduler.shared.currentSchedule.name
+        if schedule.id != nil {
+            scheduleNameLabel.text = schedule.name
             setNameViewHeight(label: scheduleNameLabel)
-            let lastSelectedDateStr = ESPScheduler.shared.currentSchedule.trigger.getTimeDetails()
+            let lastSelectedDateStr = schedule.trigger.getTimeDetails()
             datePicker.setDate(from: lastSelectedDateStr, format: "h:mm a", animated: true)
             removeButton.isHidden = false
             removeButton.setTitle("Remove", for: .normal)
             removeButton.setImage(UIImage(named: "trash"), for: .normal)
         } else {
             isNewSchedule = true
+            scheduleNameLabel.text = schedule.name
+            setNameViewHeight(label: scheduleNameLabel)
+            removeButton.isHidden = true
         }
 
         actionListTextView.textContainer.heightTracksTextView = true
@@ -103,6 +115,9 @@ class ScheduleViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = true
+        if !isBleSingleDeviceFlow {
+            isBleSingleDeviceFlow = ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPScheduler.shared.currentSchedule)
+        }
         // Show list of actions added on a schedule.
         getDeSelectedNodeIDs()
         let actionList = ESPScheduler.shared.getActionList()
@@ -174,7 +189,7 @@ class ScheduleViewController: UIViewController {
 
         }))
         input.addAction(UIAlertAction(title: "Done", style: .default, handler: { [weak input] _ in
-            let textField = input?.textFields![0]
+            let textField = input?.textFields?.first
             textField?.keyboardType = .asciiCapable
             guard let name = textField?.text else {
                 return
@@ -211,11 +226,14 @@ class ScheduleViewController: UIViewController {
     @IBAction func onDaysButtonPressed(_: Any) {}
 
     @IBAction func dailyButtonTapped(_: Any) {
+        guard let schedule = ESPScheduler.shared.currentSchedule else {
+            return
+        }
         onDaysImageView.isHidden = true
         dailyImageView.isHidden = false
         daysLabel.text = "Never"
-        ESPScheduler.shared.currentSchedule.trigger.days = 0
-        ESPScheduler.shared.currentSchedule.week = ESPWeek(number: 0)
+        schedule.trigger.days = 0
+        schedule.week = ESPWeek(number: 0)
     }
 
     @IBAction func saveSchedule(_: Any) {
@@ -240,8 +258,12 @@ class ScheduleViewController: UIViewController {
     /// Calls delete action on deselected nodes and returns true if user has edited schedule without removing all actions
     /// - Parameter callEditAction: called with flag informing if schedule actions have been deleted
     private func deleteNodesForSchedule(_ callEditAction: @escaping (Bool) -> Void) {
+        guard let key = ESPScheduler.shared.currentScheduleKey else {
+            callEditAction(false)
+            return
+        }
         DispatchQueue.main.async { Utility.showLoader(message: "", view: self.view) }
-        ESPScheduler.shared.deleteScheduleNodes(key: ESPScheduler.shared.currentScheduleKey, onView: view, nodeIDs: deSelectedNodeIDs) { result  in
+        ESPScheduler.shared.deleteScheduleNodes(key: key, onView: view, nodeIDs: deSelectedNodeIDs) { result  in
             //If user has deselected all devices, then set update device list to true and pop to schedule list screen. Else call edit schedule.
             var schedulesDeleted: Bool = false
             switch result {
@@ -257,7 +279,7 @@ class ScheduleViewController: UIViewController {
                     if schedulesDeleted {
                         User.shared.updateDeviceList = true
                         self.delegate?.serviceUpdated()
-                        self.navigationController?.popToRootViewController(animated: false)
+                        self.completeServiceEditorFlow()
                     }
                 } else {
                     callEditAction(schedulesDeleted)
@@ -272,19 +294,23 @@ class ScheduleViewController: UIViewController {
         DispatchQueue.main.async {
             Utility.showLoader(message: "", view: self.view)
         }
+        guard let schedule = ESPScheduler.shared.currentSchedule else {
+            DispatchQueue.main.async { Utility.hideLoader(view: self.view) }
+            return
+        }
         // If no id is present that means new schedule is added.
-        if ESPScheduler.shared.currentSchedule != nil, ESPScheduler.shared.currentSchedule.id == nil {
+        if schedule.id == nil {
             // Generate a unique 4 length id for the new schedule.
-            ESPScheduler.shared.currentSchedule.id = NanoID.new(4)
-            ESPScheduler.shared.currentSchedule.operation = .add
+            schedule.id = NanoID.new(4)
+            schedule.operation = .add
         } else {
             // Schedule already present so will run edit operation on it.
-            ESPScheduler.shared.currentSchedule.operation = .edit
+            schedule.operation = .edit
         }
 
         // Give value for the schedule parameters based on the user selection.
-        ESPScheduler.shared.currentSchedule.name = scheduleName
-        ESPScheduler.shared.currentSchedule.trigger = self.getTrigger()
+        schedule.name = scheduleName
+        schedule.trigger = self.getTrigger()
         
         // Call save operation.
         ESPScheduler.shared.saveSchedule(onView: view) { result  in
@@ -295,11 +321,11 @@ class ScheduleViewController: UIViewController {
                     // Result is success. Navigate back to schedule list and refetch the list.
                     // To check if schedule is successfully added.
                     User.shared.updateDeviceList = true
-                    self.formatCurrentScheduleKey()
-                    if !ESPScheduler.shared.currentSchedule.enabled {
+                    ESPScheduler.shared.persistCurrentScheduleInList()
+                    if !schedule.enabled {
                         Utility.showLoader(message: "", view: self.view)
-                        ESPScheduler.shared.currentSchedule.enabled = true
-                        ESPScheduler.shared.currentSchedule.operation = .edit
+                        schedule.enabled = true
+                        schedule.operation = .edit
                         ESPScheduler.shared.shouldEnableSchedule(onView: self.view, completionHandler: { result in
                             DispatchQueue.main.asyncAfter(deadline: .now()+1.0, execute: {
                                 Utility.hideLoader(view: self.view)
@@ -313,14 +339,14 @@ class ScheduleViewController: UIViewController {
                                         } else {
                                             self.delegate?.serviceUpdated()
                                         }
-                                        self.navigationController?.popToRootViewController(animated: false)
+                                        self.completeServiceEditorFlow()
                                         return
                                     }
                                     break
                                 case .failure:
                                     Utility.showToastMessage(view: self.view, message: "Failed to schedule devices. Please check your connection!!")
                                 }
-                                self.navigationController?.popToRootViewController(animated: false)
+                                self.completeServiceEditorFlow()
                             })
                         })
                     } else {
@@ -333,13 +359,13 @@ class ScheduleViewController: UIViewController {
                                 self.delegate?.serviceUpdated()
                             }
                         }
-                        self.navigationController?.popToRootViewController(animated: false)
+                        self.completeServiceEditorFlow()
                     }
                 case .failure:
                     if let failed = self.failedSchedule {
                         if let key = ESPScheduler.shared.currentScheduleKey, let _ = ESPScheduler.shared.schedules[key] {
-                            ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey] = failed
-                            ESPScheduler.shared.schedules[ESPScheduler.shared.currentScheduleKey]?.actions = ESPScheduler.shared.currentSchedule.actions
+                            ESPScheduler.shared.schedules[key] = failed
+                            ESPScheduler.shared.schedules[key]?.actions = schedule.actions
                         }
                     }
                     Utility.showToastMessage(view: self.view, message: ESPScheduleConstants.scheduleUpdationFailureMessage)
@@ -357,7 +383,7 @@ class ScheduleViewController: UIViewController {
                             self.delegate?.serviceUpdated()
                         }
                         User.shared.updateDeviceList = true
-                        self.navigationController?.popToRootViewController(animated: false)
+                        self.completeServiceEditorFlow()
                     }
                 }
             }
@@ -377,34 +403,37 @@ class ScheduleViewController: UIViewController {
     }
     
     private func formatCurrentScheduleKey() {
-        let trigger = ESPScheduler.shared.currentSchedule.trigger
-        ESPScheduler.shared.currentScheduleKey = "\(ESPScheduler.shared.currentSchedule.id!).\(ESPScheduler.shared.currentSchedule.name!).\(trigger.days!).\(trigger.minutes!).\(ESPScheduler.shared.currentSchedule.enabled)"
+        guard let schedule = ESPScheduler.shared.currentSchedule,
+              let id = schedule.id,
+              let name = schedule.name else {
+            return
+        }
+        let trigger = schedule.trigger
+        ESPScheduler.shared.currentScheduleKey = "\(id).\(name).\(trigger.days ?? 0).\(trigger.minutes ?? 0).\(schedule.enabled)"
     }
     
     /// Get trigger object for schedule
     /// - Returns: trigger value for current schedule
     private func getTrigger() -> ESPTrigger {
         let trigger = ESPTrigger()
-        trigger.days = ESPScheduler.shared.currentSchedule.week.getDecimalConversionOfSelectedDays()
+        trigger.days = ESPScheduler.shared.currentSchedule?.week.getDecimalConversionOfSelectedDays() ?? 0
         let date = datePicker.date
         let components = Calendar.current.dateComponents([.hour, .minute], from: date)
-        let hour = components.hour!
-        let minute = components.minute!
+        let hour = components.hour ?? 0
+        let minute = components.minute ?? 0
         trigger.minutes = hour * 60 + minute
         return trigger
     }
 
     @IBAction func selectDevicesPressed(_: Any) {
-        let selectDeviceVC = storyboard?.instantiateViewController(withIdentifier: "selecDevicesVC") as! SelectDevicesViewController
-        var availableDeviceCopy: [Device] = []
-        // Re-order list of devices such that devices whose params are selected be on top.
-        for device in ESPScheduler.shared.availableDevices.values {
-            if device.selectedParams > 0 {
-                availableDeviceCopy.insert(device, at: 0)
-            } else {
-                availableDeviceCopy.append(device)
-            }
+        if !isBleSingleDeviceFlow {
+            isBleSingleDeviceFlow = ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPScheduler.shared.currentSchedule)
         }
+        BleDeviceServiceFlow.prepareForActionPicker(ESPScheduler.shared.availableDevices, kind: .schedule)
+        guard let selectDeviceVC = storyboard?.instantiateViewController(withIdentifier: "selecDevicesVC") as? SelectDevicesViewController else {
+            return
+        }
+        var availableDeviceCopy = BleDeviceServiceFlow.orderedDevicesForActionPicker(from: ESPScheduler.shared.availableDevices)
         availableDeviceCopy = configureDeviceScheduleActions(availableDeviceCopy)
         selectDeviceVC.availableDeviceCopy = sortDevices(availableDevices: availableDeviceCopy)
         navigationController?.pushViewController(selectDeviceVC, animated: true)
@@ -437,6 +466,15 @@ class ScheduleViewController: UIViewController {
     }
     
     // MARK: - Private Methods
+
+    /// Android `finish()` parity: BLE flow returns to device params; tab flow returns to schedule list.
+    private func completeServiceEditorFlow() {
+        if isBleSingleDeviceFlow {
+            navigationController?.popViewController(animated: true)
+        } else {
+            navigationController?.popToRootViewController(animated: false)
+        }
+    }
     
     /// Set height for the schedule name label
     /// - Parameter label: schedule name label
@@ -509,20 +547,25 @@ class ScheduleViewController: UIViewController {
     private func addHeightConstraint(textField: UITextField) {
         let heightConstraint = NSLayoutConstraint(item: textField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)
         textField.addConstraint(heightConstraint)
-        textField.font = UIFont(name: textField.font!.fontName, size: 18)
+        if let fontName = textField.font?.fontName {
+            textField.font = UIFont(name: fontName, size: 18)
+        }
     }
 
     // MARK: -
 
     func setRepeatStatus() {
-        if ESPScheduler.shared.currentSchedule.trigger.days == 0 {
+        guard let schedule = ESPScheduler.shared.currentSchedule else {
+            return
+        }
+        if schedule.trigger.days == 0 {
             onDaysImageView.isHidden = true
             dailyImageView.isHidden = false
             daysLabel.text = "Never"
         } else {
             onDaysImageView.isHidden = false
             dailyImageView.isHidden = true
-            daysLabel.text = ESPScheduler.shared.currentSchedule.week.getShortDescription()
+            daysLabel.text = schedule.week.getShortDescription()
         }
     }
 }

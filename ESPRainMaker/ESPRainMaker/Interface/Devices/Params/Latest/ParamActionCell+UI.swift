@@ -97,8 +97,8 @@ extension ParamActionCell {
     
     private func isDeviceOnlineForWrite() -> Bool {
         guard let properties = param?.properties, properties.contains("write"),
-              let device = device, device.node?.isConnected == true else { return false }
-        return true
+              let device = device, let node = device.node else { return false }
+        return node.isParamReachable()
     }
     
     private func setInteractionEnabled(_ enabled: Bool) {

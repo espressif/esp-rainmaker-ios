@@ -32,6 +32,8 @@ class Node: Codable {
     var timestamp: Int = 0
     var isSchedulingSupported = false
     var localNetwork = false
+    var bleLocalNetwork = false
+    var bleLocalControlConnected = false
     var supportsEncryption = false
     var pop = ""
     var localControlUsername = ""
@@ -65,6 +67,9 @@ class Node: Codable {
         case services
         case maxSchedulesCount
         case currentSchedulesCount
+        case isSceneSupported
+        case maxScenesCount
+        case currentScenesCount
         case supportsEncryption
         case pop
         case localControlUsername
@@ -97,6 +102,9 @@ class Node: Codable {
         }
         try container.encode(maxSchedulesCount, forKey: .maxSchedulesCount)
         try container.encode(currentSchedulesCount, forKey: .currentSchedulesCount)
+        try container.encode(isSceneSupported, forKey: .isSceneSupported)
+        try container.encode(maxScenesCount, forKey: .maxScenesCount)
+        try container.encode(currentScenesCount, forKey: .currentScenesCount)
         try container.encode(supportsEncryption, forKey: .supportsEncryption)
         try container.encode(pop, forKey: .pop)
         try container.encode(localControlUsername, forKey: .localControlUsername)
@@ -175,6 +183,15 @@ class Node: Codable {
         if let currentSchedulesCount = try? container.decode(Int.self, forKey: .currentSchedulesCount) {
             self.currentSchedulesCount = currentSchedulesCount
         }
+        if let isSceneSupported = try? container.decode(Bool.self, forKey: .isSceneSupported) {
+            self.isSceneSupported = isSceneSupported
+        }
+        if let maxScenesCount = try? container.decode(Int.self, forKey: .maxScenesCount) {
+            self.maxScenesCount = maxScenesCount
+        }
+        if let currentScenesCount = try? container.decode(Int.self, forKey: .currentScenesCount) {
+            self.currentScenesCount = currentScenesCount
+        }
         if let supportsEncryption = try? container.decode(Bool.self, forKey: .supportsEncryption) {
             self.supportsEncryption = supportsEncryption
         }
@@ -208,6 +225,9 @@ class Node: Codable {
                 }
                return "Reachable on WLAN"
             }
+            if bleLocalNetwork {
+                return "Reachable on BLE"
+            }
             return status
         }
         if localNetwork {
@@ -215,6 +235,8 @@ class Node: Codable {
                 return "🔒 Reachable on WLAN"
             }
             status = "Reachable on WLAN"
+        } else if bleLocalNetwork {
+            status = "Reachable on BLE"
         } else {
             if isConnected {
                 return status

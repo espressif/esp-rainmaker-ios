@@ -84,7 +84,7 @@ class ESPLocalDevice : ESPDevice {
         }
 
         espSoftApTransport.SendConfigData(path: path, data: encryptedData) { response, error in
-            if error != nil, response == nil {
+            if let error = error, response == nil {
                 if retryOnce {
                     DispatchQueue.main.async {
                         self.initialiseLocalControlSession { status in
@@ -92,19 +92,49 @@ class ESPLocalDevice : ESPDevice {
                             case .connected:
                                 self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
                             default:
-                                completionHandler(nil, .sendDataError(error!))
+                                completionHandler(nil, .sendDataError(error))
                             }
                         }
                     }
                 } else {
-                    completionHandler(nil, .sendDataError(error!))
+                    completionHandler(nil, .sendDataError(error))
                 }
-            } else {
-                if let responseData = self.securityLayer.decrypt(data: response!) {
-                    completionHandler(responseData, nil)
+                return
+            }
+
+            guard let response = response else {
+                if retryOnce {
+                    DispatchQueue.main.async {
+                        self.initialiseLocalControlSession { status in
+                            switch status {
+                            case .connected:
+                                self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
+                            default:
+                                completionHandler(nil, .encryptionError)
+                            }
+                        }
+                    }
                 } else {
                     completionHandler(nil, .encryptionError)
                 }
+                return
+            }
+
+            if let responseData = self.securityLayer.decrypt(data: response) {
+                completionHandler(responseData, nil)
+            } else if retryOnce {
+                DispatchQueue.main.async {
+                    self.initialiseLocalControlSession { status in
+                        switch status {
+                        case .connected:
+                            self.sendDataPrivate(path: path, data: data, retryOnce: false, completionHandler: completionHandler)
+                        default:
+                            completionHandler(nil, .encryptionError)
+                        }
+                    }
+                }
+            } else {
+                completionHandler(nil, .encryptionError)
             }
         }
     }

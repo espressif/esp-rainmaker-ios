@@ -22,6 +22,7 @@ class ESPScanConstants {
     
     static let rmakerExtra = "rmaker_extra"
     static let challengeResponse = "ch_resp"
+    static let localCtrl = "local_ctrl"
     
     static let capabilities = "cap"
     static let rmaker = "rmaker"

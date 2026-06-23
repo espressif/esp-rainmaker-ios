@@ -85,3 +85,35 @@ class Utility {
         }
     }
 }
+
+extension UIAlertController {
+
+    /// Configures popover anchor for `.actionSheet` on iPad. Required — omitting this crashes on iPad.
+    func configurePopoverForActionSheet(from sourceView: UIView?, in containerView: UIView) {
+        guard preferredStyle == .actionSheet, let popover = popoverPresentationController else { return }
+        if let source = sourceView {
+            source.layoutIfNeeded()
+            popover.sourceView = source
+            popover.sourceRect = source.bounds
+            popover.permittedArrowDirections = [.up, .down]
+        } else {
+            popover.sourceView = containerView
+            popover.sourceRect = CGRect(
+                x: containerView.bounds.midX,
+                y: containerView.bounds.midY,
+                width: 0,
+                height: 0
+            )
+            popover.permittedArrowDirections = []
+        }
+    }
+}
+
+extension UIViewController {
+
+    /// Presents an action sheet with iPad-safe popover anchoring.
+    func presentActionSheet(_ alert: UIAlertController, from sourceView: UIView?) {
+        alert.configurePopoverForActionSheet(from: sourceView, in: view)
+        present(alert, animated: true)
+    }
+}

@@ -718,4 +718,54 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
             }
         }
     }
+
+    // MARK: - BLE local control proxy APIs
+
+    func reportProxyConfig(nodeId: String, body: [String: Any], completionHandler: @escaping (Bool) -> Void) {
+        reportProxyPayload(url: Constants.proxyConfigURL(nodeId: nodeId), body: body, completionHandler: completionHandler)
+    }
+
+    func reportProxyInitParams(nodeId: String, body: [String: Any], completionHandler: @escaping (Bool) -> Void) {
+        reportProxyPayload(url: Constants.proxyInitParamsURL(nodeId: nodeId), body: body, completionHandler: completionHandler)
+    }
+
+    func reportProxyParams(nodeId: String, body: [String: Any], completionHandler: @escaping (Bool) -> Void) {
+        reportProxyPayload(url: Constants.proxyParamsURL(nodeId: nodeId), body: body, completionHandler: completionHandler)
+    }
+
+    func updateNodeMetadata(nodeId: String, metadata: [String: Any], completionHandler: @escaping (Bool) -> Void) {
+        ESPExtendUserSessionWorker().checkUserSession { accessToken, _ in
+            guard let token = accessToken else {
+                completionHandler(false)
+                return
+            }
+            let url = Constants.updateNodeMetadataURL(nodeId: nodeId)
+            let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
+            let body = ["metadata": metadata]
+            self.session.request(url, method: .put, parameters: body, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                if let statusCode = response.response?.statusCode, (200 ... 299).contains(statusCode) {
+                    completionHandler(true)
+                } else {
+                    completionHandler(false)
+                }
+            }
+        }
+    }
+
+    private func reportProxyPayload(url: String, body: [String: Any], completionHandler: @escaping (Bool) -> Void) {
+        ESPExtendUserSessionWorker().checkUserSession { accessToken, _ in
+            guard let token = accessToken else {
+                completionHandler(false)
+                return
+            }
+            let headers: HTTPHeaders = [Constants.contentType: Constants.applicationJSON, Constants.authorization: token]
+            self.session.request(url, method: .post, parameters: body, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+                if let statusCode = response.response?.statusCode, (200 ... 299).contains(statusCode) {
+                    completionHandler(true)
+                } else {
+                    completionHandler(false)
+                }
+            }
+        }
+    }
 }

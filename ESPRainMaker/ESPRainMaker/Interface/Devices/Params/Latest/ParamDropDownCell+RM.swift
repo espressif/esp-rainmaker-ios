@@ -45,8 +45,7 @@ extension ParamDropDownCell {
         // CRITICAL: Check if device is offline before sending update
         // For Rainmaker devices, check node connection
         if let node = device.node {
-            let isConnected = node.isConnected || node.localNetwork
-            if !isConnected {
+            if !node.isParamReachable() {
                 // Revert dropdown selection since update failed
                 controlValueLabel.text = currentValue
                 return

@@ -193,6 +193,7 @@ class DevicesViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(matterDeviceConnectivityUpdate), name: Notification.Name(Constants.matterDeviceConnectivityUpdate), object: nil)
         #endif
         tabBarController?.tabBar.isHidden = false
+        User.shared.bleLocalControl.resumeDiscovery()
         
         // Defer initial refresh to avoid conflict with upcoming API refresh after node deletion
         if User.shared.updateDeviceList {
@@ -770,8 +771,16 @@ class DevicesViewController: UIViewController {
         NetworkManager.shared.getNodes { nodes, error in
             DispatchQueue.main.async {
                 self.loadingIndicator.isHidden = true
-                User.shared.associatedNodeList = nil
                 if error != nil {
+                    // Don't wipe the node list on a failed (e.g. offline) refresh — BLE-only nodes
+                    // don't need the cloud to be reachable. Fall back to disk if we have nothing,
+                    // then rescan so BLE reachability still updates on a pull-to-refresh while offline.
+                    if User.shared.associatedNodeList == nil || User.shared.associatedNodeList?.isEmpty == true {
+                        User.shared.associatedNodeList = self.localStorageHandler.fetchNodeDetails()
+                    }
+                    if Configuration.shared.appConfiguration.supportLocalControl {
+                        User.shared.bleLocalControl.scanForDevices()
+                    }
                     self.searchForDevicesOnWLAN()
                     self.unhideInitialView(error: error)
                     self.collectionView.isUserInteractionEnabled = true
@@ -779,6 +788,9 @@ class DevicesViewController: UIViewController {
                     return
                 }
                 User.shared.associatedNodeList = nodes
+                if Configuration.shared.appConfiguration.supportLocalControl {
+                    User.shared.bleLocalControl.scanForDevices()
+                }
                 // Mark that node list has changed for appropriate UI updates
                 self.dataChangeFlags.insert(.nodeList)
                 completion()
@@ -934,15 +946,7 @@ class DevicesViewController: UIViewController {
                 actionSheet.addAction(softapAction)
                 actionSheet.addAction(onNetworkAction)
                 actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                
-                // Configure for iPad
-                if let popover = actionSheet.popoverPresentationController {
-                    popover.sourceView = self.view
-                    popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-                    popover.permittedArrowDirections = []
-                }
-                
-                present(actionSheet, animated: true, completion: nil)
+                presentActionSheet(actionSheet, from: addButton)
             }
         }
     }
@@ -1115,7 +1119,12 @@ class DevicesViewController: UIViewController {
     }
 
     private func unhideInitialView(error: ESPNetworkError?) {
-        User.shared.associatedNodeList = localStorageHandler.fetchNodeDetails()
+        // Only fall back to disk when we have nothing in memory. Reloading unconditionally here
+        // can drop nodes that exist in memory but were never persisted (e.g. a BLE-only node just
+        // added via registerProvisionedDevice this session), silently removing them from the list.
+        if User.shared.associatedNodeList == nil || User.shared.associatedNodeList?.isEmpty == true {
+            User.shared.associatedNodeList = localStorageHandler.fetchNodeDetails()
+        }
         if User.shared.associatedNodeList?.count == 0 || User.shared.associatedNodeList == nil {
             infoLabel.text = "No devices to show\n" + (error?.description ?? "Something went wrong!!")
             emptyListIcon.image = nil

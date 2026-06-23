@@ -217,7 +217,7 @@ extension ParamSliderCell {
             }
             
             if let device = device {
-                let isConnected = device.node?.isConnected == true || device.node?.localNetwork == true
+                let isConnected = device.isReachable()
                 
                 slider.isEnabled = isConnected
                 slider.isUserInteractionEnabled = isConnected

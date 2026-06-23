@@ -78,7 +78,7 @@ class SceneListViewController: UIViewController {
             Utility.showLoader(message: "", view: view)
             refreshSceneList(self)
         } else {
-            showScenesList()
+            overlayBleFirmwareAndShowList()
         }
         checkNetworkUpdate()
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
@@ -97,22 +97,11 @@ class SceneListViewController: UIViewController {
     //MARK: IBActions
     @IBAction func refreshSceneList(_ sender: Any) {
         refreshControl.endRefreshing()
-        NetworkManager.shared.getNodes { nodes, error in
+        NetworkManager.shared.refreshAssociatedNodesThenOverlayBleFirmware {
             Utility.hideLoader(view: self.view)
-            if error != nil {
-                DispatchQueue.main.async {
-                    Utility.showToastMessage(view: self.view, message: "Network error: \(error?.description ?? "Something went wrong!!")")
-                }
-            } else {
-                User.shared.associatedNodeList = nodes
-                DispatchQueue.main.async {
-                    // Make sure to update available devices when nodes are refreshed
-                    if let nodeList = nodes {
-                        ESPSceneManager.shared.getAvailableDeviceWithSceneCapability(nodeList: nodeList)
-                    }
-                    self.showScenesList()
-                    self.refreshControl.endRefreshing()
-                }
+            DispatchQueue.main.async {
+                self.showScenesList()
+                self.refreshControl.endRefreshing()
             }
         }
     }
@@ -133,6 +122,16 @@ class SceneListViewController: UIViewController {
     }
     
     //MARK: Private methods
+
+    private func overlayBleFirmwareAndShowList() {
+        NetworkManager.shared.overlayBleOnlyFirmwareServiceParams {
+            Utility.hideLoader(view: self.view)
+            DispatchQueue.main.async {
+                self.showScenesList()
+                self.refreshControl.endRefreshing()
+            }
+        }
+    }
     
     private func setupTable() {
         tableView.tableFooterView = UIView()
@@ -220,9 +219,8 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
             return 20.0
         }
         var text = ""
-        if indexPath.row/2 < scenesList.count {
-            let id = scenesList[indexPath.row/2]
-            let scene = ESPSceneManager.shared.scenes[id]!
+        if indexPath.row/2 < scenesList.count,
+           let scene = ESPSceneManager.shared.scenes[scenesList[indexPath.row/2]] {
             if let info = scene.info {
                 text = info.replacingOccurrences(of: "\n", with: " ")
             } else {
@@ -240,10 +238,15 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
             return
         }
         tableView.deselectRow(at: indexPath, animated: false)
+        let index = indexPath.row / 2
+        guard index < scenesList.count,
+              let scene = ESPSceneManager.shared.scenes[scenesList[index]] else {
+            return
+        }
         let sceneVC = SceneViewController.getVC(isNewScene: false)
-        ESPSceneManager.shared.currentScene = ESPSceneManager.shared.scenes[scenesList[indexPath.row/2]]!
-        sceneVC.sceneKey = scenesList[indexPath.row/2]
-        ESPSceneManager.shared.currentSceneKey = scenesList[indexPath.row/2]
+        ESPSceneManager.shared.currentScene = scene
+        sceneVC.sceneKey = scenesList[index]
+        ESPSceneManager.shared.currentSceneKey = scenesList[index]
         sceneVC.delegate = self
         navigationController?.pushViewController(sceneVC, animated: true)
     }
@@ -271,9 +274,9 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
             return cell
         }
         if let cell = tableView.dequeueReusableCell(withIdentifier: SceneListCell.reuseIdentifier, for: indexPath) as? SceneListCell {
-            if indexPath.row/2 < scenesList.count {
+            if indexPath.row/2 < scenesList.count,
+               let scene = ESPSceneManager.shared.scenes[scenesList[indexPath.row/2]] {
                 let id = scenesList[indexPath.row/2]
-                let scene = ESPSceneManager.shared.scenes[id]!
                 ESPSceneManager.shared.currentScene = scene
                 ESPSceneManager.shared.configureDeviceForCurrentScene()
                 cell.scene = ESPSceneManager.shared.currentScene

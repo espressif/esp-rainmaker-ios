@@ -51,6 +51,23 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
         currentScene = nil
     }
 
+    /// Drop a node's actions so firmware ingest can replace stale cloud copies.
+    func removeActions(forNodeId nodeId: String) {
+        var emptyKeys: [String] = []
+        for (key, scene) in scenes {
+            scene.actions.removeValue(forKey: nodeId)
+            if scene.actions.isEmpty {
+                emptyKeys.append(key)
+            }
+        }
+        for key in emptyKeys {
+            scenes.removeValue(forKey: key)
+            if currentSceneKey == key {
+                currentSceneKey = nil
+            }
+        }
+    }
+
     /// Creates list of scenes from the scene JSON of a particular node.
     ///
     /// - Parameters:
@@ -104,8 +121,40 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - nodeList: List of nodes. Each node contains devices and information of their services
+    /// When editing a scene tied to a BLE-only node, scope devices to that node only (Android parity).
+    @discardableResult
+    func detectAndConfigureBleSingleDeviceFlow(from scene: ESPScene?) -> Bool {
+        guard let scene = scene else { return false }
+        return BleDeviceServiceFlow.detectSingleNodeScope(nodeIds: Array(scene.actions.keys)) { nodeId in
+            setAvailableDevicesForBleNode(nodeId: nodeId)
+        }
+    }
+
+    func setAvailableDevicesForBleNode(nodeId: String) {
+        BleDeviceServiceFlow.populateAvailableDevices(nodeId: nodeId, kind: .scene, into: &availableDevices)
+    }
+
+    private func ingestScenesFromNode(_ node: Node) {
+        guard node.isSceneSupported,
+              let nodeId = node.node_id,
+              let sceneJSONList = node.serviceEntries(for: .scene) else {
+            return
+        }
+        for sceneJSON in sceneJSONList {
+            saveScenesFromJSON(nodeID: nodeId, sceneJSON: sceneJSON)
+        }
+    }
+
     func getAvailableDeviceWithSceneCapability(nodeList: [Node]) {
+        // Rebuild from scratch each time — otherwise a BLE-only node added via the single-device
+        // flow (setAvailableDevicesForBleNode) would linger here forever, since the loop below only
+        // skips *adding* excluded nodes, it never removes a stale entry left by a previous call.
+        availableDevices.removeAll()
         for node in nodeList {
+            ingestScenesFromNode(node)
+            if BleDeviceServiceFlow.excludesFromMultiDevicePicker(node) {
+                continue
+            }
             if node.isSceneSupported {
                 if let devices = node.devices {
                     for device in devices {
@@ -121,15 +170,6 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
                         if copyDevice.params?.count ?? 0 > 0 {
                             let key = [copyDevice.node?.node_id, copyDevice.name].compactMap { $0 }.joined(separator: ".")
                             ESPSceneManager.shared.availableDevices[key] = copyDevice
-                            
-                            // Parse and save any existing scenes from the node's scene service
-                            if let sceneService = node.services?.first(where: { $0.type == Constants.sceneServiceType }),
-                               let sceneParam = sceneService.params?.first(where: { $0.type == Constants.sceneParamType }),
-                               let scenes = sceneParam.value as? [[String: Any]] {
-                                for scene in scenes {
-                                    saveScenesFromJSON(nodeID: node.node_id ?? "", sceneJSON: scene)
-                                }
-                            }
                         }
                     }
                 }
@@ -157,7 +197,41 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
             }
         }
     }
-    
+
+    /// Remove a deleted scene from in-memory list and node scene params (BLE local control parity).
+    func removeSceneFromList(key: String) {
+        guard let scene = scenes[key], let sceneId = scene.id else {
+            scenes.removeValue(forKey: key)
+            if currentSceneKey == key {
+                currentSceneKey = nil
+            }
+            return
+        }
+        for nodeId in scene.actions.keys {
+            guard let node = User.shared.getNode(id: nodeId) else { continue }
+            node.removeServiceEntry(id: sceneId, kind: .scene)
+        }
+        scenes.removeValue(forKey: key)
+        if currentSceneKey == key {
+            currentSceneKey = nil
+        }
+    }
+
+    /// Remove node associations for a scene; drop the scene when no nodes remain.
+    func removeSceneNodesFromList(key: String, nodeIDs: [String]) {
+        guard let scene = scenes[key], let sceneId = scene.id else { return }
+        for nodeId in nodeIDs {
+            scene.actions.removeValue(forKey: nodeId)
+            User.shared.getNode(id: nodeId)?.removeServiceEntry(id: sceneId, kind: .scene)
+        }
+        if scene.actions.isEmpty {
+            scenes.removeValue(forKey: key)
+            if currentSceneKey == key {
+                currentSceneKey = nil
+            }
+        }
+    }
+
     /// Gives list of devices under a scene.
     ///
     /// - Returns: Comma separated string of devices that are part of a scene
@@ -173,13 +247,13 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is received
     func saveScene(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+        let actions = createActionsFromDeviceList()
+        if canReachNodesForServiceAction(nodeIds: Array(actions.keys)) {
             var jsonString: [String: Any] = [:]
             jsonString["name"] = currentScene.name
             jsonString["id"] = currentScene.id
             jsonString["info"] = currentScene.info ?? ""
             jsonString["operation"] = currentScene.operation?.rawValue ?? "add"
-            let actions = createActionsFromDeviceList()
             var message = ESPSceneConstants.sceneUpdationPartialFailureMessage
             if let op = currentScene.operation, op == .add {
                 message = ESPSceneConstants.sceneCreationPartialFailureMessage
@@ -204,13 +278,16 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///   - nodeIDs: List of node IDs to be deleted
     ///   - completionHandler: Callback invoked after api response is received
     func deleteSceneNodes(key: String, onView: UIView, nodeIDs: [String], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+        if canReachNodesForServiceAction(nodeIds: nodeIDs) {
             if let scene = scenes[key] {
                 var jsonString: [String: Any] = [:]
                 jsonString["name"] = scene.name
                 jsonString["id"] = scene.id
                 jsonString["operation"] = "remove"
                 self.invokeServiceAction(apiManager: apiManager, keys: nodeIDs, jsonString: jsonString, text: ESPSceneConstants.sceneDeletionPartialFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: self.currentScene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
+                    if case .success(let nodesFailed) = result, !nodesFailed {
+                        self.removeSceneNodesFromList(key: key, nodeIDs: nodeIDs)
+                    }
                     completionHandler(result)
                 }
             } else {
@@ -228,13 +305,16 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///   - onView: UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is received
     func deleteSceneAt(key: String, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            currentScene = scenes[key]!
-            configureDeviceForCurrentScene()
+        currentScene = scenes[key]!
+        configureDeviceForCurrentScene()
+        if canReachNodesForServiceAction(nodeIds: [String](currentScene.actions.keys)) {
             var jsonString: [String: Any] = [:]
             jsonString["id"] = currentScene.id
             jsonString["operation"] = "remove"
             self.invokeServiceAction(apiManager: apiManager, keys: [String](currentScene.actions.keys), jsonString: jsonString, text: ESPSceneConstants.sceneDeletionPartialFailureMessage, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: self.currentScene.actions, availableDevices: availableDevices, serviceType: .scene, isSave: false, onView: onView) { result  in
+                if case .success(let nodesFailed) = result, !nodesFailed {
+                    self.removeSceneFromList(key: key)
+                }
                 completionHandler(result)
             }
         } else {
@@ -249,7 +329,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///   - onView: UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is received
     func activateScene(scene: ESPScene, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+        if canReachNodesForServiceAction(nodeIds: [String](scene.actions.keys)) {
             var jsonString: [String: Any] = [:]
             jsonString["id"] = scene.id
             jsonString["operation"] = "activate"

@@ -53,6 +53,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
 
         // Scan for bluetooth devices
+        User.shared.bleLocalControl.pauseDiscovery()
 
         // UI customization
         prefixlabel.layer.masksToBounds = true
@@ -158,6 +159,22 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
             //Check the "prov"/"cap" to see if wifi/thread is supported.
             //If Thread is supported navigate to thread network selection screen.
             //Else navigate user to wifi provisioning screen.
+            let provisioningPop = self.pop.isEmpty ? (User.shared.bleLocalControl.sessionPop ?? "") : self.pop
+            if ESPBleLocalCtrlProvisioningHelper.offerSkipWifiFlowIfSupported(
+                from: self,
+                device: device,
+                pop: provisioningPop,
+                onContinueWifi: { [weak self] in
+                    self?.routeToWifiOrThread(device: device, versionInfo: versionInfo)
+                }
+            ) {
+                return
+            }
+            routeToWifiOrThread(device: device, versionInfo: versionInfo)
+        }
+    }
+
+    private func routeToWifiOrThread(device: ESPDevice, versionInfo: NSDictionary) {
             let threadCapabilities = versionInfo.checkThreadCapabilities()
             if threadCapabilities.canProvisionOverThread {
                 if #available(iOS 15.0, *) {
@@ -185,7 +202,6 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
                     self.goToJoinNetworkVC(device: device)
                 }
             }
-        }
     }
     
     /// Navigate user to provisioning screen
@@ -207,6 +223,7 @@ class BLELandingViewController: UIViewController, UITableViewDelegate, UITableVi
     func goToClaimVC(device: ESPDevice, isCameraDevice: Bool = false) {
         let claimVC = storyboard?.instantiateViewController(withIdentifier: "claimVC") as! ClaimViewController
         claimVC.device = device
+        claimVC.pop = pop
         claimVC.isCameraDevice = isCameraDevice
         navigationController?.pushViewController(claimVC, animated: true)
     }

@@ -53,6 +53,10 @@ class User {
     lazy var localControl: ESPLocalControl = {
         ESPLocalControl()
     }()
+
+    lazy var bleLocalControl: ESPBleLocalControl = {
+        ESPBleLocalControl()
+    }()
     
     lazy var matterConnectionManager: ESPMatterConnectionManager = {
         ESPMatterConnectionManager()
@@ -189,6 +193,15 @@ class User {
         DispatchQueue.main.async {
             self.localControl.delegate = self
             self.localControl.searchForServicesOfType(type: Constants.serviceType, domain: Constants.serviceDomain)
+            self.bleLocalControl.delegate = self
+            self.bleLocalControl.scanForDevices()
+        }
+    }
+
+    /// Stop BLE local control scan and disconnect all BLE sessions.
+    func stopBleLocalControl() {
+        DispatchQueue.main.async {
+            self.bleLocalControl.disconnectAll()
         }
     }
     
@@ -355,8 +368,15 @@ extension User: ESPLocalControlDelegate {
             }
             localServices[hostname] = service
         }
-        
+
         updateNodeLocalNetworkInfo()
+    }
+}
+
+extension User: ESPBleLocalControlDelegate {
+    func bleLocalControlDidUpdate() {
+        bleLocalControl.reapplyBleStatusToNodes()
+        NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
     }
 }
 

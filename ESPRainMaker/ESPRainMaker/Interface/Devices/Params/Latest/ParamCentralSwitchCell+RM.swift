@@ -34,8 +34,7 @@ extension ParamCentralSwitchCell {
         // CRITICAL: Check if device is offline before sending update
         // For Rainmaker devices, check node connection
         if let node = device.node {
-            let isConnected = node.isConnected || node.localNetwork
-            if !isConnected {
+            if !node.isParamReachable() {
                 // Don't update - device is offline
                 return
             }

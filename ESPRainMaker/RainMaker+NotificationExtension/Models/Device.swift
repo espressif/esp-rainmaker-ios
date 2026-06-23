@@ -85,6 +85,9 @@ class Device: Codable {
         if node?.isConnected ?? false || node?.localNetwork ?? false {
             return true
         }
+        if node?.bleLocalNetwork ?? false {
+            return true
+        }
         return false
     }
 
@@ -157,7 +160,7 @@ extension Device: DeviceScheduler {
             return scheduleAction
         }
         scheduleActionStatus = .allowed
-        if let node = node, !node.isConnected {
+        if let node = node, !node.isConnected && !node.bleLocalControlConnected {
             scheduleActionStatus = .deviceOffline
         } else if !isDeviceScheduled, !isDeviceSchedulingAllowed {
             if let maxCount = self.node?.maxSchedulesCount {
@@ -222,7 +225,7 @@ extension Device: DeviceSceneHandler {
             return status
         }
         sceneActionStatus = .allowed
-        if let node = node, !node.isConnected {
+        if let node = node, !node.isConnected && !node.bleLocalControlConnected {
             sceneActionStatus = .deviceOffline
         } else if !isDeviceSceneAllowed, !isDeviceSceneEnabled {
             if let maxCount = self.node?.maxScenesCount {

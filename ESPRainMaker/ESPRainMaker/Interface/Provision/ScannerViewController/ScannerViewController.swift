@@ -59,6 +59,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        User.shared.bleLocalControl.pauseDiscovery()
         NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         self.setupScanningScreen()
         if self.isBluetoothRequired() {
@@ -245,6 +246,22 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             //Check the "prov"/"cap" to see if wifi/thread is supported.
             //If Thread is supported navigate to thread network selection screen.
             //Else navigate user to wifi provisioning screen.
+            let provisioningPop = User.shared.bleLocalControl.sessionPop ?? ""
+            if ESPBleLocalCtrlProvisioningHelper.offerSkipWifiFlowIfSupported(
+                from: self,
+                device: device,
+                pop: provisioningPop,
+                onContinueWifi: { [weak self] in
+                    self?.routeToWifiOrThread(device: device, versionInfo: versionInfo)
+                }
+            ) {
+                return
+            }
+            routeToWifiOrThread(device: device, versionInfo: versionInfo)
+        }
+    }
+
+    private func routeToWifiOrThread(device: ESPDevice, versionInfo: NSDictionary) {
             let threadCapabilities = versionInfo.checkThreadCapabilities()
             if threadCapabilities.canProvisionOverThread {
                 if #available(iOS 15.0, *) {
@@ -271,7 +288,6 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
                     self.goToJoinNetworkVC(device: device)
                 }
             }
-        }
     }
     
     @IBAction func cancelClickecd(_: Any) {
@@ -322,15 +338,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             }
             actionSheet.addAction(onNetworkAction)
             actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            
-            // Configure for iPad
-            if let popover = actionSheet.popoverPresentationController {
-                popover.sourceView = manualActionButton
-                popover.sourceRect = manualActionButton.bounds
-                popover.permittedArrowDirections = [.up, .down]
-            }
-            
-            present(actionSheet, animated: true, completion: nil)
+            presentActionSheet(actionSheet, from: manualActionButton)
         }
     }
     
@@ -390,6 +398,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     func goToClaimVC(device: ESPDevice, isCameraDevice: Bool = false) {
         let claimVC = storyboard?.instantiateViewController(withIdentifier: Constants.claimVCIdentifier) as! ClaimViewController
         claimVC.device = device
+        claimVC.pop = User.shared.bleLocalControl.sessionPop ?? ""
         claimVC.isCameraDevice = isCameraDevice
         navigationController?.pushViewController(claimVC, animated: true)
     }
