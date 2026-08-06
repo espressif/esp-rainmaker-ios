@@ -80,8 +80,8 @@ extension ParamGenericCell {
         editButton.addTarget(self, action: #selector(editButtonTapped(_:)), for: .touchUpInside)
         tapButton.addTarget(self, action: #selector(paramTapped(_:)), for: .touchUpInside)
         
-        editButton.isHidden = false
-        editButton.isEnabled = true
+        editButton.isHidden = true
+        editButton.isEnabled = false
     }
     
     // MARK: - UI Updates
@@ -113,9 +113,11 @@ extension ParamGenericCell {
     
     // MARK: - Connection State Updates
     func updateConnectionState() {
+        let isWritable = isParamWritable()
         let isOnline = isDeviceOnlineForEdit()
-        editButton.isHidden = !isOnline
-        editButton.isEnabled = isOnline
+        let canEdit = isWritable && isOnline
+        editButton.isHidden = !canEdit
+        editButton.isEnabled = canEdit
         isUserInteractionEnabled = isOnline
         alpha = isOnline ? 1.0 : 0.5
     }
@@ -151,6 +153,13 @@ extension ParamGenericCell {
         } else {
             tapButton.isHidden = true
         }
+    }
+    
+    private func isParamWritable() -> Bool {
+        guard let properties = param?.properties, properties.contains("write") else {
+            return false
+        }
+        return true
     }
     
     private func isDeviceOnlineForEdit() -> Bool {

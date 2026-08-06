@@ -68,6 +68,8 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     @IBOutlet var confirmPassword: UITextField!
     @IBOutlet var email: UITextField!
     @IBOutlet weak var brandLogo: UIImageView!
+    @IBOutlet weak var brandLogoWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var brandLogoHeightConstraint: NSLayoutConstraint!
     
     //MARK: China specific UI:
     
@@ -207,6 +209,12 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     override func viewDidLoad() {
         super.viewDidLoad()
         presentationController?.delegate = self
+        // Bump up the logo on iPad, proportionately, since it otherwise looks too small on the larger screen.
+        if Env.iPad {
+            let scale: CGFloat = 1.5
+            brandLogoWidthConstraint.constant *= scale
+            brandLogoHeightConstraint.constant *= scale
+        }
         // Looks for single or multiple taps.
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)

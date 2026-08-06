@@ -670,8 +670,8 @@
 		F84FD89A2D790B7D00919407 /* ESPMTROHSSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD8962D790B7D00919407 /* ESPMTROHSSliderTVC.xib */; };
 		F84FD89F2D790B9C00919407 /* ESPMTROCSSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */; };
 		F84FD8A02D790B9C00919407 /* ESPMTROCSSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */; };
-		F861C2632F9A105700DF4EA8 /* NodeGroupSharingConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F861C2622F9A105500DF4EA8 /* NodeGroupSharingConstants.swift */; };
 		F861C2612F97559400DF4EA8 /* MatterControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F861C2602F97559400DF4EA8 /* MatterControllerConstants.swift */; };
+		F861C2632F9A105700DF4EA8 /* NodeGroupSharingConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F861C2622F9A105500DF4EA8 /* NodeGroupSharingConstants.swift */; };
 		F87C31E02DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */; };
 		F8916C242EE2D4BF000F40F7 /* RainmakerControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */; };
 		F8916C262EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */; };
@@ -992,7 +992,7 @@
 		0CF69233270A308B0098F515 /* ESPAlexaServiceConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaServiceConstants.swift; sourceTree = "<group>"; };
 		0CF69234270A308B0098F515 /* ESPAlexaAPIWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAlexaAPIWorker.swift; sourceTree = "<group>"; };
 		0CF69241270A34140098F515 /* AppDelegate+ESPAlexa.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppDelegate+ESPAlexa.swift"; sourceTree = "<group>"; };
-		1431462320DE994B0017E119 /* ESP RainMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ESP RainMaker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1431462320DE994B0017E119 /* ESP Rainmaker Classic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ESP Rainmaker Classic.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1431462620DE994B0017E119 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1431462B20DE994B0017E119 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1431462D20DE994C0017E119 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1383,8 +1383,8 @@
 		F84FD8962D790B7D00919407 /* ESPMTROHSSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTROHSSliderTVC.xib; sourceTree = "<group>"; };
 		F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTROCSSliderTVC.swift; sourceTree = "<group>"; };
 		F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTROCSSliderTVC.xib; sourceTree = "<group>"; };
-		F861C2622F9A105500DF4EA8 /* NodeGroupSharingConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroupSharingConstants.swift; sourceTree = "<group>"; };
 		F861C2602F97559400DF4EA8 /* MatterControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatterControllerConstants.swift; sourceTree = "<group>"; };
+		F861C2622F9A105500DF4EA8 /* NodeGroupSharingConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroupSharingConstants.swift; sourceTree = "<group>"; };
 		F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = esp_rmaker_chal_resp.pb.swift; sourceTree = "<group>"; };
 		F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainmakerControllerConstants.swift; sourceTree = "<group>"; };
 		F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+RmakerControllerUtility.swift"; sourceTree = "<group>"; };
@@ -2098,7 +2098,7 @@
 		1431462420DE994B0017E119 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1431462320DE994B0017E119 /* ESP RainMaker.app */,
+				1431462320DE994B0017E119 /* ESP Rainmaker Classic.app */,
 				F1C611A324F79804007EEFC6 /* ESP ScheduleTests.xctest */,
 				F1AE33C3263611B300694B52 /* ESPRainMakerPushNotificationExtension.appex */,
 				0CCD2FAF2A121C7B00ABB680 /* MatterExtension.appex */,
@@ -3186,7 +3186,7 @@
 			);
 			name = ESPRainMaker;
 			productName = EspressifProvision;
-			productReference = 1431462320DE994B0017E119 /* ESP RainMaker.app */;
+			productReference = 1431462320DE994B0017E119 /* ESP Rainmaker Classic.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F1950ED12A3B9AD50091FDAA /* RMWidgetExtension */ = {
@@ -4387,7 +4387,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -4448,7 +4448,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D ESPRainMakerMatter";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
-				PRODUCT_NAME = "ESP RainMaker";
+				PRODUCT_NAME = "ESP Rainmaker Classic";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
@@ -4787,7 +4787,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -4848,7 +4848,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = com.espressif.rainmaker.softap;
-				PRODUCT_NAME = "ESP RainMaker";
+				PRODUCT_NAME = "ESP Rainmaker Classic";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;

@@ -30,7 +30,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1431462220DE994B0017E119"
-               BuildableName = "ESP RainMaker.app"
+               BuildableName = "ESP Rainmaker Classic.app"
                BlueprintName = "ESPRainMaker"
                ReferencedContainer = "container:ESPRainMaker.xcodeproj">
             </BuildableReference>
@@ -60,13 +60,13 @@
       <RemoteRunnable
          runnableDebuggingMode = "0"
          BundleIdentifier = "com.espressif.rainmaker.intsoftap"
-         RemotePath = "/var/containers/Bundle/Application/E1E8108D-B12B-4D46-8B78-D0C2DC52EE67/ESP RainMaker.app">
+         RemotePath = "/var/containers/Bundle/Application/E1E8108D-B12B-4D46-8B78-D0C2DC52EE67/ESP Rainmaker Classic.app">
       </RemoteRunnable>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1431462220DE994B0017E119"
-            BuildableName = "ESP RainMaker.app"
+            BuildableName = "ESP Rainmaker Classic.app"
             BlueprintName = "ESPRainMaker"
             ReferencedContainer = "container:ESPRainMaker.xcodeproj">
          </BuildableReference>
@@ -78,13 +78,14 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES"
+      askForAppToLaunch = "Yes"
       launchAutomaticallySubstyle = "2">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1431462220DE994B0017E119"
-            BuildableName = "ESP RainMaker.app"
+            BuildableName = "ESP Rainmaker Classic.app"
             BlueprintName = "ESPRainMaker"
             ReferencedContainer = "container:ESPRainMaker.xcodeproj">
          </BuildableReference>
