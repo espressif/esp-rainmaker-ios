@@ -37,7 +37,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     var group: ESPNodeGroup?
     var rainmakerNode: Node?
     var bindingEndpointClusterId: [String: Any]?
-    var connectionStatus: NodeConnectionStatus = .local
+    var connectionStatus: NodeConnectionStatus = .offline
     
     var session: Session!
 
@@ -50,6 +50,8 @@ class DeviceCollectionViewCell: UICollectionViewCell {
         layer.masksToBounds = false
         let onOffTap = UITapGestureRecognizer(target: self, action: #selector(toggle))
         self.functionalOnOffButton.addGestureRecognizer(onOffTap)
+        // XIB defaults the toggle to switch_off / visible; hide until status is known.
+        setPowerToggleVisible(false)
         
         // Add observer for device-specific updates
         NotificationCenter.default.addObserver(
@@ -63,18 +65,20 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        // Reset UI elements to default state
+        // Reset UI elements to default state. Do not default to online / switch_off —
+        // reused cells would otherwise flash an active toggle before status is applied.
+        setPowerToggleVisible(false)
         self.onOffButton.image = UIImage(named: "switch_off")
         self.deviceName.text = ""
         self.accessibilityButton.text = ""
         self.overlay.isHidden = true
-        self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
+        self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
         
         // Reset data references
         self.node = nil
         self.group = nil
         self.rainmakerNode = nil
-        self.connectionStatus = .local
+        self.connectionStatus = .offline
         
         // Remove any pending UI updates
         NSObject.cancelPreviousPerformRequests(withTarget: self)
@@ -82,6 +86,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     
     /// Ensure the cell reflects the current state from UserDefaults
     func refreshFromCurrentState() {
+        guard isNodeReachableForToggle else { return }
         if let node = self.node, let deviceId = node.deviceId {
             // Always read the current state from UserDefaults
             if let currentStatus = node.isMatterLightOn(deviceId: deviceId) {
@@ -180,65 +185,66 @@ class DeviceCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    private var isNodeReachableForToggle: Bool {
+        connectionStatus == .local || connectionStatus == .remote || connectionStatus == .controller
+    }
+
+    private func setPowerToggleVisible(_ visible: Bool) {
+        onOffButton.isHidden = !visible
+        functionalOnOffButton.isHidden = !visible
+        functionalOnOffButton.isUserInteractionEnabled = visible
+    }
+
+    private func isOnOffServerSupported() -> Bool {
+        guard let group = group, let groupId = group.groupID, let node = node, let deviceId = node.deviceId else {
+            return false
+        }
+        return ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0
+    }
+
     /// Set UI according to connection status
     /// - Parameter status: status
     func setConnectionStatusUI(status: NodeConnectionStatus) {
-        var showLight = false
         self.connectionStatus = status
         self.accessibilityButton.text = status.description + "  "
         if status == .offline {
             if let node = self.rainmakerNode, node.isRainmakerMatter {
                 self.accessibilityButton.text = "Offline at \(node.timestamp.getShortDate())" + "  "
             }
+            // Hide the toggle immediately (no deferred greyed-out image). Applying
+            // switch_on/off first and switch_disabled on the next runloop is what
+            // makes Matter cards look like they are flipping on reload.
+            setPowerToggleVisible(false)
+            overlay.isHidden = true
+            isUserInteractionEnabled = true
+            container.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
+            return
         }
-        if let group = self.group, let groupId = group.groupID, let node = self.node, let deviceId = node.deviceId {
-            if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
-                showLight = true
-                self.onOffButton.isHidden = false
-                // Always read the current state from UserDefaults to ensure accuracy
-                if let lightOnOffStatus = node.isMatterLightOn(deviceId: deviceId) {
-                    if lightOnOffStatus {
-                        self.onOffButton.image = UIImage(named: "switch_on")
-                    } else {
-                        self.onOffButton.image = UIImage(named: "switch_off")
-                    }
-                } else {
-                    // If no state is stored, default to on and store it
-                    node.setMatterLightOnStatus(status: true, deviceId: deviceId)
-                    self.onOffButton.image = UIImage(named: "switch_on")
-                }
-            }
-        } else {
-            self.onOffButton.isHidden = true
-        }
-        DispatchQueue.main.async {
-            if status == .local || status == .remote || status == .controller {
-                self.overlay.isHidden = true
-                self.isUserInteractionEnabled = true
-                self.functionalOnOffButton.isUserInteractionEnabled = true
-                self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
-                if status != .remote {
-                    self.setToggleStatusFromControllerConfig()
-                }
+
+        let showLight = isOnOffServerSupported()
+        setPowerToggleVisible(showLight)
+        if showLight, let node = self.node, let deviceId = node.deviceId {
+            if let lightOnOffStatus = node.isMatterLightOn(deviceId: deviceId) {
+                onOffButton.image = UIImage(named: lightOnOffStatus ? "switch_on" : "switch_off")
             } else {
-                if showLight {
-                    self.onOffButton.image = UIImage(named: "switch_disabled")
-                }
-                self.functionalOnOffButton.isUserInteractionEnabled = false
-                self.isUserInteractionEnabled = true
-                self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
+                onOffButton.image = UIImage(named: "switch_off")
             }
+        }
+        overlay.isHidden = true
+        isUserInteractionEnabled = true
+        container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
+        if status != .remote {
+            setToggleStatusFromControllerConfig()
         }
     }
     
     func setToggleStatusFromControllerConfig() {
+        guard isNodeReachableForToggle else { return }
         if let node = self.rainmakerNode, let controllerNode = node.matterControllerNode, let controllerNodeId = controllerNode.node_id, let matterNodeId = node.matter_node_id, let onOffStatus = MatterControllerParser.shared.getOnOffValue(controllerNodeId: controllerNodeId, matterNodeId: matterNodeId) {
-            DispatchQueue.main.async {
-                if onOffStatus {
-                    self.onOffButton.image = UIImage(named: "switch_on")
-                } else {
-                    self.onOffButton.image = UIImage(named: "switch_off")
-                }
+            if onOffStatus {
+                self.onOffButton.image = UIImage(named: "switch_on")
+            } else {
+                self.onOffButton.image = UIImage(named: "switch_off")
             }
         }
     }
@@ -265,21 +271,15 @@ class DeviceCollectionViewCell: UICollectionViewCell {
     /// Toggle button
     /// - Parameter isLightOn: light on/off status
     func setToggleButtonUI(isLightOn: Bool) {
-        // Use a serial queue to prevent race conditions in UI updates
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            
-            // Update the data source to reflect the new state
+            guard self.isNodeReachableForToggle else { return }
+
             if let node = self.node, let deviceId = node.deviceId {
-                // Also update the rainmakerNode if available to keep data in sync
                 node.setMatterLightOnStatus(status: isLightOn, deviceId: deviceId)
             }
-            
-            if isLightOn {
-                self.onOffButton.image = UIImage(named: "switch_on")
-            } else {
-                self.onOffButton.image = UIImage(named: "switch_off")
-            }
+
+            self.onOffButton.image = UIImage(named: isLightOn ? "switch_on" : "switch_off")
         }
     }
     
@@ -308,6 +308,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
         }
         
         DispatchQueue.main.async {
+            guard self.isNodeReachableForToggle else { return }
             self.setToggleButtonUI(isLightOn: isOn)
         }
     }

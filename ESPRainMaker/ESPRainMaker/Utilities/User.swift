@@ -294,7 +294,7 @@ class User {
                                 completion(nil, nil, NSError(domain: "ESP", code: 1, userInfo: [NSLocalizedDescriptionKey: AppMessages.challengeFetchFailedMsg]))
                             }
                         case .failure(let error):
-                            completion(nil, nil, error)
+                            completion(nil, nil, error.underlyingError ?? error)
                         }
                     }
             } else {
@@ -347,7 +347,7 @@ class User {
                                 }
                             }
                         case .failure(let error):
-                            completion(false, error)
+                            completion(false, error.underlyingError ?? error)
                         }
                     }
             } else {

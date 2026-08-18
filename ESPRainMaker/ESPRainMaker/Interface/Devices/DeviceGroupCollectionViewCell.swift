@@ -266,11 +266,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
                             }
                         }
                     } else {
-                        cell.switchButton.isHidden = false
-                        cell.switchButton.isEnabled = false
-                        cell.switchButton.backgroundColor = UIColor(hexString: "#E5E5E5")
-                        cell.switchButton.alpha = 0.4
-                        cell.switchButton.setBackgroundImage(UIImage(named: "switch_disabled"), for: .normal)
+                        cell.switchButton.isHidden = true
                     }
                 } else if primaryParam.dataType?.lowercased() == "string" {
                     cell.switchButton.isHidden = true
