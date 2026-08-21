@@ -27,6 +27,7 @@ target 'ESPRainMaker' do
   pod 'AWSKinesisVideoSignaling'
   pod 'GoogleWebRTC', '~> 1.1'
   pod 'Starscream', '~> 3.0'
+  pod 'GoogleSignIn', '~> 8.0'
 
 end
 

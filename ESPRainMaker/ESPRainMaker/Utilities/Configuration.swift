@@ -121,6 +121,10 @@ struct AWSConfiguration {
     var baseURL: String!
     var claimURL: String!
     var redirectURL = ""
+    /// OAuth web client ID. Used as GIDServerClientID so the Google ID token is accepted by federated login.
+    var googleWebClientId: String = ""
+    /// iOS OAuth client ID. Used as GIDClientID; Info.plist URL scheme must match this client.
+    var googleIOSClientId: String = ""
 
     init(config: [String: Any], cnConfiguration: CNConfiguration?) {
         guard let clientID = config["App Client ID"] as? String, !clientID.isEmpty else {
@@ -144,6 +148,8 @@ struct AWSConfiguration {
             claimURL = config["Claim URL"] as? String ?? ""
         }
         redirectURL = config["Redirect URL"] as? String ?? ""
+        googleWebClientId = config["Google Web Client ID"] as? String ?? ""
+        googleIOSClientId = config["Google iOS Client ID"] as? String ?? ""
     }
     
     mutating func resetBaseURLFromConfig() {

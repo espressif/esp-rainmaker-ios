@@ -19,6 +19,7 @@
 import Alamofire
 import DropDown
 import ESPProvision
+import GoogleSignIn
 import UIKit
 
 @UIApplicationMain
@@ -77,6 +78,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.launchOptions = launchOptions
 
         return true
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        if GIDSignIn.sharedInstance.handle(url) {
+            return true
+        }
+        return WXApi.handleOpen(url, delegate: self)
     }
     
     private func setupWeChatConfig() {

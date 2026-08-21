@@ -25,6 +25,10 @@
 		<string>com.espressif.rainmaker.softap://success</string>
 		<key>Claim URL</key>
 		<string>https://esp-claiming.rainmaker.espressif.com</string>
+		<key>Google Web Client ID</key>
+		<string>847141165224-5r4e8kn1rg3vu1tltq6b4qouvk5nquet.apps.googleusercontent.com</string>
+		<key>Google iOS Client ID</key>
+		<string>847141165224-kr4gih5rg49u7ubrvemqr448diu30t2d.apps.googleusercontent.com</string>
 	</dict>
 	<key>JPushService Configuration</key>
 	<dict>
