@@ -119,6 +119,8 @@
 		<string></string>
 		<key>Alexa RM Client Id</key>
 		<string></string>
+		<key>Alexa RM Client Secret</key>
+		<string></string>
 		<key>Skill Id</key>
 		<string></string>
 		<key>Skill Stage</key>

@@ -24,7 +24,7 @@ import AVFoundation
 import Alamofire
 import WebKit
 
-/// Skill state for which webview is to be shown i.e. login to amazon, enable skill linking and login to rainmaker
+/// Screen shown during linking: Amazon sign-in, skill enablement, or RainMaker sign-in.
 enum ESPEnableSkillState {
     case loginWithAmazon
     case rainMakerAuthCode
@@ -58,6 +58,8 @@ class ESPEnableAlexaSkillService: NSObject {
     var apiWorker: ESPAlexaAPIWorker!
     var apiService: ESPAlexaAPIService!
     var skillState: ESPEnableSkillState = .none
+    private var fallbackToHostedUIOnEnableFailure = false
+    private var isRequestingAuthCode = false
     
     init(presenter: ESPEnableAlexaSkillPresenter?) {
         self.presenter = presenter
@@ -65,11 +67,7 @@ class ESPEnableAlexaSkillService: NSObject {
         self.apiService = ESPAlexaAPIService()
     }
     
-    /*
-     Checked linking status and if unlinked show login to rainmaker webview.
-     If access token has expired restart the linking process by fetching access token again.
-     Else show error alert to user.
-     */
+    /// Checks whether the skill is enabled. Starts RainMaker sign-in when it is not, and restarts Alexa sign-in when the Alexa access token has expired.
     func getLinkingStatusAndLoginToRainmaker() {
         self.getLinkingStatus() { status, error in
             if status {
@@ -92,7 +90,7 @@ class ESPEnableAlexaSkillService: NSObject {
         }
     }
     
-    /// Clear access token. Restart app-app linking process.
+    /// Clears the Alexa access token and starts linking again.
     func restartEnableProcess() {
         ESPAlexaTokenWorker.shared.clearAccessToken()
         initiateEnableSkillFlow()
@@ -200,7 +198,7 @@ extension ESPEnableAlexaSkillService: ESPAlexaWebViewDelegate {
         }
     }
     
-    /// Show error alert if auth code cannot be extracted from URL for amazon alexa or ranmaker login
+    /// Shows an error when an authorization code cannot be read from the Amazon or RainMaker redirect.
     /// - Parameter message: Error message to be shown
     func errorOccurred(message: String) {
         self.presenter?.showErrorAlert(title: ESPAlexaServiceConstants.error, message: message)
@@ -301,11 +299,7 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
         }
     }
     
-    /*
-     Call API to fetch alexa API endpoint. If endpoints are fetched, then check linked status for account.
-     If account is not linked get linked status and invoke webview to login to rainmaker to get rainmaker auth code.
-     If alexa token has expired call restart app linking process by making user login to amazon and allow linking accounts and get alexa auth code, use that to get alexa tokens and restart the linking process.
-     */
+    /// Fetches the Alexa API endpoint, then checks skill enablement. An expired Alexa access token restarts Alexa sign-in.
     func getAPIEndPoint() {
         self.presenter?.showLoader(message: "")
         apiService.getESPAPIEndPoint() { status in
@@ -328,13 +322,7 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
         }
     }
     
-    /*
-     Call alexa api to get linking status.
-     If account is linked invoke completion handler with true.
-     If account is not linked invoke completion handler with false.
-     If error occurs invoke callback with error.
-     - Parameter completionHandler: callback invoked with true if accounts are linked and false if accounts are false.
-     */
+    /// Reports whether the skill is enabled. The completion handler receives `false` and an error when the account is not linked or the request fails.
     func getLinkingStatus(completionHandler: @escaping (Bool, Error?) -> Void) {
         self.presenter?.showLoader(message: "")
         apiService.getESPLinkingStatus() { status in
@@ -355,14 +343,10 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
         }
     }
     
-    /*
-     Call API to enable app-app linking.
-     If account is linked to change the alexa connect viewcontroller to connected to alexa view.
-     If not linked show toast message with "Account linking failed".
-     If alexa token has expired restart the linking process starting with getting alexa access token.
-     - Parameter code: rainmaker auth code
-     */
+    /// Enables the skill with a RainMaker authorization code. A 400 for a code from `/app-link/authorize` opens the hosted UI; any other 400 clears the Alexa tokens and shows the unauthorized alert, as before.
     func enableSkill(code: String) {
+        let fallbackToHostedUI = fallbackToHostedUIOnEnableFailure
+        fallbackToHostedUIOnEnableFailure = false
         self.presenter?.showLoader(message: "")
         apiService.espEnableSkill(code: code) { status in
             self.presenter?.hideLoader()
@@ -370,12 +354,14 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
             case .accountLinked:
                 self.presenter?.showToast(message: ESPAlexaServiceConstants.accountLinked)
                 self.presenter?.accountLinked(status: true)
+            case .invalidAccountLinkingCredentials where fallbackToHostedUI:
+                self.openRainmakerHostedUI()
             case .serverError(let error):
                 self.presenter?.showErrorAlert(title: ESPAlexaServiceConstants.error, message: error.localizedDescription)
             case .alexaAccessTokenExpired:
                 ESPAlexaTokenWorker.shared.clearAllClientTokens()
                 self.presenter?.showErrorAlert(title: ESPAlexaServiceConstants.error, message: ESPAlexaServiceConstants.accountLinkingFailed)
-            case .unauthorized:
+            case .unauthorized, .invalidAccountLinkingCredentials:
                 ESPAlexaTokenWorker.shared.clearAllClientTokens()
                 self.presenter?.showErrorAlert(title: ESPAlexaServiceConstants.error, message: ESPAlexaServiceConstants.unauthorized)
             default:
@@ -384,11 +370,7 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
         }
     }
     
-    /*
-     Call API to disable app-app linking.
-     If account linking is removed to change the alexa connect viewcontroller to connect to alexa view.
-     If alexa token has expired restart the de-linking process starting with getting alexa access token.
-     */
+    /// Disables the skill. An expired Alexa access token is refreshed and the request is retried.
     func disableSkill() {
         self.presenter?.showLoader(message: "")
         apiService.espDisableSkill() { status in
@@ -428,8 +410,37 @@ extension ESPEnableAlexaSkillService: ESPEnableAlexaAPIDelegate {
         }
     }
     
-    /// Launch webview with rainmaker login page (hosted UI).
+    /// Requests a RainMaker authorization code. Uses the hosted UI when Alexa RM Client Secret is empty, and `/app-link/authorize` when it is set.
     func loginViaRainmaker() {
+        if Configuration.shared.espAlexaConfiguration.rmClientSecret.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            openRainmakerHostedUI()
+            return
+        }
+        guard !isRequestingAuthCode else { return }
+        presenter?.showLoader(message: "")
+        let redirectURI = Configuration.shared.espAlexaConfiguration.redirectURI
+        isRequestingAuthCode = true
+        apiService.getRainMakerAuthCode(redirectURI: redirectURI) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.isRequestingAuthCode = false
+                switch result {
+                case .success(let code):
+                    self.presenter?.hideLoader()
+                    self.fallbackToHostedUIOnEnableFailure = true
+                    self.enableSkill(code: code)
+                case .fallbackToBrowser:
+                    self.presenter?.hideLoader()
+                    self.openRainmakerHostedUI()
+                case .failure:
+                    self.presenter?.hideLoader()
+                    self.presenter?.showToast(message: ESPAlexaServiceConstants.failedToGetAuthCode)
+                }
+            }
+        }
+    }
+    
+    private func openRainmakerHostedUI() {
         if let rainmakerURL = self.getURLWithState(url: Configuration.shared.espAlexaConfiguration.rainmakerURL, skillState: .rainMakerAuthCode) {
             UIApplication.shared.open(rainmakerURL, options: [.universalLinksOnly: false], completionHandler: { _ in})
         }

@@ -31,7 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var deviceToken: String?
     var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     var jPushServiceTimer: Timer?
-    var rainmakerURL: URL!
+    var rainmakerURL: URL?
+    var alexaAppLinkRedirectURI: String?
+    var alexaAppLinkState: String?
+    var alexaAppLinkAuthService: ESPAlexaAPIService?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         

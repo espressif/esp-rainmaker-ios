@@ -26,6 +26,7 @@ class ESPAlexaServiceConstants {
     static let enablingSkill = "Enabling skill"
     static let accountLinked = "Account linked"
     static let accountLinkingFailed = "Account could not be linked"
+    static let failedToGetAuthCode = "Failed to get auth code"
     static let accountUnlinkingFailed = "Disabling account linking failed"
     static let disablingSkill = "Disabling skill"
     static let accountLinkingDisabled = "Account linking disabled"

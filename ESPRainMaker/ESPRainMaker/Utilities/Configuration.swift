@@ -306,6 +306,7 @@ struct ESPAlexaConfiguration {
     private let redirectURIKey = "Redirect URL"
     private let skillIDKey = "Skill Id"
     private let clientIDKey = "Alexa RM Client Id"
+    private let rmClientSecretKey = "Alexa RM Client Secret"
     private let fetchAccessTokenURLKey = "Alexa Access Token URL"
     
     // MARK: - Config values
@@ -315,6 +316,7 @@ struct ESPAlexaConfiguration {
     var redirectURI: String = ""
     var skillId: String = ""
     var clientId: String = ""
+    var rmClientSecret: String = ""
     var fetchAccessTokenURL: String = ""
     
     //Placeholder value used in alexa app URL, LWA URL
@@ -393,6 +395,9 @@ struct ESPAlexaConfiguration {
             }
             if let val = configPlist[clientIDKey] as? String {
                 clientId = val
+            }
+            if let val = configPlist[rmClientSecretKey] as? String {
+                rmClientSecret = val
             }
             if let val = configPlist[fetchAccessTokenURLKey] as? String {
                 fetchAccessTokenURL = val

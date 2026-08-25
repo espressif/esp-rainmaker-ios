@@ -145,14 +145,24 @@ ESPRainMaker app supports remote notifications in order to notify app in realtim
 
 3. Silent notifications: This notification is triggered at the time when any of the user device param changes. It will update the app with latest param value in case when app is in foreground.
 
-### Alexa App to App Linking
+### Alexa app-to-app linking
 
-  This account linking flow enables users to link their Alexa user identity with their Rainmaker identity
-  by starting from Rainmaker app. When they start the account linking flow from the app, users can:
-  - Discover their Alexa skill through the app.
-  - Initiate skill enablement and account linking from within the app.
-  - Link their account without entering Alexa account credentials if already logged into Alexa app. They will have to login to Rainmaker once, when trying to link accounts.
-  - Link their account from your Rainmaker using [Login with Amazon (LWA)](https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html), when the Alexa app isn&#39;t installed on their device.
+Users can link a RainMaker account to an Alexa skill from the RainMaker app, or start linking from the Alexa app. In RainMaker, open **Settings**, **Voice Services**, then **Amazon Alexa**.
+
+When linking starts in RainMaker:
+
+- If the Alexa app is installed and supports app-to-app linking, the user is taken to the skill consent page. Otherwise the app opens [Login with Amazon](https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html).
+- After Alexa returns an authorization code, the app exchanges it for an Alexa access token and checks whether the skill is already enabled.
+- If the skill is not enabled, the app obtains a RainMaker authorization code and enables the skill.
+
+How that RainMaker authorization code is obtained depends on **Alexa RM Client Secret** in `Configuration.plist`:
+
+- When the secret is set, the app requests the code from `GET /app-link/authorize`. If that request returns HTTP 4xx or 5xx, or skill enablement returns HTTP 400, the app opens the RainMaker hosted UI instead.
+- When the secret is empty, the app opens the RainMaker hosted UI directly.
+
+When linking starts in the Alexa app, Alexa opens RainMaker with its own redirect URL. **Allow** uses the same secret check: `/app-link/authorize` when the secret is set, and the hosted UI otherwise. The hosted UI returns the user to Alexa to finish linking.
+
+A user who is already signed in to the Alexa app does not enter Alexa credentials again. RainMaker sign-in is required only when the hosted UI is used.
 
 ### Time Series
 
