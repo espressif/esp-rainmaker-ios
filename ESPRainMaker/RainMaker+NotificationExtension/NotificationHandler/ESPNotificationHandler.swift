@@ -37,7 +37,7 @@ enum ESPNotificationEvents: String {
 struct ESPNotificationHandler: ESPNotificationProtocol {
     
     var eventData: [String : Any]
-    var notification =  ESPNotifications(body: "", title: "", timestamp: Date().timeIntervalSince1970)
+    var notification =  ESPNotifications(body: "", title: "", timestamp: Date().timeIntervalSince1970 * 1000)
     let eventType: ESPNotificationEvents?
     
     
