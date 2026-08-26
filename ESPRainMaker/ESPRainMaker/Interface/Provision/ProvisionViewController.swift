@@ -51,6 +51,9 @@ class ProvisionViewController: UIViewController {
     var device: ESPDevice!
     var passphrase = ""
     var currentSSID = ""
+    
+    var wifiReset: Bool = false
+    var wifiResetNodeId: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -313,6 +316,9 @@ class ProvisionViewController: UIViewController {
             successVC.passphrase = self.passphrase
             successVC.step1Failed = step1Failed
             successVC.espDevice = self.device
+            successVC.wifiReset = self.wifiReset
+            successVC.wifiResetNodeId = self.wifiResetNodeId
+            successVC.successDelegate = self
             self.navigationController?.pushViewController(successVC, animated: true)
         }
     }
@@ -348,6 +354,8 @@ class ProvisionViewController: UIViewController {
         if segue.identifier == "joinNetwork" {
             let destinationVC = segue.destination as! JoinNetworkViewController
             destinationVC.device = device
+            destinationVC.wifiReset = self.wifiReset
+            destinationVC.wifiResetNodeId = self.wifiResetNodeId
         }
     }
 }
@@ -447,5 +455,14 @@ extension ProvisionViewController: DeviceAssociationProtocol {
                 self.present(alertController, animated: true, completion: nil)
             }
         }
+    }
+}
+
+extension ProvisionViewController: SuccessViewControllerDelegate {
+    
+    func wifiResetSuccess(withNodeId nodeId: String?, withDevice device: ESPDevice?) {
+        self.wifiResetNodeId = nodeId
+        self.wifiReset = true
+        self.device = device
     }
 }

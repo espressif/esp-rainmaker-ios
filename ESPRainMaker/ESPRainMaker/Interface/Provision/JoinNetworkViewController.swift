@@ -33,6 +33,8 @@ class JoinNetworkViewController: UIViewController {
     static let storyboardId = "JoinNetworkViewController"
     
     @IBOutlet var headerView: UIView!
+    var wifiReset: Bool = false
+    var wifiResetNodeId: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,9 +67,14 @@ class JoinNetworkViewController: UIViewController {
     }
 
     private func provisionDevice(ssid _: String, passphrase: String) {
-        Utility.showLoader(message: "Sending association data", view: view)
         self.passphrase = passphrase
-        User.shared.associateNodeWithUser(device: device, delegate: self)
+        if let versionInfo = device.versionInfo, versionInfo.isChallengeResponseSupported() {
+            //Navigate to success view controller
+            self.showStatusScreen()
+        } else {
+            Utility.showLoader(message: "Sending association data", view: view)
+            User.shared.associateNodeWithUser(device: device, delegate: self)
+        }
     }
 
     @IBAction func passwordClicked(_: Any) {
@@ -115,6 +122,9 @@ class JoinNetworkViewController: UIViewController {
                 successVC.ssid = cleanedSSID
                 successVC.step1Failed = step1Failed
                 successVC.espDevice = self.device
+                successVC.wifiReset = self.wifiReset
+                successVC.wifiResetNodeId = self.wifiResetNodeId
+                successVC.successDelegate = self
                 self.navigationController?.pushViewController(successVC, animated: true)
                 return
             }
@@ -142,5 +152,14 @@ extension JoinNetworkViewController: DeviceAssociationProtocol {
                 self.present(alertController, animated: true, completion: nil)
             }
         }
+    }
+}
+
+extension JoinNetworkViewController: SuccessViewControllerDelegate {
+    
+    func wifiResetSuccess(withNodeId nodeId: String?, withDevice device: ESPDevice?) {
+        self.wifiResetNodeId = nodeId
+        self.wifiReset = true
+        self.device = device
     }
 }

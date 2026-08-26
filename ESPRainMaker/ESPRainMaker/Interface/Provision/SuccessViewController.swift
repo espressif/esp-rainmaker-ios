@@ -20,6 +20,10 @@ import ESPProvision
 import Foundation
 import UIKit
 
+protocol SuccessViewControllerDelegate: AnyObject {
+    func wifiResetSuccess(withNodeId nodeId: String?, withDevice device: ESPDevice?)
+}
+
 class SuccessViewController: UIViewController {
     var statusText: String?
     var deviceID: String?
@@ -69,12 +73,22 @@ class SuccessViewController: UIViewController {
     let deviceAddedMessage = "device added successfully"
     
     var finalNode: Node?
-
+    weak var successDelegate: SuccessViewControllerDelegate?
+    var wifiReset: Bool = false
+    var wifiResetNodeId: String?
+    var errorMessage: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         if let device = self.espDevice, let versionInfo = device.versionInfo, versionInfo.isChallengeResponseSupported() {
-            self.executeChallengeResponseWorkflow()
+            if self.wifiReset, let nodeId = self.wifiResetNodeId {
+                self.setupUIForChallengeResponse()
+                self.startStep1()
+                self.provisionDevicePostChallengeResponse(nodeId: nodeId)
+            } else {
+                self.executeChallengeResponseWorkflow()
+            }
         } else {
             if step1Failed {
                 if failureMessage.count > 0 {
@@ -101,14 +115,28 @@ class SuccessViewController: UIViewController {
                 }
                 return
             }
-            self.startStep2()
-            self.provisionDevice(nodeId: nodeId) { provisionError in
-                guard let provisionError = provisionError else {
-                    User.shared.updateDeviceList = true
-                    self.startStep3()
-                    self.step5SetupNode(nodeID: nodeId)
-                    return
-                }
+            self.provisionDevicePostChallengeResponse(nodeId: nodeId)
+        }
+    }
+    
+    /// Provision device post challenge-response workflow
+    /// - Parameter nodeId: node id of the device
+    private func provisionDevicePostChallengeResponse(nodeId: String) {
+        self.wifiResetNodeId = nodeId
+        self.startStep2()
+        self.provisionDevice(nodeId: nodeId) { provisionError in
+            guard let provisionError = provisionError else {
+                User.shared.updateDeviceList = true
+                self.startStep3()
+                self.step5SetupNode(nodeID: nodeId)
+                return
+            }
+            switch provisionError {
+            case .configurationError, .wifiStatusAuthenticationError, .wifiStatusError, .wifiStatusDisconnected, .wifiStatusNetworkNotFound, .wifiStatusUnknownError:
+                self.step2FailedWithMessage(error: provisionError, shouldDisconnectDevice: false)
+                self.errorMessage = provisionError.description
+                self.sendWifiResetCommand()
+            default:
                 self.step2FailedWithMessage(error: provisionError)
             }
         }
@@ -174,8 +202,13 @@ class SuccessViewController: UIViewController {
             case .success:
                 completion(nil)
             case let .failure(error):
+                switch error {
+                case .wifiStatusUnknownError, .wifiStatusDisconnected, .wifiStatusNetworkNotFound, .wifiStatusAuthenticationError:
+                    self.step2FailedWithMessage(error: error, shouldDisconnectDevice: false)
+                default:
+                    self.step2FailedWithMessage(error: error)
+                }
                 completion(error)
-                self.step2FailedWithMessage(error: error)
             case .configApplied:
                 break
             }
@@ -301,8 +334,10 @@ class SuccessViewController: UIViewController {
                 self.step3SendRequestToAddDevice()
             case let .failure(error):
                 switch error {
-                case .configurationError:
-                    self.step1FailedWithMessage(message: "Failed to apply network configuration to device")
+                case .configurationError, .wifiStatusAuthenticationError:
+                    self.errorMessage = error.description
+                    self.step1FailedWithMessage(message: "Failed to apply network configuration to device", shouldDisconnectDevice: false)
+                    self.sendWifiResetCommand()
                 case .sessionError:
                     self.step1FailedWithMessage(message: "Session is not established")
                 case .wifiStatusDisconnected:
@@ -511,21 +546,23 @@ class SuccessViewController: UIViewController {
 
     /// Handle step 1 failure and present error UI and next steps to user.
     /// - Parameter message: Error description to display.
-    func step1FailedWithMessage(message: String) {
+    func step1FailedWithMessage(message: String, shouldDisconnectDevice: Bool = true) {
         DispatchQueue.main.async {
             self.step1Indicator.stopAnimating()
             self.step1Image.image = UIImage(named: "error_icon")
             self.step1Image.isHidden = false
             self.step1ErrorLabel.text = message
             self.step1ErrorLabel.isHidden = false
-            self.espDevice.disconnect()
-            self.provisionFinsihedWithStatus(message: "Reboot your board and try again.")
+            if shouldDisconnectDevice {
+                self.espDevice.disconnect()
+                self.provisionFinsihedWithStatus(message: "Reboot your board and try again.")
+            }
         }
     }
 
     /// Handle step 2 failure and present error UI and next steps to user.
     /// - Parameter error: Provisioning error for Wi‑Fi/transport.
-    func step2FailedWithMessage(error: ESPProvisionError) {
+    func step2FailedWithMessage(error: ESPProvisionError, shouldDisconnectDevice: Bool = true) {
         DispatchQueue.main.async {
             self.step2Indicator.stopAnimating()
             self.step2Image.image = UIImage(named: "error_icon")
@@ -534,14 +571,19 @@ class SuccessViewController: UIViewController {
             switch error {
             case .wifiStatusUnknownError, .wifiStatusDisconnected, .wifiStatusNetworkNotFound, .wifiStatusAuthenticationError:
                 errorMessage = error.description
-                self.espDevice.disconnect()
+                self.errorMessage = errorMessage
+                if shouldDisconnectDevice {
+                    self.espDevice.disconnect()
+                }
                 self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
             case .wifiStatusError:
                 errorMessage = "Unable to fetch Wi-Fi state."
                 self.step3SendRequestToAddDevice()
             default:
                 errorMessage = "Unknown error."
-                self.espDevice.disconnect()
+                if shouldDisconnectDevice {
+                    self.espDevice.disconnect()
+                }
                 self.provisionFinsihedWithStatus(message: "Reset your board to factory defaults and retry.")
             }
             self.step2ErrorLabel.text = errorMessage
@@ -633,6 +675,79 @@ class SuccessViewController: UIViewController {
         destinationVC.checkDeviceAssociation = true
         navigationController?.navigationBar.isHidden = false
         navigationController?.popToRootViewController(animated: true)
+    }
+    
+    // MARK: - WiFi Reset
+    /// Send WiFi reset command to device when provisioning fails
+    /// Checks connection status and reconnects if needed before sending reset
+    private func sendWifiResetCommand() {
+        // Check if device is still connected
+        if !espDevice.isSessionEstablished() {
+            // Device disconnected - reconnect first
+            espDevice.connect { [weak self] status in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    switch status {
+                    case .connected:
+                        // Reconnected successfully - now send reset command
+                        self.sendResetCommandAfterConnection() { success, error in
+                            if success {
+                                DispatchQueue.main.async {
+                                    self.showReenterPasswordAlert()
+                                }
+                            }
+                        }
+                    default:
+                        break
+                    }
+                }
+            }
+        } else {
+            // Device is still connected - send reset command directly
+            self.sendResetCommandAfterConnection() { success, error in
+                if success {
+                    DispatchQueue.main.async {
+                        self.showReenterPasswordAlert()
+                    }
+                }
+            }
+        }
+    }
+
+    /// Send WiFi reset command (assumes device is connected)
+    private func sendResetCommandAfterConnection(completion: @escaping (Bool, Error?) -> Void) {
+        espDevice.resetWifiStatus { [weak self] success, error in
+            guard let self = self else {
+                return
+            }
+            completion(success, error)
+        }
+    }
+
+    /// Show alert dialog to re-enter WiFi password
+    private func showReenterPasswordAlert() {
+        let title = "Provisioning"
+        var message = "Please set up Wi-Fi again using the correct credentials."
+        if let msg = self.errorMessage {
+            message = "\(msg). Wi-Fi has been reset. Please re-enter the Wi-Fi credentials."
+        }
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        // OK button
+        let okAction = UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.successDelegate?.wifiResetSuccess(withNodeId: self.wifiResetNodeId, withDevice: self.espDevice)
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(okAction)
+        DispatchQueue.main.async {
+            self.present(alert, animated: true, completion: nil)
+        }
     }
 }
 
@@ -770,7 +885,5 @@ extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
 extension SuccessViewController: ParamUpdateProtocol {
     
     /// Called when updating controller parameters fails.
-    func failureInUpdatingParam() {
-        
-    }
+    func failureInUpdatingParam() {}
 }
