@@ -29,6 +29,8 @@ extension ParamCustomActionCell {
             delegate?.launchRainmakerController()
         case .launchController:
             delegate?.launchController()
+        case .updateDeviceList:
+            delegate?.updateDeviceList()
         case .updateThreadDataset:
             delegate?.updateThreadDataset()
         case .setActiveThreadDataset:

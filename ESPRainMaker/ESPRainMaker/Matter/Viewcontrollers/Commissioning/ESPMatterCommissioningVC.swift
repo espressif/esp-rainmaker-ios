@@ -190,6 +190,7 @@ class ESPMatterCommissioningVC: UIViewController {
                 Utility.hideLoader(view: self.view)
             }
             User.shared.updateDeviceList = true
+            NotificationCenter.default.post(name: Notification.Name(Constants.refreshDeviceList), object: nil)
             self.navigationController?.popToRootViewController(animated: true)
         }
     }

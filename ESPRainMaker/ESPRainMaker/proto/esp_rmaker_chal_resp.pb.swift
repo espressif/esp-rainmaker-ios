@@ -21,11 +21,12 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-enum RmakerMisc_RMakerMiscStatus: SwiftProtobuf.Enum, Swift.CaseIterable {
+enum RmakerChResp_RMakerChRespStatus: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
   case success // = 0
   case fail // = 1
   case invalidParam // = 2
+  case disabled // = 3
   case UNRECOGNIZED(Int)
 
   init() {
@@ -37,6 +38,7 @@ enum RmakerMisc_RMakerMiscStatus: SwiftProtobuf.Enum, Swift.CaseIterable {
     case 0: self = .success
     case 1: self = .fail
     case 2: self = .invalidParam
+    case 3: self = .disabled
     default: self = .UNRECOGNIZED(rawValue)
     }
   }
@@ -46,25 +48,29 @@ enum RmakerMisc_RMakerMiscStatus: SwiftProtobuf.Enum, Swift.CaseIterable {
     case .success: return 0
     case .fail: return 1
     case .invalidParam: return 2
+    case .disabled: return 3
     case .UNRECOGNIZED(let i): return i
     }
   }
 
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  static let allCases: [RmakerMisc_RMakerMiscStatus] = [
+  static let allCases: [RmakerChResp_RMakerChRespStatus] = [
     .success,
     .fail,
     .invalidParam,
+    .disabled,
   ]
 
 }
 
-enum RmakerMisc_RMakerMiscMsgType: SwiftProtobuf.Enum, Swift.CaseIterable {
+enum RmakerChResp_RMakerChRespMsgType: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
   case typeCmdChallengeResponse // = 0
   case typeRespChallengeResponse // = 1
   case typeCmdGetNodeID // = 2
   case typeRespGetNodeID // = 3
+  case typeCmdDisableChalResp // = 4
+  case typeRespDisableChalResp // = 5
   case UNRECOGNIZED(Int)
 
   init() {
@@ -77,6 +83,8 @@ enum RmakerMisc_RMakerMiscMsgType: SwiftProtobuf.Enum, Swift.CaseIterable {
     case 1: self = .typeRespChallengeResponse
     case 2: self = .typeCmdGetNodeID
     case 3: self = .typeRespGetNodeID
+    case 4: self = .typeCmdDisableChalResp
+    case 5: self = .typeRespDisableChalResp
     default: self = .UNRECOGNIZED(rawValue)
     }
   }
@@ -87,21 +95,25 @@ enum RmakerMisc_RMakerMiscMsgType: SwiftProtobuf.Enum, Swift.CaseIterable {
     case .typeRespChallengeResponse: return 1
     case .typeCmdGetNodeID: return 2
     case .typeRespGetNodeID: return 3
+    case .typeCmdDisableChalResp: return 4
+    case .typeRespDisableChalResp: return 5
     case .UNRECOGNIZED(let i): return i
     }
   }
 
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  static let allCases: [RmakerMisc_RMakerMiscMsgType] = [
+  static let allCases: [RmakerChResp_RMakerChRespMsgType] = [
     .typeCmdChallengeResponse,
     .typeRespChallengeResponse,
     .typeCmdGetNodeID,
     .typeRespGetNodeID,
+    .typeCmdDisableChalResp,
+    .typeRespDisableChalResp,
   ]
 
 }
 
-struct RmakerMisc_CmdCRPayload: @unchecked Sendable {
+struct RmakerChResp_CmdCRPayload: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -113,7 +125,7 @@ struct RmakerMisc_CmdCRPayload: @unchecked Sendable {
   init() {}
 }
 
-struct RmakerMisc_RespCRPayload: @unchecked Sendable {
+struct RmakerChResp_RespCRPayload: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -127,8 +139,8 @@ struct RmakerMisc_RespCRPayload: @unchecked Sendable {
   init() {}
 }
 
-/// Empty payload 
-struct RmakerMisc_CmdGetNodeIDPayload: Sendable {
+/// Empty payload
+struct RmakerChResp_CmdGetNodeIDPayload: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -138,7 +150,7 @@ struct RmakerMisc_CmdGetNodeIDPayload: Sendable {
   init() {}
 }
 
-struct RmakerMisc_RespGetNodeIDPayload: Sendable {
+struct RmakerChResp_RespGetNodeIDPayload: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -150,56 +162,96 @@ struct RmakerMisc_RespGetNodeIDPayload: Sendable {
   init() {}
 }
 
-struct RmakerMisc_RMakerMiscPayload: Sendable {
+/// Empty payload - command to disable challenge-response
+struct RmakerChResp_CmdDisableChalRespPayload: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var msg: RmakerMisc_RMakerMiscMsgType = .typeCmdChallengeResponse
+  var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  var status: RmakerMisc_RMakerMiscStatus = .success
+  init() {}
+}
 
-  var payload: RmakerMisc_RMakerMiscPayload.OneOf_Payload? = nil
+/// Response contains only status in the parent message
+struct RmakerChResp_RespDisableChalRespPayload: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
 
-  var cmdChallengeResponsePayload: RmakerMisc_CmdCRPayload {
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct RmakerChResp_RMakerChRespPayload: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var msg: RmakerChResp_RMakerChRespMsgType = .typeCmdChallengeResponse
+
+  var status: RmakerChResp_RMakerChRespStatus = .success
+
+  var payload: RmakerChResp_RMakerChRespPayload.OneOf_Payload? = nil
+
+  var cmdChallengeResponsePayload: RmakerChResp_CmdCRPayload {
     get {
       if case .cmdChallengeResponsePayload(let v)? = payload {return v}
-      return RmakerMisc_CmdCRPayload()
+      return RmakerChResp_CmdCRPayload()
     }
     set {payload = .cmdChallengeResponsePayload(newValue)}
   }
 
-  var respChallengeResponsePayload: RmakerMisc_RespCRPayload {
+  var respChallengeResponsePayload: RmakerChResp_RespCRPayload {
     get {
       if case .respChallengeResponsePayload(let v)? = payload {return v}
-      return RmakerMisc_RespCRPayload()
+      return RmakerChResp_RespCRPayload()
     }
     set {payload = .respChallengeResponsePayload(newValue)}
   }
 
-  var cmdGetNodeIdpayload: RmakerMisc_CmdGetNodeIDPayload {
+  var cmdGetNodeIdpayload: RmakerChResp_CmdGetNodeIDPayload {
     get {
       if case .cmdGetNodeIdpayload(let v)? = payload {return v}
-      return RmakerMisc_CmdGetNodeIDPayload()
+      return RmakerChResp_CmdGetNodeIDPayload()
     }
     set {payload = .cmdGetNodeIdpayload(newValue)}
   }
 
-  var respGetNodeIdpayload: RmakerMisc_RespGetNodeIDPayload {
+  var respGetNodeIdpayload: RmakerChResp_RespGetNodeIDPayload {
     get {
       if case .respGetNodeIdpayload(let v)? = payload {return v}
-      return RmakerMisc_RespGetNodeIDPayload()
+      return RmakerChResp_RespGetNodeIDPayload()
     }
     set {payload = .respGetNodeIdpayload(newValue)}
+  }
+
+  var cmdDisableChalRespPayload: RmakerChResp_CmdDisableChalRespPayload {
+    get {
+      if case .cmdDisableChalRespPayload(let v)? = payload {return v}
+      return RmakerChResp_CmdDisableChalRespPayload()
+    }
+    set {payload = .cmdDisableChalRespPayload(newValue)}
+  }
+
+  var respDisableChalRespPayload: RmakerChResp_RespDisableChalRespPayload {
+    get {
+      if case .respDisableChalRespPayload(let v)? = payload {return v}
+      return RmakerChResp_RespDisableChalRespPayload()
+    }
+    set {payload = .respDisableChalRespPayload(newValue)}
   }
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   enum OneOf_Payload: Equatable, Sendable {
-    case cmdChallengeResponsePayload(RmakerMisc_CmdCRPayload)
-    case respChallengeResponsePayload(RmakerMisc_RespCRPayload)
-    case cmdGetNodeIdpayload(RmakerMisc_CmdGetNodeIDPayload)
-    case respGetNodeIdpayload(RmakerMisc_RespGetNodeIDPayload)
+    case cmdChallengeResponsePayload(RmakerChResp_CmdCRPayload)
+    case respChallengeResponsePayload(RmakerChResp_RespCRPayload)
+    case cmdGetNodeIdpayload(RmakerChResp_CmdGetNodeIDPayload)
+    case respGetNodeIdpayload(RmakerChResp_RespGetNodeIDPayload)
+    case cmdDisableChalRespPayload(RmakerChResp_CmdDisableChalRespPayload)
+    case respDisableChalRespPayload(RmakerChResp_RespDisableChalRespPayload)
 
   }
 
@@ -208,26 +260,29 @@ struct RmakerMisc_RMakerMiscPayload: Sendable {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "rmaker_misc"
+fileprivate let _protobuf_package = "rmaker_ch_resp"
 
-extension RmakerMisc_RMakerMiscStatus: SwiftProtobuf._ProtoNameProviding {
+extension RmakerChResp_RMakerChRespStatus: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "Success"),
     1: .same(proto: "Fail"),
     2: .same(proto: "InvalidParam"),
+    3: .same(proto: "Disabled"),
   ]
 }
 
-extension RmakerMisc_RMakerMiscMsgType: SwiftProtobuf._ProtoNameProviding {
+extension RmakerChResp_RMakerChRespMsgType: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "TypeCmdChallengeResponse"),
     1: .same(proto: "TypeRespChallengeResponse"),
     2: .same(proto: "TypeCmdGetNodeID"),
     3: .same(proto: "TypeRespGetNodeID"),
+    4: .same(proto: "TypeCmdDisableChalResp"),
+    5: .same(proto: "TypeRespDisableChalResp"),
   ]
 }
 
-extension RmakerMisc_CmdCRPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension RmakerChResp_CmdCRPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".CmdCRPayload"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "payload"),
@@ -252,14 +307,14 @@ extension RmakerMisc_CmdCRPayload: SwiftProtobuf.Message, SwiftProtobuf._Message
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: RmakerMisc_CmdCRPayload, rhs: RmakerMisc_CmdCRPayload) -> Bool {
+  static func ==(lhs: RmakerChResp_CmdCRPayload, rhs: RmakerChResp_CmdCRPayload) -> Bool {
     if lhs.payload != rhs.payload {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension RmakerMisc_RespCRPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension RmakerChResp_RespCRPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".RespCRPayload"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "payload"),
@@ -289,7 +344,7 @@ extension RmakerMisc_RespCRPayload: SwiftProtobuf.Message, SwiftProtobuf._Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: RmakerMisc_RespCRPayload, rhs: RmakerMisc_RespCRPayload) -> Bool {
+  static func ==(lhs: RmakerChResp_RespCRPayload, rhs: RmakerChResp_RespCRPayload) -> Bool {
     if lhs.payload != rhs.payload {return false}
     if lhs.nodeID != rhs.nodeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -297,7 +352,7 @@ extension RmakerMisc_RespCRPayload: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 }
 
-extension RmakerMisc_CmdGetNodeIDPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension RmakerChResp_CmdGetNodeIDPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".CmdGetNodeIDPayload"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -310,13 +365,13 @@ extension RmakerMisc_CmdGetNodeIDPayload: SwiftProtobuf.Message, SwiftProtobuf._
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: RmakerMisc_CmdGetNodeIDPayload, rhs: RmakerMisc_CmdGetNodeIDPayload) -> Bool {
+  static func ==(lhs: RmakerChResp_CmdGetNodeIDPayload, rhs: RmakerChResp_CmdGetNodeIDPayload) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension RmakerMisc_RespGetNodeIDPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension RmakerChResp_RespGetNodeIDPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".RespGetNodeIDPayload"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_id"),
@@ -341,15 +396,53 @@ extension RmakerMisc_RespGetNodeIDPayload: SwiftProtobuf.Message, SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: RmakerMisc_RespGetNodeIDPayload, rhs: RmakerMisc_RespGetNodeIDPayload) -> Bool {
+  static func ==(lhs: RmakerChResp_RespGetNodeIDPayload, rhs: RmakerChResp_RespGetNodeIDPayload) -> Bool {
     if lhs.nodeID != rhs.nodeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".RMakerMiscPayload"
+extension RmakerChResp_CmdDisableChalRespPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".CmdDisableChalRespPayload"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: RmakerChResp_CmdDisableChalRespPayload, rhs: RmakerChResp_CmdDisableChalRespPayload) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension RmakerChResp_RespDisableChalRespPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".RespDisableChalRespPayload"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: RmakerChResp_RespDisableChalRespPayload, rhs: RmakerChResp_RespDisableChalRespPayload) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension RmakerChResp_RMakerChRespPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".RMakerChRespPayload"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "msg"),
     2: .same(proto: "status"),
@@ -357,6 +450,8 @@ extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._Me
     11: .same(proto: "respChallengeResponsePayload"),
     12: .same(proto: "cmdGetNodeIDPayload"),
     13: .same(proto: "respGetNodeIDPayload"),
+    14: .same(proto: "cmdDisableChalRespPayload"),
+    15: .same(proto: "respDisableChalRespPayload"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -368,7 +463,7 @@ extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._Me
       case 1: try { try decoder.decodeSingularEnumField(value: &self.msg) }()
       case 2: try { try decoder.decodeSingularEnumField(value: &self.status) }()
       case 10: try {
-        var v: RmakerMisc_CmdCRPayload?
+        var v: RmakerChResp_CmdCRPayload?
         var hadOneofValue = false
         if let current = self.payload {
           hadOneofValue = true
@@ -381,7 +476,7 @@ extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._Me
         }
       }()
       case 11: try {
-        var v: RmakerMisc_RespCRPayload?
+        var v: RmakerChResp_RespCRPayload?
         var hadOneofValue = false
         if let current = self.payload {
           hadOneofValue = true
@@ -394,7 +489,7 @@ extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._Me
         }
       }()
       case 12: try {
-        var v: RmakerMisc_CmdGetNodeIDPayload?
+        var v: RmakerChResp_CmdGetNodeIDPayload?
         var hadOneofValue = false
         if let current = self.payload {
           hadOneofValue = true
@@ -407,7 +502,7 @@ extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._Me
         }
       }()
       case 13: try {
-        var v: RmakerMisc_RespGetNodeIDPayload?
+        var v: RmakerChResp_RespGetNodeIDPayload?
         var hadOneofValue = false
         if let current = self.payload {
           hadOneofValue = true
@@ -417,6 +512,32 @@ extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._Me
         if let v = v {
           if hadOneofValue {try decoder.handleConflictingOneOf()}
           self.payload = .respGetNodeIdpayload(v)
+        }
+      }()
+      case 14: try {
+        var v: RmakerChResp_CmdDisableChalRespPayload?
+        var hadOneofValue = false
+        if let current = self.payload {
+          hadOneofValue = true
+          if case .cmdDisableChalRespPayload(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.payload = .cmdDisableChalRespPayload(v)
+        }
+      }()
+      case 15: try {
+        var v: RmakerChResp_RespDisableChalRespPayload?
+        var hadOneofValue = false
+        if let current = self.payload {
+          hadOneofValue = true
+          if case .respDisableChalRespPayload(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.payload = .respDisableChalRespPayload(v)
         }
       }()
       default: break
@@ -452,12 +573,20 @@ extension RmakerMisc_RMakerMiscPayload: SwiftProtobuf.Message, SwiftProtobuf._Me
       guard case .respGetNodeIdpayload(let v)? = self.payload else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 13)
     }()
+    case .cmdDisableChalRespPayload?: try {
+      guard case .cmdDisableChalRespPayload(let v)? = self.payload else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 14)
+    }()
+    case .respDisableChalRespPayload?: try {
+      guard case .respDisableChalRespPayload(let v)? = self.payload else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 15)
+    }()
     case nil: break
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: RmakerMisc_RMakerMiscPayload, rhs: RmakerMisc_RMakerMiscPayload) -> Bool {
+  static func ==(lhs: RmakerChResp_RMakerChRespPayload, rhs: RmakerChResp_RMakerChRespPayload) -> Bool {
     if lhs.msg != rhs.msg {return false}
     if lhs.status != rhs.status {return false}
     if lhs.payload != rhs.payload {return false}

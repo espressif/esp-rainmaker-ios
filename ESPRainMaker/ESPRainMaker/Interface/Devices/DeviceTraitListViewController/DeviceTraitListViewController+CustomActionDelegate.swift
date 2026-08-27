@@ -29,22 +29,20 @@ extension DeviceTraitListViewController: ParamCustomActionDelegate {
     /// Checks if device supports client-only controller or Rainmaker controller flow
     func launchController() {
         if let device = self.device, let node = device.node {
-            if node.isClientOnlyControllerFlowSupported {
-                self.enterClientOnlyControllerFlow(node: node)
-            } else if node.isRmakerControllerSupported {
-                self.enterRmakerControllerFlow(node: node)
+            if node.rmakerControllerGroupParam != nil || node.clientOnlyControllerRmakerGroupParam != nil {
+                DispatchQueue.main.async {
+                    self.showGroupSelectionScreen()
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.showRainmakerLoginScreen()
+                }
             }
         }
     }
     
-    /// If base URL, user token and group id are set then call the update device list API
-    /// This is for client only controller devices
-    /// - Parameter node: node
-    private func enterClientOnlyControllerFlow(node: Node) {
-        if let baseURL = node.clientOnlyControllerBaseURLParam?.value as? String, baseURL.count > 0,
-            let groupId = node.clientOnlyControllerGroupParam?.value as? String, groupId.count > 0,
-            let userToken = node.clientOnlyControllerUserTokenParam?.value as? String, userToken.count > 0 {
-            
+    func updateDeviceList() {
+        if let node = self.device.node {
             DispatchQueue.main.async {
                 Utility.showLoader(message: "Updating device list...", view: self.view)
             }
@@ -53,8 +51,6 @@ extension DeviceTraitListViewController: ParamCustomActionDelegate {
                     Utility.hideLoader(view: self.view)
                 }
             }
-        } else {
-            self.showGroupSelectionScreen()
         }
     }
     
@@ -62,19 +58,7 @@ extension DeviceTraitListViewController: ParamCustomActionDelegate {
     /// This is for rmaker controller devices
     /// - Parameter node: node
     private func enterRmakerControllerFlow(node: Node) {
-        if let baseURL = node.clientOnlyControllerBaseURLParam?.value as? String, baseURL.count > 0,
-           let userToken = node.clientOnlyControllerUserTokenParam?.value as? String, userToken.count > 0 {
-            DispatchQueue.main.async {
-                Utility.showLoader(message: "Updating device list...", view: self.view)
-            }
-            self.updateDeviceList(node: node) { status in
-                DispatchQueue.main.async {
-                    Utility.hideLoader(view: self.view)
-                }
-            }
-        } else {
-            self.showRainmakerLoginScreen()
-        }
+        self.showRainmakerLoginScreen()
     }
 
     /// Update thread dataset - currently empty implementation
@@ -431,7 +415,7 @@ extension DeviceTraitListViewController: ClientOnlyControllerCredentialsDelegate
     func showGroupSelectionScreen() {
         #if ESPRainMakerMatter
         let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
-        guard let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as? ESPFabricSelectionVC else { return }
+        let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as! ESPFabricSelectionVC
         fabricSelectionVC.isClientOnlyContoller = true
         fabricSelectionVC.clientOnlyControllerDelegate = self
         self.navigationController?.setNavigationBarHidden(true, animated: false)
@@ -465,63 +449,14 @@ extension DeviceTraitListViewController: ClientOnlyControllerCredentialsDelegate
         }
         let baseURL = Configuration.shared.awsConfiguration.baseURL ?? ""
         let refreshToken = cloudResponse.refreshToken ?? ""
-        
-        if refreshToken.count > 0, let finalNode = self.device.node {
-            self.updateGenericDeviceNOC(node: finalNode, refreshToken: refreshToken, baseURL: baseURL, groupId: groupId) { status in
-                if let status = status, status == .success {
-                    self.updateDeviceList(node: finalNode) { _ in }
-                }
-            }
-        }
-    }
     
-    /// Update device Network Operation Credentials (NOC) based on controller type
-    /// - Parameters:
-    ///   - node: The node to update
-    ///   - refreshToken: Authentication token
-    ///   - baseURL: Base URL for the controller
-    ///   - groupId: Optional group ID
-    ///   - completion: Completion handler with status
-    private func updateGenericDeviceNOC(node: Node, refreshToken: String, baseURL: String, groupId: String?, completion: @escaping (ESPCloudResponseStatus?) -> Void) {
-        if node.isClientOnlyControllerFlowSupported, let groupId = groupId {
-            self.updateDeviceNOC(node: node, token: refreshToken, baseURL: baseURL, groupId: groupId) { status in
-                completion(status)
-                if let status = status, status == .success {
-                    self.updateDeviceList(node: node) { _ in }
-                }
+        if let node = self.device.node {
+            if node.isRmakerControllerSupported {
+                NodeControllerParamUpdater.updateRmakerControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
             }
-        } else if node.isRmakerControllerFlowSupported {
-            self.updateDeviceNOCForRmakeController(node: node, token: refreshToken, baseURL: baseURL) { status in
-                completion(status)
-                if let status = status, status == .success {
-                    self.updateDeviceList(node: node) { _ in }
-                }
+            if node.isClientOnlyControllerSupported {
+                NodeControllerParamUpdater.updateClientOnlyControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
             }
-        } else if let groupId = groupId {
-            self.updateDeviceNOC(node: node, token: refreshToken, baseURL: baseURL, groupId: groupId) { status in
-                completion(status)
-            }
-        }
-    }
-    
-    /// Update device Network Operation Credentials (NOC) for client-only controller
-    /// - Parameters:
-    ///   - node: The node to update
-    ///   - token: Authentication token
-    ///   - baseURL: Base URL for the controller
-    ///   - groupId: Group ID for the controller
-    ///   - completion: Completion handler with status
-    private func updateDeviceNOC(node: Node, token: String, baseURL: String, groupId: String, completion: @escaping (ESPCloudResponseStatus?) -> Void) {
-        if let serviceName = node.getServiceName(forServiceType: Constants.matterControllerServiceType), let nodeId = node.node_id, let grpIdParamName = node.clientOnlyControllerGroupParam?.name, let baseURLParamName = node.clientOnlyControllerBaseURLParam?.name, let userTokenName = node.clientOnlyControllerUserTokenParam?.name {
-            
-            let params: [String: Any] = [serviceName : [baseURLParamName: baseURL,
-                                                           userTokenName: token,
-                                                          grpIdParamName: groupId] as Any]
-            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
-                completion(status)
-            }
-        } else {
-            completion(nil)
         }
     }
     
@@ -530,33 +465,34 @@ extension DeviceTraitListViewController: ClientOnlyControllerCredentialsDelegate
     ///   - node: The node to update
     ///   - completion: Completion handler with status
     private func updateDeviceList(node: Node, completion: @escaping (ESPCloudResponseStatus?) -> Void) {
-        var serviceName = ""
+        var clientOnlyServiceName = ""
+        var clientOnlyUpdateCommandParam: Param?
         if node.isClientOnlyControllerSupported, let service = node.getServiceName(forServiceType: Constants.matterControllerServiceType) {
-            serviceName = service
-        } else if node.isRmakerControllerSupported, let service = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType) {
-            serviceName = service
+            clientOnlyServiceName = service
+            clientOnlyUpdateCommandParam = node.clientOnlyControllerUpdateDeviceListCommandParam
         }
-        if serviceName.count > 0, let nodeId = node.node_id, let mtrCtlCmdName = node.clientOnlyControllerUpdateDeviceListCommandParam?.name {
-            let params: [String: Any] = [serviceName : [mtrCtlCmdName: 2] as Any]
-            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
-                completion(status)
+        
+        var rmakerServiceName = ""
+        var rmakerUpdateCommandParam: Param?
+        if node.isRmakerControllerSupported, let service = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType) {
+            rmakerServiceName = service
+            rmakerUpdateCommandParam = node.rmakerControllerUpdateDeviceListCommandParam
+        }
+        
+        if clientOnlyServiceName.count > 0, let nodeId = node.node_id, let mtrCtlCmdName = clientOnlyUpdateCommandParam?.name {
+            let params: [String: Any] = [clientOnlyServiceName : [mtrCtlCmdName: 2] as Any]
+            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { clientOnlyStatus in
+                if rmakerServiceName.count > 0, let nodeId = node.node_id, let mtrCtlCmdName = rmakerUpdateCommandParam?.name {
+                    let params: [String: Any] = [rmakerServiceName : [mtrCtlCmdName: 2] as Any]
+                    DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
+                        completion(status)
+                    }
+                } else {
+                    completion(clientOnlyStatus)
+                }
             }
-        } else {
-            completion(nil)
-        }
-    }
-    
-    /// Update device Network Operation Credentials (NOC) for Rainmaker controller
-    /// - Parameters:
-    ///   - node: The node to update
-    ///   - token: Authentication token
-    ///   - baseURL: Base URL for the controller
-    ///   - completion: Completion handler with status
-    private func updateDeviceNOCForRmakeController(node: Node, token: String, baseURL: String, completion: @escaping (ESPCloudResponseStatus?) -> Void) {
-        if let serviceName = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType), let nodeId = node.node_id, let baseURLParamName = node.rmakerControllerBaseURLParam?.name, let userTokenName = node.rmakerControllerUserTokenParam?.name {
-            
-            let params: [String: Any] = [serviceName : [baseURLParamName: baseURL,
-                                                           userTokenName: token] as Any]
+        } else if rmakerServiceName.count > 0, let nodeId = node.node_id, let mtrCtlCmdName = rmakerUpdateCommandParam?.name {
+            let params: [String: Any] = [rmakerServiceName : [mtrCtlCmdName: 2] as Any]
             DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
                 completion(status)
             }

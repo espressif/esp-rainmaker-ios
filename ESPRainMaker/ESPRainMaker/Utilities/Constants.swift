@@ -176,6 +176,12 @@ struct Constants {
     static let serviceType = "_esp_local_ctrl._tcp."
     static let matterCommissionedServiceType = "_matter._tcp"
     static let serviceDomain = "local"
+    
+    // On Network Provisioning constants
+    static let challengeRespServiceType = "_esp_rmaker_chal_resp._tcp."
+    static let keyOnNetworkDevice = "on_network_device"
+    static let keyIsOnNetworkFlow = "is_on_network_flow"
+    static let keyPop = "pop"
 
     // Schedule related constants
     static let scheduleServiceType = "esp.service.schedule"

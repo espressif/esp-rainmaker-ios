@@ -30,21 +30,33 @@ extension Node {
     /// Gets the user token parameter for Rainmaker controller service
     /// - Returns: The user token parameter if available, nil otherwise
     var rmakerControllerUserTokenParam: Param? {
-        return self.getServiceParam(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType, andParamType: RainmakerControllerConstants.paramUserToken)
+        if let dynamicAttribute = self.getServiceParam(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType, andParamType: RainmakerControllerConstants.paramUserToken), let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
     }
     
     /// Gets the base URL parameter for Rainmaker controller service
     /// - Returns: The base URL parameter if available, nil otherwise
     var rmakerControllerBaseURLParam: Param? {
-        return self.getServiceParam(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType, andParamType: RainmakerControllerConstants.paramBaseURL)
+        if let dynamicAttribute = self.getServiceParam(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType, andParamType: RainmakerControllerConstants.paramBaseURL), let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
     }
     
-    /// Indicates whether the node supports the complete Rainmaker controller flow
-    /// Checks if the node supports Rainmaker controller AND has both base URL and user token parameters configured
-    var isRmakerControllerFlowSupported: Bool {
-        if self.isRmakerControllerSupported, let _ = rmakerControllerBaseURLParam, let _ = rmakerControllerUserTokenParam {
-            return true
+    /// Gets the group id parameter for Rainmaker controller service
+    /// - Returns: The group id parameter if available, nil otherwise
+    var rmakerControllerGroupParam: Param? {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType, andParamType: RainmakerControllerConstants.paramRainmakerGroupId), let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
         }
-        return false
+        return nil
+    }
+    
+    /// Gets the update device list command parameter for Rainmaker controller service (if exposed)
+    /// - Returns: The command parameter if available, nil otherwise
+    var rmakerControllerUpdateDeviceListCommandParam: Param? {
+        return self.getServiceParam(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType, andParamType: ClientOnlyControllerConstants.paramMatterCtlCmd)
     }
 }

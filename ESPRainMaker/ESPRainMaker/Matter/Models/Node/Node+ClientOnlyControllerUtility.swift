@@ -25,16 +25,32 @@ extension Node {
         return false
     }
     
+    var clientOnlyControllerRmakerGroupParam: Param? {
+        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramRainmakerGroupId), let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
+    }
+    
     var clientOnlyControllerGroupParam: Param? {
-        return self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramRainmakerGroupId)
+        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramGroupId), let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
     }
     
     var clientOnlyControllerUserTokenParam: Param? {
-        return self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramUserToken)
+        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramUserToken), let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
     }
     
     var clientOnlyControllerBaseURLParam: Param? {
-        return self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramBaseURL)
+        if let dynamicAttribute = self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramBaseURL), let properties = dynamicAttribute.properties, properties.contains("write") {
+            return dynamicAttribute
+        }
+        return nil
     }
     
     var clientOnlyControllerUpdateDeviceListCommandParam: Param? {
@@ -43,12 +59,5 @@ extension Node {
     
     var clientOnlyControllerNodeIdParam: Param? {
         return self.getServiceParam(forServiceType: Constants.matterControllerServiceType, andParamType: ClientOnlyControllerConstants.paramMatterNodeId)
-    }
-    
-    var isClientOnlyControllerFlowSupported: Bool {
-        if self.isClientOnlyControllerSupported, let _ = clientOnlyControllerBaseURLParam, let _ = clientOnlyControllerGroupParam, let _ = clientOnlyControllerUserTokenParam {
-            return true
-        }
-        return false
     }
 }

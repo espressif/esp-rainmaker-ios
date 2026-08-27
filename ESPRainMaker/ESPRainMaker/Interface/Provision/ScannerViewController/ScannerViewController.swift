@@ -277,6 +277,12 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     @IBAction func cancelClickecd(_: Any) {
         navigationController?.popToRootViewController(animated: false)
     }
+    
+    private func goToOnNetworkDiscovery() {
+        // Create programmatically - view controller now supports programmatic initialization
+        let onNetworkVC = OnNetworkDiscoveryViewController()
+        navigationController?.pushViewController(onNetworkVC, animated: true)
+    }
 
     @IBAction func selectManualProvisioning(_: Any) {
         switch Configuration.shared.espProvSetting.transport {
@@ -311,6 +317,10 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             }
             actionSheet.addAction(mtrCommAction)
             #endif
+            let onNetworkAction = UIAlertAction(title: "On Network", style: .default) { _ in
+                self.goToOnNetworkDiscovery()
+            }
+            actionSheet.addAction(onNetworkAction)
             actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             
             // Configure for iPad
