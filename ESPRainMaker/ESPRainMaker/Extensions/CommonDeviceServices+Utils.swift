@@ -282,7 +282,7 @@ enum BleDeviceServiceFlow {
     static func detectSingleNodeScope(nodeIds: [String], configureBleNode: (String) -> Void) -> Bool {
         for nodeId in nodeIds {
             guard let node = User.shared.getNode(id: nodeId),
-                  node.isBleLocalControlServiceNode() else {
+                  node.isBleOnlyExcludedFromMultiDeviceServices() else {
                 continue
             }
             configureBleNode(nodeId)

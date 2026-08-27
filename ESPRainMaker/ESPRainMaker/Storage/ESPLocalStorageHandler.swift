@@ -20,6 +20,7 @@ import Foundation
 
 extension ESPLocalStorageKeys {
     static let scheduleDetails = "com.espressif.schedule.details"
+    static let sceneDetails = "com.espressif.scene.details"
     static let nodeGroups = "com.espressif.node.groups"
 }
 
@@ -27,6 +28,7 @@ extension ESPLocalStorageKeys {
 struct ESPLocalStorageHandler: ESPNodesStorageProtocol, ESPSchedulesStorageProtocol, ESPNodeGroupsStorageProtocol, ESPNotificationsStoreProtocol {
 
     let scheduleHandler = ESPLocalStorageSchedules(nil)
+    let sceneHandler = ESPLocalStorageScenes(nil)
     // Initiates handlers for shared local storage.
     let nodesHandler = ESPLocalStorageNodes(ESPLocalStorageKeys.suiteName)
     let nodeGroupHandler = ESPLocalStorageNodeGroups(ESPLocalStorageKeys.suiteName)
@@ -53,6 +55,10 @@ struct ESPLocalStorageHandler: ESPNodesStorageProtocol, ESPSchedulesStorageProto
             ESPScheduler.shared.schedules = fetchSchedules()
             ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodes ?? [])
         }
+        if Configuration.shared.appConfiguration.supportScene {
+            ESPSceneManager.shared.scenes = fetchScenes()
+            ESPSceneManager.shared.getAvailableDeviceWithSceneCapability(nodeList: nodes ?? [])
+        }
         return nodes
     }
     
@@ -64,6 +70,18 @@ struct ESPLocalStorageHandler: ESPNodesStorageProtocol, ESPSchedulesStorageProto
     // Check fetchSchedules: of ESPLocalStorageSchedules.
     func fetchSchedules() -> [String : ESPSchedule] {
         scheduleHandler.fetchSchedules()
+    }
+    
+    func saveScenes(scenes: [String : ESPScene]) {
+        sceneHandler.saveScenes(scenes: scenes)
+    }
+    
+    func fetchScenes() -> [String : ESPScene] {
+        sceneHandler.fetchScenes()
+    }
+    
+    func cleanupScenes() {
+        sceneHandler.cleanupScenes()
     }
     
     // Check cleanupSchedules: of ESPLocalStorageSchedules.
@@ -79,6 +97,7 @@ struct ESPLocalStorageHandler: ESPNodesStorageProtocol, ESPSchedulesStorageProto
     // Cleans all locally stored information like node details, node groups, etc. for current user.
     func cleanupData() {
         cleanupSchedules()
+        cleanupScenes()
         cleanupNodeDetails()
         cleanupNodeGroups()
         cleanupNotifications()

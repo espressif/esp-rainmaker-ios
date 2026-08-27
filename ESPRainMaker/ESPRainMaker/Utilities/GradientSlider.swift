@@ -234,6 +234,7 @@ import UIKit
         layer.addSublayer(_trackLayer)
         layer.addSublayer(_thumbLayer)
         _thumbLayer.addSublayer(_thumbIconLayer)
+        isExclusiveTouch = true
     }
 
     // MARK: - Layout
@@ -333,15 +334,16 @@ import UIKit
     override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
         super.beginTracking(touch, with: event)
         let pt = touch.location(in: self)
-
-        let center = _thumbLayer.position
-        let diameter = max(thumbSize, 44.0)
-        let r = CGRect(x: center.x - diameter / 2.0, y: center.y - diameter / 2.0, width: diameter, height: diameter)
-        if r.contains(pt) {
-            sendActions(for: UIControl.Event.touchDown)
-            return true
+        let hitArea = bounds.insetBy(dx: 0, dy: -12)
+        guard hitArea.contains(pt) else {
+            return false
         }
-        return false
+        disableInteractivePopForTracking()
+        let newValue = valueForLocation(point: pt)
+        setValue(newValue, animated: false)
+        sendActions(for: .touchDown)
+        sendActions(for: .valueChanged)
+        return true
     }
 
     override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
@@ -364,6 +366,53 @@ import UIKit
         }
         actionBlock(self, _value, true)
         sendActions(for: [UIControl.Event.valueChanged, UIControl.Event.touchUpInside])
+        restoreInteractivePopAfterTracking()
+    }
+
+    override func cancelTracking(with event: UIEvent?) {
+        restoreInteractivePopAfterTracking()
+        super.cancelTracking(with: event)
+    }
+
+    private var popRestoreEdgeEnabled: Bool?
+    private var popRestoreContentEnabled: Bool?
+
+    private func enclosingNavigationController() -> UINavigationController? {
+        var responder: UIResponder? = self
+        while let current = responder {
+            if let viewController = current as? UIViewController {
+                return viewController.navigationController
+            }
+            responder = current.next
+        }
+        return nil
+    }
+
+    private func disableInteractivePopForTracking() {
+        popRestoreEdgeEnabled = nil
+        popRestoreContentEnabled = nil
+        guard let navigationController = enclosingNavigationController() else {
+            return
+        }
+        popRestoreEdgeEnabled = navigationController.interactivePopGestureRecognizer?.isEnabled
+        popRestoreContentEnabled = navigationController.esp_interactiveContentPopGestureRecognizer?.isEnabled
+        navigationController.setInteractiveNavigationPopEnabled(false)
+    }
+
+    private func restoreInteractivePopAfterTracking() {
+        guard let navigationController = enclosingNavigationController() else {
+            popRestoreEdgeEnabled = nil
+            popRestoreContentEnabled = nil
+            return
+        }
+        if let edgeEnabled = popRestoreEdgeEnabled {
+            navigationController.interactivePopGestureRecognizer?.isEnabled = edgeEnabled
+        }
+        if let contentEnabled = popRestoreContentEnabled {
+            navigationController.esp_interactiveContentPopGestureRecognizer?.isEnabled = contentEnabled
+        }
+        popRestoreEdgeEnabled = nil
+        popRestoreContentEnabled = nil
     }
 
     // MARK: - Private Functions
@@ -434,5 +483,21 @@ import UIKit
         let colors = locations.map { UIColor(hue: $0, saturation: s, brightness: l, alpha: a).cgColor }
         _trackLayer.colors = colors
         _trackLayer.locations = locations as [NSNumber]
+    }
+}
+
+extension UINavigationController {
+    /// iOS 26 full-screen back-swipe. Looked up at runtime so this compiles against older SDKs.
+    var esp_interactiveContentPopGestureRecognizer: UIGestureRecognizer? {
+        let selector = NSSelectorFromString("interactiveContentPopGestureRecognizer")
+        guard responds(to: selector) else {
+            return nil
+        }
+        return perform(selector)?.takeUnretainedValue() as? UIGestureRecognizer
+    }
+
+    func setInteractiveNavigationPopEnabled(_ enabled: Bool) {
+        interactivePopGestureRecognizer?.isEnabled = enabled
+        esp_interactiveContentPopGestureRecognizer?.isEnabled = enabled
     }
 }

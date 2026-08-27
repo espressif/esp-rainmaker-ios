@@ -217,19 +217,14 @@ class DeviceTraitListViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        User.shared.bleLocalControl.resumeDiscovery()
         checkNetworkUpdate()
         checkOfflineStatus() // Update connection status when view appears
         tabBarController?.tabBar.isHidden = true
 
-        if let nodeId = device?.node?.node_id,
-           User.shared.bleLocalControl.isDiscovered(nodeId: nodeId),
-           !User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
-            User.shared.bleLocalControl.connectDevice(nodeId: nodeId) { [weak self] _ in
-                DispatchQueue.main.async {
-                    self?.checkOfflineStatus()
-                    self?.updateBleScheduleSceneOverflowMenu()
-                }
-            }
+        connectBleSessionForParamsScreen()
+        if let nodeId = device?.node?.node_id, User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            updateDeviceAttributesSilently()
         }
 
         updateBleScheduleSceneOverflowMenu()
@@ -266,6 +261,7 @@ class DeviceTraitListViewController: UIViewController {
     }
 
     @objc func localNetworkUpdateReceived() {
+        connectBleSessionForParamsScreen()
     }
     
     @objc func reloadParamTableView() {
@@ -425,7 +421,7 @@ class DeviceTraitListViewController: UIViewController {
             return
         }
         
-        if device?.isReachable() ?? false {
+        if shouldPollDeviceParams() {
             updateDeviceAttributesSilently()
         }
     }
@@ -561,13 +557,7 @@ class DeviceTraitListViewController: UIViewController {
     @objc func checkOfflineStatus() {
         updateNwChangeDeviceNode()
         DispatchQueue.main.async {
-            let nodeId = self.device?.node?.node_id ?? "unknown"
-            let localNetwork = self.device?.node?.localNetwork ?? false
-            let isConnected = self.device?.node?.isConnected ?? false
-            let isMatter = (self.device?.node as? Node)?.isMatter ?? false
-            
-            // Check if this is a Matter device and use Node.connectionStatus
-            if let node = self.device?.node as? Node, node.isMatter {
+            if let node = self.device?.node, node.isMatter {
                 // Use Node.connectionStatus for Matter devices
                 let connectionStatus = node.connectionStatus
                 switch connectionStatus {
@@ -589,34 +579,19 @@ class DeviceTraitListViewController: UIViewController {
                     self.offlineLabel.text = statusText.isEmpty ? "Offline" : statusText
                     self.offlineLabel.isHidden = false
                 }
-            } else {
-                // For non-Matter devices, use existing logic
-                let bleLocalNetwork = self.device?.node?.bleLocalNetwork ?? false
-                if localNetwork {
-                    if self.device.node?.supportsEncryption ?? false {
-                        self.offlineLabel.text = "🔒 Reachable on WLAN"
-                    } else {
-                        self.offlineLabel.text = "Reachable on WLAN"
-                    }
-                    self.offlineLabel.isHidden = false
-                } else if bleLocalNetwork {
-                    if self.device?.node?.bleLocalControlConnected == true
-                        || User.shared.bleLocalControl.isConnected(nodeId: self.device?.node?.node_id ?? "") {
-                        self.offlineLabel.text = "Connected on BLE"
-                    } else {
-                        self.offlineLabel.text = "Reachable on BLE"
-                    }
-                    self.offlineLabel.isHidden = false
-                } else if isConnected {
-                    // Regular Rainmaker device - hide label when connected
+            } else if let node = self.device?.node {
+                switch node.preferredParamTransport() {
+                case .cloud:
                     self.offlineLabel.text = ""
                     self.offlineLabel.isHidden = true
-                } else {
-                    // Device is offline - always show the label
-                    let statusText = self.device?.node?.nodeStatus ?? ""
+                case .wlan, .ble, .none:
+                    let statusText = node.paramControlStatusText()
                     self.offlineLabel.text = statusText.isEmpty ? "Offline" : statusText
                     self.offlineLabel.isHidden = false
                 }
+            } else {
+                self.offlineLabel.text = "Offline"
+                self.offlineLabel.isHidden = false
             }
             // Update refresh control state when connection status changes
             self.updateRefreshControlState()
@@ -650,6 +625,17 @@ class DeviceTraitListViewController: UIViewController {
             }
         }
     }
+
+    /// Cloud/WLAN reachable, or BLE-only with a discovered/connected session (Android device-screen poll).
+    private func shouldPollDeviceParams() -> Bool {
+        if device?.isReachable() == true {
+            return true
+        }
+        guard let node = device?.node, let nodeId = node.node_id else {
+            return false
+        }
+        return node.preferredParamTransport() == .ble && User.shared.bleLocalControl.isAvailable(nodeId: nodeId)
+    }
     
     /// Suspend polling during notification updates
     private func suspendPolling() {
@@ -680,7 +666,9 @@ class DeviceTraitListViewController: UIViewController {
     /// Update device attributes silently (no loader, no UI blocking)
     private func updateDeviceAttributesSilently() {
         guard !shouldSkipUpdate(), let nodeId = device?.node?.node_id else { return }
-        
+        let previousValues = dataSource.map { ($0.name ?? "", $0.value) }
+        let previousParamNames = Set(dataSource.compactMap { $0.name })
+
         NetworkManager.shared.getNodeInfo(nodeId: nodeId) { [weak self] node, error in
             guard let self = self, error == nil, let node = node else { return }
             DispatchQueue.main.async {
@@ -694,9 +682,8 @@ class DeviceTraitListViewController: UIViewController {
                 User.shared.associatedNodeList?[index] = node
                 
                 if let currentDevice = node.devices?.first(where: { $0.name == self.device?.name }) {
-                    // Store old dataSource to detect structural changes (params added/removed)
-                    let oldDataSource = self.dataSource.map { ($0.name ?? "", $0.value) }
-                    let oldParamNames = Set(self.dataSource.compactMap { $0.name })
+                    let oldDataSource = previousValues
+                    let oldParamNames = previousParamNames
                     
                     // Update device
                     self.device = currentDevice
@@ -1323,6 +1310,36 @@ extension DeviceTraitListViewController {
         return sceneCapableDeviceCopy(from: device) != nil
     }
 
+    /// Open a BLE session when this screen is shown so set_params does not have to connect first.
+    private func connectBleSessionForParamsScreen() {
+        guard shouldUseBleParamSession(), let nodeId = device?.node?.node_id else { return }
+        let ble = User.shared.bleLocalControl
+        if ble.isConnected(nodeId: nodeId) {
+            return
+        }
+        if ble.isDiscovered(nodeId: nodeId) {
+            ble.connectDevice(nodeId: nodeId) { [weak self] success in
+                DispatchQueue.main.async {
+                    self?.checkOfflineStatus()
+                    self?.updateBleScheduleSceneOverflowMenu()
+                    if success {
+                        self?.updateDeviceAttributesSilently()
+                    }
+                }
+            }
+            return
+        }
+        ble.scanForDevices()
+    }
+
+    private func shouldUseBleParamSession() -> Bool {
+        guard let node = device?.node else { return false }
+        if node.isBleOnlyExcludedFromMultiDeviceServices() {
+            return true
+        }
+        return node.preferredParamTransport() == .ble
+    }
+
     private func ensureBleConnectedThen(_ action: @escaping () -> Void) {
         guard let nodeId = device?.node?.node_id else { return }
         if User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
@@ -1448,6 +1465,7 @@ extension DeviceTraitListViewController {
         }
         scheduleVC.isBleSingleDeviceFlow = true
         scheduleVC.isNewSchedule = true
+        ESPScheduler.shared.isEditorActive = true
         nav.pushViewController(scheduleVC, animated: true)
     }
 
@@ -1474,6 +1492,7 @@ extension DeviceTraitListViewController {
         let sceneVC = SceneViewController.getVC(isNewScene: true)
         sceneVC.sceneName = name
         sceneVC.isBleSingleDeviceFlow = true
+        ESPSceneManager.shared.isEditorActive = true
         nav.pushViewController(sceneVC, animated: true)
     }
 

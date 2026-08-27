@@ -566,16 +566,7 @@ class SuccessViewController: UIViewController {
                     // Always store the node, regardless of client-only controller support
                     self.finalNode = newNode
                     
-                    for service in newNode.services ?? [] {
-                        if service.type?.lowercased() == Constants.timezoneServiceName {
-                            if let param = service.params?.first(where: { $0.type?.lowercased() == Constants.timezoneServiceParam }) {
-                                let timezone = param.value as? String
-                                if timezone == nil || timezone!.isEmpty {
-                                    DeviceControlHelper.shared.updateParam(nodeID: nodeID, parameter: [service.name ?? "Time": [param.name ?? "": TimeZone.current.identifier]], delegate: nil)
-                                }
-                            }
-                        }
-                    }
+                    DeviceControlHelper.shared.applyProvisionTimeServiceParams(nodeID: nodeID, services: newNode.services)
                     // Re-evaluate step 5 whenever node details arrive (not only when Time service is present),
                     // so controller group flow runs after connect + fetch even if esp.service.time is missing.
                     self.check5thStepStatus()

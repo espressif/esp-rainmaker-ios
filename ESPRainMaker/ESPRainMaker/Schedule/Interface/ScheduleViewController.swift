@@ -60,16 +60,17 @@ class ScheduleViewController: UIViewController {
             return
         }
         
-        if !isBleSingleDeviceFlow {
-            isBleSingleDeviceFlow = ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: schedule)
+        if schedule.id == nil {
+            isNewSchedule = true
         }
-        // Update list of available devices for schedule
-        if !isBleSingleDeviceFlow, let nodeList = User.shared.associatedNodeList {
-            ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+        if isNewSchedule {
+            if !isBleSingleDeviceFlow, let nodeList = User.shared.associatedNodeList {
+                ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+            }
+            ESPScheduler.shared.configureDeviceForCurrentSchedule()
+        } else {
+            isBleSingleDeviceFlow = ESPScheduler.shared.prepareAvailableDevices(for: schedule)
         }
-        
-        // Configure view for current schedule
-        ESPScheduler.shared.configureDeviceForCurrentSchedule()
         
         failedSchedule = getFailedSchedule(schedule: schedule)
         
@@ -87,7 +88,6 @@ class ScheduleViewController: UIViewController {
             removeButton.setTitle("Remove", for: .normal)
             removeButton.setImage(UIImage(named: "trash"), for: .normal)
         } else {
-            isNewSchedule = true
             scheduleNameLabel.text = schedule.name
             setNameViewHeight(label: scheduleNameLabel)
             removeButton.isHidden = true
@@ -110,14 +110,19 @@ class ScheduleViewController: UIViewController {
         removeButton.layer.borderColor = UIColor(hexString: "#f45c10").cgColor
         removeButton.backgroundColor = UIColor(hexString: "#FFECE4")
         setRepeatStatus()
+        ESPScheduler.shared.isEditorActive = true
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isMovingFromParent {
+            ESPScheduler.shared.isEditorActive = false
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = true
-        if !isBleSingleDeviceFlow {
-            isBleSingleDeviceFlow = ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPScheduler.shared.currentSchedule)
-        }
         // Show list of actions added on a schedule.
         getDeSelectedNodeIDs()
         let actionList = ESPScheduler.shared.getActionList()
@@ -426,8 +431,8 @@ class ScheduleViewController: UIViewController {
     }
 
     @IBAction func selectDevicesPressed(_: Any) {
-        if !isBleSingleDeviceFlow {
-            isBleSingleDeviceFlow = ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPScheduler.shared.currentSchedule)
+        if !isNewSchedule {
+            isBleSingleDeviceFlow = ESPScheduler.shared.prepareAvailableDevices(for: ESPScheduler.shared.currentSchedule)
         }
         BleDeviceServiceFlow.prepareForActionPicker(ESPScheduler.shared.availableDevices, kind: .schedule)
         guard let selectDeviceVC = storyboard?.instantiateViewController(withIdentifier: "selecDevicesVC") as? SelectDevicesViewController else {

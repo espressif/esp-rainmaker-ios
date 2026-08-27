@@ -221,17 +221,33 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         cell.layer.masksToBounds = false
 
         cell.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
-        let isLocallyReachable = (device.node?.localNetwork ?? false) || (device.node?.bleLocalNetwork ?? false)
-        if isLocallyReachable {
-            cell.statusView.isHidden = false
-        } else if device.node?.isConnected ?? false {
-            cell.statusView.isHidden = true
+        if let node = device.node, node.isMatter {
+            let isLocallyReachable = node.localNetwork || node.bleLocalNetwork
+            if isLocallyReachable {
+                cell.statusView.isHidden = false
+            } else if node.isConnected {
+                cell.statusView.isHidden = true
+            } else {
+                cell.statusView.isHidden = false
+                cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
+            }
+            cell.offlineLabel.text = node.nodeStatus
+        } else if let node = device.node {
+            switch node.preferredParamTransport() {
+            case .wlan, .ble:
+                cell.statusView.isHidden = false
+            case .cloud:
+                cell.statusView.isHidden = true
+            case .none:
+                cell.statusView.isHidden = false
+                cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
+            }
+            cell.offlineLabel.text = node.paramControlStatusText()
         } else {
             cell.statusView.isHidden = false
             cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
+            cell.offlineLabel.text = "Offline"
         }
-
-        cell.offlineLabel.text = device.node?.nodeStatus ?? ""
 
         var primaryKeyFound = false
 

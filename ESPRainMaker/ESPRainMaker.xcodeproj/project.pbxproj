@@ -98,8 +98,6 @@
 		0C80AA2D26FDBD4B00480C53 /* ESPLogoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1B26FDBD4B00480C53 /* ESPLogoutService.swift */; };
 		0C80AA2E26FDBD4B00480C53 /* ESPCreateUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1C26FDBD4B00480C53 /* ESPCreateUserService.swift */; };
 		0C80AA2F26FDBD4B00480C53 /* ESPIdProviderLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1D26FDBD4B00480C53 /* ESPIdProviderLoginService.swift */; };
-		B7E1F00226FDBD4B00480C53 /* ESPFederatedLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */; };
-		B7E1F00426FDBD4B00480C53 /* ESPGoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */; };
 		0C80AA3026FDBD4B00480C53 /* ESPExtendSessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1E26FDBD4B00480C53 /* ESPExtendSessionService.swift */; };
 		0C80AA3126FDBD4B00480C53 /* ESPForgotPasswordService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1F26FDBD4B00480C53 /* ESPForgotPasswordService.swift */; };
 		0C80AA3226FDBD4B00480C53 /* ESPChangePasswordService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA2026FDBD4B00480C53 /* ESPChangePasswordService.swift */; };
@@ -163,6 +161,9 @@
 		0CBLE0522C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0512C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift */; };
 		0CBLE0622C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0612C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift */; };
 		0CBLE0722C75CD00ADB85617 /* ESPBleLocalControl+Params.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0712C75CD00ADB85617 /* ESPBleLocalControl+Params.swift */; };
+		0CBLE0822C75CD00ADB85618 /* ESPBleDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0812C75CD00ADB85618 /* ESPBleDiscoveryService.swift */; };
+		0CBLE0922C75CD00ADB85619 /* User+BleLocalControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0912C75CD00ADB85619 /* User+BleLocalControl.swift */; };
+		0CBLE0A22C75CD00ADB8561A /* NetworkManager+BleLocalControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0A12C75CD00ADB8561A /* NetworkManager+BleLocalControl.swift */; };
 		0CC11EFA2C7A10C300047627 /* AppDelegate+WXApiDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC11EF92C7A10C300047627 /* AppDelegate+WXApiDelegate.swift */; };
 		0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */; };
 		0CC91FFB2B3BCAEE00EAC1E7 /* ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC91FFA2B3BCAEE00EAC1E7 /* ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift */; };
@@ -268,6 +269,11 @@
 		143146B520EB273B0017E119 /* ProvisionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143146B420EB273B0017E119 /* ProvisionViewController.swift */; };
 		144149442126AE09002AD5E1 /* SuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144149432126AE09002AD5E1 /* SuccessViewController.swift */; };
 		7A5756242D5B53AC008BB40B /* ESPMTRCommissioner+ThreadBorderRouterManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5756232D5B53A7008BB40B /* ESPMTRCommissioner+ThreadBorderRouterManagement.swift */; };
+		A1B2C3D52EE2D600000F40F7 /* ControllerServiceParamUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42EE2D600000F40F7 /* ControllerServiceParamUpdater.swift */; };
+		A1B2C3D72EE2D610000F40F7 /* Node+RmControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D62EE2D610000F40F7 /* Node+RmControllerUtility.swift */; };
+		A1B2C3D92EE2D620000F40F7 /* Node+GroupsServiceUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */; };
+		B7E1F00226FDBD4B00480C53 /* ESPFederatedLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */; };
+		B7E1F00426FDBD4B00480C53 /* ESPGoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */; };
 		C512AEC5D6D74B9240C94CDB /* Pods_ESPRainMaker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8540FD629D257CB4F3BB2A2 /* Pods_ESPRainMaker.framework */; };
 		F1012F62251110B300839F06 /* Schedule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F1012F61251110B300839F06 /* Schedule.storyboard */; };
 		F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */; };
@@ -684,11 +690,8 @@
 		F87C31E02DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */; };
 		F8916C242EE2D4BF000F40F7 /* RainmakerControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */; };
 		F8916C262EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */; };
-		F8916C2A2EE2F001000F40F7 /* NodeControllerParamUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */; };
-		A1B2C3D52EE2D600000F40F7 /* ControllerServiceParamUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42EE2D600000F40F7 /* ControllerServiceParamUpdater.swift */; };
-		A1B2C3D72EE2D610000F40F7 /* Node+RmControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D62EE2D610000F40F7 /* Node+RmControllerUtility.swift */; };
-		A1B2C3D92EE2D620000F40F7 /* Node+GroupsServiceUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */; };
 		F8916C282EE2EBE8000F40F7 /* ESPReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C272EE2EBE8000F40F7 /* ESPReviewManager.swift */; };
+		F8916C2A2EE2F001000F40F7 /* NodeControllerParamUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */; };
 		F8A1D3E62F7C4A1100B12345 /* DetailedStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1D3E52F7C4A1100B12345 /* DetailedStats.swift */; };
 		F8A9418A2E438BED00E669AE /* ESPMTRCommissionerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A941892E438BED00E669AE /* ESPMTRCommissionerManager.swift */; };
 		F8D1CAD12E54561E00962FEF /* PairingModeMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D1CAD02E54561800962FEF /* PairingModeMessages.swift */; };
@@ -847,8 +850,6 @@
 		0C80AA1B26FDBD4B00480C53 /* ESPLogoutService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPLogoutService.swift; sourceTree = "<group>"; };
 		0C80AA1C26FDBD4B00480C53 /* ESPCreateUserService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPCreateUserService.swift; sourceTree = "<group>"; };
 		0C80AA1D26FDBD4B00480C53 /* ESPIdProviderLoginService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPIdProviderLoginService.swift; sourceTree = "<group>"; };
-		B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPFederatedLoginService.swift; sourceTree = "<group>"; };
-		B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPGoogleSignInService.swift; sourceTree = "<group>"; };
 		0C80AA1E26FDBD4B00480C53 /* ESPExtendSessionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPExtendSessionService.swift; sourceTree = "<group>"; };
 		0C80AA1F26FDBD4B00480C53 /* ESPForgotPasswordService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPForgotPasswordService.swift; sourceTree = "<group>"; };
 		0C80AA2026FDBD4B00480C53 /* ESPChangePasswordService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPChangePasswordService.swift; sourceTree = "<group>"; };
@@ -912,6 +913,9 @@
 		0CBLE0512C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPBleLocalControl+Scan.swift"; sourceTree = "<group>"; };
 		0CBLE0612C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPBleLocalControl+Connect.swift"; sourceTree = "<group>"; };
 		0CBLE0712C75CD00ADB85617 /* ESPBleLocalControl+Params.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPBleLocalControl+Params.swift"; sourceTree = "<group>"; };
+		0CBLE0812C75CD00ADB85618 /* ESPBleDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPBleDiscoveryService.swift; sourceTree = "<group>"; };
+		0CBLE0912C75CD00ADB85619 /* User+BleLocalControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User+BleLocalControl.swift"; sourceTree = "<group>"; };
+		0CBLE0A12C75CD00ADB8561A /* NetworkManager+BleLocalControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkManager+BleLocalControl.swift"; sourceTree = "<group>"; };
 		0CC11EF92C7A10C300047627 /* AppDelegate+WXApiDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+WXApiDelegate.swift"; sourceTree = "<group>"; };
 		0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSceneActionAllowedProtocol.swift; sourceTree = "<group>"; };
 		0CC91FFA2B3BCAEE00EAC1E7 /* ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift"; sourceTree = "<group>"; };
@@ -1022,8 +1026,13 @@
 		143146B420EB273B0017E119 /* ProvisionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvisionViewController.swift; sourceTree = "<group>"; };
 		144149432126AE09002AD5E1 /* SuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessViewController.swift; sourceTree = "<group>"; };
 		7A5756232D5B53A7008BB40B /* ESPMTRCommissioner+ThreadBorderRouterManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPMTRCommissioner+ThreadBorderRouterManagement.swift"; sourceTree = "<group>"; };
+		A1B2C3D42EE2D600000F40F7 /* ControllerServiceParamUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerServiceParamUpdater.swift; sourceTree = "<group>"; };
+		A1B2C3D62EE2D610000F40F7 /* Node+RmControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+RmControllerUtility.swift"; sourceTree = "<group>"; };
+		A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+GroupsServiceUtility.swift"; sourceTree = "<group>"; };
 		A8540FD629D257CB4F3BB2A2 /* Pods_ESPRainMaker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ESPRainMaker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8D7A5E88F616C17F1DFA81F /* Pods-ESPRainMaker.esprainmaker-release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ESPRainMaker.esprainmaker-release.xcconfig"; path = "Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker.esprainmaker-release.xcconfig"; sourceTree = "<group>"; };
+		B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPFederatedLoginService.swift; sourceTree = "<group>"; };
+		B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPGoogleSignInService.swift; sourceTree = "<group>"; };
 		EA1B9B9CBC01A94083166C44 /* Pods-ESPRainMaker.esprainmakermatter.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ESPRainMaker.esprainmakermatter.xcconfig"; path = "Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker.esprainmakermatter.xcconfig"; sourceTree = "<group>"; };
 		F1012F61251110B300839F06 /* Schedule.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Schedule.storyboard; sourceTree = "<group>"; };
 		F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLELandingViewController.swift; sourceTree = "<group>"; };
@@ -1406,11 +1415,8 @@
 		F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = esp_rmaker_chal_resp.pb.swift; sourceTree = "<group>"; };
 		F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainmakerControllerConstants.swift; sourceTree = "<group>"; };
 		F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+RmakerControllerUtility.swift"; sourceTree = "<group>"; };
-		F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeControllerParamUpdater.swift; sourceTree = "<group>"; };
-		A1B2C3D42EE2D600000F40F7 /* ControllerServiceParamUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerServiceParamUpdater.swift; sourceTree = "<group>"; };
-		A1B2C3D62EE2D610000F40F7 /* Node+RmControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+RmControllerUtility.swift"; sourceTree = "<group>"; };
-		A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+GroupsServiceUtility.swift"; sourceTree = "<group>"; };
 		F8916C272EE2EBE8000F40F7 /* ESPReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPReviewManager.swift; sourceTree = "<group>"; };
+		F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeControllerParamUpdater.swift; sourceTree = "<group>"; };
 		F8A1D3E52F7C4A1100B12345 /* DetailedStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedStats.swift; sourceTree = "<group>"; };
 		F8A941892E438BED00E669AE /* ESPMTRCommissionerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRCommissionerManager.swift; sourceTree = "<group>"; };
 		F8D1CAD02E54561800962FEF /* PairingModeMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingModeMessages.swift; sourceTree = "<group>"; };
@@ -2312,6 +2318,7 @@
 				0CBLE0512C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift */,
 				0CBLE0612C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift */,
 				0CBLE0712C75CD00ADB85617 /* ESPBleLocalControl+Params.swift */,
+				0CBLE0812C75CD00ADB85618 /* ESPBleDiscoveryService.swift */,
 				0CBLE0212C75CD00ADB85611 /* Node+BleLocalControl.swift */,
 				0CBLE0312C75CD00ADB85612 /* ESPBleLocalCtrlProvisioningHelper.swift */,
 				F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */,
@@ -2348,6 +2355,7 @@
 				F809FF3D2E09B64B008BD38D /* ESPAssumeRoleCredentialsProvider.swift */,
 				F122619F22C61695004D049F /* DeviceAssociation.swift */,
 				F1C8082B22CA17790098F3B4 /* NetworkManager.swift */,
+				0CBLE0A12C75CD00ADB8561A /* NetworkManager+BleLocalControl.swift */,
 				F1E46CA0253ED6B9007000FB /* ESPAPIManager.swift */,
 				F1C8F405260CDA3800A79767 /* ESPCustomJsonEncoder.swift */,
 				0C40754A2C89D30F00FCACD8 /* ESPServerTrustEvaluatorsWorker.swift */,
@@ -2851,6 +2859,7 @@
 				F1DD70A322A8EA140092DAB9 /* Utility.swift */,
 				F1DD70A522A8EA2A0092DAB9 /* Constants.swift */,
 				F12261A322C620ED004D049F /* User.swift */,
+				0CBLE0912C75CD00ADB85619 /* User+BleLocalControl.swift */,
 				F1AB511A23321B7E002401F9 /* JSONParser.swift */,
 				F1FB153E234DED260053B0ED /* Errors.swift */,
 				F17F1411239F96C3008326A4 /* VersionManager.swift */,
@@ -3456,9 +3465,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3632,6 +3645,7 @@
 				0CBLE0522C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift in Sources */,
 				0CBLE0622C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift in Sources */,
 				0CBLE0722C75CD00ADB85617 /* ESPBleLocalControl+Params.swift in Sources */,
+				0CBLE0822C75CD00ADB85618 /* ESPBleDiscoveryService.swift in Sources */,
 				0CBLE0222C75CD00ADB85611 /* Node+BleLocalControl.swift in Sources */,
 				0CBLE0322C75CD00ADB85612 /* ESPBleLocalCtrlProvisioningHelper.swift in Sources */,
 				0CBLE0422C75CD00ADB85613 /* esp_rmaker_prov_local_ctrl.pb.swift in Sources */,
@@ -3782,6 +3796,7 @@
 				0CD359462A2D25F30081017C /* ESPMTRCommissioner+Setup.swift in Sources */,
 				F1390F3B27D8D6A800F80DFB /* ESPGetAutomationService.swift in Sources */,
 				F12261A422C620ED004D049F /* User.swift in Sources */,
+				0CBLE0922C75CD00ADB85619 /* User+BleLocalControl.swift in Sources */,
 				F13A01BA23E98B690067F8B8 /* UserInfo.swift in Sources */,
 				0C387F7E2A2F442A00C5EFA4 /* NotificationsViewController.swift in Sources */,
 				F1124F67268D0A0900FA0B9E /* ESPNodeSharingDeclinedEvent.swift in Sources */,
@@ -3881,6 +3896,7 @@
 				0C80AA3926FDBEF200480C53 /* ESPKeychainErrors.swift in Sources */,
 				F11DC9A12577772F00603BF5 /* DropDownTableViewCell.swift in Sources */,
 				F1C8082C22CA17790098F3B4 /* NetworkManager.swift in Sources */,
+				0CBLE0A22C75CD00ADB8561A /* NetworkManager+BleLocalControl.swift in Sources */,
 				0C2426DE2BF4A5B6004BDF49 /* ESPNodeGroupSharingDeclinedEvent.swift in Sources */,
 				F18744202695EE1400971591 /* NotificationsTableViewCell.swift in Sources */,
 				F123428724D0131200CAD4A2 /* ScheduleGenericTableViewCell.swift in Sources */,
@@ -4403,6 +4419,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/ESPRainMaker/Matter/ESPMTRCommissioner/Framework",
 					"$(PROJECT_DIR)/ESPRainMaker/Matter/ESPMTRCommissioner",
+					"$(PROJECT_DIR)/ESPRainMaker",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -4419,7 +4436,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.8.1;
+				MARKETING_VERSION = 3.9.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -4803,6 +4820,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/ESPRainMaker/Matter/ESPMTRCommissioner/Framework",
 					"$(PROJECT_DIR)/ESPRainMaker/Matter/ESPMTRCommissioner",
+					"$(PROJECT_DIR)/ESPRainMaker",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -4819,7 +4837,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/SDK",
 				);
-				MARKETING_VERSION = 3.8.1;
+				MARKETING_VERSION = 3.9.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

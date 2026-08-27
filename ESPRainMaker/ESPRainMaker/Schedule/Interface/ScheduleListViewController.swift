@@ -36,8 +36,8 @@ class ScheduleListViewController: UIViewController {
         super.viewDidLoad()
         
         ESPScheduler.shared.currentScheduleKey = nil
-        // Ensure devices are loaded immediately
-        if ESPScheduler.shared.availableDevices.count == 0, let nodeList = User.shared.associatedNodeList {
+        // Force reload the available devices from the node list
+        if let nodeList = User.shared.associatedNodeList {
             ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
         }
         
@@ -77,19 +77,21 @@ class ScheduleListViewController: UIViewController {
         }
         checkNetworkUpdate()
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(bleLocalNetworkUpdate), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender _: Any?) {
         if segue.identifier == Constants.addScheduleSegue || segue.identifier == Constants.addNewScheduleSegue {
+            ESPScheduler.shared.addSchedule()
             if let vc = segue.destination as? ScheduleViewController {
                 vc.delegate = self
             }
-            ESPScheduler.shared.addSchedule()
         }
     }
 
@@ -101,6 +103,10 @@ class ScheduleListViewController: UIViewController {
                 self.networkIndicator.isHidden = false
             }
         }
+    }
+
+    @objc private func bleLocalNetworkUpdate() {
+        overlayBleFirmwareAndShowList()
     }
 
     // MARK: -  IBActions
@@ -116,7 +122,7 @@ class ScheduleListViewController: UIViewController {
 
     @IBAction func refreshScheduleList(_: Any) {
         refreshControl.endRefreshing()
-        NetworkManager.shared.refreshAssociatedNodesThenOverlayBleFirmware {
+        NetworkManager.shared.refreshNodesWithBleOverlay {
             Utility.hideLoader(view: self.view)
             DispatchQueue.main.async {
                 self.showScheduleList()
@@ -222,6 +228,7 @@ extension ScheduleListViewController: UITableViewDelegate {
         ESPScheduler.shared.currentSchedule = schedule
         scheduleVC.scheduleKey = scheduleList[index]
         ESPScheduler.shared.currentScheduleKey = scheduleList[index]
+        ESPScheduler.shared.isEditorActive = true
         navigationController?.pushViewController(scheduleVC, animated: true)
     }
 
@@ -279,12 +286,9 @@ extension ScheduleListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleListTVC", for: indexPath) as! ScheduleListTableViewCell
-        ESPScheduler.shared.currentSchedule = schedule
-        ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: schedule)
-        ESPScheduler.shared.configureDeviceForCurrentSchedule()
         cell.schedule = schedule
         cell.scheduleLabel.text = schedule.name ?? ""
-        cell.actionLabel.text = ESPScheduler.shared.getActionList()
+        cell.actionLabel.text = ESPScheduler.shared.actionList(for: schedule)
         cell.timerLabel.text = schedule.trigger.getTimeDetails()
         if schedule.trigger.days == 0 {
             cell.daysLabel.text = "Once"

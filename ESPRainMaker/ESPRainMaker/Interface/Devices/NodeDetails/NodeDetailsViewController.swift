@@ -30,6 +30,7 @@ class NodeDetailsViewController: UIViewController {
     // Constants
     let systemServices = "System Services"
     let firmwareUpdate = "firmwareUpdate"
+    let syncTime = "syncTime"
     let enablePairingMode = "enablePairingMode"
     let bindingAction = "bindingAction"
     let wifiProvisioning = Constants.wifiProvisioningTitle
@@ -46,6 +47,7 @@ class NodeDetailsViewController: UIViewController {
     var sharingIndex = 0
     var timeZoneParam: Param!
     var timeZoneService: Service!
+    var timeStampParam: Param?
     var shareAction: UIAlertAction?
     
     var vendorId: String?
@@ -91,6 +93,7 @@ class NodeDetailsViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        User.shared.bleLocalControl.resumeDiscovery()
         tabBarController?.tabBar.isHidden = true
         createDataSource()
     }
@@ -310,6 +313,38 @@ class NodeDetailsViewController: UIViewController {
         }
     }
     #endif
+
+    private func getTableViewCellForSyncTime(forIndexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailActionTVC", for: forIndexPath) as! NodeDetailActionTableViewCell
+        cell.nodeDetailActionLabel.text = "Sync Time"
+        cell.addMemberButtonAction = { [weak self] in
+            self?.syncNodeTime()
+        }
+        return cell
+    }
+
+    private func syncNodeTime() {
+        guard let paramName = timeStampParam?.name, !paramName.isEmpty,
+              let serviceName = timeZoneService?.name, !serviceName.isEmpty else {
+            return
+        }
+        let epoch = Int(Date().timeIntervalSince1970)
+        DeviceControlHelper.shared.updateParam(
+            nodeID: currentNode.node_id,
+            parameter: [serviceName: [paramName: epoch]],
+            delegate: nil
+        ) { [weak self] status in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                switch status {
+                case .success:
+                    Utility.showToastMessage(view: self.view, message: "Time synced.")
+                default:
+                    Utility.showToastMessage(view: self.view, message: "Failed to sync time.")
+                }
+            }
+        }
+    }
     
     /// Remove fabric
     /// - Parameter completion: completion handler
@@ -386,12 +421,17 @@ class NodeDetailsViewController: UIViewController {
             dataSource[index].append("Product Name:\(productName)")
         }
         #endif
+        timeStampParam = nil
         if let tzService = currentNode.services?.first(where: { $0.type == Constants.timezoneServiceName }) {
+            timeZoneService = tzService
             if let tzParam = tzService.params?.first(where: { $0.type == Constants.timezoneServiceParam }) {
                 let timezone = tzParam.value as? String
                 timeZoneParam = tzParam
-                timeZoneService = tzService
                 dataSource[index].append("Timezone:\(timezone ?? "")")
+            }
+            if let tsParam = tzService.params?.first(where: { $0.type == Constants.timezoneTimestampParam }) {
+                timeStampParam = tsParam
+                dataSource[index].append(syncTime)
             }
         }
         if let attributes = currentNode.attributes {
@@ -483,6 +523,7 @@ class NodeDetailsViewController: UIViewController {
         #endif
         
         if let nodeId = currentNode.node_id,
+           currentNode.isFirmwareWifiCapable(),
            User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
             let caps = User.shared.bleLocalControl.deviceCapabilities(nodeId: nodeId) ?? []
             if caps.contains(ESPScanConstants.wiFiScan) || caps.contains(ESPScanConstants.wifiProv) {
@@ -864,6 +905,9 @@ extension NodeDetailsViewController: UITableViewDataSource {
         }
         
         let value = dataSource[indexPath.section][indexPath.row + 1]
+        if value == syncTime {
+            return getTableViewCellForSyncTime(forIndexPath: indexPath)
+        }
         if let firstIndex = value.firstIndex(of: ":") {
             let title = String(value[..<firstIndex])
 
@@ -911,6 +955,7 @@ extension NodeDetailsViewController: UITableViewDataSource {
                 Utility.showToastMessage(view: view, message: "BLE connection required for Wi-Fi provisioning.")
                 return
             }
+            User.shared.bleLocalControl.pauseDiscovery()
             let openProvision: () -> Void = { [weak self] in
                 guard let self = self else { return }
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -933,6 +978,7 @@ extension NodeDetailsViewController: UITableViewDataSource {
                     case .connected:
                         openProvision()
                     default:
+                        User.shared.bleLocalControl.resumeDiscovery()
                         Utility.showToastMessage(view: self.view, message: "BLE session failed. Cannot open Wi-Fi provisioning.")
                     }
                 }

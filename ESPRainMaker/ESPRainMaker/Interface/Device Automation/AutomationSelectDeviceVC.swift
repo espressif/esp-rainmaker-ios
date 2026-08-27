@@ -55,6 +55,17 @@ class AutomationSelectDeviceVC: UIViewController, SelectDeviceActionCellDelegate
             rightBarButton.setTitle("Save", for: .normal)
         }
         enableSaveButton()
+        devicesTableView.delaysContentTouches = false
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setInteractiveNavigationPopEnabled(false)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setInteractiveNavigationPopEnabled(true)
     }
     
     // MARK: - IB Actions

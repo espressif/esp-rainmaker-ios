@@ -26,8 +26,18 @@ class SelectDevicesViewController: UIViewController, ScheduleActionDelegate, Sel
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
         self.registerCells(tableView)
+        tableView.delaysContentTouches = false
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setInteractiveNavigationPopEnabled(false)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setInteractiveNavigationPopEnabled(true)
     }
 
     // MARK: - IBActions

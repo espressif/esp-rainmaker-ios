@@ -24,6 +24,14 @@ struct BleLocalCtrlInfo {
     let pop: String
 }
 
+/// Transport used for param get/set. BLE is last.
+enum ESPParamTransport {
+    case wlan
+    case cloud
+    case ble
+    case none
+}
+
 extension Node {
 
     /// Parse `metadata.ble_local_ctrl` for post-provision BLE control.
@@ -47,6 +55,47 @@ extension Node {
     /// Cloud-connected, on WLAN, or reachable over BLE (discovered or connected).
     func isParamReachable() -> Bool {
         isConnected || localNetwork || bleLocalNetwork
+    }
+
+    /// Phone can reach RainMaker cloud for this node.
+    func isCloudParamTransportAvailable() -> Bool {
+        isConnected && ESPNetworkMonitor.shared.isConnectedToNetwork
+    }
+
+    /// WLAN, then cloud, then BLE. BLE-only nodes have no WLAN/cloud and stay on BLE.
+    func preferredParamTransport() -> ESPParamTransport {
+        guard let nodeId = node_id, !nodeId.isEmpty else {
+            return isCloudParamTransportAvailable() ? .cloud : .none
+        }
+        if Configuration.shared.appConfiguration.supportLocalControl,
+           User.shared.localServices[nodeId] != nil,
+           User.shared.canUseWlanLocalControl(nodeId: nodeId) {
+            return .wlan
+        }
+        if isCloudParamTransportAvailable() {
+            return .cloud
+        }
+        if User.shared.bleLocalControl.isAvailable(nodeId: nodeId) || bleLocalNetwork {
+            return .ble
+        }
+        return .none
+    }
+
+    /// Home/params status for the transport in use. Cloud stays unlabeled (existing design).
+    func paramControlStatusText() -> String {
+        switch preferredParamTransport() {
+        case .wlan:
+            return supportsEncryption ? "🔒 Reachable on WLAN" : "Reachable on WLAN"
+        case .ble:
+            return "Reachable on BLE"
+        case .cloud:
+            return ""
+        case .none:
+            if timestamp == 0 {
+                return "Offline"
+            }
+            return "Offline at " + timestamp.getShortDate()
+        }
     }
 
     /// BLE-only node excluded from multi-device schedule/scene flows.
@@ -96,6 +145,16 @@ extension Node {
         return !name.isEmpty
     }
 
+    /// `false` only when onboarding stored `wifi_capable: false` (BLE-only firmware).
+    /// Missing key keeps the previous live `prov.cap` check on node details.
+    func isFirmwareWifiCapable() -> Bool {
+        guard let bleLocalCtrl = metadata?[Constants.bleLocalCtrlMetadataKey] as? [String: Any],
+              let wifiCapable = bleLocalCtrl[Constants.bleLocalCtrlWifiCapableKey] as? Bool else {
+            return true
+        }
+        return wifiCapable
+    }
+
     private func serviceListParam(for kind: BleDeviceServiceKind) -> Param? {
         guard let service = services?.first(where: { $0.type == kind.serviceType }),
               let param = service.params?.first(where: { $0.type == kind.paramType }) else {
@@ -132,7 +191,7 @@ extension Node {
 
 extension NSDictionary {
 
-    /// Device supports BLE-only local control onboarding (skip Wi-Fi).
+    /// Device supports BLE local control onboarding (`local_ctrl` + challenge response).
     func isBleLocalControlSupported() -> Bool {
         guard let rmakerExtra = self[ESPScanConstants.rmakerExtra] as? NSDictionary,
               let caps = rmakerExtra[ESPScanConstants.capabilities] as? [String],
@@ -141,4 +200,22 @@ extension NSDictionary {
         }
         return isChallengeResponseSupported()
     }
+
+    /// `prov.cap` advertises Wi-Fi or Thread provisioning endpoints.
+    /// SESSION_ONLY firmware omits these; ALWAYS/PROV_ONLY includes them while endpoints are active.
+    func hasNetworkProvisioningCapability() -> Bool {
+        if shouldScanWifiNetwork() {
+            return true
+        }
+        if checkThreadCapabilities().canProvisionOverThread {
+            return true
+        }
+        if let deviceInfo = self[ESPScanConstants.prov] as? NSDictionary,
+           let caps = deviceInfo[ESPScanConstants.capabilities] as? [String],
+           caps.contains(ESPScanConstants.wifiProv) {
+            return true
+        }
+        return false
+    }
+
 }

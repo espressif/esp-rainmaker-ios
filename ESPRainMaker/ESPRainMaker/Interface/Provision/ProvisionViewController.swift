@@ -56,6 +56,7 @@ class ProvisionViewController: UIViewController {
     var wifiResetNodeId: String?
     var isBleWifiReprovision = false
     var bleReprovisionNodeId: String?
+    private var didFinishBleWifiReprovision = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,6 +78,12 @@ class ProvisionViewController: UIViewController {
         // Added observers for Keyboard hide/unhide event.
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+
+        // Same as BLE landing: the discovery CBCentralManager must not scan during
+        // scanWifiList / provision on this ESPDevice.
+        if isBleWifiReprovision {
+            User.shared.bleLocalControl.pauseDiscovery()
+        }
 
         if threadDetailList.count == 0 {
             scanDeviceForWiFiList()
@@ -178,27 +185,7 @@ class ProvisionViewController: UIViewController {
         self.passphrase = passphrase
         if isBleWifiReprovision {
             Utility.showLoader(message: "Provisioning Wi-Fi", view: view)
-            device.provision(ssid: currentSSID, passPhrase: passphrase) { [weak self] status in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    switch status {
-                    case .configApplied:
-                        // Credentials accepted by the device; still connecting to Wi-Fi. Keep waiting.
-                        Utility.showLoader(message: "Connecting to Wi-Fi", view: self.view)
-                    case .success:
-                        Utility.hideLoader(view: self.view)
-                        if let nodeId = self.bleReprovisionNodeId {
-                            User.shared.bleLocalControl.disconnectDevice(nodeId: nodeId)
-                        }
-                        self.navigationController?.popViewController(animated: true)
-                    case .failure:
-                        Utility.hideLoader(view: self.view)
-                        let alert = UIAlertController(title: "Error", message: "Wi-Fi provisioning failed. Please try again.", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        self.present(alert, animated: true)
-                    }
-                }
-            }
+            reconnectThenSendWifiCredentials()
             return
         }
         if let versionInfo = device.versionInfo, versionInfo.isChallengeResponseSupported() {
@@ -207,6 +194,53 @@ class ProvisionViewController: UIViewController {
         } else {
             Utility.showLoader(message: "Sending association data", view: view)
             User.shared.associateNodeWithUser(device: device, delegate: self)
+        }
+    }
+
+    private func reconnectThenSendWifiCredentials() {
+        guard let nodeId = bleReprovisionNodeId else {
+            sendBleWifiCredentials()
+            return
+        }
+        User.shared.bleLocalControl.reconnectDevice(nodeId: nodeId) { [weak self] success in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                guard success, let device = User.shared.bleLocalControl.activeDevice(nodeId: nodeId) else {
+                    Utility.hideLoader(view: self.view)
+                    let alert = UIAlertController(title: "Error", message: "Wi-Fi provisioning failed. Please try again.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                    return
+                }
+                self.device = device
+                self.sendBleWifiCredentials()
+            }
+        }
+    }
+
+    private func sendBleWifiCredentials() {
+        device.provision(ssid: currentSSID, passPhrase: passphrase) { [weak self] status in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                switch status {
+                case .configApplied:
+                    Utility.showLoader(message: "Connecting to Wi-Fi", view: self.view)
+                case .success:
+                    Utility.hideLoader(view: self.view)
+                    self.didFinishBleWifiReprovision = true
+                    if let nodeId = self.bleReprovisionNodeId {
+                        User.shared.bleLocalControl.disconnectDevice(nodeId: nodeId)
+                        User.shared.refreshNodeAfterWifiJoin(nodeId: nodeId)
+                    }
+                    User.shared.updateDeviceList = true
+                    self.navigationController?.popViewController(animated: true)
+                case .failure:
+                    Utility.hideLoader(view: self.view)
+                    let alert = UIAlertController(title: "Error", message: "Wi-Fi provisioning failed. Please try again.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                }
+            }
         }
     }
     
@@ -241,6 +275,13 @@ class ProvisionViewController: UIViewController {
         passphraseTextfield.togglePasswordVisibility()
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if isBleWifiReprovision, !didFinishBleWifiReprovision {
+            resetBleSession()
+        }
+    }
+
     @IBAction func cancelClicked(_: Any) {
         if isBleWifiReprovision {
             navigationController?.popViewController(animated: true)
@@ -248,6 +289,11 @@ class ProvisionViewController: UIViewController {
         }
         device.disconnect()
         navigationController?.popToRootViewController(animated: false)
+    }
+
+    private func resetBleSession() {
+        guard let nodeId = bleReprovisionNodeId else { return }
+        User.shared.bleLocalControl.resetStaleBleSession(nodeId: nodeId)
     }
 
     @IBAction func provisionButtonClicked(_: Any) {

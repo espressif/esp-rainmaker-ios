@@ -150,37 +150,31 @@ class User {
             NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
         }
     }
-    
-    private func setEncryptionOnLocalControl(node: Node) {
+
+    func setEncryptionOnLocalControl(node: Node) {
         if let service = localServices[node.node_id ?? ""] {
-            if node.supportsEncryption {
-                var secureUserName: String!
-                if let securityType = node.securityType, securityType == ESPSecurity.secure2.rawValue {
-                    let nodeLevelUsername = node.localControlUsername.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if !nodeLevelUsername.isEmpty {
-                        secureUserName = nodeLevelUsername
-                    } else {
-                        secureUserName = Configuration.shared.appConfiguration.localControlSec2Username
-                    }
-                    service.espLocalDevice = ESPLocalDevice(name: esp, security: .secure2, transport: .softap, proofOfPossession: node.pop, username: secureUserName, softAPPassword: nil, advertisementData: nil)
-                    service.espLocalDevice.versionInfo = [prov: [secVer: securityType]]
+            guard node.supportsEncryption, !node.pop.isEmpty else { return }
+            var secureUserName: String!
+            if let securityType = node.securityType, securityType == ESPSecurity.secure2.rawValue {
+                let nodeLevelUsername = node.localControlUsername.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !nodeLevelUsername.isEmpty {
+                    secureUserName = nodeLevelUsername
                 } else {
-                    service.espLocalDevice = ESPLocalDevice(name: esp, security: .secure, transport: .softap, proofOfPossession: node.pop, username: secureUserName, softAPPassword: nil, advertisementData: nil)
+                    secureUserName = Configuration.shared.appConfiguration.localControlSec2Username
                 }
-                service.espLocalDevice.espSoftApTransport = ESPSoftAPTransport(baseUrl: service.hostname)
+                service.espLocalDevice = ESPLocalDevice(name: esp, security: .secure2, transport: .softap, proofOfPossession: node.pop, username: secureUserName, softAPPassword: nil, advertisementData: nil)
+                service.espLocalDevice.versionInfo = [prov: [secVer: securityType]]
+            } else {
+                service.espLocalDevice = ESPLocalDevice(name: esp, security: .secure, transport: .softap, proofOfPossession: node.pop, username: secureUserName, softAPPassword: nil, advertisementData: nil)
             }
+            service.espLocalDevice.espSoftApTransport = ESPSoftAPTransport(baseUrl: service.hostname)
             service.espLocalDevice.hostname = service.hostname
         }
     }
 
     private func processNodeInfoResponse(nodeList: [Node]) {
         for localNode in nodeList {
-            if let index = User.shared.associatedNodeList?.firstIndex(where: { node -> Bool in
-                node.node_id == localNode.node_id
-            }) {
-                localNode.localNetwork = true
-                User.shared.associatedNodeList![index] = localNode
-            }
+            replaceAssociatedNode(localNode, localNetwork: true)
         }
         if nodeList.count > 0 {
             NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
@@ -198,13 +192,6 @@ class User {
         }
     }
 
-    /// Stop BLE local control scan and disconnect all BLE sessions.
-    func stopBleLocalControl() {
-        DispatchQueue.main.async {
-            self.bleLocalControl.disconnectAll()
-        }
-    }
-    
     /// Start search for matter devices on local network
     /// - Parameter discoveredNodesCompletion: discovered nodes completion
     func startCommissionedMatterServiceDiscovery(discoveredNodesCompletion: @escaping ([String]) -> Void) {
@@ -370,13 +357,6 @@ extension User: ESPLocalControlDelegate {
         }
 
         updateNodeLocalNetworkInfo()
-    }
-}
-
-extension User: ESPBleLocalControlDelegate {
-    func bleLocalControlDidUpdate() {
-        bleLocalControl.reapplyBleStatusToNodes()
-        NotificationCenter.default.post(Notification(name: Notification.Name(Constants.localNetworkUpdateNotification)))
     }
 }
 
