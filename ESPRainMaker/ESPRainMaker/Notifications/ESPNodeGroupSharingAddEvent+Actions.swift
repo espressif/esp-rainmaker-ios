@@ -26,7 +26,7 @@ extension ESPNodeGroupSharingAddEvent {
         switch ESPNotificationsAddSharingCategory(rawValue: actionIdentifier) {
         case .accept:
             if let requestID = eventData[ESPNotificationKeys.requestIDKey] as? String {
-                NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestID, accept: true) { _ in
+                NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestID, accept: true) { _, _ in
                     DispatchQueue.main.async {
                         NodeGroupManager.shared.listUpdated = true
                         User.shared.updateDeviceList = true
@@ -37,7 +37,7 @@ extension ESPNodeGroupSharingAddEvent {
             }
         case .decline:
             if let requestID = eventData[ESPNotificationKeys.requestIDKey] as? String {
-                NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestID, accept: false) { _ in
+                NodeGroupSharingManager.shared.actOnSharingRequest(requestId: requestID, accept: false) { _, _ in
                     NodeGroupManager.shared.listUpdated = true
                     User.shared.updateDeviceList = true
                 }

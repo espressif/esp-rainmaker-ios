@@ -111,7 +111,7 @@ class NotificationsViewController: UIViewController {
                     self.updateNotificationView()
                 } else {
                     // Error while denying sharing request.
-                    Utility.showToastMessage(view: self.view, message: "Unknown error: Unable to deny sharing request.", duration: 5.0)
+                    Utility.showToastMessage(view: self.view, message: "Unable to deny sharing request.", duration: 5.0)
                 }
                 return
             }
@@ -142,7 +142,7 @@ class NotificationsViewController: UIViewController {
                     self.updateNotificationView()
                 } else {
                     // Error while accepting sharing request.
-                    Utility.showToastMessage(view: self.view, message: "Unknown error: Unable to deny sharing request.", duration: 5.0)
+                    Utility.showToastMessage(view: self.view, message: "Unable to accept sharing request.", duration: 5.0)
                 }
                 return
             }

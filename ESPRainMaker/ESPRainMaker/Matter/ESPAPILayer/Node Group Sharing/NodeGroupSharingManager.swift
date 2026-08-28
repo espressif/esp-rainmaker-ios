@@ -18,6 +18,17 @@
 
 import Foundation
 
+private enum NodeGroupSharingAPIKeys {
+    static let primaryUserTrueQuery = "?primary_user=true"
+    static let primaryUserFalseQuery = "?primary_user=false"
+    static let requestIdQueryPrefix = "&request_id="
+    static let startRequestIdQueryPrefix = "&start_request_id="
+    static let startUserNameQueryPrefix = "&start_user_name="
+    static let sharingRequestsKey = "sharing_requests"
+    static let nextRequestIdKey = "next_request_id"
+    static let nextUserNameKey = "next_user_name"
+}
+
 /// Group sharing API manager
 class NodeGroupSharingManager {
     
@@ -33,6 +44,19 @@ class NodeGroupSharingManager {
     private init() {
         // Listen for configuration updates and reinitialize API manager
         NotificationCenter.default.addObserver(self, selector: #selector(configurationUpdated), name: NSNotification.Name(Constants.configurationUpdateNotification), object: nil)
+    }
+    
+    private func parseStatusAndDescription(from data: Data?) -> (isSuccess: Bool, description: String?) {
+        guard
+            let data = data,
+            let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else {
+            return (false, nil)
+        }
+        
+        let status = (response[ESPMatterConstants.status] as? String)?.lowercased()
+        let description = response[Constants.descriptionKey] as? String
+        return (status == ESPMatterConstants.success, description)
     }
     
     deinit {
@@ -62,25 +86,77 @@ class NodeGroupSharingManager {
         }
     }
     
-    /// Get node group sharing requests
+    /// Get node group sharing requests. If pagination data is present in response,
+    /// fetches all pages and returns a consolidated payload.
     /// - Parameters:
+    ///   - isPrimary: true for sent requests, false for received requests.
+    ///   - requestId: optional request id filter for backend support.
     ///   - completion: completion
     func getNodeGroupSharingRequests(isPrimary: Bool = true, requestId: String? = nil, _ completion: @escaping (Data?) -> Void) {
+        self.getNodeGroupSharingRequests(isPrimary: isPrimary,
+                                         requestId: requestId,
+                                         startRequestId: nil,
+                                         startUserName: nil,
+                                         accumulatedRequests: [],
+                                         completion)
+    }
+
+    private func getNodeGroupSharingRequests(isPrimary: Bool,
+                                             requestId: String?,
+                                             startRequestId: String?,
+                                             startUserName: String?,
+                                             accumulatedRequests: [[String: Any]],
+                                             _ completion: @escaping (Data?) -> Void) {
         var url = nodeGroupSharingRequests
-        if isPrimary {
-            url += "?primary_user=true"
-        } else {
-            url += "?primary_user=false"
-        }
+        url += isPrimary ? NodeGroupSharingAPIKeys.primaryUserTrueQuery : NodeGroupSharingAPIKeys.primaryUserFalseQuery
+
         if let requestId = requestId {
-            url += "&request_id=\(requestId)"
+            url += NodeGroupSharingAPIKeys.requestIdQueryPrefix + requestId
+        } else if let startRequestId = startRequestId {
+            url += NodeGroupSharingAPIKeys.startRequestIdQueryPrefix + startRequestId
+            let userName = startUserName ?? User.shared.userInfo.username
+            url += NodeGroupSharingAPIKeys.startUserNameQueryPrefix + userName
         }
+
         self.apiManager.genericAuthorizedDataRequest(url: url, parameter: nil, method: .get) { data, _ in
-            if let data = data {
-                completion(data)
-            } else {
+            guard let data = data else {
                 completion(nil)
+                return
             }
+
+            guard var response = (try? JSONSerialization.jsonObject(with: data) as? [String: Any]) else {
+                completion(data)
+                return
+            }
+
+            // Preserve failure payload handling in callers.
+            if let status = response[ESPMatterConstants.status] as? String,
+               status.lowercased() == ESPMatterConstants.failure {
+                completion(data)
+                return
+            }
+
+            let currentRequests = response[NodeGroupSharingAPIKeys.sharingRequestsKey] as? [[String: Any]] ?? []
+            let mergedRequests = accumulatedRequests + currentRequests
+
+            let nextRequestId = response[NodeGroupSharingAPIKeys.nextRequestIdKey] as? String
+            let nextUserName = response[NodeGroupSharingAPIKeys.nextUserNameKey] as? String
+
+            if let nextRequestId = nextRequestId, !nextRequestId.isEmpty {
+                self.getNodeGroupSharingRequests(isPrimary: isPrimary,
+                                                 requestId: requestId,
+                                                 startRequestId: nextRequestId,
+                                                 startUserName: nextUserName,
+                                                 accumulatedRequests: mergedRequests,
+                                                 completion)
+                return
+            }
+
+            response[NodeGroupSharingAPIKeys.sharingRequestsKey] = mergedRequests
+            response.removeValue(forKey: NodeGroupSharingAPIKeys.nextRequestIdKey)
+            response.removeValue(forKey: NodeGroupSharingAPIKeys.nextUserNameKey)
+            let mergedData = try? JSONSerialization.data(withJSONObject: response)
+            completion(mergedData ?? data)
         }
     }
     
@@ -107,14 +183,11 @@ class NodeGroupSharingManager {
     
     /// Delete request sent
     /// - Parameter requestId: request id
-    func deleteRequest(requestId: String, completion: @escaping (Bool) -> Void) {
+    func deleteRequest(requestId: String, completion: @escaping (Bool, String?) -> Void) {
         let url = nodeGroupSharingRequests + "?request_id=\(requestId)"
         self.apiManager.genericAuthorizedDataRequest(url: url, parameter: nil, method: .delete) { data, _ in
-            if let data = data, let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = response[ESPMatterConstants.status] as? String, status.lowercased() == ESPMatterConstants.success {
-                completion(true)
-                return
-            }
-            completion(false)
+            let result = self.parseStatusAndDescription(from: data)
+            completion(result.isSuccess, result.description)
         }
     }
     
@@ -122,14 +195,11 @@ class NodeGroupSharingManager {
     /// - Parameters:
     ///   - requestId: request id
     ///   - accept: accept/decline
-    func actOnSharingRequest(requestId: String, accept: Bool, completion: @escaping (Bool) -> Void) {
+    func actOnSharingRequest(requestId: String, accept: Bool, completion: @escaping (Bool, String?) -> Void) {
         let url = nodeGroupSharingRequests
         self.apiManager.genericAuthorizedDataRequest(url: url, parameter: [ESPMatterConstants.accept: accept, ESPMatterConstants.requestId: requestId], method: .put) { data, _ in
-            if let data = data, let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = response[ESPMatterConstants.status] as? String, status.lowercased() == ESPMatterConstants.success {
-                completion(true)
-                return
-            }
-            completion(false)
+            let result = self.parseStatusAndDescription(from: data)
+            completion(result.isSuccess, result.description)
         }
     }
     
@@ -138,14 +208,11 @@ class NodeGroupSharingManager {
     /// - Parameter groupId: group id
     /// - Parameter email: email id
     /// - Parameter completion: completion
-    func revokeAccess(groupId: String, email: String, completion: @escaping (Bool) -> Void) {
+    func revokeAccess(groupId: String, email: String, completion: @escaping (Bool, String?) -> Void) {
         let url = nodeGroupSharing + "?groups=\(groupId)&user_name=\(email)"
         self.apiManager.genericAuthorizedDataRequest(url: url, parameter: nil, method: .delete) { data, _ in
-            if let data = data, let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let status = response[ESPMatterConstants.status] as? String, status.lowercased() == ESPMatterConstants.success {
-                completion(true)
-                return
-            }
-            completion(false)
+            let result = self.parseStatusAndDescription(from: data)
+            completion(result.isSuccess, result.description)
         }
     }
 }

@@ -20,6 +20,9 @@ import DropDown
 import UIKit
 
 class TimeZoneTableViewCell: DropDownTableViewCell {
+    private var hasConfiguredAppearance = false
+    private static let dropDownCellNibName = "DropDownCell"
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -38,11 +41,22 @@ class TimeZoneTableViewCell: DropDownTableViewCell {
         contentView.layer.cornerRadius = 10
         contentView.layer.borderColor = UIColor.lightGray.cgColor
         backView.backgroundColor = UIColor.white
-        backView.heightAnchor.constraint(equalToConstant: 55.0).isActive = true
+        if !hasConfiguredAppearance {
+            backView.heightAnchor.constraint(equalToConstant: 55.0).isActive = true
+            hasConfiguredAppearance = true
+        }
         contentView.layer.masksToBounds = true
     }
 
     override func dropDownButtonTapped(_: Any) {
+        let dropDownBundle = Bundle(for: DropDown.self)
+        guard dropDownBundle.path(forResource: Self.dropDownCellNibName, ofType: "nib") != nil else {
+            if let view = resolveHostViewForToast() {
+                Utility.showToastMessage(view: view, message: "Timezone options are unavailable right now.")
+            }
+            return
+        }
+
         DropDown.appearance().backgroundColor = UIColor.white
         DropDown.appearance().selectionBackgroundColor = #colorLiteral(red: 0.04705882353, green: 0.4392156863, blue: 0.9098039216, alpha: 1)
         let dropDown = DropDown()
@@ -61,12 +75,24 @@ class TimeZoneTableViewCell: DropDownTableViewCell {
 
         // Assigning action for dropdown item selection
         dropDown.selectionAction = { [unowned self] (_: Int, item: String) in
-            DeviceControlHelper.shared.updateParam(nodeID: self.node?.node_id, parameter: [self.service?.name ?? "": [self.param.name ?? "": item]], delegate: paramDelegate)
+            guard let paramName = self.param?.name, let serviceName = self.service?.name else { return }
+            DeviceControlHelper.shared.updateParam(nodeID: self.node?.node_id, parameter: [serviceName: [paramName: item]], delegate: paramDelegate)
             param.value = item
             currentValue = item
             DispatchQueue.main.async {
                 controlValueLabel.text = item
             }
         }
+    }
+
+    private func resolveHostViewForToast() -> UIView? {
+        var responder: UIResponder? = self
+        while let current = responder {
+            if let viewController = current as? UIViewController {
+                return viewController.view
+            }
+            responder = current.next
+        }
+        return self.window
     }
 }
