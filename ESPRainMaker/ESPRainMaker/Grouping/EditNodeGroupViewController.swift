@@ -278,7 +278,7 @@ extension EditNodeGroupViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "selectGroupNodeCVC", for: indexPath) as! SelectGroupNodeCollectionViewCell
         let device = getDeviceAt(indexPath: indexPath)
-        if let node = device.node, node.isMatter, let groupId = node.groupId, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, node.clientOnlyControllerNodeIdParam == nil {
+        if let node = device.node, node.isMatter, let groupId = node.groupId, let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal, node.clientOnlyControllerNodeIdParam == nil, !node.isMatterControllerSetupSupported {
             
             let (result, _) = ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId)
             if result {

@@ -18,16 +18,17 @@
 
 struct ClientOnlyControllerConstants {
     
-    static let defaultType = "matter-controller"
+    static let defaultType = MatterControllerConstants.defaultType
     
-    static let serviceType = "esp.service.matter-controller"
+    static let serviceType = MatterControllerConstants.serviceType
+    static let setupServiceType = MatterControllerConstants.setupServiceType
     
-    static let paramBaseURL = "esp.param.base-url"
-    static let paramUserToken = "esp.param.user-token"
-    static let paramRainmakerGroupId = "esp.param.rmaker-group-id"
-    static let paramMatterCtlCmd = "esp.param.matter-ctl-cmd"
-    static let paramMatterCtlStatus = "esp.param.matter-ctl-status"
-    static let paramMatterNodeId = "esp.param.matter-node-id"
+    static let paramBaseURL = MatterControllerConstants.paramBaseURL
+    static let paramUserToken = MatterControllerConstants.paramUserToken
+    static let paramRainmakerGroupId = MatterControllerConstants.paramRainmakerGroupId
+    static let paramMatterCtlCmd = MatterControllerConstants.paramMatterCtlCmd
+    static let paramMatterCtlStatus = MatterControllerConstants.paramMatterCtlStatus
+    static let paramMatterNodeId = MatterControllerConstants.paramMatterNodeId
     
-    static let paramGroupId = "esp.param.rmaker-group-id"
+    static let paramGroupId = MatterControllerConstants.paramGroupId
 }

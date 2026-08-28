@@ -25,6 +25,25 @@ import Foundation
 //MARK: rainmaker controller methods
 @available(iOS 16.4, *)
 extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
+
+    func handlePostCommissioningSetupControllerFlowIfNeeded(groupId: String, isRainmaker: Bool, completion: @escaping (Bool) -> Void) {
+        completion(false)
+    }
+
+    /// Show login for Rainmaker-only controller service flow.
+    private func showClientOnlyControllerLoginScreen(groupId: String) {
+        let storyboard = UIStoryboard(name: "Login", bundle: nil)
+        if let nav = storyboard.instantiateViewController(withIdentifier: "signInController") as? UINavigationController,
+           let signInVC = nav.viewControllers.first as? SignInViewController,
+           let tab = self.tabBarController {
+            signInVC.setClientOnlyControllerFlow(isRainmakerControllerFlow: true,
+                                                 isClientOnlyControllerFlow: true,
+                                                 groupId: groupId)
+            signInVC.clientOnlyControllerDelegate = self
+            nav.modalPresentationStyle = .fullScreen
+            tab.present(nav, animated: true, completion: nil)
+        }
+    }
     
     /// Show Rainmaker Login Screen
     func showRainmakerLoginScreen(groupId: String, matterNodeId: String) {
@@ -139,6 +158,32 @@ extension ESPMatterCommissioningVC: RainmakerControllerFlowDelegate {
                     DispatchQueue.main.async {
                         self.hideLoaderAndAlertUser()
                     }
+                }
+            }
+        }
+    }
+}
+
+@available(iOS 16.4, *)
+extension ESPMatterCommissioningVC: ClientOnlyControllerCredentialsDelegate {
+
+    func loginCompleted(cloudResponse: ESPSessionResponse, groupId: String?) {
+        guard let groupId = groupId, !groupId.isEmpty, let commissionerGroupId = self.groupId else { return }
+        let refreshToken = cloudResponse.refreshToken ?? ""
+        let baseURL = Configuration.shared.awsConfiguration.baseURL ?? ""
+        let commissioner = ESPMTRCommissionerManager.shared.getCommissioner(for: commissionerGroupId)
+        guard let nodeId = commissioner.rainmakerNodeId, !nodeId.isEmpty else { return }
+
+        NetworkManager.shared.getNodeInfo(nodeId: nodeId) { node, _ in
+            guard let node = node else { return }
+            ControllerServiceParamUpdater.performPostLoginControllerSetup(node: node,
+                                                                          baseURL: baseURL,
+                                                                          refreshToken: refreshToken,
+                                                                          groupId: groupId,
+                                                                          delegate: self) {
+                ControllerServiceParamUpdater.sendUpdateDeviceListToControllerSetupNodes(groupId: groupId)
+                DispatchQueue.main.async {
+                    self.goToHomeScreen(isRainmaker: true)
                 }
             }
         }

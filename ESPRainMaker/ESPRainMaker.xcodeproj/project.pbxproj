@@ -671,10 +671,14 @@
 		F84FD89F2D790B9C00919407 /* ESPMTROCSSliderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */; };
 		F84FD8A02D790B9C00919407 /* ESPMTROCSSliderTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */; };
 		F861C2632F9A105700DF4EA8 /* NodeGroupSharingConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F861C2622F9A105500DF4EA8 /* NodeGroupSharingConstants.swift */; };
+		F861C2612F97559400DF4EA8 /* MatterControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F861C2602F97559400DF4EA8 /* MatterControllerConstants.swift */; };
 		F87C31E02DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */; };
 		F8916C242EE2D4BF000F40F7 /* RainmakerControllerConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */; };
 		F8916C262EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */; };
 		F8916C2A2EE2F001000F40F7 /* NodeControllerParamUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */; };
+		A1B2C3D52EE2D600000F40F7 /* ControllerServiceParamUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42EE2D600000F40F7 /* ControllerServiceParamUpdater.swift */; };
+		A1B2C3D72EE2D610000F40F7 /* Node+RmControllerUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D62EE2D610000F40F7 /* Node+RmControllerUtility.swift */; };
+		A1B2C3D92EE2D620000F40F7 /* Node+GroupsServiceUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */; };
 		F8916C282EE2EBE8000F40F7 /* ESPReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8916C272EE2EBE8000F40F7 /* ESPReviewManager.swift */; };
 		F8A1D3E62F7C4A1100B12345 /* DetailedStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1D3E52F7C4A1100B12345 /* DetailedStats.swift */; };
 		F8A9418A2E438BED00E669AE /* ESPMTRCommissionerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A941892E438BED00E669AE /* ESPMTRCommissionerManager.swift */; };
@@ -1380,10 +1384,14 @@
 		F84FD89C2D790B9C00919407 /* ESPMTROCSSliderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTROCSSliderTVC.swift; sourceTree = "<group>"; };
 		F84FD89D2D790B9C00919407 /* ESPMTROCSSliderTVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ESPMTROCSSliderTVC.xib; sourceTree = "<group>"; };
 		F861C2622F9A105500DF4EA8 /* NodeGroupSharingConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGroupSharingConstants.swift; sourceTree = "<group>"; };
+		F861C2602F97559400DF4EA8 /* MatterControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatterControllerConstants.swift; sourceTree = "<group>"; };
 		F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = esp_rmaker_chal_resp.pb.swift; sourceTree = "<group>"; };
 		F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainmakerControllerConstants.swift; sourceTree = "<group>"; };
 		F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+RmakerControllerUtility.swift"; sourceTree = "<group>"; };
 		F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeControllerParamUpdater.swift; sourceTree = "<group>"; };
+		A1B2C3D42EE2D600000F40F7 /* ControllerServiceParamUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerServiceParamUpdater.swift; sourceTree = "<group>"; };
+		A1B2C3D62EE2D610000F40F7 /* Node+RmControllerUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+RmControllerUtility.swift"; sourceTree = "<group>"; };
+		A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+GroupsServiceUtility.swift"; sourceTree = "<group>"; };
 		F8916C272EE2EBE8000F40F7 /* ESPReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPReviewManager.swift; sourceTree = "<group>"; };
 		F8A1D3E52F7C4A1100B12345 /* DetailedStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedStats.swift; sourceTree = "<group>"; };
 		F8A941892E438BED00E669AE /* ESPMTRCommissionerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPMTRCommissionerManager.swift; sourceTree = "<group>"; };
@@ -1514,6 +1522,8 @@
 			children = (
 				F8916C252EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift */,
 				F8916C292EE2F001000F40F7 /* NodeControllerParamUpdater.swift */,
+				A1B2C3D62EE2D610000F40F7 /* Node+RmControllerUtility.swift */,
+				A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */,
 				F8E9947A2DF17333006F406C /* Node+ClientOnlyControllerUtility.swift */,
 				F809FF422E09B974008BD38D /* Node+CameraUtility.swift */,
 				0C71B9D72A360B8000978005 /* Node+MatterUtility.swift */,
@@ -3110,6 +3120,7 @@
 			isa = PBXGroup;
 			children = (
 				F8916C222EE2D4BF000F40F7 /* RainmakerControllerConstants.swift */,
+				A1B2C3D42EE2D600000F40F7 /* ControllerServiceParamUpdater.swift */,
 			);
 			path = RainmakerController;
 			sourceTree = "<group>";
@@ -3117,6 +3128,7 @@
 		F8E994752DF16BB5006F406C /* ClientOnlyController */ = {
 			isa = PBXGroup;
 			children = (
+				F861C2602F97559400DF4EA8 /* MatterControllerConstants.swift */,
 				F8E994782DF16C05006F406C /* ClientOnlyControllerConstants.swift */,
 			);
 			path = ClientOnlyController;
@@ -3561,6 +3573,9 @@
 				F1CE295D2861D015009EFC8E /* Double+TimeString.swift in Sources */,
 				F8916C262EE2D4E7000F40F7 /* Node+RmakerControllerUtility.swift in Sources */,
 				F8916C2A2EE2F001000F40F7 /* NodeControllerParamUpdater.swift in Sources */,
+				A1B2C3D72EE2D610000F40F7 /* Node+RmControllerUtility.swift in Sources */,
+				A1B2C3D92EE2D620000F40F7 /* Node+GroupsServiceUtility.swift in Sources */,
+				A1B2C3D52EE2D600000F40F7 /* ControllerServiceParamUpdater.swift in Sources */,
 				F18EC5C023BE0BF700F9188E /* AssociationConfig.swift in Sources */,
 				F1CE295C2861D015009EFC8E /* Date+DayOfWeek.swift in Sources */,
 				0C17D20F2CCF89A200D0FDA7 /* MatterControllerDataModels.swift in Sources */,
@@ -3680,6 +3695,7 @@
 				0C80AA2E26FDBD4B00480C53 /* ESPCreateUserService.swift in Sources */,
 				F18744252696087A00971591 /* ESPNotificationsStore.swift in Sources */,
 				F1C1AD5025EEB58F00EB2917 /* RoundHueSliderTableViewCell.swift in Sources */,
+				F861C2612F97559400DF4EA8 /* MatterControllerConstants.swift in Sources */,
 				0CD359222A2D25E30081017C /* ESPNodeDetailsResponse.swift in Sources */,
 				F1EAACAB23E2A74300E9A6A8 /* UIColor+Extension.swift in Sources */,
 				0CB404262CAE6B5D0041B362 /* ESPNodeMetadataService.swift in Sources */,

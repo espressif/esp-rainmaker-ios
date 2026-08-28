@@ -948,9 +948,11 @@ extension NodeDetailsViewController {
     /// Remove device information from group metadata
     /// Remove device from rainmaker cloud
     func removeDeviceInformation() {
+        let setupNodeIdsToNotify = self.findControllerSetupNodesInCurrentGroup()
         self.removeDeviceFromRainmaker { result in
             if result {
                 self.removeDeviceInfoFromGroupMetadata { _ in
+                    self.sendUpdateDeviceListToControllerSetupNodes(nodeIds: setupNodeIdsToNotify)
                     self.nodeDeletionSuccessful()
                 }
             } else {
@@ -970,13 +972,13 @@ extension NodeDetailsViewController {
             if currentNode.isOnOffServerSupported.0 {
                 service.removeDestinationNodeFromGroupMetadata(groupId: grpId, destinationNodeId: id) { result in
                     completion(result)
-                    return
                 }
+                return
             } else if currentNode.isOnOffClientSupported {
                 service.removeSourceNodeFromGroupMetadata(groupId: grpId, node: currentNode) { result in
                     completion(result)
-                    return
                 }
+                return
             }
         }
         completion(false)
@@ -1019,5 +1021,72 @@ extension NodeDetailsViewController {
             node.node_id == self.currentNode.node_id
         })
         self.updateDeviceListAndNavigateToHomeScreen()
+    }
+
+    private func findControllerSetupNodesInCurrentGroup() -> [String] {
+        guard let groupId = self.currentNode.groupId,
+              let allNodes = User.shared.associatedNodeList else { return [] }
+        let nodeIds: [String] = allNodes.compactMap { node -> String? in
+            guard node.node_id != self.currentNode.node_id,
+                  self.isNodeInTargetGroup(node: node, groupId: groupId),
+                  self.hasAnyControllerService(node: node),
+                  let nodeId = node.node_id else { return nil }
+            return nodeId
+        }
+        return Array(Set(nodeIds))
+    }
+
+    private func sendUpdateDeviceListToControllerSetupNodes(nodeIds: [String]) {
+        guard let allNodes = User.shared.associatedNodeList else { return }
+        for nodeId in nodeIds {
+            guard let node = allNodes.first(where: { $0.node_id == nodeId }) else { continue }
+            var params: [String: Any] = [:]
+
+            if let serviceName = node.getServiceName(forServiceType: MatterControllerConstants.serviceType),
+               let cmdParamName = node.clientOnlyControllerUpdateDeviceListCommandParam?.name {
+                params[serviceName] = [cmdParamName: 2]
+            }
+
+            if let serviceName = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType),
+               let cmdParamName = node.rmakerControllerUpdateDeviceListCommandParam?.name {
+                params[serviceName] = [cmdParamName: 2]
+            }
+
+            if let serviceName = node.getServiceName(forServiceType: ClientOnlyControllerConstants.setupServiceType),
+               let cmdParamName = node.clientOnlyControllerUpdateDeviceListCommandParam?.name {
+                params[serviceName] = [cmdParamName: 2]
+            }
+
+            guard !params.isEmpty else { continue }
+            print("Node removal command to be sent for nodeid: \(nodeId) with params: \(params)")
+            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: nil)
+        }
+    }
+
+    private func hasAnyControllerService(node: Node) -> Bool {
+        return node.getServiceName(forServiceType: MatterControllerConstants.serviceType) != nil ||
+        node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType) != nil ||
+        node.getServiceName(forServiceType: ClientOnlyControllerConstants.setupServiceType) != nil
+    }
+
+    private func isNodeInTargetGroup(node: Node, groupId: String) -> Bool {
+        if node.groupId == groupId {
+            return true
+        }
+        let candidateGroupIds: [String?] = [
+            node.clientOnlyControllerRmakerGroupParam?.value as? String,
+            node.clientOnlyControllerGroupParam?.value as? String,
+            node.clientOnlyControllerSetupRmakerGroupParam?.value as? String,
+            node.clientOnlyControllerSetupGroupParam?.value as? String,
+            node.rmakerControllerGroupParam?.value as? String
+        ]
+        for candidate in candidateGroupIds {
+            if let id = candidate?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !id.isEmpty,
+               id == groupId {
+                return true
+            }
+        }
+        return false
     }
 }

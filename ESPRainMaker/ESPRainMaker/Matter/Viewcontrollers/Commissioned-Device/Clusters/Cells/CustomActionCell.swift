@@ -23,6 +23,7 @@ enum CustomAction {
     case launchRainmakerController
     case launchController
     case updateDeviceList
+    case addToGroup
     case updateThreadDataset
     case setActiveThreadDataset
     case mergeThreadDataset
@@ -34,6 +35,7 @@ protocol CustomActionDelegate: AnyObject {
     func launchRainmakerController()
     func launchController()
     func updateDeviceList()
+    func addToGroup()
     func updateThreadDataset()
     func setActiveThreadDataset()
     func mergeThreadDataset()
@@ -92,6 +94,10 @@ class CustomActionCell: UITableViewCell {
             case .updateDeviceList:
                 self.headerLabel.text = "Controller"
                 self.descriptionLabel.text = "Update Device List"
+            case .addToGroup:
+                self.headerLabel.text = "Groups"
+                self.descriptionLabel.text = "Add to Group"
+                self.launchButton.setTitle("Add", for: .normal)
             case .updateThreadDataset:
                 self.headerLabel.text = "Border Router"
                 self.descriptionLabel.text = "Update Thread Dataset"
@@ -120,6 +126,8 @@ class CustomActionCell: UITableViewCell {
             self.delegate?.launchController()
         case .updateDeviceList:
             self.delegate?.updateDeviceList()
+        case .addToGroup:
+            self.delegate?.addToGroup()
         case .updateThreadDataset:
             self.delegate?.updateThreadDataset()
         case .setActiveThreadDataset:

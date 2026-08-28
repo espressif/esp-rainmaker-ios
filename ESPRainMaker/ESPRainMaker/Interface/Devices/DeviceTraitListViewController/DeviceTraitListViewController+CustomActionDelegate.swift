@@ -21,7 +21,21 @@ extension DeviceTraitListViewController: ParamCustomActionDelegate {
     /// Launch Rainmaker controller flow for the device
     func launchRainmakerController() {
         if let device = self.device, let node = device.node {
-            self.enterRmakerControllerFlow(node: node)
+            if ControllerServiceParamUpdater.shouldOpenGroupSelectionForUpdateParams(node: node) {
+                DispatchQueue.main.async {
+                    self.showGroupSelectionScreen(purpose: .clientOnlyController)
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.showRainmakerLoginScreen()
+                }
+            }
+        }
+    }
+    
+    func addToGroup() {
+        DispatchQueue.main.async {
+            self.showGroupSelectionScreen(purpose: .groupsServiceOnly)
         }
     }
     
@@ -29,9 +43,9 @@ extension DeviceTraitListViewController: ParamCustomActionDelegate {
     /// Checks if device supports client-only controller or Rainmaker controller flow
     func launchController() {
         if let device = self.device, let node = device.node {
-            if node.rmakerControllerGroupParam != nil || node.clientOnlyControllerRmakerGroupParam != nil {
+            if ControllerServiceParamUpdater.shouldOpenGroupSelectionForUpdateParams(node: node) {
                 DispatchQueue.main.async {
-                    self.showGroupSelectionScreen()
+                    self.showGroupSelectionScreen(purpose: .clientOnlyController)
                 }
             } else {
                 DispatchQueue.main.async {
@@ -46,19 +60,12 @@ extension DeviceTraitListViewController: ParamCustomActionDelegate {
             DispatchQueue.main.async {
                 Utility.showLoader(message: "Updating device list...", view: self.view)
             }
-            self.updateDeviceList(node: node) { status in
+            ControllerServiceParamUpdater.sendUpdateDeviceListCommand(node: node, delegate: self) { _ in
                 DispatchQueue.main.async {
                     Utility.hideLoader(view: self.view)
                 }
             }
         }
-    }
-    
-    /// If base URL and user token are set then call the update device list API
-    /// This is for rmaker controller devices
-    /// - Parameter node: node
-    private func enterRmakerControllerFlow(node: Node) {
-        self.showRainmakerLoginScreen()
     }
 
     /// Update thread dataset - currently empty implementation
@@ -412,11 +419,12 @@ extension DeviceTraitListViewController: ParamCustomActionDelegate {
 extension DeviceTraitListViewController: ClientOnlyControllerCredentialsDelegate {
     
     /// Show group selection screen for client-only controller flow
-    func showGroupSelectionScreen() {
+    func showGroupSelectionScreen(purpose: ControllerGroupSelectionPurpose = .clientOnlyController) {
         #if ESPRainMakerMatter
         let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
         guard let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as? ESPFabricSelectionVC else { return }
         fabricSelectionVC.isClientOnlyContoller = true
+        fabricSelectionVC.groupSelectionPurpose = purpose
         fabricSelectionVC.clientOnlyControllerDelegate = self
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.pushViewController(fabricSelectionVC, animated: true)
@@ -449,68 +457,45 @@ extension DeviceTraitListViewController: ClientOnlyControllerCredentialsDelegate
         }
         let baseURL = Configuration.shared.awsConfiguration.baseURL ?? ""
         let refreshToken = cloudResponse.refreshToken ?? ""
-    
         if let node = self.device.node {
-            if node.isRmakerControllerSupported {
-                NodeControllerParamUpdater.updateRmakerControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
-            }
-            if node.isClientOnlyControllerSupported {
-                NodeControllerParamUpdater.updateClientOnlyControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
-            }
-        }
-    }
-    
-    /// Update device list by triggering the update command on the controller
-    /// - Parameters:
-    ///   - node: The node to update
-    ///   - completion: Completion handler with status
-    private func updateDeviceList(node: Node, completion: @escaping (ESPCloudResponseStatus?) -> Void) {
-        var clientOnlyServiceName = ""
-        var clientOnlyUpdateCommandParam: Param?
-        if node.isClientOnlyControllerSupported, let service = node.getServiceName(forServiceType: Constants.matterControllerServiceType) {
-            clientOnlyServiceName = service
-            clientOnlyUpdateCommandParam = node.clientOnlyControllerUpdateDeviceListCommandParam
-        }
-        
-        var rmakerServiceName = ""
-        var rmakerUpdateCommandParam: Param?
-        if node.isRmakerControllerSupported, let service = node.getServiceName(forServiceType: RainmakerControllerConstants.rmakerControllerServiceType) {
-            rmakerServiceName = service
-            rmakerUpdateCommandParam = node.rmakerControllerUpdateDeviceListCommandParam
-        }
-        
-        if clientOnlyServiceName.count > 0, let nodeId = node.node_id, let mtrCtlCmdName = clientOnlyUpdateCommandParam?.name {
-            let params: [String: Any] = [clientOnlyServiceName : [mtrCtlCmdName: 2] as Any]
-            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { clientOnlyStatus in
-                if rmakerServiceName.count > 0, let nodeId = node.node_id, let mtrCtlCmdName = rmakerUpdateCommandParam?.name {
-                    let params: [String: Any] = [rmakerServiceName : [mtrCtlCmdName: 2] as Any]
-                    DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
-                        completion(status)
-                    }
-                } else {
-                    completion(clientOnlyStatus)
-                }
-            }
-        } else if rmakerServiceName.count > 0, let nodeId = node.node_id, let mtrCtlCmdName = rmakerUpdateCommandParam?.name {
-            let params: [String: Any] = [rmakerServiceName : [mtrCtlCmdName: 2] as Any]
-            DeviceControlHelper.shared.updateParam(nodeID: nodeId, parameter: params, delegate: self) { status in
-                completion(status)
-            }
-        } else {
-            completion(nil)
+            ControllerServiceParamUpdater.performPostLoginControllerSetup(node: node,
+                                                                          baseURL: baseURL,
+                                                                          refreshToken: refreshToken,
+                                                                          groupId: groupId,
+                                                                          delegate: self,
+                                                                          completion: {})
         }
     }
 }
 
 #if ESPRainMakerMatter
 extension DeviceTraitListViewController: ClientOnlyControllerGroupSelectionDelegate {
-    /// Handle group selection for client-only controller flow
-    /// - Parameter groupId: The selected group ID
+    
     func groupSelected(groupId: String) {
-        DispatchQueue.main.async {
-            self.navigationController?.popViewController(animated: true)
-            if groupId.count > 0 {
-                self.showRainmakerLoginScreen(groupId: groupId)
+        proceedAfterGroupSelection(groupId: groupId, openLogin: true)
+    }
+    
+    func groupsServiceGroupSelected(groupId: String) {
+        proceedAfterGroupSelection(groupId: groupId, openLogin: false)
+    }
+    
+    private func proceedAfterGroupSelection(groupId: String, openLogin: Bool) {
+        guard let node = self.device.node, let nodeId = node.node_id, groupId.count > 0 else { return }
+        let finish: () -> Void = {
+            DispatchQueue.main.async {
+                self.navigationController?.popViewController(animated: true)
+                if openLogin {
+                    self.showRainmakerLoginScreen(groupId: groupId)
+                } else {
+                    ControllerServiceParamUpdater.updateGroupsServiceParams(node: node, groupId: groupId, delegate: self, completion: {})
+                }
+            }
+        }
+        if NodeGroupManager.shared.isNodeInGroup(nodeId: nodeId, groupId: groupId) {
+            finish()
+        } else {
+            NodeGroupManager.shared.addNodeToGroup(nodeId: nodeId, groupId: groupId) { success, _ in
+                if success { finish() }
             }
         }
     }

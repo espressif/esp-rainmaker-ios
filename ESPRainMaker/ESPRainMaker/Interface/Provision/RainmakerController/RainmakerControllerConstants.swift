@@ -19,18 +19,31 @@
 struct RainmakerControllerConstants {
     
     static let defaultType = "rmaker-user-auth"
+    static let groupsServiceDefaultType = "groups-service"
     
     /// Service type identifier for Rainmaker controller functionality
     /// Used to identify nodes that support Rainmaker controller services
     static let rmakerControllerServiceType = "esp.service.rmaker-user-auth"
+
+    /// Matches Android `AppConstants.SERVICE_TYPE_RM_CONTROLLER` — group id params may live on this service.
+    static let rmControllerServiceType = "esp.service.rmaker-controller"
+
+    /// Matches Android `AppConstants.SERVICE_TYPE_GROUPS`.
+    static let groupsServiceType = "esp.service.groups"
     
     /// Parameter name for base URL configuration in Rainmaker controller service
     /// Used to store the base URL endpoint for the Rainmaker controller
-    static let paramBaseURL = "esp.param.base-url"
+    static let paramBaseURL = MatterControllerConstants.paramBaseURL
     
     /// Parameter name for user authentication token in Rainmaker controller service
     /// Used to store the user's authentication token for accessing Rainmaker controller features
-    static let paramUserToken = "esp.param.user-token"
+    static let paramUserToken = MatterControllerConstants.paramUserToken
     
-    static let paramRainmakerGroupId = "esp.param.rmaker-group-id"
+    static let paramRainmakerGroupId = MatterControllerConstants.paramRainmakerGroupId
+    static let paramGroupId = MatterControllerConstants.paramGroupId
+}
+
+enum ControllerGroupSelectionPurpose {
+    case clientOnlyController
+    case groupsServiceOnly
 }

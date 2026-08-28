@@ -135,7 +135,7 @@ struct JSONParser {
                 #if ESPRainMakerMatter
                 if node.isMatter, let services = config[Constants.services] as? [[String: Any]] {
                     for service in services {
-                        if let type = service[Constants.type] as? String, type == Constants.matterControllerServiceType, let serviceName = service[Constants.name] as? String {
+                        if let type = service[Constants.type] as? String, type == MatterControllerConstants.serviceType, let serviceName = service[Constants.name] as? String {
                             node.setControllerServiceName(serviceName: serviceName)
                             if let params = service[Constants.params] as? [[String: Any]] {
                                 for param in params {
@@ -175,7 +175,18 @@ struct JSONParser {
                         let item = devices[index]
                         let newDevice = Device()
                         newDevice.name = item["name"] as? String
-                        newDevice.type = item[Constants.type] as? String
+                        if let deviceType = item[Constants.type] as? String {
+                            // Normalize short controller types so ESPRMDeviceType icon mapping works.
+                            if deviceType == MatterControllerConstants.defaultType {
+                                newDevice.type = Constants.controllerDeviceType
+                            } else if deviceType == "controller" {
+                                newDevice.type = Constants.rainmakerControllerDeviceType
+                            } else {
+                                newDevice.type = deviceType
+                            }
+                        } else {
+                            newDevice.type = nil
+                        }
                         newDevice.primary = item["primary"] as? String
                         newDevice.node = node
                         newDevice.isMatter = node.isMatter

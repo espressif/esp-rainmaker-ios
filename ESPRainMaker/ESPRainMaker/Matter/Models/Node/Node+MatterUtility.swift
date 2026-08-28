@@ -272,7 +272,7 @@ extension Node {
                 }
             }
         }
-        return (true, nil)
+        return (false, nil)
     }
     
     var deviceType: Int? {
@@ -298,14 +298,14 @@ extension Node {
     
     func setControllerServiceName(serviceName: String) {
         if let id = self.node_id {
-            let key = "esp.service.matter-controller.\(id)"
+            let key = "\(MatterControllerConstants.serviceType).\(id)"
             UserDefaults.standard.set(serviceName, forKey: key)
         }
     }
     
     var controllerServiceName: String {
         if let id = self.node_id {
-            let key = "esp.service.matter-controller.\(id)"
+            let key = "\(MatterControllerConstants.serviceType).\(id)"
             if let value = UserDefaults.standard.value(forKey: key) as? String {
                 return value
             }

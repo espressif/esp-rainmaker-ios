@@ -515,9 +515,11 @@ class SuccessViewController: UIViewController {
                                     DeviceControlHelper.shared.updateParam(nodeID: nodeID, parameter: [service.name ?? "Time": [param.name ?? "": TimeZone.current.identifier]], delegate: nil)
                                 }
                             }
-                            self.check5thStepStatus()
                         }
                     }
+                    // Re-evaluate step 5 whenever node details arrive (not only when Time service is present),
+                    // so controller group flow runs after connect + fetch even if esp.service.time is missing.
+                    self.check5thStepStatus()
                 }
             }
         }
@@ -553,16 +555,14 @@ class SuccessViewController: UIViewController {
                 
                 //Client-Only-Controller - Only call for devices that support this flow
                 if let finalNode = self.finalNode {
-                    // Prefer Rainmaker user-auth with group-id to follow the group-aware flow
-                    if finalNode.isRmakerControllerSupported, let _ = finalNode.rmakerControllerGroupParam {
-                        self.handleRainmakerControllerGroupFlow()
-                    } else if finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerRmakerGroupParam {
-                        
-                        self.handleClientOnlyControllerFlow()
-                    } else if finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerGroupParam {
-                        self.handleClientOnlyControllerFlow()
-                    } else if finalNode.isRmakerControllerSupported || finalNode.isClientOnlyControllerSupported {
-                        
+                    ControllerServiceParamUpdater.sendUpdateDeviceListToControllerSetupNodes(groupId: finalNode.groupId)
+                    if ControllerServiceParamUpdater.shouldOpenGroupSelectionAfterProvisioning(node: finalNode) {
+                        if ControllerServiceParamUpdater.isGroupsServiceOnlyFlow(node: finalNode) {
+                            self.showGroupSelectionScreen(purpose: .groupsServiceOnly)
+                        } else {
+                            self.handleRainmakerControllerGroupFlow()
+                        }
+                    } else if ControllerServiceParamUpdater.hasControllerLoginService(node: finalNode) {
                         self.showRainmakerLoginScreen()
                     }
                 }
@@ -1089,43 +1089,22 @@ extension SuccessViewController {
     
     /// Handle workflow for Rainmaker controller devices that expose group id
     private func handleRainmakerControllerGroupFlow() {
-        if let finalNode = self.finalNode, finalNode.isRmakerControllerSupported, let _ = finalNode.rmakerControllerGroupParam {
-            NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
-                DispatchQueue.main.async {
-                    if let nodeGroups = nodeGroups, nodeGroups.count > 0 {
-                        self.showGroupSelectionScreen()
-                    } else {
-                        self.showRainmakerLoginScreen()
-                    }
-                }
+        if let finalNode = self.finalNode,
+           finalNode.isRmakerControllerSupported
+            || finalNode.isRmControllerSupported
+            || finalNode.getService(forServiceType: MatterControllerConstants.serviceType) != nil
+            || finalNode.isMatterControllerSetupSupported {
+            // Always show group selection UI when group params are empty.
+            // The group selection screen supports creating a new group even when the user has none.
+            DispatchQueue.main.async {
+                self.showGroupSelectionScreen()
             }
         }
     }
     
     /// Handle workflow for client only controller device type
     private func handleClientOnlyControllerFlow() {
-        if let finalNode = self.finalNode, finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerRmakerGroupParam {
-            NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
-                DispatchQueue.main.async {
-                    if let nodeGroups = nodeGroups, nodeGroups.count > 0 {
-                        self.showGroupSelectionScreen()
-                    } else {
-                        self.showRainmakerLoginScreen()
-                    }
-                }
-            }
-        } else if let finalNode = self.finalNode, finalNode.isClientOnlyControllerSupported, let _ = finalNode.clientOnlyControllerGroupParam {
-            NodeGroupManager.shared.getNodeGroups { nodeGroups, _ in
-                DispatchQueue.main.async {
-                    if let nodeGroups = nodeGroups, nodeGroups.count > 0 {
-                        self.showGroupSelectionScreen()
-                    } else {
-                        self.showRainmakerLoginScreen()
-                    }
-                    
-                }
-            }
-        }
+        self.handleRainmakerControllerGroupFlow()
     }
     
     /// Show Rainmaker Login Screen
@@ -1143,11 +1122,12 @@ extension SuccessViewController {
     }
     
     /// Navigate to the Matter fabric selection screen (client‑only controller flow).
-    func showGroupSelectionScreen() {
+    func showGroupSelectionScreen(purpose: ControllerGroupSelectionPurpose = .clientOnlyController) {
         #if ESPRainMakerMatter
         let storyBrd = UIStoryboard(name: ESPMatterConstants.matterStoryboardId, bundle: nil)
         let fabricSelectionVC = storyBrd.instantiateViewController(withIdentifier: ESPFabricSelectionVC.storyboardId) as! ESPFabricSelectionVC
         fabricSelectionVC.isClientOnlyContoller = true
+        fabricSelectionVC.groupSelectionPurpose = purpose
         fabricSelectionVC.clientOnlyControllerDelegate = self
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.pushViewController(fabricSelectionVC, animated: true)
@@ -1158,13 +1138,31 @@ extension SuccessViewController {
 #if ESPRainMakerMatter
 extension SuccessViewController: ClientOnlyControllerGroupSelectionDelegate {
     
-    /// Called when a group is selected in the fabric selection screen.
-    /// - Parameter groupId: Selected group identifier.
     func groupSelected(groupId: String) {
-        DispatchQueue.main.async {
-            self.navigationController?.popViewController(animated: true)
-            if groupId.count > 0 {
-                self.showRainmakerLoginScreen(groupId: groupId)
+        proceedAfterGroupSelection(groupId: groupId, openLogin: true)
+    }
+    
+    func groupsServiceGroupSelected(groupId: String) {
+        proceedAfterGroupSelection(groupId: groupId, openLogin: false)
+    }
+    
+    private func proceedAfterGroupSelection(groupId: String, openLogin: Bool) {
+        guard let node = self.finalNode, let nodeId = node.node_id, groupId.count > 0 else { return }
+        let finish: () -> Void = {
+            DispatchQueue.main.async {
+                self.navigationController?.popViewController(animated: true)
+                if openLogin {
+                    self.showRainmakerLoginScreen(groupId: groupId)
+                } else {
+                    ControllerServiceParamUpdater.updateGroupsServiceParams(node: node, groupId: groupId, delegate: self, completion: {})
+                }
+            }
+        }
+        if NodeGroupManager.shared.isNodeInGroup(nodeId: nodeId, groupId: groupId) {
+            finish()
+        } else {
+            NodeGroupManager.shared.addNodeToGroup(nodeId: nodeId, groupId: groupId) { success, _ in
+                if success { finish() }
             }
         }
     }
@@ -1179,18 +1177,15 @@ extension SuccessViewController: ClientOnlyControllerCredentialsDelegate {
         DispatchQueue.main.async {
             self.navigationController?.popViewController(animated: true)
         }
-        
         let baseURL = Configuration.shared.awsConfiguration.baseURL ?? ""
         let refreshToken = cloudResponse.refreshToken ?? ""
-        
         if let node = self.finalNode {
-            if node.isRmakerControllerSupported {
-                NodeControllerParamUpdater.updateRmakerControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
-            }
-            if node.isClientOnlyControllerSupported {
-                NodeControllerParamUpdater.updateClientOnlyControllerParams(node: node, baseURL: baseURL, refreshToken: refreshToken, groupId: groupId, delegate: self) {}
-                
-            }
+            ControllerServiceParamUpdater.performPostLoginControllerSetup(node: node,
+                                                                          baseURL: baseURL,
+                                                                          refreshToken: refreshToken,
+                                                                          groupId: groupId,
+                                                                          delegate: self,
+                                                                          completion: {})
         }
     }
 }

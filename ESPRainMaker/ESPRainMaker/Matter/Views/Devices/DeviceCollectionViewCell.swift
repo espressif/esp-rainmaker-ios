@@ -193,21 +193,19 @@ class DeviceCollectionViewCell: UICollectionViewCell {
         }
         if let group = self.group, let groupId = group.groupID, let node = self.node, let deviceId = node.deviceId {
             if ESPMatterClusterUtil.shared.isOnOffServerSupported(groupId: groupId, deviceId: deviceId).0 {
-                DispatchQueue.main.async {
-                    showLight = true
-                    self.onOffButton.isHidden = false
-                    // Always read the current state from UserDefaults to ensure accuracy
-                    if let lightOnOffStatus = node.isMatterLightOn(deviceId: deviceId) {
-                        if lightOnOffStatus {
-                            self.onOffButton.image = UIImage(named: "switch_on")
-                        } else {
-                            self.onOffButton.image = UIImage(named: "switch_off")
-                        }
-                    } else {
-                        // If no state is stored, default to on and store it
-                        node.setMatterLightOnStatus(status: true, deviceId: deviceId)
+                showLight = true
+                self.onOffButton.isHidden = false
+                // Always read the current state from UserDefaults to ensure accuracy
+                if let lightOnOffStatus = node.isMatterLightOn(deviceId: deviceId) {
+                    if lightOnOffStatus {
                         self.onOffButton.image = UIImage(named: "switch_on")
+                    } else {
+                        self.onOffButton.image = UIImage(named: "switch_off")
                     }
+                } else {
+                    // If no state is stored, default to on and store it
+                    node.setMatterLightOnStatus(status: true, deviceId: deviceId)
+                    self.onOffButton.image = UIImage(named: "switch_on")
                 }
             }
         } else {
@@ -217,6 +215,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
             if status == .local || status == .remote || status == .controller {
                 self.overlay.isHidden = true
                 self.isUserInteractionEnabled = true
+                self.functionalOnOffButton.isUserInteractionEnabled = true
                 self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
                 if status != .remote {
                     self.setToggleStatusFromControllerConfig()
@@ -225,6 +224,7 @@ class DeviceCollectionViewCell: UICollectionViewCell {
                 if showLight {
                     self.onOffButton.image = UIImage(named: "switch_disabled")
                 }
+                self.functionalOnOffButton.isUserInteractionEnabled = false
                 self.isUserInteractionEnabled = true
                 self.container.layer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
             }

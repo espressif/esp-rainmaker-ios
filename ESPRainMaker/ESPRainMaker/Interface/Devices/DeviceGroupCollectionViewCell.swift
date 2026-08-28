@@ -75,7 +75,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDelegate {
     func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         #if ESPRainMakerMatter
         let node = getNodeAt(indexPath: indexPath)
-        if #available(iOS 16.4, *), node.isMatter, node.clientOnlyControllerNodeIdParam == nil {
+        if #available(iOS 16.4, *), node.isMatter, node.clientOnlyControllerNodeIdParam == nil, !node.isMatterControllerSetupSupported {
             var status: NodeConnectionStatus = .offline
             if let id = node.node_id, let groupId = self.fabricDetails.getGroupId(nodeId: id), let group = self.fabricDetails.getGroupData(groupId: groupId), let nodeDetails = self.fabricDetails.getNodeDetails(nodeId: id) {
                 if let matterNodeId = node.matter_node_id, let deviceId = matterNodeId.hexToDecimal {
@@ -158,7 +158,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         #if ESPRainMakerMatter
         let node = getNodeAt(indexPath: indexPath)
-        if #available(iOS 16.4, *), node.isMatter, node.clientOnlyControllerNodeIdParam == nil, var cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
+        if #available(iOS 16.4, *), node.isMatter, node.clientOnlyControllerNodeIdParam == nil, !node.isMatterControllerSetupSupported, var cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeviceCollectionViewCell.reuseIdentifier, for: indexPath) as? DeviceCollectionViewCell {
             // Use node.connectionStatus computed property instead of recalculating
             // This ensures we use the same logic as everywhere else and get updated values
             var status: NodeConnectionStatus = node.connectionStatus
