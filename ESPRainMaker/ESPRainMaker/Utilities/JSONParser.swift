@@ -349,6 +349,11 @@ struct JSONParser {
                                     node.pop = paramValue
                                 }
                             }
+                            if param.type == Constants.localControlUsernameParamType {
+                                if let paramValue = param.value as? String {
+                                    node.localControlUsername = paramValue
+                                }
+                            }
                         }
                     }
                 }

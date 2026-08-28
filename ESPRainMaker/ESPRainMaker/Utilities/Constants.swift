@@ -173,6 +173,7 @@ struct Constants {
     static let localControlServiceType = "esp.service.local_control"
     static let localControlParamType = "esp.param.local_control_type"
     static let popParamType = "esp.param.local_control_pop"
+    static let localControlUsernameParamType = "esp.param.local_control_username"
     static let serviceType = "_esp_local_ctrl._tcp."
     static let matterCommissionedServiceType = "_matter._tcp"
     static let serviceDomain = "local"

@@ -152,7 +152,12 @@ class User {
             if node.supportsEncryption {
                 var secureUserName: String!
                 if let securityType = node.securityType, securityType == ESPSecurity.secure2.rawValue {
-                    secureUserName = Configuration.shared.appConfiguration.localControlSec2Username
+                    let nodeLevelUsername = node.localControlUsername.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !nodeLevelUsername.isEmpty {
+                        secureUserName = nodeLevelUsername
+                    } else {
+                        secureUserName = Configuration.shared.appConfiguration.localControlSec2Username
+                    }
                     service.espLocalDevice = ESPLocalDevice(name: esp, security: .secure2, transport: .softap, proofOfPossession: node.pop, username: secureUserName, softAPPassword: nil, advertisementData: nil)
                     service.espLocalDevice.versionInfo = [prov: [secVer: securityType]]
                 } else {
