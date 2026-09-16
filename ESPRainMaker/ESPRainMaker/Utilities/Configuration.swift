@@ -199,6 +199,7 @@ struct AppConfiguration {
     var supportDeviceAutomation = true
     var supportOTAUpdate = false
     var supportConfigOverride = false
+    var enableNativeAppleSignIn = false
     var userPool: Int = 2
     var supportContinuousUpdate = true
     // In milliseconds
@@ -220,6 +221,7 @@ struct AppConfiguration {
             supportDeviceAutomation = configDict["Enable Device Automation"] as? Bool ?? true
             supportOTAUpdate = configDict["Enable OTA Update"] as? Bool ?? false
             supportConfigOverride = configDict["Enable Config Override"] as? Bool ?? false
+            enableNativeAppleSignIn = configDict["Enable Native Apple Sign In"] as? Bool ?? false
             if let pool = configDict["User Pool"] as? Int {
                 userPool = pool
             }

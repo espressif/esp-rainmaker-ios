@@ -274,6 +274,7 @@
 		A1B2C3D92EE2D620000F40F7 /* Node+GroupsServiceUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D82EE2D620000F40F7 /* Node+GroupsServiceUtility.swift */; };
 		B7E1F00226FDBD4B00480C53 /* ESPFederatedLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */; };
 		B7E1F00426FDBD4B00480C53 /* ESPGoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */; };
+		B7E1F00626FDBD4B00480C53 /* ESPAppleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00526FDBD4B00480C53 /* ESPAppleSignInService.swift */; };
 		C512AEC5D6D74B9240C94CDB /* Pods_ESPRainMaker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8540FD629D257CB4F3BB2A2 /* Pods_ESPRainMaker.framework */; };
 		F1012F62251110B300839F06 /* Schedule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F1012F61251110B300839F06 /* Schedule.storyboard */; };
 		F1072BC5256F9BD400D7CE2C /* BLELandingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */; };
@@ -1033,6 +1034,7 @@
 		A8D7A5E88F616C17F1DFA81F /* Pods-ESPRainMaker.esprainmaker-release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ESPRainMaker.esprainmaker-release.xcconfig"; path = "Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker.esprainmaker-release.xcconfig"; sourceTree = "<group>"; };
 		B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPFederatedLoginService.swift; sourceTree = "<group>"; };
 		B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPGoogleSignInService.swift; sourceTree = "<group>"; };
+		B7E1F00526FDBD4B00480C53 /* ESPAppleSignInService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPAppleSignInService.swift; sourceTree = "<group>"; };
 		EA1B9B9CBC01A94083166C44 /* Pods-ESPRainMaker.esprainmakermatter.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ESPRainMaker.esprainmakermatter.xcconfig"; path = "Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker.esprainmakermatter.xcconfig"; sourceTree = "<group>"; };
 		F1012F61251110B300839F06 /* Schedule.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Schedule.storyboard; sourceTree = "<group>"; };
 		F1072BC3256F9BD300D7CE2C /* BLELandingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLELandingViewController.swift; sourceTree = "<group>"; };
@@ -1663,6 +1665,7 @@
 				0C80AA1D26FDBD4B00480C53 /* ESPIdProviderLoginService.swift */,
 				B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */,
 				B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */,
+				B7E1F00526FDBD4B00480C53 /* ESPAppleSignInService.swift */,
 				0C80AA1E26FDBD4B00480C53 /* ESPExtendSessionService.swift */,
 				0C80AA1F26FDBD4B00480C53 /* ESPForgotPasswordService.swift */,
 				0C80AA2026FDBD4B00480C53 /* ESPChangePasswordService.swift */,
@@ -3713,6 +3716,7 @@
 				0C80AA2F26FDBD4B00480C53 /* ESPIdProviderLoginService.swift in Sources */,
 				B7E1F00226FDBD4B00480C53 /* ESPFederatedLoginService.swift in Sources */,
 				B7E1F00426FDBD4B00480C53 /* ESPGoogleSignInService.swift in Sources */,
+				B7E1F00626FDBD4B00480C53 /* ESPAppleSignInService.swift in Sources */,
 				F1CC3C24295D866E0000D6DC /* ESPOTAAPIWorker.swift in Sources */,
 				0CD359542A2D25F30081017C /* ESPMTRCommissioner+GetAllDeviceEndpoints.swift in Sources */,
 				0C2F51032C92B88B0031B098 /* DeviceTraitListViewController+CustomActionDelegate.swift in Sources */,

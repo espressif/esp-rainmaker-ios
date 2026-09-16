@@ -79,6 +79,8 @@
 		<false/>
 		<key>Enable Config Override</key>
 		<true/>
+		<key>Enable Native Apple Sign In</key>
+		<true/>
 		<key>User Pool</key>
 		<integer>2</integer>
 		<key>Enable Continuous Updates</key>

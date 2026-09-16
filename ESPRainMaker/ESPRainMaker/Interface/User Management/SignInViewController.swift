@@ -413,11 +413,29 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     }
 
     @IBAction func loginWithApple(_: Any) {
-        loginWith(idProvider: "SignInWithApple")
+        loginWithNativeApple()
     }
 
     @IBAction func loginWithGithub(_: Any) {
         loginWith(idProvider: "GitHub")
+    }
+
+    func loginWithNativeApple() {
+        ESPAppleSignInService.shared.signIn(presenting: self) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let idToken):
+                let service = ESPFederatedLoginService(presenter: self)
+                service.loaderDelegate = self
+                service.login(provider: Constants.appleFederatedProvider, idToken: idToken)
+            case .cancelled:
+                break
+            case .unavailable:
+                self.loginWith(idProvider: Constants.appleSignIn)
+            case .failure:
+                self.showAlert()
+            }
+        }
     }
 
     func loginWith(idProvider: String) {
@@ -721,7 +739,7 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     }
     
     @IBAction func chinaLoginToApple(_ sender: Any) {
-        loginWith(idProvider: "SignInWithApple")
+        loginWithNativeApple()
     }
     
     @IBAction func chinaLoginToWeChhat(_ sender: Any) {
