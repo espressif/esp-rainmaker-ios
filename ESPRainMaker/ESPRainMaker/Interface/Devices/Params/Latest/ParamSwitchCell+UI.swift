@@ -125,7 +125,7 @@ extension ParamSwitchCell {
     private func isDeviceOnlineForWrite() -> Bool {
         guard let properties = param?.properties, properties.contains("write"),
               let device = device, let node = device.node else { return false }
-        return node.isConnected || node.localNetwork
+        return node.isParamReachable()
     }
 }
 

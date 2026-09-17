@@ -52,13 +52,13 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is received
     func saveSchedule(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+        let actions = createActionsFromDeviceList()
+        if canReachNodesForServiceAction(nodeIds: Array(actions.keys)) {
             var jsonString: [String: Any] = [:]
             jsonString["name"] = currentSchedule.name
             jsonString["id"] = currentSchedule.id
             jsonString["operation"] = currentSchedule.operation?.rawValue ?? "add"
             jsonString["triggers"] = [["d": currentSchedule.trigger.days!, "m": currentSchedule.trigger.minutes!]]
-            let actions = createActionsFromDeviceList()
             if actions.keys.count > 0 {
                 var message = ESPScheduleConstants.scheduleUpdationPartialFailureMessage
                 if let operation = currentSchedule.operation, operation == .add {
@@ -81,12 +81,12 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is received
     func shouldEnableSchedule(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
-            configureDeviceForCurrentSchedule()
+        configureDeviceForCurrentSchedule()
+        let actions = createActionsFromDeviceList()
+        if canReachNodesForServiceAction(nodeIds: Array(actions.keys)) {
             var jsonString: [String: Any] = [:]
             jsonString["id"] = currentSchedule.id
             jsonString["operation"] = currentSchedule.enabled == true ? "enable" : "disable"
-            let actions = createActionsFromDeviceList()
             if actions.keys.count > 0 {
                 self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: ESPScheduleConstants.scheduleUpdationPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
                     completionHandler(result)
@@ -107,13 +107,16 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///   - nodeIDs: List of node IDs to be deleted
     ///   - completionHandler: Callback invoked after api response is received
     func deleteScheduleNodes(key: String, onView: UIView, nodeIDs: [String], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+        if canReachNodesForServiceAction(nodeIds: nodeIDs) {
             if let schedule = ESPScheduler.shared.schedules[key] {
                 var jsonString: [String: Any] = [:]
                 jsonString["name"] = schedule.name
                 jsonString["id"] = schedule.id
                 jsonString["operation"] = "remove"
                 self.invokeServiceAction(apiManager: apiManager, keys: nodeIDs, jsonString: jsonString, text: ESPScheduleConstants.scheduleDeletionPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: schedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
+                    if case .success(let nodesFailed) = result, !nodesFailed {
+                        self.removeScheduleNodesFromList(key: key, nodeIDs: nodeIDs)
+                    }
                     completionHandler(result)
                 }
             } else {
@@ -130,7 +133,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is received
     func deleteScheduleAt(key: String, onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+        if canReachNodesForServiceAction(nodeIds: [String](ESPScheduler.shared.schedules[key]?.actions.keys ?? [:].keys)) {
             currentSchedule = ESPScheduler.shared.schedules[key]!
             configureDeviceForCurrentSchedule()
             var jsonString: [String: Any] = [:]
@@ -138,6 +141,9 @@ class ESPScheduler: CommonDeviceServicesProtocol {
             jsonString["id"] = currentSchedule.id
             jsonString["operation"] = "remove"
             self.invokeServiceAction(apiManager: apiManager, keys: [String](currentSchedule.actions.keys), jsonString: jsonString, text: ESPScheduleConstants.scheduleDeletionPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: self.currentSchedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
+                if case .success(let nodesFailed) = result, !nodesFailed {
+                    self.removeScheduleFromList(key: key)
+                }
                 completionHandler(result)
             }
         } else {
@@ -159,6 +165,23 @@ class ESPScheduler: CommonDeviceServicesProtocol {
         currentSchedule = nil
     }
 
+    /// Drop a node's actions so firmware ingest can replace stale cloud copies.
+    func removeActions(forNodeId nodeId: String) {
+        var emptyKeys: [String] = []
+        for (key, schedule) in schedules {
+            schedule.actions.removeValue(forKey: nodeId)
+            if schedule.actions.isEmpty {
+                emptyKeys.append(key)
+            }
+        }
+        for key in emptyKeys {
+            schedules.removeValue(forKey: key)
+            if currentScheduleKey == key {
+                currentScheduleKey = nil
+            }
+        }
+    }
+
     /// In list of available devices select param and update param values as given in the current schedule.
     func configureDeviceForCurrentSchedule() {
         resetAvailableDeviceStatus(availableDevices: &availableDevices)
@@ -177,6 +200,87 @@ class ESPScheduler: CommonDeviceServicesProtocol {
                     }
                 }
             }
+        }
+    }
+
+    /// Store the in-memory schedule (with actions) after a successful save.
+    func persistCurrentScheduleInList() {
+        guard let schedule = currentSchedule,
+              let id = schedule.id,
+              let name = schedule.name else {
+            return
+        }
+        schedule.actions = snapshotActionsFromAvailableDevices()
+        let key = "\(id).\(name).\(schedule.trigger.days ?? 0).\(schedule.trigger.minutes ?? 0).\(schedule.enabled)"
+        currentScheduleKey = key
+        schedules[key] = schedule
+    }
+
+    /// Remove a deleted schedule from in-memory list and node schedule params (BLE local control parity).
+    func removeScheduleFromList(key: String) {
+        guard let schedule = schedules[key], let scheduleId = schedule.id else {
+            schedules.removeValue(forKey: key)
+            if currentScheduleKey == key {
+                currentScheduleKey = nil
+            }
+            return
+        }
+        for nodeId in schedule.actions.keys {
+            guard let node = User.shared.getNode(id: nodeId) else { continue }
+            node.removeServiceEntry(id: scheduleId, kind: .schedule)
+        }
+        schedules.removeValue(forKey: key)
+        if currentScheduleKey == key {
+            currentScheduleKey = nil
+        }
+    }
+
+    /// Remove node associations for a schedule; drop the schedule when no nodes remain.
+    func removeScheduleNodesFromList(key: String, nodeIDs: [String]) {
+        guard let schedule = schedules[key], let scheduleId = schedule.id else { return }
+        for nodeId in nodeIDs {
+            schedule.actions.removeValue(forKey: nodeId)
+            User.shared.getNode(id: nodeId)?.removeServiceEntry(id: scheduleId, kind: .schedule)
+        }
+        if schedule.actions.isEmpty {
+            schedules.removeValue(forKey: key)
+            if currentScheduleKey == key {
+                currentScheduleKey = nil
+            }
+        }
+    }
+
+    /// Snapshot selected schedule actions from the current available-devices list.
+    func snapshotActionsFromAvailableDevices() -> [String: [Device]] {
+        var actions: [String: [Device]] = [:]
+        for device in availableDevices.values where device.selectedParams > 0 {
+            guard let nodeId = device.node?.node_id else { continue }
+            let snapshot = Device(device: device)
+            snapshot.node = device.node
+            snapshot.selectedParams = device.selectedParams
+            snapshot.params = device.params?.filter { $0.selected }.map { selected in
+                let copy = Param(param: selected)
+                copy.value = selected.value
+                copy.selected = true
+                return copy
+            }
+            if actions[nodeId] != nil {
+                actions[nodeId]!.append(snapshot)
+            } else {
+                actions[nodeId] = [snapshot]
+            }
+        }
+        return actions
+    }
+
+    private func ingestSchedulesFromNode(_ node: Node) {
+        guard node.isSchedulingSupported,
+              let nodeId = node.node_id,
+              let scheduleJSONList = node.serviceEntries(for: .schedule) else {
+            return
+        }
+        for scheduleJSON in scheduleJSONList {
+            saveScheduleListFromJSON(nodeID: nodeId, scheduleJSON: scheduleJSON)
         }
     }
 
@@ -225,7 +329,9 @@ class ESPScheduler: CommonDeviceServicesProtocol {
 
         // Check for existing schedule in the list for a given key
         if let existingSchedule = ESPScheduler.shared.schedules[key] {
-            existingSchedule.actions[nodeID] = devices
+            if !devices.isEmpty {
+                existingSchedule.actions[nodeID] = devices
+            }
         } else {
             // Create a new schedule object if no key is found on the list
             let newSchedule = ESPSchedule()
@@ -234,7 +340,9 @@ class ESPScheduler: CommonDeviceServicesProtocol {
             newSchedule.name = name
             newSchedule.trigger = trigger
             newSchedule.week = ESPWeek(number: trigger.days ?? 0)
-            newSchedule.actions[nodeID] = devices
+            if !devices.isEmpty {
+                newSchedule.actions[nodeID] = devices
+            }
             ESPScheduler.shared.schedules[key] = newSchedule
         }
     }
@@ -243,8 +351,29 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - nodeList: List of nodes. Each node contains devices and information of their services.
+    /// When editing a schedule tied to a BLE-only node, scope devices to that node only (Android parity).
+    @discardableResult
+    func detectAndConfigureBleSingleDeviceFlow(from schedule: ESPSchedule?) -> Bool {
+        guard let schedule = schedule else { return false }
+        return BleDeviceServiceFlow.detectSingleNodeScope(nodeIds: Array(schedule.actions.keys)) { nodeId in
+            setAvailableDevicesForBleNode(nodeId: nodeId)
+        }
+    }
+
+    func setAvailableDevicesForBleNode(nodeId: String) {
+        BleDeviceServiceFlow.populateAvailableDevices(nodeId: nodeId, kind: .schedule, into: &availableDevices)
+    }
+
     func getAvailableDeviceWithScheduleCapability(nodeList: [Node]) {
+        // Rebuild from scratch each time — otherwise a BLE-only node added via the single-device
+        // flow (setAvailableDevicesForBleNode) would linger here forever, since the loop below only
+        // skips *adding* excluded nodes, it never removes a stale entry left by a previous call.
+        availableDevices.removeAll()
         for node in nodeList {
+            ingestSchedulesFromNode(node)
+            if BleDeviceServiceFlow.excludesFromMultiDevicePicker(node) {
+                continue
+            }
             if node.isSchedulingSupported {
                 if let devices = node.devices {
                     for device in devices {
@@ -260,15 +389,6 @@ class ESPScheduler: CommonDeviceServicesProtocol {
                         if copyDevice.params?.count ?? 0 > 0 {
                             let key = [copyDevice.node?.node_id, copyDevice.name].compactMap { $0 }.joined(separator: ".")
                             ESPScheduler.shared.availableDevices[key] = copyDevice
-                            
-                            // Parse and save any existing schedules from the node's schedule service
-                            if let scheduleService = node.services?.first(where: { $0.type == Constants.scheduleServiceType }),
-                               let scheduleParam = scheduleService.params?.first(where: { $0.type == Constants.scheduleParamType }),
-                               let schedules = scheduleParam.value as? [[String: Any]] {
-                                for schedule in schedules {
-                                    saveScheduleListFromJSON(nodeID: node.node_id ?? "", scheduleJSON: schedule)
-                                }
-                            }
                         }
                     }
                 }

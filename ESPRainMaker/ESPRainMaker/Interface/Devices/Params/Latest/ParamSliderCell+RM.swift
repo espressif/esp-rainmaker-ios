@@ -50,8 +50,7 @@ extension ParamSliderCell {
         // CRITICAL: Check if device is offline before sending update
         // For Rainmaker devices, check node connection
         if let node = device.node {
-            let isConnected = node.isConnected || node.localNetwork
-            if !isConnected {
+            if !node.isParamReachable() {
                 // Device offline - call completion with failure
                 DispatchQueue.main.async {
                     if let initialValue = self.sliderInitialValue {

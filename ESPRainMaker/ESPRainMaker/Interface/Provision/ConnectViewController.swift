@@ -79,6 +79,7 @@ class ConnectViewController: UIViewController {
 
     @IBAction func nextBtnClicked(_: Any) {
         pop = popTextField.text ?? ""
+        User.shared.bleLocalControl.sessionPop = pop
 
         if let device = onNetworkDevice, let completion = onNetworkPOPCompletion {
             guard !pop.isEmpty else {
@@ -157,6 +158,21 @@ class ConnectViewController: UIViewController {
             //Check the "prov"/"cap" to see if wifi/thread is supported.
             //If Thread is supported navigate to thread network selection screen.
             //Else navigate user to wifi provisioning screen.
+            if ESPBleLocalCtrlProvisioningHelper.offerSkipWifiFlowIfSupported(
+                from: self,
+                device: device,
+                pop: self.pop,
+                onContinueWifi: { [weak self] in
+                    self?.routeToWifiOrThread(device: device, versionInfo: versionInfo)
+                }
+            ) {
+                return
+            }
+            routeToWifiOrThread(device: device, versionInfo: versionInfo)
+        }
+    }
+
+    private func routeToWifiOrThread(device: ESPDevice, versionInfo: NSDictionary) {
             let threadCapabilities = versionInfo.checkThreadCapabilities()
             if threadCapabilities.canProvisionOverThread {
                 if #available(iOS 15.0, *) {
@@ -184,7 +200,6 @@ class ConnectViewController: UIViewController {
                     self.goToJoinNetworkVC()
                 }
             }
-        }
     }
 
     // Show status screen, called when device connection fails.
@@ -212,6 +227,7 @@ class ConnectViewController: UIViewController {
     func goToClaimVC(device: ESPDevice, isCameraDevice: Bool = false) {
         let claimVC = storyboard?.instantiateViewController(withIdentifier: "claimVC") as! ClaimViewController
         claimVC.device = device
+        claimVC.pop = pop
         claimVC.isCameraDevice = isCameraDevice
         navigationController?.pushViewController(claimVC, animated: true)
     }

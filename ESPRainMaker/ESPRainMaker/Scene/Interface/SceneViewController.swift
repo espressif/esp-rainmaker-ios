@@ -29,6 +29,8 @@ class SceneViewController: UIViewController {
     static let storyboardId = "SceneViewController"
     
     var isNewScene: Bool = true
+    /// When true, only the launching BLE node is available (Android `KEY_IS_BLE_SINGLE_DEVICE`).
+    var isBleSingleDeviceFlow = false
     var deSelectedNodeIDs: [String] = [String]()
     var selectedNodeIDs: [String] = [String]()
     var sceneName: String = ""
@@ -59,6 +61,10 @@ class SceneViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBarController?.tabBar.isHidden = true
+
+        if !isBleSingleDeviceFlow {
+            isBleSingleDeviceFlow = ESPSceneManager.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPSceneManager.shared.currentScene)
+        }
         
         descriptionTextView.textContainerInset = UIEdgeInsets.zero
         descriptionTextView.textContainer.lineFragmentPadding = 0
@@ -70,18 +76,21 @@ class SceneViewController: UIViewController {
         // Configure view for current scene
         ESPSceneManager.shared.configureDeviceForCurrentScene()
         
-        failedScene = getFailedScene(scene: ESPSceneManager.shared.currentScene)
+        guard let scene = ESPSceneManager.shared.currentScene else {
+            return
+        }
+        failedScene = getFailedScene(scene: scene)
         
         //Get devices already selected for scene
         selectedNodeIDs = getSelectedNodeIDs()
         
-        if ESPSceneManager.shared.currentScene.id != nil {
-            sceneNameLabel.text = ESPSceneManager.shared.currentScene.name
+        if scene.id != nil {
+            sceneNameLabel.text = scene.name
         } else {
             sceneNameLabel.text = sceneName
         }
         setNameViewHeight(label: sceneNameLabel)
-        if let desc = ESPSceneManager.shared.currentScene.info {
+        if let desc = scene.info {
             descriptionTextView.text = desc
             self.sceneDescriptionLabel.isHidden = !(desc.count == 0)
         }
@@ -179,20 +188,24 @@ class SceneViewController: UIViewController {
         DispatchQueue.main.async {
             Utility.showLoader(message: "", view: self.view)
         }
+        guard let scene = ESPSceneManager.shared.currentScene else {
+            DispatchQueue.main.async { Utility.hideLoader(view: self.view) }
+            return
+        }
         // If no id is present that means new scene is added.
-        if ESPSceneManager.shared.currentScene != nil, ESPSceneManager.shared.currentScene.id == nil {
+        if scene.id == nil {
             // Generate a unique 4 length id for the new scene.
-            ESPSceneManager.shared.currentScene.id = NanoID.new(4)
-            ESPSceneManager.shared.currentScene.operation = .add
+            scene.id = NanoID.new(4)
+            scene.operation = .add
         } else {
             // Scene already present so will run edit operation on it.
-            ESPSceneManager.shared.currentScene.operation = .edit
+            scene.operation = .edit
         }
 
         // Give value for the scene parameters based on the user selection.
-        ESPSceneManager.shared.currentScene.name = sceneName
+        scene.name = sceneName
         if let description = self.descriptionTextView.text {
-            ESPSceneManager.shared.currentScene.info = description
+            scene.info = description
         }
         
         // Call save operation.
@@ -214,12 +227,13 @@ class SceneViewController: UIViewController {
                         }
                     }
                     self.formatCurrentSceneKey()
-                    self.navigationController?.popToRootViewController(animated: false)
+                    self.completeServiceEditorFlow()
                 case .failure:
+                    Utility.showToastMessage(view: self.view, message: ESPSceneConstants.sceneUpdationFailureMessage)
                     if let failed = self.failedScene {
                         if let key = ESPSceneManager.shared.currentSceneKey, let _ = ESPSceneManager.shared.scenes[key] {
-                            ESPSceneManager.shared.scenes[ESPSceneManager.shared.currentSceneKey] = failed
-                            ESPSceneManager.shared.scenes[ESPSceneManager.shared.currentSceneKey]?.actions = ESPSceneManager.shared.currentScene.actions
+                            ESPSceneManager.shared.scenes[key] = failed
+                            ESPSceneManager.shared.scenes[key]?.actions = scene.actions
                         }
                     }
                     if scenesDeleted {
@@ -236,7 +250,7 @@ class SceneViewController: UIViewController {
                             self.delegate?.serviceUpdated()
                         }
                         User.shared.updateDeviceList = true
-                        self.navigationController?.popToRootViewController(animated: false)
+                        self.completeServiceEditorFlow()
                     }
                 }
             }
@@ -244,15 +258,21 @@ class SceneViewController: UIViewController {
     }
     
     private func formatCurrentSceneKey() {
-        ESPSceneManager.shared.currentSceneKey = "\(ESPSceneManager.shared.currentScene.id!)"
+        if let id = ESPSceneManager.shared.currentScene?.id {
+            ESPSceneManager.shared.currentSceneKey = id
+        }
     }
     
     /// Calls delete action on deselected nodes and returns true if user has edited scene without removing all actions
     /// - Parameter callEditAction: called with flag informing if scene actions have been deleted
     private func deleteNodesForScene(_ callEditAction: @escaping (Bool) -> Void) {
+        guard let key = ESPSceneManager.shared.currentSceneKey else {
+            callEditAction(false)
+            return
+        }
         DispatchQueue.main.async {
             Utility.showLoader(message: "", view: self.view) }
-            ESPSceneManager.shared.deleteSceneNodes(key: ESPSceneManager.shared.currentSceneKey, onView: view, nodeIDs: deSelectedNodeIDs) { result  in
+            ESPSceneManager.shared.deleteSceneNodes(key: key, onView: view, nodeIDs: deSelectedNodeIDs) { result  in
                 //If user has deselected all devices, then set update device list to true and pop to scene list screen. Else call edit scene.
                 var sceneDevicesDeleted: Bool = false
                 switch result {
@@ -270,7 +290,7 @@ class SceneViewController: UIViewController {
                             if sceneDevicesDeleted {
                                 self.delegate?.serviceUpdated()
                             }
-                            self.navigationController?.popToRootViewController(animated: false)
+                            self.completeServiceEditorFlow()
                         }
                     } else {
                         callEditAction(sceneDevicesDeleted)
@@ -290,7 +310,7 @@ class SceneViewController: UIViewController {
         input.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: { _ in
         }))
         input.addAction(UIAlertAction(title: "Done", style: .default, handler: { [weak input] _ in
-            let textField = input?.textFields![0]
+            let textField = input?.textFields?.first
             textField?.keyboardType = .asciiCapable
             guard let name = textField?.text else {
                 return
@@ -302,10 +322,17 @@ class SceneViewController: UIViewController {
     }
     
     @IBAction func actionsPressed(_ sender: Any) {
+        if !isBleSingleDeviceFlow {
+            isBleSingleDeviceFlow = ESPSceneManager.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPSceneManager.shared.currentScene)
+        }
+        BleDeviceServiceFlow.prepareForActionPicker(ESPSceneManager.shared.availableDevices, kind: .scene)
+        var refreshedCopy = BleDeviceServiceFlow.orderedDevicesForActionPicker(from: ESPSceneManager.shared.availableDevices)
+        refreshedCopy = configureDeviceSceneActions(refreshedCopy)
         let storyboard = UIStoryboard(name: "Scene", bundle: nil)
-        let selectDeviceVC = storyboard.instantiateViewController(withIdentifier: "SceneSelectDevicesVC") as! SceneSelectDevicesVC
-        // Re-order list of devices such that devices whose params are selected be on top.
-        selectDeviceVC.availableDeviceCopy = sortDevices(availableDevices: availableDeviceCopy)
+        guard let selectDeviceVC = storyboard.instantiateViewController(withIdentifier: "SceneSelectDevicesVC") as? SceneSelectDevicesVC else {
+            return
+        }
+        selectDeviceVC.availableDeviceCopy = sortDevices(availableDevices: refreshedCopy)
         navigationController?.pushViewController(selectDeviceVC, animated: true)
     }
     
@@ -392,6 +419,15 @@ class SceneViewController: UIViewController {
         return devices
     }
     
+    /// Android `finish()` parity: BLE flow returns to device params; tab flow returns to scene list.
+    private func completeServiceEditorFlow() {
+        if isBleSingleDeviceFlow {
+            navigationController?.popViewController(animated: true)
+        } else {
+            navigationController?.popToRootViewController(animated: false)
+        }
+    }
+
     /// Set height for the schedule name label
     /// - Parameter label: schedule name label
     private func setNameViewHeight(label: UILabel) {
@@ -404,7 +440,9 @@ class SceneViewController: UIViewController {
     private func addHeightConstraint(textField: UITextField) {
         let heightConstraint = NSLayoutConstraint(item: textField, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)
         textField.addConstraint(heightConstraint)
-        textField.font = UIFont(name: textField.font!.fontName, size: 18)
+        if let fontName = textField.font?.fontName {
+            textField.font = UIFont(name: fontName, size: 18)
+        }
     }
     
     /// Get list of node IDs for which some action has been selected
@@ -468,13 +506,14 @@ extension SceneViewController: UITextViewDelegate {
             if height > 0 {
                 topBarTopSpace.constant = -(height)
             }
-            let originalText = textView.text
-            guard let stringRange = Range(range, in: originalText!) else { return false }
-            let updatedText = originalText!.replacingCharacters(in: stringRange, with: text)
-            let lineHeight = "A".getViewHeight(labelWidth: self.descriptionTextView.frame.width, font: descriptionTextView.font!) - descriptionTextView.textContainerInset.top - descriptionTextView.textContainerInset.bottom - 0.5
+            let originalText = textView.text ?? ""
+            guard let stringRange = Range(range, in: originalText) else { return false }
+            let updatedText = originalText.replacingCharacters(in: stringRange, with: text)
+            let font = descriptionTextView.font ?? UIFont.systemFont(ofSize: 14)
+            let lineHeight = "A".getViewHeight(labelWidth: self.descriptionTextView.frame.width, font: font) - descriptionTextView.textContainerInset.top - descriptionTextView.textContainerInset.bottom - 0.5
             let rows: Int = Int((descriptionTextView.contentSize.height - descriptionTextView.textContainerInset.top - descriptionTextView.textContainerInset.bottom) / lineHeight)
             if rows > 15 {
-                if updatedText.count < originalText!.count {
+                if updatedText.count < originalText.count {
                     return true
                 } else {
                     return false

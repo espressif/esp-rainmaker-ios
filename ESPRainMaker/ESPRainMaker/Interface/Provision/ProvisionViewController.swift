@@ -54,6 +54,8 @@ class ProvisionViewController: UIViewController {
     
     var wifiReset: Bool = false
     var wifiResetNodeId: String?
+    var isBleWifiReprovision = false
+    var bleReprovisionNodeId: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -174,6 +176,31 @@ class ProvisionViewController: UIViewController {
 
     private func provisionDevice(ssid _: String, passphrase: String) {
         self.passphrase = passphrase
+        if isBleWifiReprovision {
+            Utility.showLoader(message: "Provisioning Wi-Fi", view: view)
+            device.provision(ssid: currentSSID, passPhrase: passphrase) { [weak self] status in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    switch status {
+                    case .configApplied:
+                        // Credentials accepted by the device; still connecting to Wi-Fi. Keep waiting.
+                        Utility.showLoader(message: "Connecting to Wi-Fi", view: self.view)
+                    case .success:
+                        Utility.hideLoader(view: self.view)
+                        if let nodeId = self.bleReprovisionNodeId {
+                            User.shared.bleLocalControl.disconnectDevice(nodeId: nodeId)
+                        }
+                        self.navigationController?.popViewController(animated: true)
+                    case .failure:
+                        Utility.hideLoader(view: self.view)
+                        let alert = UIAlertController(title: "Error", message: "Wi-Fi provisioning failed. Please try again.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .default))
+                        self.present(alert, animated: true)
+                    }
+                }
+            }
+            return
+        }
         if let versionInfo = device.versionInfo, versionInfo.isChallengeResponseSupported() {
             //Navigate to success view controller
             self.showStatusScreen()
@@ -215,6 +242,10 @@ class ProvisionViewController: UIViewController {
     }
 
     @IBAction func cancelClicked(_: Any) {
+        if isBleWifiReprovision {
+            navigationController?.popViewController(animated: true)
+            return
+        }
         device.disconnect()
         navigationController?.popToRootViewController(animated: false)
     }
@@ -263,8 +294,34 @@ class ProvisionViewController: UIViewController {
         DispatchQueue.main.async {
             Utility.showLoader(message: "Scanning for Wi-Fi", view: self.view)
         }
-        device.scanWifiList { wifiList, _ in
+        ensureSessionThenScanWifi()
+    }
+
+    /// BLE Wi-Fi reprovision reuses the local-control device; session may not be live between ops.
+    /// Re-establish before scanWifiList — ESPProvision force-unwraps session during scan.
+    private func ensureSessionThenScanWifi() {
+        guard isBleWifiReprovision, !device.isSessionEstablished() else {
+            performWifiScan()
+            return
+        }
+        device.initialiseSession(sessionPath: nil) { [weak self] status in
             DispatchQueue.main.async {
+                guard let self = self else { return }
+                switch status {
+                case .connected:
+                    self.performWifiScan()
+                default:
+                    Utility.hideLoader(view: self.view)
+                    Utility.showToastMessage(view: self.view, message: "BLE session failed. Cannot scan Wi-Fi.")
+                }
+            }
+        }
+    }
+
+    private func performWifiScan() {
+        device.scanWifiList { [weak self] wifiList, _ in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
                 Utility.hideLoader(view: self.view)
                 if let list = wifiList {
                     self.wifiDetailList = list.sorted { $0.rssi > $1.rssi }

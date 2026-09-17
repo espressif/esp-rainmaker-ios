@@ -29,6 +29,7 @@ class ClaimViewController: UIViewController {
     @IBOutlet var centralIcon: UIImageView!
 
     var device: ESPDevice!
+    var pop = ""
     var count = 0
     var threadOperationalDataset: Data!
     var provisionCompletionHandler: (() -> Void)?
@@ -69,31 +70,18 @@ class ClaimViewController: UIViewController {
                 Utility.hideLoader(view: self.view)
                 if result {
                     if let versionInfo = self.device.versionInfo {
-                        let threadCapabilities = versionInfo.checkThreadCapabilities()
-                        if threadCapabilities.canProvisionOverThread {
-                            if #available(iOS 15.0, *) {
-                                self.device.network = .thread
-                                self.provisionDeviceWithThreadNetwork(device: self.device) {
-                                    DispatchQueue.main.async {
-                                        self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: threadCapabilities.shouldScanThreadNetworks, device: self.device)
-                                    }
-                                }
-                            } else {
-                                self.centralIcon.layer.removeAllAnimations()
-                                self.alertUser(title: Constants.notice, message: AppMessages.upgradeOS15VersionMsg, buttonTitle: "OK") {
-                                    DispatchQueue.main.async {
-                                        self.navigationController?.popToRootViewController(animated: true)
-                                    }
-                                }
+                        let provisioningPop = self.pop.isEmpty ? (User.shared.bleLocalControl.sessionPop ?? "") : self.pop
+                        if ESPBleLocalCtrlProvisioningHelper.offerSkipWifiFlowIfSupported(
+                            from: self,
+                            device: self.device,
+                            pop: provisioningPop,
+                            onContinueWifi: { [weak self] in
+                                self?.routeToWifiOrThread(versionInfo: versionInfo)
                             }
-                        } else {
-                            self.device.network = .wifi
-                            if versionInfo.shouldScanWifiNetwork() {
-                                self.goToProvision()
-                            } else {
-                                self.goToJoinNetworkVC()
-                            }
+                        ) {
+                            return
                         }
+                        self.routeToWifiOrThread(versionInfo: versionInfo)
                     }
                 } else {
                     self.centralIcon.layer.removeAllAnimations()
@@ -122,6 +110,34 @@ class ClaimViewController: UIViewController {
         let joinNetworkVC = storyboard?.instantiateViewController(withIdentifier: JoinNetworkViewController.storyboardId) as! JoinNetworkViewController
         joinNetworkVC.device = device
         navigationController?.pushViewController(joinNetworkVC, animated: true)
+    }
+
+    private func routeToWifiOrThread(versionInfo: NSDictionary) {
+        let threadCapabilities = versionInfo.checkThreadCapabilities()
+        if threadCapabilities.canProvisionOverThread {
+            if #available(iOS 15.0, *) {
+                self.device.network = .thread
+                self.provisionDeviceWithThreadNetwork(device: self.device) {
+                    DispatchQueue.main.async {
+                        self.showThreadNetworkSelectionVC(shouldScanThreadNetworks: threadCapabilities.shouldScanThreadNetworks, device: self.device)
+                    }
+                }
+            } else {
+                self.centralIcon.layer.removeAllAnimations()
+                self.alertUser(title: Constants.notice, message: AppMessages.upgradeOS15VersionMsg, buttonTitle: "OK") {
+                    DispatchQueue.main.async {
+                        self.navigationController?.popToRootViewController(animated: true)
+                    }
+                }
+            }
+        } else {
+            self.device.network = .wifi
+            if versionInfo.shouldScanWifiNetwork() {
+                self.goToProvision()
+            } else {
+                self.goToJoinNetworkVC()
+            }
+        }
     }
 
     @IBAction func doneButtonPressed(_: Any) {

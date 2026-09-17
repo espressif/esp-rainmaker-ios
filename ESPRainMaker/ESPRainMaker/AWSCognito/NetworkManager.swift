@@ -25,6 +25,8 @@ class NetworkManager {
     static let shared = NetworkManager()
     var session: Session!
     var apiManager = ESPAPIManager()
+    private var bleProxyReportWorkItems: [String: DispatchWorkItem] = [:]
+    private let bleProxyReportDelay: TimeInterval = 0.5
     
     private init() {
         // Listen for configuration updates and reinitialize API manager
@@ -80,6 +82,8 @@ class NetworkManager {
                 }
                 completionHandler(nil, .emptyConfigData)
             }
+        } else if User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            self.refreshNodeParamsFromBle(nodeId: nodeId, completionHandler: completionHandler)
         } else {
             getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
         }
@@ -163,6 +167,8 @@ class NetworkManager {
                             completionHandler(nil)
                         }
                     }
+                } else if User.shared.bleLocalControl.isAvailable(nodeId: nodeid) {
+                    refreshDeviceParamsFromBle(nodeId: nodeid, device: device, completionHandler: completionHandler)
                 } else {
                     getDeviceParamPrivate(device: device, completionHandler: completionHandler)
                 }
@@ -198,6 +204,17 @@ class NetworkManager {
                             completionHandler(.success)
                         }
                     }
+                } else if User.shared.bleLocalControl.isAvailable(nodeId: nodeid) {
+                    User.shared.bleLocalControl.connectAndSetParams(nodeId: nodeid, parameter: parameter) { status in
+                        switch status {
+                        case .success:
+                            self.applySetParamToLocalNodes(nodeId: nodeid, parameter: parameter)
+                            completionHandler(.success)
+                            self.reportBleParamsToProxy(nodeId: nodeid)
+                        default:
+                            self.clearBleAndFallbackToCloud(nodeId: nodeid, nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
+                        }
+                    }
                 } else {
                     setDeviceParamPrivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
                 }
@@ -205,6 +222,259 @@ class NetworkManager {
         } else {
             setDeviceParamPrivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
         }
+    }
+
+    // MARK: - BLE local control helpers
+
+    /// Cloud getNodes when online, then overlay BLE-only firmware scene/schedule params.
+    func refreshAssociatedNodesThenOverlayBleFirmware(completion: @escaping () -> Void) {
+        let overlay = { [weak self] in
+            guard let self = self else {
+                completion()
+                return
+            }
+            User.shared.bleLocalControl.reapplyBleStatusToNodes()
+            self.overlayBleOnlyFirmwareServiceParams(completion: completion)
+        }
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+            getNodes { nodes, error in
+                if error == nil, let nodes = nodes {
+                    User.shared.associatedNodeList = nodes
+                }
+                overlay()
+            }
+        } else {
+            overlay()
+        }
+    }
+
+    /// Read params from BLE-only firmware (when reachable) and ingest scenes/schedules from them.
+    func overlayBleOnlyFirmwareServiceParams(completion: @escaping () -> Void) {
+        guard Configuration.shared.appConfiguration.supportLocalControl else {
+            completion()
+            return
+        }
+        let nodeIds = (User.shared.associatedNodeList ?? []).compactMap { node -> String? in
+            guard let nodeId = node.node_id,
+                  node.isBleOnlyExcludedFromMultiDeviceServices(),
+                  User.shared.bleLocalControl.isAvailable(nodeId: nodeId) else {
+                return nil
+            }
+            return nodeId
+        }
+        overlayBleParamsSequentially(nodeIds: nodeIds, updatedIds: []) { updatedIds in
+            if !updatedIds.isEmpty {
+                for nodeId in updatedIds {
+                    ESPSceneManager.shared.removeActions(forNodeId: nodeId)
+                    ESPScheduler.shared.removeActions(forNodeId: nodeId)
+                }
+                if let nodeList = User.shared.associatedNodeList {
+                    ESPSceneManager.shared.getAvailableDeviceWithSceneCapability(nodeList: nodeList)
+                    ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+                }
+            }
+            completion()
+        }
+    }
+
+    private func overlayBleParamsSequentially(nodeIds: [String], updatedIds: [String], completion: @escaping ([String]) -> Void) {
+        var remaining = nodeIds
+        guard let nodeId = remaining.first else {
+            completion(updatedIds)
+            return
+        }
+        remaining.removeFirst()
+        queryBleParamsConnectingIfNeeded(nodeId: nodeId) { [weak self] json in
+            guard let self = self else {
+                completion(updatedIds)
+                return
+            }
+            var nextUpdated = updatedIds
+            if let json = json, let node = User.shared.getNode(id: nodeId) {
+                self.applyBleParamJson(json, to: node)
+                node.bleLocalNetwork = true
+                nextUpdated.append(nodeId)
+                if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                    self.reportBleParamsToProxy(nodeId: nodeId)
+                }
+            }
+            self.overlayBleParamsSequentially(nodeIds: remaining, updatedIds: nextUpdated, completion: completion)
+        }
+    }
+
+    private func queryBleParamsConnectingIfNeeded(nodeId: String, completion: @escaping ([String: Any]?) -> Void) {
+        let query = {
+            User.shared.bleLocalControl.queryParams(nodeId: nodeId, completion: completion)
+        }
+        if User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            query()
+        } else if User.shared.bleLocalControl.isDiscovered(nodeId: nodeId) {
+            User.shared.bleLocalControl.connectDevice(nodeId: nodeId) { success in
+                if success {
+                    query()
+                } else {
+                    completion(nil)
+                }
+            }
+        } else {
+            completion(nil)
+        }
+    }
+
+    private func refreshNodeParamsFromBle(nodeId: String, completionHandler: @escaping (Node?, ESPNetworkError?) -> Void) {
+        guard let cachedNode = User.shared.getNode(id: nodeId) else {
+            getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
+            return
+        }
+        User.shared.bleLocalControl.queryParams(nodeId: nodeId) { json in
+            if let json = json {
+                self.applyBleParamJson(json, to: cachedNode)
+                cachedNode.bleLocalNetwork = true
+                completionHandler(cachedNode, nil)
+            } else if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                self.getNodeInfoPrivate(nodeId: nodeId, completionHandler: completionHandler)
+            } else {
+                completionHandler(nil, .noNetwork)
+            }
+        }
+    }
+
+    private func applyBleParamJson(_ json: [String: Any], to node: Node) {
+        if let devices = node.devices {
+            for device in devices {
+                applyBleParams(json: json, to: device)
+            }
+        }
+        for service in node.services ?? [] {
+            guard let serviceName = service.name,
+                  let serviceInfo = json[serviceName] as? [String: Any] else { continue }
+            for param in service.params ?? [] {
+                guard let paramName = param.name, let value = serviceInfo[paramName] else { continue }
+                param.value = value
+            }
+        }
+        node.syncServiceEntryCount(for: .scene)
+        node.syncServiceEntryCount(for: .schedule)
+    }
+
+    private func applyBleParams(json: [String: Any], to device: Device) {
+        guard let deviceName = device.name,
+              let attributes = json[deviceName] as? [String: Any],
+              let params = device.params else { return }
+        device.deviceName = deviceName
+        for index in params.indices {
+            guard let paramName = params[index].name,
+                  let reportedValue = attributes[paramName] else { continue }
+            if params[index].type == Constants.deviceNameParam {
+                device.deviceName = reportedValue as? String ?? deviceName
+            }
+            params[index].value = reportedValue
+        }
+    }
+
+    private func applySetParamToLocalNodes(nodeId: String, parameter: [String: Any]) {
+        guard let node = User.shared.getNode(id: nodeId), let devices = node.devices else { return }
+        for device in devices {
+            applySetParam(parameter: parameter, to: device)
+        }
+    }
+
+    private func applySetParam(parameter: [String: Any], to device: Device) {
+        guard let deviceName = device.name,
+              let attributes = parameter[deviceName] as? [String: Any],
+              let params = device.params else { return }
+        for index in params.indices {
+            guard let paramName = params[index].name,
+                  let reportedValue = attributes[paramName] else { continue }
+            if params[index].type == Constants.deviceNameParam {
+                device.deviceName = reportedValue as? String ?? deviceName
+            }
+            params[index].value = reportedValue
+        }
+    }
+
+    private func refreshDeviceParamsFromBle(
+        nodeId: String,
+        device: Device,
+        completionHandler: @escaping (ESPNetworkError?) -> Void
+    ) {
+        let queryParams: () -> Void = { [weak self] in
+            guard let self = self else { return }
+            User.shared.bleLocalControl.queryParams(nodeId: nodeId) { json in
+                if let json = json {
+                    self.applyBleParams(json: json, to: device)
+                    completionHandler(nil)
+                } else if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                    self.getDeviceParamPrivate(device: device, completionHandler: completionHandler)
+                } else {
+                    completionHandler(.noNetwork)
+                }
+            }
+        }
+
+        if User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            queryParams()
+        } else if User.shared.bleLocalControl.isDiscovered(nodeId: nodeId) {
+            User.shared.bleLocalControl.connectDevice(nodeId: nodeId) { success in
+                if success {
+                    queryParams()
+                } else if ESPNetworkMonitor.shared.isConnectedToNetwork {
+                    self.getDeviceParamPrivate(device: device, completionHandler: completionHandler)
+                } else {
+                    completionHandler(.noNetwork)
+                }
+            }
+        } else if ESPNetworkMonitor.shared.isConnectedToNetwork {
+            getDeviceParamPrivate(device: device, completionHandler: completionHandler)
+        } else {
+            completionHandler(.noNetwork)
+        }
+    }
+
+    private func reportBleParamsToProxy(nodeId: String) {
+        bleProxyReportWorkItems[nodeId]?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.bleProxyReportWorkItems[nodeId] = nil
+            self.performReportBleParamsToProxy(nodeId: nodeId)
+        }
+        bleProxyReportWorkItems[nodeId] = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + bleProxyReportDelay, execute: work)
+    }
+
+    private func performReportBleParamsToProxy(nodeId: String) {
+        guard ESPNetworkMonitor.shared.isConnectedToNetwork else { return }
+        User.shared.bleLocalControl.getParamsWithTimestamp(nodeId: nodeId) { _, rawJSON in
+            guard let rawJSON = rawJSON,
+                  let body = ESPBleLocalCtrlProvisioningHelper.makeProxyBody(fromRawResponse: rawJSON) else {
+                return
+            }
+            self.apiManager.reportProxyParams(nodeId: nodeId, body: body) { _ in }
+        }
+    }
+
+    private func clearBleAndFallbackToCloud(
+        nodeId: String,
+        nodeID: String?,
+        parameter: [String: Any],
+        completionHandler: @escaping (ESPCloudResponseStatus) -> Void
+    ) {
+        let node = User.shared.getNode(id: nodeId)
+        let isBleOnlyNode = node?.isBleLocalControlServiceNode() == true && !(node?.isConnected ?? false)
+
+        if isBleOnlyNode {
+            // BLE-only devices have no cloud param path; keep discovery state and retry scan.
+            User.shared.bleLocalControl.scanForDevices()
+            completionHandler(.failure)
+            return
+        }
+
+        User.shared.bleLocalControl.disconnectDevice(nodeId: nodeId)
+        if let node = node {
+            node.bleLocalNetwork = false
+            node.bleLocalControlConnected = false
+        }
+        setDeviceParamPrivate(nodeID: nodeID, parameter: parameter, completionHandler: completionHandler)
     }
 
     private func setDeviceParamPrivate(nodeID: String?, parameter: [String: Any], completionHandler: @escaping (ESPCloudResponseStatus) -> Void) {

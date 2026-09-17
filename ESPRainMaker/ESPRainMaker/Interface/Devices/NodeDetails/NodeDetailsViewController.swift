@@ -32,6 +32,7 @@ class NodeDetailsViewController: UIViewController {
     let firmwareUpdate = "firmwareUpdate"
     let enablePairingMode = "enablePairingMode"
     let bindingAction = "bindingAction"
+    let wifiProvisioning = Constants.wifiProvisioningTitle
     
     @IBOutlet var tableView: UITableView!
     @IBOutlet var loadingIndicator: SpinnerView!
@@ -481,6 +482,18 @@ class NodeDetailsViewController: UIViewController {
         }
         #endif
         
+        if let nodeId = currentNode.node_id,
+           User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            let caps = User.shared.bleLocalControl.deviceCapabilities(nodeId: nodeId) ?? []
+            if caps.contains(ESPScanConstants.wiFiScan) || caps.contains(ESPScanConstants.wifiProv) {
+                index += 1
+                dataSource.append([])
+                dataSource[index].append(wifiProvisioning)
+                dataSource[index].append(Constants.provisionWifiButton)
+                collapsed.append(false)
+            }
+        }
+        
         tableView.reloadData()
     }
 
@@ -676,8 +689,8 @@ extension NodeDetailsViewController: UITableViewDelegate {
             headerView.arrowImageView.image = UIImage(named: "down_arrow_icon")
         }
         
-        // Check if device is offline
-        if headerTitle == systemServices, !currentNode.isConnected {
+        // Check if device is offline (also reachable over BLE local control)
+        if headerTitle == systemServices, !currentNode.isConnected, !currentNode.bleLocalNetwork {
             headerView.headerLabel.text = headerTitle + " (Offline)"
         }
         
@@ -825,8 +838,8 @@ extension NodeDetailsViewController: UITableViewDataSource {
             cell.node = currentNode
             cell.delegate = self
             
-            // Check if device is connected
-            if currentNode.isConnected {
+            // Check if device is connected (also reachable over BLE local control)
+            if currentNode.isConnected || currentNode.bleLocalNetwork {
                 cell.alpha = 1.0
                 cell.resetButton.alpha = 1.0
                 cell.resetButton.isEnabled = true
@@ -842,6 +855,11 @@ extension NodeDetailsViewController: UITableViewDataSource {
             cell.contentView.layer.cornerRadius = 10
             cell.contentView.layer.borderColor = UIColor.lightGray.cgColor
             cell.contentView.layer.masksToBounds = true
+            return cell
+        } else if sectionValue == wifiProvisioning {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "nodeDetailsTVC", for: indexPath) as! NodeDetailsTableViewCell
+            cell.titleLabel.text = dataSource[indexPath.section][indexPath.row + 1]
+            cell.detailLabel.text = currentNode.node_id ?? ""
             return cell
         }
         
@@ -887,6 +905,38 @@ extension NodeDetailsViewController: UITableViewDataSource {
             let firmwareUpdateVC = deviceStoryboard.instantiateViewController(withIdentifier: firmwareUpdate) as! FirmwareUpdateViewController
             firmwareUpdateVC.currentNode = currentNode
             navigationController?.pushViewController(firmwareUpdateVC, animated: true)
+        } else if sectionValue == wifiProvisioning {
+            guard let nodeId = currentNode.node_id,
+                  let device = User.shared.bleLocalControl.activeDevice(nodeId: nodeId) else {
+                Utility.showToastMessage(view: view, message: "BLE connection required for Wi-Fi provisioning.")
+                return
+            }
+            let openProvision: () -> Void = { [weak self] in
+                guard let self = self else { return }
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let provisionVC = storyboard.instantiateViewController(withIdentifier: "provision") as! ProvisionViewController
+                provisionVC.isBleWifiReprovision = true
+                provisionVC.bleReprovisionNodeId = nodeId
+                provisionVC.device = device
+                self.navigationController?.pushViewController(provisionVC, animated: true)
+            }
+            if device.isSessionEstablished() {
+                openProvision()
+                return
+            }
+            Utility.showLoader(message: "Connecting...", view: view)
+            device.initialiseSession(sessionPath: nil) { [weak self] status in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    Utility.hideLoader(view: self.view)
+                    switch status {
+                    case .connected:
+                        openProvision()
+                    default:
+                        Utility.showToastMessage(view: self.view, message: "BLE session failed. Cannot open Wi-Fi provisioning.")
+                    }
+                }
+            }
         }
     }
 }

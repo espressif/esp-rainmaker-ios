@@ -210,9 +210,7 @@ extension ParamHueSliderCell {
             }
             
             if let device = device, let node = device.node {
-                let isConnected = node.isConnected == true
-                let isLocalNetwork = node.localNetwork == true
-                let isOnline = isConnected || isLocalNetwork
+                let isOnline = node.isParamReachable()
                 let hasWritePermission = properties.contains("write")
                 
                 hueSlider.isEnabled = isOnline && hasWritePermission

@@ -30,6 +30,7 @@ extension ParamGenericCell {
         }
         
         guard let param = param, let device = device else { return }
+        guard param.properties?.contains("write") == true else { return }
         
         // CRITICAL: Use param.name if available, fallback to attributeKey (matches old implementation)
         let capturedParamName = param.name ?? attributeKey
@@ -129,7 +130,7 @@ extension ParamGenericCell {
         }
         
         guard let device = device, let node = device.node else { return false }
-        return !(node.isConnected || node.localNetwork)
+        return !node.isParamReachable()
     }
 }
 

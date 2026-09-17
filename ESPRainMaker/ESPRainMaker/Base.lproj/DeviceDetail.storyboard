@@ -170,6 +170,8 @@
                         <outlet property="offlineLabel" destination="vgD-RA-Ypi" id="8SE-kW-lqZ"/>
                         <outlet property="tableView" destination="EuC-HO-Qx5" id="4FM-vb-v36"/>
                         <outlet property="titleLabel" destination="cde-Gf-DWb" id="TlW-he-z5V"/>
+                        <outlet property="topBarView" destination="Fts-gK-0Xe" id="BLE-tb-vw1"/>
+                        <outlet property="nodeInfoButton" destination="4St-yp-dzE" id="BLE-nf-bt1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fMD-VO-uv5" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -178,14 +178,27 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
                 } else if let matterDeviceName = node.matterDeviceName {
                     cell.deviceName.text = matterDeviceName
                 }
-                if let groupId = self.fabricDetails.getGroupId(nodeId: id), let nodeDetails = self.fabricDetails.getNodeDetails(nodeId: id) {
+                // Prefer node.groupId (read from the node's own cached matterMetadata, the same source
+                // ESPMatterClusterUtil/DeviceViewController/NodeDetailsViewController rely on and which
+                // survives an offline launch) over the narrower fabricDetails lookup, which may not be
+                // populated yet even though the cluster/device-type data needed for the icon is available.
+                if let groupId = node.groupId ?? self.fabricDetails.getGroupId(nodeId: id) {
+                    let nodeDetails = self.fabricDetails.getNodeDetails(nodeId: id)
                     if let devices = node.devices {
                         if devices.count > 1 {
                             self.configureNodeCell(cell: &cell, rainmakerNode: node, node: nodeDetails, groupId: groupId, matterNodeId: matterNodeId, deviceId: deviceId, isSingleDeviceNode: false, indexPath: indexPath)
                         } else {
                             self.configureNodeCell(cell: &cell, rainmakerNode: node, node: nodeDetails, groupId: groupId, matterNodeId: matterNodeId, deviceId: deviceId, isSingleDeviceNode: true, indexPath: indexPath)
                         }
+                    } else {
+                        // node.devices missing (e.g. cluster data not ready yet) - avoid a blank cell.
+                        cell.deviceImage.image = UIImage(named: ESPMatterConstants.defaultDevice)
+                        cell.onOffButton.isHidden = true
                     }
+                } else {
+                    // No cached group id for this node at all - fall back to a default icon instead of leaving the cell blank.
+                    cell.deviceImage.image = UIImage(named: ESPMatterConstants.defaultDevice)
+                    cell.onOffButton.isHidden = true
                 }
             }
             cell.setConnectionStatusUI(status: status)
@@ -208,7 +221,8 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
         cell.layer.masksToBounds = false
 
         cell.layer.backgroundColor = UIColor.white.withAlphaComponent(1.0).cgColor
-        if device.node?.localNetwork ?? false {
+        let isLocallyReachable = (device.node?.localNetwork ?? false) || (device.node?.bleLocalNetwork ?? false)
+        if isLocallyReachable {
             cell.statusView.isHidden = false
         } else if device.node?.isConnected ?? false {
             cell.statusView.isHidden = true
@@ -287,6 +301,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
 
         cell.deviceImageView.image = ESPRMDeviceType(rawValue: device.type ?? "")?.getImageFromDeviceType() ?? UIImage(named: Constants.dummyDeviceImage)
         self.setSecurityCameraImage(cell: cell, device: device)
+        cell.updateBleLoadingState()
         return cell
     }
 
@@ -327,7 +342,7 @@ extension DeviceGroupCollectionViewCell: UICollectionViewDataSource {
     ///   - isSingleDeviceNode: is single device node
     ///   - indexPath: index path
     @available(iOS 16.4, *)
-    func configureNodeCell(cell: inout DeviceCollectionViewCell, rainmakerNode: Node, node: ESPNodeDetails, groupId: String, matterNodeId: String, deviceId: UInt64, isSingleDeviceNode: Bool, indexPath: IndexPath) {
+    func configureNodeCell(cell: inout DeviceCollectionViewCell, rainmakerNode: Node, node: ESPNodeDetails?, groupId: String, matterNodeId: String, deviceId: UInt64, isSingleDeviceNode: Bool, indexPath: IndexPath) {
         let endPointClusterId = ESPMatterClusterUtil.shared.fetchBindingServers(groupId: groupId, deviceId: deviceId)
         cell.node = node
         if let group = self.fabricDetails.getGroupData(groupId: groupId) {

@@ -74,6 +74,17 @@ extension CommonDeviceServicesProtocol {
         return (Constants.sceneKey, Constants.scenesKey)
     }
     
+    /// Cloud API or BLE local control, depending on node reachability.
+    func canReachNodesForServiceAction(nodeIds: [String]) -> Bool {
+        if ESPNetworkMonitor.shared.isConnectedToNetwork {
+            return true
+        }
+        guard Configuration.shared.appConfiguration.supportLocalControl else {
+            return false
+        }
+        return !nodeIds.isEmpty && nodeIds.allSatisfy { User.shared.bleLocalControl.isAvailable(nodeId: $0) }
+    }
+
     /// Call multi params API and process the response and send response status via callback or show error message
     ///
     /// - Parameters:
@@ -83,13 +94,67 @@ extension CommonDeviceServicesProtocol {
     ///   - text: error text to be shown
     ///   - completionHandler: Callback invoked after api response is received
     func callParamsAPIWithActions(apiManager: ESPAPIManager, list: [[String: Any]], actions: [String: [Device]], onView: UIView, text: String, availableDevices: [String: Device], completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        apiManager.setMultipleDeviceParam(parameter: list) { cloudResponse, error in
-            if error == nil {
-                self.handleResponse(cloudResponse: cloudResponse, actions: actions, onView: onView, errorText: text, availableDevices: availableDevices, completionHandler: completionHandler)
-            } else {
+        let nodeIdKey = ESPSceneConstants.nodeIdKey
+        let payloadKey = ESPSceneConstants.payloadKey
+        var bleRequests: [(nodeId: String, payload: [String: Any])] = []
+        var cloudList: [[String: Any]] = []
+
+        for item in list {
+            guard let nodeId = item[nodeIdKey] as? String,
+                  let payload = item[payloadKey] as? [String: Any] else {
                 completionHandler(.failure)
+                return
+            }
+            if Configuration.shared.appConfiguration.supportLocalControl,
+               User.shared.bleLocalControl.isAvailable(nodeId: nodeId) {
+                bleRequests.append((nodeId, payload))
+            } else {
+                cloudList.append(item)
             }
         }
+
+        sendBleServiceActions(bleRequests) { bleFailed in
+            if bleFailed {
+                completionHandler(.failure)
+                return
+            }
+            guard !cloudList.isEmpty else {
+                completionHandler(.success(false))
+                return
+            }
+            apiManager.setMultipleDeviceParam(parameter: cloudList) { cloudResponse, error in
+                if error == nil {
+                    self.handleResponse(cloudResponse: cloudResponse, actions: actions, onView: onView, errorText: text, availableDevices: availableDevices, completionHandler: completionHandler)
+                } else {
+                    completionHandler(.failure)
+                }
+            }
+        }
+    }
+
+    private func sendBleServiceActions(_ requests: [(nodeId: String, payload: [String: Any])], completion: @escaping (Bool) -> Void) {
+        guard !requests.isEmpty else {
+            completion(false)
+            return
+        }
+        var index = 0
+        var failed = false
+
+        func sendNext() {
+            if index >= requests.count {
+                completion(failed)
+                return
+            }
+            let request = requests[index]
+            index += 1
+            NetworkManager.shared.setDeviceParam(nodeID: request.nodeId, parameter: request.payload) { status in
+                if status != .success {
+                    failed = true
+                }
+                sendNext()
+            }
+        }
+        sendNext()
     }
     
     /// Handle response from cloud
@@ -198,6 +263,90 @@ extension CommonDeviceServicesProtocol {
         }
         callParamsAPIWithActions(apiManager: apiManager, list: actionsList, actions: actions, onView: onView, text: text, availableDevices: availableDevices) { result  in
             completionHandler(result)
+        }
+    }
+}
+
+// MARK: - BLE local control schedule & scene routing
+
+/// Shared rules for schedule/scene on BLE local-control nodes.
+enum BleDeviceServiceFlow {
+
+    /// Active BLE session, not cloud-connected — omit from tab multi-device picker only.
+    static func excludesFromMultiDevicePicker(_ node: Node) -> Bool {
+        node.isBleOnlyExcludedFromMultiDeviceServices()
+    }
+
+    /// Scope editor to one BLE local-control node when editing an existing schedule/scene.
+    @discardableResult
+    static func detectSingleNodeScope(nodeIds: [String], configureBleNode: (String) -> Void) -> Bool {
+        for nodeId in nodeIds {
+            guard let node = User.shared.getNode(id: nodeId),
+                  node.isBleLocalControlServiceNode() else {
+                continue
+            }
+            configureBleNode(nodeId)
+            return true
+        }
+        return false
+    }
+
+    /// Build `availableDevices` for a BLE single-device schedule/scene editor.
+    static func populateAvailableDevices(
+        nodeId: String,
+        kind: BleDeviceServiceKind,
+        into availableDevices: inout [String: Device]
+    ) {
+        availableDevices.removeAll()
+        guard let node = User.shared.getNode(id: nodeId) else { return }
+        node.syncServiceEntryCount(for: kind)
+        if User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+            node.bleLocalControlConnected = true
+        }
+        for device in node.devices ?? [] {
+            let copyDevice = Device(device: device)
+            resetActionEligibility(on: copyDevice, kind: kind)
+            copyDevice.params = []
+            if let params = device.params {
+                for param in params where param.canUseDeviceServices {
+                    copyDevice.params?.append(Param(param: param))
+                }
+            }
+            guard copyDevice.params?.isEmpty == false else { continue }
+            let key = [nodeId, copyDevice.name].compactMap { $0 }.joined(separator: ".")
+            availableDevices[key] = copyDevice
+        }
+    }
+
+    /// Refresh reachability/eligibility before opening the action picker.
+    static func prepareForActionPicker(_ availableDevices: [String: Device], kind: BleDeviceServiceKind) {
+        for device in availableDevices.values {
+            resetActionEligibility(on: device, kind: kind)
+            if let nodeId = device.node?.node_id,
+               User.shared.bleLocalControl.isConnected(nodeId: nodeId) {
+                device.node?.bleLocalControlConnected = true
+            }
+        }
+    }
+
+    /// Selected devices first — shared ordering for schedule and scene pickers.
+    static func orderedDevicesForActionPicker(from availableDevices: [String: Device]) -> [Device] {
+        var selected: [Device] = []
+        var unselected: [Device] = []
+        for device in availableDevices.values {
+            if device.selectedParams > 0 {
+                selected.append(device)
+            } else {
+                unselected.append(device)
+            }
+        }
+        return selected + unselected
+    }
+
+    private static func resetActionEligibility(on device: Device, kind: BleDeviceServiceKind) {
+        switch kind {
+        case .schedule: device.scheduleActionStatus = nil
+        case .scene: device.sceneActionStatus = nil
         }
     }
 }

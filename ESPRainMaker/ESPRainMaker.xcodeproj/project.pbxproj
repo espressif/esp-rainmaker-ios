@@ -154,6 +154,13 @@
 		0CB404262CAE6B5D0041B362 /* ESPNodeMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB404242CAE6B5D0041B362 /* ESPNodeMetadataService.swift */; };
 		0CB4A0652A86548B00908AE0 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB4A0642A86548B00908AE0 /* Matter.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		0CBAC3C5278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBAC3C4278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift */; };
+		0CBLE0122C75CD00ADB85610 /* ESPBleLocalControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0112C75CD00ADB85610 /* ESPBleLocalControl.swift */; };
+		0CBLE0222C75CD00ADB85611 /* Node+BleLocalControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0212C75CD00ADB85611 /* Node+BleLocalControl.swift */; };
+		0CBLE0322C75CD00ADB85612 /* ESPBleLocalCtrlProvisioningHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0312C75CD00ADB85612 /* ESPBleLocalCtrlProvisioningHelper.swift */; };
+		0CBLE0422C75CD00ADB85613 /* esp_rmaker_prov_local_ctrl.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0412C75CD00ADB85613 /* esp_rmaker_prov_local_ctrl.pb.swift */; };
+		0CBLE0522C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0512C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift */; };
+		0CBLE0622C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0612C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift */; };
+		0CBLE0722C75CD00ADB85617 /* ESPBleLocalControl+Params.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBLE0712C75CD00ADB85617 /* ESPBleLocalControl+Params.swift */; };
 		0CC11EFA2C7A10C300047627 /* AppDelegate+WXApiDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC11EF92C7A10C300047627 /* AppDelegate+WXApiDelegate.swift */; };
 		0CC79253265BCDDF00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */; };
 		0CC91FFB2B3BCAEE00EAC1E7 /* ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC91FFA2B3BCAEE00EAC1E7 /* ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift */; };
@@ -894,6 +901,13 @@
 		0CB404242CAE6B5D0041B362 /* ESPNodeMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPNodeMetadataService.swift; sourceTree = "<group>"; };
 		0CB4A0642A86548B00908AE0 /* Matter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Matter.framework; path = System/Library/Frameworks/Matter.framework; sourceTree = SDKROOT; };
 		0CBAC3C4278AD02A003E34E2 /* SelectDeviceActionCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDeviceActionCellDelegate.swift; sourceTree = "<group>"; };
+		0CBLE0112C75CD00ADB85610 /* ESPBleLocalControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPBleLocalControl.swift; sourceTree = "<group>"; };
+		0CBLE0212C75CD00ADB85611 /* Node+BleLocalControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+BleLocalControl.swift"; sourceTree = "<group>"; };
+		0CBLE0312C75CD00ADB85612 /* ESPBleLocalCtrlProvisioningHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESPBleLocalCtrlProvisioningHelper.swift; sourceTree = "<group>"; };
+		0CBLE0412C75CD00ADB85613 /* esp_rmaker_prov_local_ctrl.pb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = esp_rmaker_prov_local_ctrl.pb.swift; sourceTree = "<group>"; };
+		0CBLE0512C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPBleLocalControl+Scan.swift"; sourceTree = "<group>"; };
+		0CBLE0612C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPBleLocalControl+Connect.swift"; sourceTree = "<group>"; };
+		0CBLE0712C75CD00ADB85617 /* ESPBleLocalControl+Params.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ESPBleLocalControl+Params.swift"; sourceTree = "<group>"; };
 		0CC11EF92C7A10C300047627 /* AppDelegate+WXApiDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+WXApiDelegate.swift"; sourceTree = "<group>"; };
 		0CC79252265BCDDE00C2CDF6 /* ScheduleSceneActionAllowedProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSceneActionAllowedProtocol.swift; sourceTree = "<group>"; };
 		0CC91FFA2B3BCAEE00EAC1E7 /* ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParamSliderTableViewCell+ParamSliderCoolingControlProtocol.swift"; sourceTree = "<group>"; };
@@ -2167,6 +2181,7 @@
 				F87C31DF2DB8B0A400D0A107 /* esp_rmaker_chal_resp.pb.swift */,
 				F1110430252D927F0030A1D3 /* constants.pb.swift */,
 				F111042C252D924F0030A1D3 /* esp_local_ctrl.pb.swift */,
+				0CBLE0412C75CD00ADB85613 /* esp_rmaker_prov_local_ctrl.pb.swift */,
 				F191CD482511235600BDCEF1 /* esp_rmaker_claim.pb.swift */,
 				F151FEDF246E874E006F514E /* esp_rmaker_user_mapping.pb.swift */,
 			);
@@ -2287,6 +2302,12 @@
 			children = (
 				F8FE303A2F3211E30004665A /* ESPChallengeRespServiceDiscovery.swift */,
 				F117CDEE252C75CD00ADB856 /* ESPLocalControl.swift */,
+				0CBLE0112C75CD00ADB85610 /* ESPBleLocalControl.swift */,
+				0CBLE0512C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift */,
+				0CBLE0612C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift */,
+				0CBLE0712C75CD00ADB85617 /* ESPBleLocalControl+Params.swift */,
+				0CBLE0212C75CD00ADB85611 /* Node+BleLocalControl.swift */,
+				0CBLE0312C75CD00ADB85612 /* ESPBleLocalCtrlProvisioningHelper.swift */,
 				F1110428252D8E2D0030A1D3 /* ESPLocalService.swift */,
 				F1C352CF26DBC40900A88893 /* ESPLocalDevice.swift */,
 			);
@@ -3429,13 +3450,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ESPRainMaker/Pods-ESPRainMaker-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3605,6 +3622,13 @@
 				F19A9D1B22C0ED4C00A450C3 /* ConfirmSignUpViewController.swift in Sources */,
 				F1CA0C94257A1E5A0085E19A /* ScheduleDropDownTableViewCell.swift in Sources */,
 				F117CDEF252C75CD00ADB856 /* ESPLocalControl.swift in Sources */,
+				0CBLE0122C75CD00ADB85610 /* ESPBleLocalControl.swift in Sources */,
+				0CBLE0522C75CD00ADB85615 /* ESPBleLocalControl+Scan.swift in Sources */,
+				0CBLE0622C75CD00ADB85616 /* ESPBleLocalControl+Connect.swift in Sources */,
+				0CBLE0722C75CD00ADB85617 /* ESPBleLocalControl+Params.swift in Sources */,
+				0CBLE0222C75CD00ADB85611 /* Node+BleLocalControl.swift in Sources */,
+				0CBLE0322C75CD00ADB85612 /* ESPBleLocalCtrlProvisioningHelper.swift in Sources */,
+				0CBLE0422C75CD00ADB85613 /* esp_rmaker_prov_local_ctrl.pb.swift in Sources */,
 				0C6D23EC2C8EC3A7003773FD /* ESPOTAUpdateEvent.swift in Sources */,
 				0CD3591D2A2D25E30081017C /* ESPUserCertificates.swift in Sources */,
 				0C80AA3126FDBD4B00480C53 /* ESPForgotPasswordService.swift in Sources */,

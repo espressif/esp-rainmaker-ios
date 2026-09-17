@@ -30,18 +30,69 @@ class DevicesCollectionViewCell: UICollectionViewCell {
     @IBOutlet var triggerButton: UIButton!
     @IBOutlet var statusView: UIView!
     @IBOutlet var offlineLabel: UILabel!
+
+    private lazy var bleLoadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(indicator)
+        NSLayoutConstraint.activate([
+            indicator.centerXAnchor.constraint(equalTo: switchButton.centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: switchButton.centerYAnchor)
+        ])
+        return indicator
+    }()
+
+    func updateBleLoadingState() {
+        guard let nodeId = device?.node?.node_id else {
+            bleLoadingIndicator.stopAnimating()
+            switchButton.isHidden = false
+            return
+        }
+        let loading = User.shared.bleLocalControl.isParamUpdateInProgress(nodeId: nodeId)
+        if loading {
+            bleLoadingIndicator.startAnimating()
+            switchButton.isHidden = true
+            triggerButton.isHidden = true
+        } else {
+            bleLoadingIndicator.stopAnimating()
+        }
+    }
     @IBAction func switchButtonPressed(_: Any) {
+        let previousValue = switchValue
         switchValue = !switchValue
+        updatePrimaryParamValue(switchValue)
+
         NetworkManager.shared.setDeviceParam(nodeID: device.node?.node_id, parameter: [device.name ?? "": [device.primary ?? "": switchValue]]) { result in
-            switch result {
-            case .failure:
-                let view = self.parentViewController?.view ?? self.contentView
-                Utility.showToastMessage(view: view, message: "Fail to update parameter. Please check you network connection!!")
-            default:
-                break
+            DispatchQueue.main.async {
+                switch result {
+                case .failure:
+                    self.switchValue = previousValue
+                    self.updatePrimaryParamValue(previousValue)
+                    self.updateSwitchImage()
+                    let view = self.parentViewController?.view ?? self.contentView
+                    Utility.showToastMessage(view: view, message: "Fail to update parameter. Please check you network connection!!")
+                case .success:
+                    self.updateSwitchImage()
+                    NotificationCenter.default.post(Notification(name: Notification.Name(Constants.reloadCollectionView)))
+                default:
+                    self.updateSwitchImage()
+                    break
+                }
             }
         }
 
+        updateSwitchImage()
+    }
+
+    private func updatePrimaryParamValue(_ value: Bool) {
+        guard let primaryName = device.primary,
+              let params = device.params,
+              let index = params.firstIndex(where: { $0.name == primaryName }) else { return }
+        params[index].value = value
+    }
+
+    private func updateSwitchImage() {
         if switchValue {
             switchButton.setBackgroundImage(UIImage(named: "switch_on"), for: .normal)
         } else {
@@ -80,5 +131,6 @@ class DevicesCollectionViewCell: UICollectionViewCell {
         deviceImageView.image = UIImage(named: Constants.dummyDeviceImage)
         deviceName.text = ""
         statusView.isHidden = true
+        bleLoadingIndicator.stopAnimating()
     }
 }

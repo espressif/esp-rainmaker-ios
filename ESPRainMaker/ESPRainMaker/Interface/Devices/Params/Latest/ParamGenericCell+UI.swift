@@ -173,7 +173,7 @@ extension ParamGenericCell {
             return true // Default to showing button if device/node info not available
         }
         
-        return node.isConnected || node.localNetwork
+        return node.isParamReachable()
     }
 }
 

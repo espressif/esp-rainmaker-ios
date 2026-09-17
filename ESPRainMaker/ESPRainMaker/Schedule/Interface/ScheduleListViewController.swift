@@ -73,8 +73,7 @@ class ScheduleListViewController: UIViewController {
             Utility.showLoader(message: "", view: view)
             refreshScheduleList(self)
         } else {
-            ESPScheduler.shared.currentScheduleKey = nil
-            showScheduleList()
+            overlayBleFirmwareAndShowList()
         }
         checkNetworkUpdate()
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
@@ -117,27 +116,26 @@ class ScheduleListViewController: UIViewController {
 
     @IBAction func refreshScheduleList(_: Any) {
         refreshControl.endRefreshing()
-        NetworkManager.shared.getNodes { nodes, error in
+        NetworkManager.shared.refreshAssociatedNodesThenOverlayBleFirmware {
             Utility.hideLoader(view: self.view)
-            if error != nil {
-                DispatchQueue.main.async {
-                    Utility.showToastMessage(view: self.view, message: "Network error: \(error?.description ?? "Something went wrong!!")")
-                }
-            } else {
-                User.shared.associatedNodeList = nodes
-                DispatchQueue.main.async {
-                    // Make sure to update available devices when nodes are refreshed
-                    if let nodeList = nodes {
-                        ESPScheduler.shared.getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
-                    }
-                    self.showScheduleList()
-                    self.refreshControl.endRefreshing()
-                }
+            DispatchQueue.main.async {
+                self.showScheduleList()
+                self.refreshControl.endRefreshing()
             }
         }
     }
 
     // MARK: Private Methods
+
+    private func overlayBleFirmwareAndShowList() {
+        NetworkManager.shared.overlayBleOnlyFirmwareServiceParams {
+            Utility.hideLoader(view: self.view)
+            DispatchQueue.main.async {
+                self.showScheduleList()
+                self.refreshControl.endRefreshing()
+            }
+        }
+    }
 
     func showScheduleList() {
         getScheduleList()
@@ -214,11 +212,16 @@ extension ScheduleListViewController: UITableViewDelegate {
             return
         }
         tableView.deselectRow(at: indexPath, animated: false)
+        let index = indexPath.row / 2
+        guard index < scheduleList.count,
+              let schedule = ESPScheduler.shared.schedules[scheduleList[index]] else {
+            return
+        }
         let scheduleVC = storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController
         scheduleVC.delegate = self
-        ESPScheduler.shared.currentSchedule = ESPScheduler.shared.schedules[scheduleList[indexPath.row/2]]!
-        scheduleVC.scheduleKey = scheduleList[indexPath.row/2]
-        ESPScheduler.shared.currentScheduleKey = scheduleList[indexPath.row/2]
+        ESPScheduler.shared.currentSchedule = schedule
+        scheduleVC.scheduleKey = scheduleList[index]
+        ESPScheduler.shared.currentScheduleKey = scheduleList[index]
         navigationController?.pushViewController(scheduleVC, animated: true)
     }
 
@@ -270,9 +273,14 @@ extension ScheduleListViewController: UITableViewDataSource {
             cell.isHidden = true
             return cell
         }
+        let index = indexPath.row / 2
+        guard index < scheduleList.count,
+              let schedule = ESPScheduler.shared.schedules[scheduleList[index]] else {
+            return UITableViewCell()
+        }
         let cell = tableView.dequeueReusableCell(withIdentifier: "scheduleListTVC", for: indexPath) as! ScheduleListTableViewCell
-        let schedule = ESPScheduler.shared.schedules[scheduleList[indexPath.row/2]]!
         ESPScheduler.shared.currentSchedule = schedule
+        ESPScheduler.shared.detectAndConfigureBleSingleDeviceFlow(from: schedule)
         ESPScheduler.shared.configureDeviceForCurrentSchedule()
         cell.schedule = schedule
         cell.scheduleLabel.text = schedule.name ?? ""

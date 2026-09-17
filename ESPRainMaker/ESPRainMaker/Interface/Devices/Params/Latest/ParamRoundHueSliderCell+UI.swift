@@ -168,10 +168,8 @@ extension ParamRoundHueSliderCell {
             return
         }
         
-        // Check if device is actually online (connected OR on local network)
-        let isConnected = node.isConnected == true
-        let isLocalNetwork = node.localNetwork == true
-        let isOnline = isConnected || isLocalNetwork
+        // Check if device is actually online (cloud, WLAN, or BLE local control)
+        let isOnline = node.isParamReachable()
         
         hueSlider.isEnabled = isOnline
         hueSlider.isUserInteractionEnabled = isOnline
@@ -198,7 +196,7 @@ extension ParamRoundHueSliderCell {
     private func isDeviceOnlineForWrite() -> Bool {
         guard let properties = param?.properties, properties.contains("write"),
               let device = device, let node = device.node else { return false }
-        return node.isConnected == true || node.localNetwork == true
+        return node.isParamReachable()
     }
 }
 

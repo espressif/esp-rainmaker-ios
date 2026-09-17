@@ -80,6 +80,7 @@ class SuccessViewController: UIViewController {
     // On Network Provisioning properties
     var isOnNetworkFlow: Bool = false
     var onNetworkDevice: ESPOnNetworkDevice?
+    var isBleLocalCtrlFlow: Bool = false
     var pop: String?
     private var localDevice: ESPLocalDevice?
 
@@ -135,6 +136,10 @@ class SuccessViewController: UIViewController {
     /// - Parameter nodeId: node id of the device
     private func provisionDevicePostChallengeResponse(nodeId: String) {
         self.wifiResetNodeId = nodeId
+        if isBleLocalCtrlFlow {
+            startBleLocalCtrlProvisioningFlow(nodeId: nodeId)
+            return
+        }
         self.startStep2()
         self.provisionDevice(nodeId: nodeId) { provisionError in
             guard let provisionError = provisionError else {
@@ -154,7 +159,55 @@ class SuccessViewController: UIViewController {
         }
     }
     
-    /// This method is used to setup the initial UI of the screen
+    /// BLE-only local control onboarding after challenge-response mapping.
+    private func startBleLocalCtrlProvisioningFlow(nodeId: String) {
+        DispatchQueue.main.async {
+            self.step1Indicator.stopAnimating()
+            self.step1Image.image = UIImage(named: "checkbox_checked")
+            self.step1Image.isHidden = false
+            self.step2Label.text = "Setting up BLE local control"
+            self.step2Image.isHidden = true
+            self.step2Indicator.isHidden = false
+            self.step2Indicator.startAnimating()
+            self.step2ErrorLabel.isHidden = true
+            self.step5Image.isHidden = true
+            self.step5Indicator.isHidden = true
+            self.step5ErrorLabel.isHidden = true
+        }
+
+        let deviceName = espDevice.name
+        let popValue = pop ?? ""
+
+        ESPBleLocalCtrlProvisioningHelper.runPostMappingFlow(
+            device: espDevice,
+            nodeId: nodeId,
+            deviceName: deviceName,
+            pop: popValue,
+            progress: { [weak self] message in
+                DispatchQueue.main.async {
+                    self?.step2Label.text = message
+                }
+            },
+            completion: { [weak self] success, errorMessage in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    self.step2Indicator.stopAnimating()
+                    if success {
+                        self.step2Image.image = UIImage(named: "checkbox_checked")
+                        self.step2Image.isHidden = false
+                        User.shared.updateDeviceList = true
+                        self.startStep3()
+                        self.step5SetupNode(nodeID: nodeId)
+                    } else {
+                        self.step2Indicator.stopAnimating()
+                        self.step2ErrorLabel.text = errorMessage ?? "BLE local control setup failed"
+                        self.step2ErrorLabel.isHidden = false
+                    }
+                }
+            }
+        )
+    }
+
     /// Number of steps is different from normal provisioning
     private func setupUIForChallengeResponse(isOnNetwork: Bool = false) {
         self.step1Label.text = ESPProvisionConstants.confirmingNodeAssociation
@@ -472,8 +525,14 @@ class SuccessViewController: UIViewController {
             self.step5Indicator.isHidden = false
             self.step5Indicator.startAnimating()
             self.setupTimeout = Timer(timeInterval: 35.0, target: self, selector: #selector(self.setupTimeOut), userInfo: nil, repeats: false)
+            if self.isBleLocalCtrlFlow {
+                // BLE-only nodes never connect over cloud MQTT; match Android completion UX.
+                self.nodeIsConnected = true
+            }
             self.getNodeDetails(nodeID: nodeID)
-            self.getNodeStatus(nodeID: nodeID)
+            if !self.isBleLocalCtrlFlow {
+                self.getNodeStatus(nodeID: nodeID)
+            }
         }
     }
     
@@ -531,7 +590,10 @@ class SuccessViewController: UIViewController {
             self.step5Image.isHidden = false
             self.step5Indicator.isHidden = true
             self.step5Indicator.stopAnimating()
-            if self.nodeDetailsFetched, self.nodeIsConnected {
+            let setupComplete = self.isBleLocalCtrlFlow
+                ? self.nodeDetailsFetched
+                : (self.nodeDetailsFetched && self.nodeIsConnected)
+            if setupComplete {
                 self.step5Image.image = UIImage(named: "checkbox_checked")
             } else {
                 self.step5Image.image = UIImage(named: "warning_icon")
@@ -546,7 +608,10 @@ class SuccessViewController: UIViewController {
     /// triggers controller-specific post-setup flows.
     private func check5thStepStatus() {
         DispatchQueue.main.async {
-            if self.nodeDetailsFetched, self.nodeIsConnected {
+            let setupComplete = self.isBleLocalCtrlFlow
+                ? self.nodeDetailsFetched
+                : (self.nodeDetailsFetched && self.nodeIsConnected)
+            if setupComplete {
                 self.step5Image.image = UIImage(named: "checkbox_checked")
                 self.step5Image.isHidden = false
                 self.step5Indicator.isHidden = true

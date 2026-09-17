@@ -93,6 +93,18 @@ struct Constants {
     static var deleteUserAccount: String { Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user" }
     static var initiateMapping: String { Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping/initiate" }
     static var verifyMapping: String { Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/mapping/verify" }
+    static func proxyConfigURL(nodeId: String) -> String {
+        Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/\(nodeId)/proxy/config"
+    }
+    static func proxyInitParamsURL(nodeId: String) -> String {
+        Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/\(nodeId)/proxy/initparams"
+    }
+    static func proxyParamsURL(nodeId: String) -> String {
+        Configuration.shared.awsConfiguration.baseURL + "/" + Constants.apiVersion + "/user/nodes/\(nodeId)/proxy/params"
+    }
+    static func updateNodeMetadataURL(nodeId: String) -> String {
+        Constants.getNodes + "?node_id=\(nodeId)"
+    }
 
     // UserDefault keys
     static let newDeviceAdded = Constants.bundleIdentifier + ".newDeviceAdded"
@@ -182,7 +194,21 @@ struct Constants {
     static let challengeRespServiceType = "_esp_rmaker_chal_resp._tcp."
     static let keyOnNetworkDevice = "on_network_device"
     static let keyIsOnNetworkFlow = "is_on_network_flow"
+    static let keyIsBleLocalCtrlFlow = "is_ble_local_ctrl_flow"
     static let keyPop = "pop"
+
+    // BLE local control constants
+    static let bleLocalCtrlMetadataKey = "ble_local_ctrl"
+    static let bleLocalCtrlPopKey = "pop"
+    static let bleDevicePrefix = "PROV_"
+    static let handlerGetParams = "get_params"
+    static let handlerSetParams = "set_params"
+    static let handlerGetConfig = "get_config"
+    static func bleLocalCtrlPopStorageKey(nodeId: String) -> String {
+        bundleIdentifier + ".ble_local_ctrl_pop." + nodeId
+    }
+    static let wifiProvisioningTitle = "Wi-Fi Provisioning"
+    static let provisionWifiButton = "Configure Wi-Fi"
 
     // Schedule related constants
     static let scheduleServiceType = "esp.service.schedule"

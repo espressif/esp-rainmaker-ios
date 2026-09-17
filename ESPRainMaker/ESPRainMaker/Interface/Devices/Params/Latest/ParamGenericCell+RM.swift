@@ -152,8 +152,7 @@ extension ParamGenericCell {
         
         // For Rainmaker devices, also check current connection status
         if let node = device.node {
-            let isConnected = node.isConnected || node.localNetwork
-            if !isConnected {
+            if !node.isParamReachable() {
                 isCurrentlyOffline = true
             }
         }
