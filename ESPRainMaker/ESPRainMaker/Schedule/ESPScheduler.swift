@@ -25,6 +25,8 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     var currentSchedule: ESPSchedule!
     var currentScheduleKey: String!
     var apiManager = ESPAPIManager()
+    /// List/cloud/BLE overlay must not rebuild `availableDevices` while the editor is on screen.
+    var isEditorActive = false
     
     // MARK constant strings:
     let nodeIdKey = "node_id"
@@ -65,6 +67,9 @@ class ESPScheduler: CommonDeviceServicesProtocol {
                     message = ESPScheduleConstants.scheduleCreationPartialFailureMessage
                 }
                 self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: message, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: true, onView: onView) { result in
+                    if case .success = result {
+                        self.currentSchedule.actions = actions
+                    }
                     completionHandler(result)
                 }
             } else {
@@ -81,18 +86,13 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///   - onView:UIView to show message in case of failure.
     ///   - completionHandler: Callback invoked after api response is received
     func shouldEnableSchedule(onView: UIView, completionHandler: @escaping (ESPServiceAPIResponseStatus) -> Void) {
-        configureDeviceForCurrentSchedule()
-        let actions = createActionsFromDeviceList()
-        if canReachNodesForServiceAction(nodeIds: Array(actions.keys)) {
+        let nodeIds = [String](currentSchedule.actions.keys)
+        if canReachNodesForServiceAction(nodeIds: nodeIds), !nodeIds.isEmpty {
             var jsonString: [String: Any] = [:]
             jsonString["id"] = currentSchedule.id
             jsonString["operation"] = currentSchedule.enabled == true ? "enable" : "disable"
-            if actions.keys.count > 0 {
-                self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: ESPScheduleConstants.scheduleUpdationPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
-                    completionHandler(result)
-                }
-            } else {
-                completionHandler(.failure)
+            self.invokeServiceAction(apiManager: apiManager, keys: nodeIds, jsonString: jsonString, text: ESPScheduleConstants.scheduleUpdationPartialFailureMessage, nodeIdKey: nodeIdKey, payloadKey: payloadKey, actions: currentSchedule.actions, availableDevices: availableDevices, serviceType: .schedule, isSave: false, onView: onView) { result  in
+                completionHandler(result)
             }
         } else {
             completionHandler(.failure)
@@ -160,6 +160,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
 
     /// Remove each element from the schedule list and refetch.
     func refreshScheduleList() {
+        guard !isEditorActive else { return }
         ESPScheduler.shared.schedules.removeAll()
         availableDevices.removeAll()
         currentSchedule = nil
@@ -167,6 +168,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
 
     /// Drop a node's actions so firmware ingest can replace stale cloud copies.
     func removeActions(forNodeId nodeId: String) {
+        guard !isEditorActive else { return }
         var emptyKeys: [String] = []
         for (key, schedule) in schedules {
             schedule.actions.removeValue(forKey: nodeId)
@@ -203,7 +205,8 @@ class ESPScheduler: CommonDeviceServicesProtocol {
         }
     }
 
-    /// Store the in-memory schedule (with actions) after a successful save.
+    /// Keep the in-memory schedule after a BLE/local save, and write it to disk
+    /// so BLE-only schedules survive an offline relaunch (cloud getNodes never saw them).
     func persistCurrentScheduleInList() {
         guard let schedule = currentSchedule,
               let id = schedule.id,
@@ -214,6 +217,30 @@ class ESPScheduler: CommonDeviceServicesProtocol {
         let key = "\(id).\(name).\(schedule.trigger.days ?? 0).\(schedule.trigger.minutes ?? 0).\(schedule.enabled)"
         currentScheduleKey = key
         schedules[key] = schedule
+        ESPLocalStorageHandler().saveSchedules(schedules: schedules)
+    }
+
+    /// Snapshot selected schedule actions from the current available-devices list.
+    func snapshotActionsFromAvailableDevices() -> [String: [Device]] {
+        var actions: [String: [Device]] = [:]
+        for device in availableDevices.values where device.selectedParams > 0 {
+            guard let nodeId = device.node?.node_id else { continue }
+            let snapshot = Device(device: device)
+            snapshot.node = device.node
+            snapshot.selectedParams = device.selectedParams
+            snapshot.params = device.params?.filter { $0.selected }.map { selected in
+                let copy = Param(param: selected)
+                copy.value = selected.value
+                copy.selected = true
+                return copy
+            }
+            if actions[nodeId] != nil {
+                actions[nodeId]!.append(snapshot)
+            } else {
+                actions[nodeId] = [snapshot]
+            }
+        }
+        return actions
     }
 
     /// Remove a deleted schedule from in-memory list and node schedule params (BLE local control parity).
@@ -250,29 +277,6 @@ class ESPScheduler: CommonDeviceServicesProtocol {
         }
     }
 
-    /// Snapshot selected schedule actions from the current available-devices list.
-    func snapshotActionsFromAvailableDevices() -> [String: [Device]] {
-        var actions: [String: [Device]] = [:]
-        for device in availableDevices.values where device.selectedParams > 0 {
-            guard let nodeId = device.node?.node_id else { continue }
-            let snapshot = Device(device: device)
-            snapshot.node = device.node
-            snapshot.selectedParams = device.selectedParams
-            snapshot.params = device.params?.filter { $0.selected }.map { selected in
-                let copy = Param(param: selected)
-                copy.value = selected.value
-                copy.selected = true
-                return copy
-            }
-            if actions[nodeId] != nil {
-                actions[nodeId]!.append(snapshot)
-            } else {
-                actions[nodeId] = [snapshot]
-            }
-        }
-        return actions
-    }
-
     private func ingestSchedulesFromNode(_ node: Node) {
         guard node.isSchedulingSupported,
               let nodeId = node.node_id,
@@ -290,6 +294,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///   - nodeID:Node ID for which JSON is fetched.
     ///   - scheduleJSON: JSON containing schedule parameters for a particular node
     func saveScheduleListFromJSON(nodeID: String, scheduleJSON: [String: Any]) {
+        guard !isEditorActive else { return }
         let id = scheduleJSON["id"] as? String ?? ""
 
         let trigger = ESPTrigger()
@@ -299,7 +304,12 @@ class ESPScheduler: CommonDeviceServicesProtocol {
             trigger.minutes = triggerDict["m"] as? Int ?? 0
         }
 
-        let enabled = scheduleJSON["enabled"] as? Int ?? 0 == 1 ? true : false
+        let enabled: Bool
+        if let intVal = scheduleJSON["enabled"] as? Int {
+            enabled = intVal == 1
+        } else {
+            enabled = scheduleJSON["enabled"] as? Bool ?? false
+        }
         let name = scheduleJSON["name"] as? String ?? ""
 
         var devices: [Device] = []
@@ -351,6 +361,17 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - nodeList: List of nodes. Each node contains devices and information of their services.
+    /// BLE-only: that node only. Wi-Fi: every Wi-Fi device that supports scheduling.
+    @discardableResult
+    func prepareAvailableDevices(for schedule: ESPSchedule?) -> Bool {
+        let ble = detectAndConfigureBleSingleDeviceFlow(from: schedule)
+        if !ble, let nodeList = User.shared.associatedNodeList {
+            getAvailableDeviceWithScheduleCapability(nodeList: nodeList)
+        }
+        configureDeviceForCurrentSchedule()
+        return ble
+    }
+
     /// When editing a schedule tied to a BLE-only node, scope devices to that node only (Android parity).
     @discardableResult
     func detectAndConfigureBleSingleDeviceFlow(from schedule: ESPSchedule?) -> Bool {
@@ -365,6 +386,7 @@ class ESPScheduler: CommonDeviceServicesProtocol {
     }
 
     func getAvailableDeviceWithScheduleCapability(nodeList: [Node]) {
+        guard !isEditorActive else { return }
         // Rebuild from scratch each time — otherwise a BLE-only node added via the single-device
         // flow (setAvailableDevicesForBleNode) would linger here forever, since the loop below only
         // skips *adding* excluded nodes, it never removes a stale entry left by a previous call.
@@ -407,7 +429,26 @@ class ESPScheduler: CommonDeviceServicesProtocol {
         }
     }
     
-    /// Gives list of devices under a schedule
+    /// Device names for a schedule row. Uses the schedule's own actions so BLE-only
+    /// nodes (excluded from the tab picker) still show a name.
+    func actionList(for schedule: ESPSchedule) -> String {
+        var names: [String] = []
+        for (nodeId, devices) in schedule.actions {
+            let node = User.shared.getNode(id: nodeId)
+            for device in devices {
+                if let liveName = node?.devices?.first(where: { $0.name == device.name })?.getDeviceName() {
+                    names.append(liveName)
+                } else if !device.deviceName.isEmpty {
+                    names.append(device.deviceName)
+                } else if let name = device.name {
+                    names.append(name)
+                }
+            }
+        }
+        return names.sorted().joined(separator: ", ")
+    }
+
+    /// Gives list of devices under the current schedule from the shared picker map.
     ///
     /// - Returns: Comma separated string of devices that are part of a schedule
     func getActionList() -> String {

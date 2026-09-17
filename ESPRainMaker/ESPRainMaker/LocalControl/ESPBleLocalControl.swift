@@ -26,7 +26,7 @@ protocol ESPBleLocalControlDelegate: AnyObject {
 }
 
 /// Manages BLE local control: discovery, on-demand connection, and param I/O.
-/// Mirrors the role of `ESPLocalControl` for WLAN, using `ESPProvisionManager` for BLE transport.
+/// Discovery uses `ESPBleDiscoveryService` (CBCentralManager). Connect uses ESPProvision.
 class ESPBleLocalControl: NSObject {
 
     enum ConnectionState {
@@ -44,20 +44,17 @@ class ESPBleLocalControl: NSObject {
         let nodeId: String
     }
 
-    let scanTimeout: TimeInterval = 10.0
-    let scanRetryDelay: TimeInterval = 2.0
-    let maxScanRetries = 3
     let operationTimeout: TimeInterval = 5.0
     let bleDevicePrefix = Constants.bleDevicePrefix
 
     weak var delegate: ESPBleLocalControlDelegate?
 
-    /// Tracks phone Bluetooth radio state so we can rediscover after BT off/on.
-    lazy var centralManager: CBCentralManager = {
-        CBCentralManager(delegate: self, queue: .main)
+    lazy var discoveryService: ESPBleDiscoveryService = {
+        let service = ESPBleDiscoveryService(devicePrefix: bleDevicePrefix)
+        service.delegate = self
+        return service
     }()
 
-    var scanRetryCount = 0
     var isBluetoothPoweredOn = false
 
     /// PoP used for session init outside the connection map (e.g. BLE-only onboarding).
@@ -66,7 +63,6 @@ class ESPBleLocalControl: NSObject {
     var connectionMap: [String: BleDeviceConnection] = [:]
     var currentConnectingNodeId: String?
     var connectCallback: ((Bool) -> Void)?
-    var isScanning = false
     var proxyReadInProgress: Set<String> = []
     var operationTimers: [String: Timer] = [:]
     var paramUpdateNodeIds = Set<String>()

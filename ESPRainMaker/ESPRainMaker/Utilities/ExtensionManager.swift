@@ -601,6 +601,7 @@ extension ESPNoRefreshTokenLogic {
         NodeSharingManager.shared.sharingRequestsReceived = []
         User.shared.accessToken = nil
         User.shared.userInfo = UserInfo(username: "", email: "", userID: "", loggedInWith: .cognito)
+        User.shared.stopBleLocalControl()
         User.shared.associatedNodeList = nil
         // Refresh Widget after user logout.
         if #available(iOS 14.0, *) {

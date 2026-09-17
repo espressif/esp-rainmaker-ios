@@ -47,4 +47,24 @@ class DeviceControlHelper {
             }
         }
     }
+
+    /// After provision, write empty Time Service TZ and epoch Timestamp when those params exist.
+    func applyProvisionTimeServiceParams(nodeID: String, services: [Service]?) {
+        guard let timeService = services?.first(where: { $0.type?.lowercased() == Constants.timezoneServiceName }) else {
+            return
+        }
+        var timeParams: [String: Any] = [:]
+        if let tzParam = timeService.params?.first(where: { $0.type?.lowercased() == Constants.timezoneServiceParam }) {
+            let timezone = tzParam.value as? String
+            if timezone == nil || timezone!.isEmpty {
+                timeParams[tzParam.name ?? ""] = TimeZone.current.identifier
+            }
+        }
+        if let timestampParam = timeService.params?.first(where: { $0.type?.lowercased() == Constants.timezoneTimestampParam }),
+           let timestampName = timestampParam.name, !timestampName.isEmpty {
+            timeParams[timestampName] = Int(Date().timeIntervalSince1970)
+        }
+        guard !timeParams.isEmpty else { return }
+        updateParam(nodeID: nodeID, parameter: [timeService.name ?? "Time": timeParams], delegate: nil)
+    }
 }

@@ -82,6 +82,13 @@ class SceneListViewController: UIViewController {
         }
         checkNetworkUpdate()
         NotificationCenter.default.addObserver(self, selector: #selector(checkNetworkUpdate), name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(bleLocalNetworkUpdate), name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.networkUpdateNotification), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.localNetworkUpdateNotification), object: nil)
     }
     
     @objc func checkNetworkUpdate() {
@@ -93,11 +100,15 @@ class SceneListViewController: UIViewController {
             }
         }
     }
+
+    @objc private func bleLocalNetworkUpdate() {
+        overlayBleFirmwareAndShowList()
+    }
     
     //MARK: IBActions
     @IBAction func refreshSceneList(_ sender: Any) {
         refreshControl.endRefreshing()
-        NetworkManager.shared.refreshAssociatedNodesThenOverlayBleFirmware {
+        NetworkManager.shared.refreshNodesWithBleOverlay {
             Utility.hideLoader(view: self.view)
             DispatchQueue.main.async {
                 self.showScenesList()
@@ -181,17 +192,28 @@ class SceneListViewController: UIViewController {
     
     private func showScenesList() {
         getScenesList()
-        if ESPSceneManager.shared.availableDevices.count < 1 {
+        let hasSceneDevices = User.shared.associatedNodeList?.contains { $0.isSceneSupported } ?? false
+        if !hasSceneDevices {
             initialLabel.text = "You don't have any device \n that supports this."
+            addSceneButton.isHidden = true
+            editButton.isHidden = true
+            initialView.isHidden = false
+            addButton.isHidden = true
+            tableView.isHidden = true
         } else if scenesList.count < 1 {
             initialLabel.text = "No Scenes added."
+            addSceneButton.isHidden = false
+            editButton.isHidden = true
+            initialView.isHidden = false
+            addButton.isHidden = true
+            tableView.isHidden = true
+        } else {
+            addSceneButton.isHidden = false
+            editButton.isHidden = false
+            initialView.isHidden = true
+            addButton.isHidden = false
+            tableView.isHidden = false
         }
-        self.addSceneButton.isHidden = (ESPSceneManager.shared.availableDevices.count < 1)
-        let areScenesPresent = scenesList.count>0 ? true : false
-        self.editButton.isHidden = !areScenesPresent
-        self.initialView.isHidden = areScenesPresent
-        self.addButton.isHidden = !areScenesPresent
-        tableView.isHidden = !areScenesPresent
         tableView.reloadData()
     }
     
@@ -221,11 +243,10 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
         var text = ""
         if indexPath.row/2 < scenesList.count,
            let scene = ESPSceneManager.shared.scenes[scenesList[indexPath.row/2]] {
-            if let info = scene.info {
+            if let info = scene.info, info.count > 0 {
                 text = info.replacingOccurrences(of: "\n", with: " ")
             } else {
-                ESPSceneManager.shared.currentScene = scene
-                text = ESPSceneManager.shared.getActionList()
+                text = ESPSceneManager.shared.actionList(for: scene)
             }
         }
         let singleLineHeight = "*".getViewHeight(labelWidth: tableView.frame.width-(0.22*tableView.frame.width+51.5), font: UIFont.systemFont(ofSize: 11.0, weight: .regular))
@@ -247,6 +268,7 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
         ESPSceneManager.shared.currentScene = scene
         sceneVC.sceneKey = scenesList[index]
         ESPSceneManager.shared.currentSceneKey = scenesList[index]
+        ESPSceneManager.shared.isEditorActive = true
         sceneVC.delegate = self
         navigationController?.pushViewController(sceneVC, animated: true)
     }
@@ -276,17 +298,12 @@ extension SceneListViewController: UITableViewDelegate, UITableViewDataSource {
         if let cell = tableView.dequeueReusableCell(withIdentifier: SceneListCell.reuseIdentifier, for: indexPath) as? SceneListCell {
             if indexPath.row/2 < scenesList.count,
                let scene = ESPSceneManager.shared.scenes[scenesList[indexPath.row/2]] {
-                let id = scenesList[indexPath.row/2]
-                ESPSceneManager.shared.currentScene = scene
-                ESPSceneManager.shared.configureDeviceForCurrentScene()
-                cell.scene = ESPSceneManager.shared.currentScene
-                if let scene = ESPSceneManager.shared.scenes[id] {
-                    cell.sceneName.text = scene.name
-                    if let info = scene.info, info.count > 0 {
-                        cell.sceneDevicesList.text = info.replacingOccurrences(of: "\n", with: " ")
-                    } else {
-                        cell.sceneDevicesList.text = ESPSceneManager.shared.getActionList()
-                    }
+                cell.scene = scene
+                cell.sceneName.text = scene.name
+                if let info = scene.info, info.count > 0 {
+                    cell.sceneDevicesList.text = info.replacingOccurrences(of: "\n", with: " ")
+                } else {
+                    cell.sceneDevicesList.text = ESPSceneManager.shared.actionList(for: scene)
                 }
                 cell.layer.cornerRadius = 10.0
                 cell.delegate = self

@@ -25,6 +25,12 @@ protocol ESPSchedulesStorageProtocol {
     func cleanupSchedules()
 }
 
+protocol ESPScenesStorageProtocol {
+    func saveScenes(scenes: [String: ESPScene])
+    func fetchScenes() -> [String: ESPScene]
+    func cleanupScenes()
+}
+
 class ESPLocalStorageSchedules: ESPLocalStorage, ESPSchedulesStorageProtocol {
     
     /// Method to save current schedule information locally.
@@ -61,4 +67,33 @@ class ESPLocalStorageSchedules: ESPLocalStorage, ESPSchedulesStorageProtocol {
         cleanupData(forKey: ESPLocalStorageKeys.scheduleDetails)
     }
     
+}
+
+class ESPLocalStorageScenes: ESPLocalStorage, ESPScenesStorageProtocol {
+
+    func saveScenes(scenes: [String: ESPScene]) {
+        do {
+            let encoded = try JSONEncoder().encode(scenes)
+            saveDataInUserDefault(data: encoded, key: ESPLocalStorageKeys.sceneDetails)
+        } catch {
+            print(error)
+        }
+    }
+
+    func fetchScenes() -> [String: ESPScene] {
+        var sceneList: [String: ESPScene] = [:]
+        do {
+            if let sceneData = getDataFromSharedUserDefault(key: ESPLocalStorageKeys.sceneDetails) {
+                sceneList = try JSONDecoder().decode([String: ESPScene].self, from: sceneData)
+            }
+            return sceneList
+        } catch {
+            print(error)
+            return sceneList
+        }
+    }
+
+    func cleanupScenes() {
+        cleanupData(forKey: ESPLocalStorageKeys.sceneDetails)
+    }
 }

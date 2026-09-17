@@ -287,6 +287,10 @@ struct JSONParser {
             if let statusInfo = node_details["status"] as? [String: Any], let connectivity = statusInfo["connectivity"] as? [String: Any], let status = connectivity["connected"] as? Bool {
                 node.isConnected = status
                 node.timestamp = connectivity["timestamp"] as? Int ?? 0
+            } else if node.isBleLocalControlServiceNode() {
+                // BLE-only nodes have no MQTT. Missing connectivity must not keep the
+                // Node.isConnected default (true), or home looks remotely connected.
+                node.isConnected = false
             }
 
             if let paramInfo = node_details["params"] as? [String: Any], let devices = node.devices {

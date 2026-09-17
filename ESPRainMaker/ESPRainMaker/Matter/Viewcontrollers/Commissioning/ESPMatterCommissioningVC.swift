@@ -252,16 +252,7 @@ class ESPMatterCommissioningVC: UIViewController {
         // Fetch latest nodes
         NetworkManager.shared.getNodeInfo(nodeId: nodeID) { node, _ in
             if let node = node {
-                for service in node.services ?? [] {
-                    if service.type?.lowercased() == Constants.timezoneServiceName {
-                        if let param = service.params?.first(where: { $0.type?.lowercased() == Constants.timezoneServiceParam }) {
-                            let timezone = param.value as? String
-                            if timezone == nil || timezone!.isEmpty {
-                                DeviceControlHelper.shared.updateParam(nodeID: nodeID, parameter: [service.name ?? "Time": [param.name ?? "": TimeZone.current.identifier]], delegate: nil)
-                            }
-                        }
-                    }
-                }
+                DeviceControlHelper.shared.applyProvisionTimeServiceParams(nodeID: nodeID, services: node.services)
                 completion(nodeID)
             } else {
                 completion(nil)

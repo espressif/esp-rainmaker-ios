@@ -62,8 +62,13 @@ class SceneViewController: UIViewController {
         super.viewDidLoad()
         tabBarController?.tabBar.isHidden = true
 
-        if !isBleSingleDeviceFlow {
-            isBleSingleDeviceFlow = ESPSceneManager.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPSceneManager.shared.currentScene)
+        if isNewScene {
+            if !isBleSingleDeviceFlow, let nodeList = User.shared.associatedNodeList {
+                ESPSceneManager.shared.getAvailableDeviceWithSceneCapability(nodeList: nodeList)
+            }
+            ESPSceneManager.shared.configureDeviceForCurrentScene()
+        } else {
+            isBleSingleDeviceFlow = ESPSceneManager.shared.prepareAvailableDevices(for: ESPSceneManager.shared.currentScene)
         }
         
         descriptionTextView.textContainerInset = UIEdgeInsets.zero
@@ -73,8 +78,6 @@ class SceneViewController: UIViewController {
         actionListTextView.isScrollEnabled = false
         actionListTextView.contentInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
         descriptionTextView.delegate = self
-        // Configure view for current scene
-        ESPSceneManager.shared.configureDeviceForCurrentScene()
         
         guard let scene = ESPSceneManager.shared.currentScene else {
             return
@@ -115,6 +118,14 @@ class SceneViewController: UIViewController {
             }
         }
         availableDeviceCopy = configureDeviceSceneActions(availableDeviceCopy)
+        ESPSceneManager.shared.isEditorActive = true
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isMovingFromParent {
+            ESPSceneManager.shared.isEditorActive = false
+        }
     }
     
     @objc private func hideKeyBoard() {
@@ -130,6 +141,7 @@ class SceneViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         // Show list of actions added on a scene.
         getDeSelectedNodeIDs()
         let actionList = ESPSceneManager.shared.getActionList()
@@ -217,6 +229,7 @@ class SceneViewController: UIViewController {
                     // Result is success. Navigate back to scene list and refetch the list.
                     // To check if scene is successfully added.
                     User.shared.updateDeviceList = true
+                    ESPSceneManager.shared.persistCurrentSceneInList()
                     if !nodesFailed {
                         if self.isNewScene {
                             self.delegate?.serviceAdded()
@@ -322,8 +335,8 @@ class SceneViewController: UIViewController {
     }
     
     @IBAction func actionsPressed(_ sender: Any) {
-        if !isBleSingleDeviceFlow {
-            isBleSingleDeviceFlow = ESPSceneManager.shared.detectAndConfigureBleSingleDeviceFlow(from: ESPSceneManager.shared.currentScene)
+        if !isNewScene {
+            isBleSingleDeviceFlow = ESPSceneManager.shared.prepareAvailableDevices(for: ESPSceneManager.shared.currentScene)
         }
         BleDeviceServiceFlow.prepareForActionPicker(ESPSceneManager.shared.availableDevices, kind: .scene)
         var refreshedCopy = BleDeviceServiceFlow.orderedDevicesForActionPicker(from: ESPSceneManager.shared.availableDevices)

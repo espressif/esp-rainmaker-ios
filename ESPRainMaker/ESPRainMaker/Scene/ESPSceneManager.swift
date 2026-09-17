@@ -27,6 +27,8 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     var currentScene: ESPScene!
     var currentSceneKey: String!
     var apiManager = ESPAPIManager()
+    /// List/cloud/BLE overlay must not rebuild `availableDevices` while the editor is on screen.
+    var isEditorActive = false
     
     private init() {
         // Listen for configuration updates and reinitialize API manager
@@ -46,6 +48,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     
     /// Remove each element from the scene list and refetch.
     func refreshSceneList() {
+        guard !isEditorActive else { return }
         scenes.removeAll()
         availableDevices.removeAll()
         currentScene = nil
@@ -53,6 +56,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
 
     /// Drop a node's actions so firmware ingest can replace stale cloud copies.
     func removeActions(forNodeId nodeId: String) {
+        guard !isEditorActive else { return }
         var emptyKeys: [String] = []
         for (key, scene) in scenes {
             scene.actions.removeValue(forKey: nodeId)
@@ -74,6 +78,9 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///   - nodeID:Node ID for which JSON is fetched.
     ///   - sceneJSON: JSON containing scene parameters for a particular node
     func saveScenesFromJSON(nodeID: String, sceneJSON: [String: Any]) {
+        if isEditorActive {
+            return
+        }
         if nodeID.count == 0 {
             return
         }
@@ -121,6 +128,17 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     ///
     /// - Parameters:
     ///   - nodeList: List of nodes. Each node contains devices and information of their services
+    /// BLE-only: that node only. Wi-Fi: every Wi-Fi device that supports scenes.
+    @discardableResult
+    func prepareAvailableDevices(for scene: ESPScene?) -> Bool {
+        let ble = detectAndConfigureBleSingleDeviceFlow(from: scene)
+        if !ble, let nodeList = User.shared.associatedNodeList {
+            getAvailableDeviceWithSceneCapability(nodeList: nodeList)
+        }
+        configureDeviceForCurrentScene()
+        return ble
+    }
+
     /// When editing a scene tied to a BLE-only node, scope devices to that node only (Android parity).
     @discardableResult
     func detectAndConfigureBleSingleDeviceFlow(from scene: ESPScene?) -> Bool {
@@ -146,6 +164,7 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
     }
 
     func getAvailableDeviceWithSceneCapability(nodeList: [Node]) {
+        guard !isEditorActive else { return }
         // Rebuild from scratch each time — otherwise a BLE-only node added via the single-device
         // flow (setAvailableDevicesForBleNode) would linger here forever, since the loop below only
         // skips *adding* excluded nodes, it never removes a stale entry left by a previous call.
@@ -198,6 +217,44 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
         }
     }
 
+    /// Keep the in-memory scene after a BLE/local save, and write it to disk
+    /// so BLE-only scenes survive an offline relaunch (cloud getNodes never saw them).
+    func persistCurrentSceneInList() {
+        guard let scene = currentScene,
+              let id = scene.id,
+              let name = scene.name else {
+            return
+        }
+        scene.actions = snapshotActionsFromAvailableDevices()
+        let key = "\(id).\(name).\(scene.info ?? "")"
+        currentSceneKey = key
+        scenes[key] = scene
+        ESPLocalStorageHandler().saveScenes(scenes: scenes)
+    }
+
+    /// Snapshot selected scene actions from the current available-devices list.
+    func snapshotActionsFromAvailableDevices() -> [String: [Device]] {
+        var actions: [String: [Device]] = [:]
+        for device in availableDevices.values where device.selectedParams > 0 {
+            guard let nodeId = device.node?.node_id else { continue }
+            let snapshot = Device(device: device)
+            snapshot.node = device.node
+            snapshot.selectedParams = device.selectedParams
+            snapshot.params = device.params?.filter { $0.selected }.map { selected in
+                let copy = Param(param: selected)
+                copy.value = selected.value
+                copy.selected = true
+                return copy
+            }
+            if actions[nodeId] != nil {
+                actions[nodeId]?.append(snapshot)
+            } else {
+                actions[nodeId] = [snapshot]
+            }
+        }
+        return actions
+    }
+
     /// Remove a deleted scene from in-memory list and node scene params (BLE local control parity).
     func removeSceneFromList(key: String) {
         guard let scene = scenes[key], let sceneId = scene.id else {
@@ -232,7 +289,26 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
         }
     }
 
-    /// Gives list of devices under a scene.
+    /// Device names for a scene row. Uses the scene's own actions so BLE-only
+    /// nodes (excluded from the tab picker) still show a name.
+    func actionList(for scene: ESPScene) -> String {
+        var names: [String] = []
+        for (nodeId, devices) in scene.actions {
+            let node = User.shared.getNode(id: nodeId)
+            for device in devices {
+                if let liveName = node?.devices?.first(where: { $0.name == device.name })?.getDeviceName() {
+                    names.append(liveName)
+                } else if !device.deviceName.isEmpty {
+                    names.append(device.deviceName)
+                } else if let name = device.name {
+                    names.append(name)
+                }
+            }
+        }
+        return names.sorted().joined(separator: ", ")
+    }
+
+    /// Gives list of devices under a scene from the shared picker map.
     ///
     /// - Returns: Comma separated string of devices that are part of a scene
     func getActionList() -> String {
@@ -260,6 +336,9 @@ class ESPSceneManager: CommonDeviceServicesProtocol {
             }
             if actions.keys.count > 0 {
                 self.invokeServiceAction(apiManager: apiManager, keys: [String](actions.keys), jsonString: jsonString, text: message, nodeIdKey: ESPSceneConstants.nodeIdKey, payloadKey: ESPSceneConstants.payloadKey, actions: actions, availableDevices: availableDevices, serviceType: .scene, isSave: true, onView: onView) { result in
+                    if case .success = result {
+                        self.currentScene.actions = actions
+                    }
                     completionHandler(result)
                 }
             } else {

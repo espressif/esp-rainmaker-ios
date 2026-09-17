@@ -148,6 +148,7 @@ struct Constants {
     // Service types
     static let timezoneServiceName = "esp.service.time"
     static let timezoneServiceParam = "esp.param.tz"
+    static let timezoneTimestampParam = "esp.param.timestamp"
     static let systemService = "esp.service.system"
 
     // Theme Color
@@ -202,6 +203,7 @@ struct Constants {
     // BLE local control constants
     static let bleLocalCtrlMetadataKey = "ble_local_ctrl"
     static let bleLocalCtrlPopKey = "pop"
+    static let bleLocalCtrlWifiCapableKey = "wifi_capable"
     static let bleDevicePrefix = "PROV_"
     static let handlerGetParams = "get_params"
     static let handlerSetParams = "set_params"

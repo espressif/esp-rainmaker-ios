@@ -35,8 +35,18 @@ class SceneSelectDevicesVC: UIViewController, SelectDeviceActionCellDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //register cells for tableview
         self.registerCells(tableView)
+        tableView.delaysContentTouches = false
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setInteractiveNavigationPopEnabled(false)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setInteractiveNavigationPopEnabled(true)
     }
     
     @IBAction func cancelPressed(_ sender: Any) {

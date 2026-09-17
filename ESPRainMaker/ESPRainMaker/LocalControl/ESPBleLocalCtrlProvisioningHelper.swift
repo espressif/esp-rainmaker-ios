@@ -75,10 +75,12 @@ enum ESPBleLocalCtrlProvisioningHelper {
                             finishFlow(success: false, message: "Failed to report parameters to cloud.", completion: completion)
                             return
                         }
+                        let wifiCapable = (device.versionInfo as NSDictionary?)?.hasNetworkProvisioningCapability() ?? false
                         let metadata: [String: Any] = [
                             Constants.bleLocalCtrlMetadataKey: [
                                 Constants.name: deviceName,
-                                Constants.bleLocalCtrlPopKey: effectivePop
+                                Constants.bleLocalCtrlPopKey: effectivePop,
+                                Constants.bleLocalCtrlWifiCapableKey: wifiCapable
                             ]
                         ]
                         progress("Updating node metadata...")
@@ -208,7 +210,8 @@ enum ESPBleLocalCtrlProvisioningHelper {
         return nil
     }
 
-    /// Offer skip-Wi-Fi onboarding when firmware supports BLE local control + challenge response.
+    /// Shown just before the skip-Wi-Fi prompt. BLE-only firmware (no Wi-Fi/Thread
+    /// prov caps) takes the same path as tapping Yes. Hybrid still gets the prompt.
     static func offerSkipWifiFlowIfSupported(
         from viewController: UIViewController,
         device: ESPDevice,
@@ -218,6 +221,10 @@ enum ESPBleLocalCtrlProvisioningHelper {
         guard let versionInfo = device.versionInfo as NSDictionary?,
               versionInfo.isBleLocalControlSupported() else {
             return false
+        }
+        if !versionInfo.hasNetworkProvisioningCapability() {
+            navigateToBleLocalCtrlFlow(from: viewController, device: device, pop: pop)
+            return true
         }
         let alert = UIAlertController(
             title: "Skip Wi-Fi Provisioning?",
