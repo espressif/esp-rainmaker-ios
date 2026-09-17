@@ -391,7 +391,25 @@ class SignInViewController: UIViewController, ESPNoRefreshTokenLogic, UITextView
     }
 
     @IBAction func loginWithGoogle(_: Any) {
-        loginWith(idProvider: "Google")
+        if ESPGoogleSignInService.isConfigured {
+            ESPGoogleSignInService.shared.signIn(presenting: self) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success(let idToken):
+                    let service = ESPFederatedLoginService(presenter: self)
+                    service.loaderDelegate = self
+                    service.login(provider: Constants.googleFederatedProvider, idToken: idToken)
+                case .cancelled:
+                    break
+                case .unavailable:
+                    self.loginWith(idProvider: Constants.google)
+                case .failure:
+                    self.showAlert()
+                }
+            }
+            return
+        }
+        loginWith(idProvider: Constants.google)
     }
 
     @IBAction func loginWithApple(_: Any) {

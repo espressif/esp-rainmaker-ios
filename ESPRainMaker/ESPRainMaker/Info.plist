@@ -18,6 +18,10 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>GIDClientID</key>
+	<string>847141165224-kr4gih5rg49u7ubrvemqr448diu30t2d.apps.googleusercontent.com</string>
+	<key>GIDServerClientID</key>
+	<string>847141165224-5r4e8kn1rg3vu1tltq6b4qouvk5nquet.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -26,6 +30,14 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.espressif.rainmaker.softap</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.847141165224-kr4gih5rg49u7ubrvemqr448diu30t2d</string>
 			</array>
 		</dict>
 		<dict>

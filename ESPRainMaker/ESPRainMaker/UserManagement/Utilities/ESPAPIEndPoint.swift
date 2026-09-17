@@ -32,6 +32,8 @@ enum ESPAPIEndPoint {
     case confirmForgotPassword(url: String, name: String, password: String, verificationCode: String, userPool: Int)
     case logoutUser(url: String, userPool: Int)
     case requestToken(authURL: String, redirectURL: String, code: String, appClientId: String?)
+    /// Exchange a native identity-provider ID token for RainMaker session tokens.
+    case federatedLogin(url: String, provider: String, idToken: String)
     
     
     /// Returns URL string for the corresponding API endpoint
@@ -75,6 +77,9 @@ enum ESPAPIEndPoint {
             
         case .requestToken(let authURL, _, _, _):
             return "\(authURL)/token"
+            
+        case .federatedLogin(let url, let provider, _):
+            return "\(url)/auth/federated/\(provider)"
         }
     }
     
@@ -98,6 +103,9 @@ enum ESPAPIEndPoint {
             
         case .requestToken:
             return [ESPAPIKeys.contentType: ESPAPIKeys.applicationURLEncoded]
+            
+        case .federatedLogin:
+            return [ESPAPIKeys.contentType: ESPAPIKeys.applicationJSON]
         }
     }
     
@@ -114,7 +122,7 @@ enum ESPAPIEndPoint {
         case .fetchUserDetails(_,_,_):
             return .get
             
-        case .requestToken:
+        case .requestToken, .federatedLogin:
             return .post
         }
     }
@@ -168,6 +176,9 @@ enum ESPAPIEndPoint {
                         ESPAPIKeys.code: code,
                         ESPAPIKeys.redirctURI: redirectURL]
             }
+            
+        case .federatedLogin(_, _, let idToken):
+            return [ESPAPIKeys.idToken: idToken]
         }
     }
     
@@ -197,6 +208,8 @@ enum ESPAPIEndPoint {
             return "logoutUser"
         case .requestToken(_,_,_,_):
             return "requestToken"
+        case .federatedLogin(_, let provider, _):
+            return "federatedLogin(\(provider))"
         }
     }
 }
@@ -221,4 +234,5 @@ struct ESPAPIKeys {
     static let redirctURI = "redirect_uri"
     static let clientId = "client_id"
     static let isWeChatToken = "wechat_token_only"
+    static let idToken = "id_token"
 }

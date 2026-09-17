@@ -98,6 +98,8 @@
 		0C80AA2D26FDBD4B00480C53 /* ESPLogoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1B26FDBD4B00480C53 /* ESPLogoutService.swift */; };
 		0C80AA2E26FDBD4B00480C53 /* ESPCreateUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1C26FDBD4B00480C53 /* ESPCreateUserService.swift */; };
 		0C80AA2F26FDBD4B00480C53 /* ESPIdProviderLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1D26FDBD4B00480C53 /* ESPIdProviderLoginService.swift */; };
+		B7E1F00226FDBD4B00480C53 /* ESPFederatedLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */; };
+		B7E1F00426FDBD4B00480C53 /* ESPGoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */; };
 		0C80AA3026FDBD4B00480C53 /* ESPExtendSessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1E26FDBD4B00480C53 /* ESPExtendSessionService.swift */; };
 		0C80AA3126FDBD4B00480C53 /* ESPForgotPasswordService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA1F26FDBD4B00480C53 /* ESPForgotPasswordService.swift */; };
 		0C80AA3226FDBD4B00480C53 /* ESPChangePasswordService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C80AA2026FDBD4B00480C53 /* ESPChangePasswordService.swift */; };
@@ -845,6 +847,8 @@
 		0C80AA1B26FDBD4B00480C53 /* ESPLogoutService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPLogoutService.swift; sourceTree = "<group>"; };
 		0C80AA1C26FDBD4B00480C53 /* ESPCreateUserService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPCreateUserService.swift; sourceTree = "<group>"; };
 		0C80AA1D26FDBD4B00480C53 /* ESPIdProviderLoginService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPIdProviderLoginService.swift; sourceTree = "<group>"; };
+		B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPFederatedLoginService.swift; sourceTree = "<group>"; };
+		B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPGoogleSignInService.swift; sourceTree = "<group>"; };
 		0C80AA1E26FDBD4B00480C53 /* ESPExtendSessionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPExtendSessionService.swift; sourceTree = "<group>"; };
 		0C80AA1F26FDBD4B00480C53 /* ESPForgotPasswordService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPForgotPasswordService.swift; sourceTree = "<group>"; };
 		0C80AA2026FDBD4B00480C53 /* ESPChangePasswordService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESPChangePasswordService.swift; sourceTree = "<group>"; };
@@ -1651,6 +1655,8 @@
 				0C80AA1B26FDBD4B00480C53 /* ESPLogoutService.swift */,
 				0C80AA1C26FDBD4B00480C53 /* ESPCreateUserService.swift */,
 				0C80AA1D26FDBD4B00480C53 /* ESPIdProviderLoginService.swift */,
+				B7E1F00126FDBD4B00480C53 /* ESPFederatedLoginService.swift */,
+				B7E1F00326FDBD4B00480C53 /* ESPGoogleSignInService.swift */,
 				0C80AA1E26FDBD4B00480C53 /* ESPExtendSessionService.swift */,
 				0C80AA1F26FDBD4B00480C53 /* ESPForgotPasswordService.swift */,
 				0C80AA2026FDBD4B00480C53 /* ESPChangePasswordService.swift */,
@@ -3691,6 +3697,8 @@
 				F1A866A727EBC60900A9858B /* AutomationActionTableViewCell.swift in Sources */,
 				0CF69239270A308B0098F515 /* ESPEnableAlexaSkillService.swift in Sources */,
 				0C80AA2F26FDBD4B00480C53 /* ESPIdProviderLoginService.swift in Sources */,
+				B7E1F00226FDBD4B00480C53 /* ESPFederatedLoginService.swift in Sources */,
+				B7E1F00426FDBD4B00480C53 /* ESPGoogleSignInService.swift in Sources */,
 				F1CC3C24295D866E0000D6DC /* ESPOTAAPIWorker.swift in Sources */,
 				0CD359542A2D25F30081017C /* ESPMTRCommissioner+GetAllDeviceEndpoints.swift in Sources */,
 				0C2F51032C92B88B0031B098 /* DeviceTraitListViewController+CustomActionDelegate.swift in Sources */,

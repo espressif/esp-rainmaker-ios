@@ -591,6 +591,7 @@ extension ESPNoRefreshTokenLogic {
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         ESPMatterFabricDetails.shared.clearGroupSharingData()
         ESPTokenWorker.shared.deleteAll()
+        ESPGoogleSignInService.signOut()
         ESPAlexaTokenWorker.shared.clearAllClientTokens()
         UserDefaults.standard.removeObject(forKey: Constants.wifiPassword)
         let localStorageHandler = ESPLocalStorageHandler()

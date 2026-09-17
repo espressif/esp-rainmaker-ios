@@ -119,6 +119,25 @@ struct RequestToken: Codable {
         case expiresIn = "expires_in"
         case tokenType = "token_type"
     }
+    
+    /// RainMaker login responses use `idtoken`; OAuth token responses use `id_token`.
+    static func from(data: Data) -> RequestToken? {
+        let decoder = JSONDecoder()
+        if let token = try? decoder.decode(RequestToken.self, from: data),
+           token.accessToken != nil || token.idToken != nil {
+            return token
+        }
+        if let session = try? decoder.decode(ESPSessionResponse.self, from: data) {
+            var token = RequestToken()
+            token.idToken = session.idToken
+            token.accessToken = session.accessToken
+            token.refreshToken = session.refreshToken
+            if token.accessToken != nil || token.idToken != nil {
+                return token
+            }
+        }
+        return nil
+    }
 }
 
 
