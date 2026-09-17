@@ -30,7 +30,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1431462220DE994B0017E119"
-               BuildableName = "ESP RainMaker.app"
+               BuildableName = "ESP Rainmaker Classic.app"
                BlueprintName = "ESPRainMaker"
                ReferencedContainer = "container:ESPRainMaker.xcodeproj">
             </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1431462220DE994B0017E119"
-            BuildableName = "ESP RainMaker.app"
+            BuildableName = "ESP Rainmaker Classic.app"
             BlueprintName = "ESPRainMaker"
             ReferencedContainer = "container:ESPRainMaker.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1431462220DE994B0017E119"
-            BuildableName = "ESP RainMaker.app"
+            BuildableName = "ESP Rainmaker Classic.app"
             BlueprintName = "ESPRainMaker"
             ReferencedContainer = "container:ESPRainMaker.xcodeproj">
          </BuildableReference>

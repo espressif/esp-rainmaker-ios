@@ -691,6 +691,8 @@
                         <outlet property="appleLoginButton" destination="vpi-yr-s7g" id="tHA-lE-YAO"/>
                         <outlet property="appleLogo" destination="IUq-nW-AIo" id="dhc-IZ-a7G"/>
                         <outlet property="brandLogo" destination="bSh-Uq-p9g" id="vBi-8W-j2p"/>
+                        <outlet property="brandLogoHeightConstraint" destination="lz7-Ok-inz" id="a1B-2c-3De"/>
+                        <outlet property="brandLogoWidthConstraint" destination="Jhx-Dy-fDB" id="a4E-5f-6Gh"/>
                         <outlet property="checkBox" destination="kfM-iD-Fe4" id="KTm-7W-Xou"/>
                         <outlet property="chinaAppleLogo" destination="urt-Q0-NDb" id="Vl2-ww-ltW"/>
                         <outlet property="chinaAppleSigninButton" destination="QGn-db-mNk" id="7OW-5H-dVa"/>
