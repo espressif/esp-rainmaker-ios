@@ -32,6 +32,7 @@ class ConnectViewController: UIViewController {
     /// When set, this VC is used only to collect POP for on-network provisioning (no device connection).
     var onNetworkDevice: ESPOnNetworkDevice?
     var onNetworkPOPCompletion: ((String) -> Void)?
+    private var didHandleDeviceConnection = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,23 +89,31 @@ class ConnectViewController: UIViewController {
             return
         }
 
+        didHandleDeviceConnection = false
         Utility.showLoader(message: "Connecting to device", view: view)
         espDevice.connect(delegate: self) { status in
             DispatchQueue.main.async {
+                guard !self.didHandleDeviceConnection else { return }
                 Utility.hideLoader(view: self.view)
                 switch status {
                 case .connected:
-                    DispatchQueue.main.async {
-                        self.checkForAssistedClaiming(device: self.espDevice)
-                    }
+                    self.didHandleDeviceConnection = true
+                    self.checkForAssistedClaiming(device: self.espDevice)
                 case let .failedToConnect(error):
+                    self.didHandleDeviceConnection = true
                     switch error {
                     case .sessionInitError:
                         self.showStatusScreen(step1Failed: true, message: error.description + ".Please check if POP is correct.")
+                    case .softAPConnectionFailure:
+                        let action = UIAlertAction(title: "Retry", style: .default) { _ in
+                            self.navigationController?.popToRootViewController(animated: false)
+                        }
+                        self.showAlert(error: error.description, action: action)
                     default:
                         self.showStatusScreen(step1Failed: true, message: error.description)
                     }
                 default:
+                    self.didHandleDeviceConnection = true
                     let action = UIAlertAction(title: "Retry", style: .default, handler: nil)
                     self.showAlert(error: "Device disconnected", action: action)
                 }
