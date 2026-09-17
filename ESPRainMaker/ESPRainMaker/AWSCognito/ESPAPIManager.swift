@@ -153,7 +153,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         if nserror.code == 13 {
                             ESPNetworkMonitor.shared.setNetworkConnection(connected: false)
                         }
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        completionHandler(nil, self.serverError(from: error))
                         return
                     }
                 }
@@ -200,7 +200,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         completionHandler(nil, ESPNetworkError.emptyConfigData)
                         return
                     case let .failure(error):
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        completionHandler(nil, self.serverError(from: error))
                         return
                     }
                 }
@@ -247,7 +247,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         completionHandler(nil)
                         return
                     case let .failure(error):
-                        completionHandler(ESPNetworkError.serverError(error.localizedDescription))
+                        completionHandler(self.serverError(from: error))
                         return
                     }
                 }
@@ -331,7 +331,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         }
                     case let .failure(error):
                         // Check for any error on response
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        completionHandler(nil, self.serverError(from: error))
                         return
                     }
                     completionHandler(nil, nil)
@@ -504,7 +504,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                                 ESPNetworkMonitor.shared.setNetworkConnection(connected: false)
                             }
                             DispatchQueue.main.async {
-                                completionHandler(nil, .serverError(error.localizedDescription))
+                                completionHandler(nil, self.serverError(from: error))
                             }
                         }
                     }
@@ -611,7 +611,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         if let urlError = error.underlyingError as? URLError, (urlError.code == URLError.Code.notConnectedToInternet || urlError.code == URLError.Code.dataNotAllowed) {
                             completionHandler(nil, .noNetwork)
                         } else {
-                            completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                            completionHandler(nil, self.serverError(from: error))
                         }
                         return
                     }
@@ -645,7 +645,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         completionHandler(value, nil)
                         return
                     case let .failure(error):
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        completionHandler(nil, self.serverError(from: error))
                         return
                     }
                 }
@@ -680,7 +680,7 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                         completionHandler(value, nil)
                         return
                     case let .failure(error):
-                        completionHandler(nil, ESPNetworkError.serverError(error.localizedDescription))
+                        completionHandler(nil, self.serverError(from: error))
                         return
                     }
                 }
@@ -690,6 +690,11 @@ class ESPAPIManager: ESPNoRefreshTokenLogic {
                 }
             }
         }
+    }
+
+    /// Prefer the underlying URL error text over Alamofire's "URLSessionTask failed with error:" wrapper.
+    private func serverError(from error: AFError) -> ESPNetworkError {
+        .serverError((error.underlyingError ?? error).localizedDescription)
     }
     
     /// Check error code and ireturn true if user session is valid
