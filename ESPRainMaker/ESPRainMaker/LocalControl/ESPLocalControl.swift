@@ -130,11 +130,48 @@ extension ESPLocalControl: NetServiceDelegate {
     func netServiceDidResolveAddress(_ sender: NetService) {
         let localService = ESPLocalService(service: sender)
         localService.hostname = "\(sender.hostName ?? ""):\(sender.port)"
+        if let hostName = sender.hostName, !hostName.isEmpty, let txtData = sender.txtRecordData() {
+            localService.nodeId = nodeId(fromTXTRecord: txtData)
+        }
         services[localService.hostname] = localService
         removeServiceFromResolveQueue(service: sender)
     }
 
     func netService(_ sender: NetService, didNotResolve _: [String: NSNumber]) {
         removeServiceFromResolveQueue(service: sender)
+    }
+
+    /// Extract node id from mDNS TXT record data (key `node_id`).
+    ///
+    /// - Parameters:
+    ///   - data: Raw TXT record data of the resolved service.
+    /// - Returns: Node id if present and valid, otherwise nil.
+    private func nodeId(fromTXTRecord data: Data) -> String? {
+        let bytes = [UInt8](data)
+        var index = 0
+        while index < bytes.count {
+            let length = Int(bytes[index])
+            index += 1
+            if length == 0 {
+                continue
+            }
+            if index + length > bytes.count {
+                return nil
+            }
+            let entry = bytes[index ..< index + length]
+            index += length
+            guard let separatorIndex = entry.firstIndex(of: UInt8(ascii: "=")) else {
+                continue
+            }
+            let key = String(decoding: entry[entry.startIndex ..< separatorIndex], as: UTF8.self)
+            if key.caseInsensitiveCompare(Constants.nodeID) == .orderedSame {
+                guard let value = String(bytes: entry[(separatorIndex + 1)...], encoding: .utf8) else {
+                    return nil
+                }
+                let trimmed = value.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "\0")))
+                return trimmed.isEmpty ? nil : trimmed
+            }
+        }
+        return nil
     }
 }
