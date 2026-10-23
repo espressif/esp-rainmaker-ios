@@ -52,6 +52,8 @@ enum ESPLocalServiceError {
 class ESPLocalService: NSObject {
     var netService: NetService
     var hostname = ""
+    /// Node id from the mDNS TXT record key `node_id`, or nil when it is absent or invalid.
+    var nodeId: String?
     var espLocalDevice = ESPLocalDevice(name: "espDevice", security: .unsecure, transport: .softap)
 
     private let control_endpoint = "esp_local_ctrl/control"

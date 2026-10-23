@@ -347,13 +347,19 @@ class User {
 extension User: ESPLocalControlDelegate {
     func updateInAvailableLocalServices(services: [ESPLocalService]) {
         localServices.removeAll()
-        for service in services {
+        // Fallback: node id derived from mDNS hostname (firmware without TXT node_id).
+        for service in services where (service.nodeId ?? "").isEmpty {
             var hostname = service.hostname
-            if hostname.contains(".") {
-                let endIndex = hostname.range(of: ".")!.lowerBound
-                hostname = String(hostname[..<endIndex])
+            if let range = hostname.range(of: ".") {
+                hostname = String(hostname[..<range.lowerBound])
             }
             localServices[hostname] = service
+        }
+        // Authoritative: node id from mDNS TXT record overrides hostname-derived entries.
+        for service in services {
+            if let nodeId = service.nodeId, !nodeId.isEmpty {
+                localServices[nodeId] = service
+            }
         }
 
         updateNodeLocalNetworkInfo()
