@@ -34,6 +34,8 @@ enum ESPAPIEndPoint {
     case requestToken(authURL: String, redirectURL: String, code: String, appClientId: String?)
     /// Exchange a native identity-provider ID token for RainMaker session tokens.
     case federatedLogin(url: String, provider: String, idToken: String)
+    /// Issue a RainMaker OAuth auth code for Alexa skill linking without Hosted UI. `url` is the API base URL without the version prefix.
+    case alexaAppLinkAuthorize(url: String, clientId: String, redirectURI: String, state: String, clientSecret: String, accessToken: String)
     
     
     /// Returns URL string for the corresponding API endpoint
@@ -80,6 +82,13 @@ enum ESPAPIEndPoint {
             
         case .federatedLogin(let url, let provider, _):
             return "\(url)/auth/federated/\(provider)"
+            
+        case .alexaAppLinkAuthorize(let url, _, _, _, _, _):
+            var base = url
+            if base.hasSuffix("/") {
+                base.removeLast()
+            }
+            return "\(base)/app-link/authorize"
         }
     }
     
@@ -106,6 +115,9 @@ enum ESPAPIEndPoint {
             
         case .federatedLogin:
             return [ESPAPIKeys.contentType: ESPAPIKeys.applicationJSON]
+            
+        case .alexaAppLinkAuthorize(_, _, _, _, _, let accessToken):
+            return [ESPAPIKeys.authorization: accessToken]
         }
     }
     
@@ -119,7 +131,7 @@ enum ESPAPIEndPoint {
         case .updateUsername(_,_,_,_), .requestForgotPassword(_,_,_), .confirmForgotPassword(_,_,_,_,_), .changePassword(_,_,_,_,_):
             return .put
             
-        case .fetchUserDetails(_,_,_):
+        case .fetchUserDetails(_,_,_), .alexaAppLinkAuthorize:
             return .get
             
         case .requestToken, .federatedLogin:
@@ -179,6 +191,13 @@ enum ESPAPIEndPoint {
             
         case .federatedLogin(_, _, let idToken):
             return [ESPAPIKeys.idToken: idToken]
+            
+        case .alexaAppLinkAuthorize(_, let clientId, let redirectURI, let state, let clientSecret, _):
+            return [ESPAPIKeys.clientId: clientId,
+                    ESPAPIKeys.redirctURI: redirectURI,
+                    ESPAPIKeys.responseType: ESPAPIKeys.authorizationCodeResponseType,
+                    ESPAPIKeys.state: state,
+                    ESPAPIKeys.clientSecret: clientSecret]
         }
     }
     
@@ -210,6 +229,8 @@ enum ESPAPIEndPoint {
             return "requestToken"
         case .federatedLogin(_, let provider, _):
             return "federatedLogin(\(provider))"
+        case .alexaAppLinkAuthorize:
+            return "alexaAppLinkAuthorize"
         }
     }
 }
@@ -233,6 +254,10 @@ struct ESPAPIKeys {
     static let code = "code"
     static let redirctURI = "redirect_uri"
     static let clientId = "client_id"
+    static let clientSecret = "client_secret"
+    static let responseType = "response_type"
+    static let authorizationCodeResponseType = "code"
+    static let state = "state"
     static let isWeChatToken = "wechat_token_only"
     static let idToken = "id_token"
 }

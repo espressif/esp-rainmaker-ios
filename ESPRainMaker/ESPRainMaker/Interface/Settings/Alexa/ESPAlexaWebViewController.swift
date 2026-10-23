@@ -44,11 +44,11 @@ class ESPAlexaWebViewController: UIViewController {
         WKWebView.clean()
     }
     
-    /// Launch WKWebiew
+    /// Loads the linking page in a web view.
     /// - Parameters:
     ///   - url: url to be loaded with WKWebview
     ///   - state: enable skill state
-    ///   - presenter: viewcontroller the webview is invoked from
+    ///   - presenter: view controller that presented the web view
     func launchWebview(url: URL, state: ESPEnableSkillState, presenter: UIViewController) {
         self.skillState = state
         self.webView.load(URLRequest(url: url))
@@ -63,7 +63,7 @@ class ESPAlexaWebViewController: UIViewController {
 
 extension ESPAlexaWebViewController: WKNavigationDelegate {
     
-    /// WKWebiew navigation started callback
+    /// Called when the web view starts loading a page.
     /// - Parameters:
     ///   - webView: WKWebView for loading URL
     ///   - navigation: navigation description
@@ -73,7 +73,7 @@ extension ESPAlexaWebViewController: WKNavigationDelegate {
         }
     }
     
-    /// WKWebiew navigation finished callback
+    /// Called when the web view finishes loading a page.
     /// - Parameters:
     ///   - webView: WKWebView for loading URL
     ///   - navigation: navigation description
@@ -91,7 +91,7 @@ extension ESPAlexaWebViewController: WKNavigationDelegate {
         }
     }
     
-    /// WKWebiew navigation failed callback
+    /// Called when the web view fails to load a page.
     /// - Parameters:
     ///   - webView: WKWebView for loading URL
     ///   - navigation: navigation description

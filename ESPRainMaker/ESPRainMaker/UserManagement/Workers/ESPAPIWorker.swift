@@ -71,6 +71,38 @@ class ESPAPIWorker {
                 completionHandler: completionHandler)
     }
     
+    /// GET that must not follow 302 so the Location header (auth code) can be read.
+    public func callAPIWithoutFollowingRedirects(endPoint: ESPAPIEndPoint,
+                                                 encoding: ParameterEncoding = URLEncoding.default,
+                                                 completionHandler: @escaping (HTTPURLResponse?, Error?) -> Void) {
+        let requestSession: Session
+        if ESPServerTrustParams.shared.fileName != nil {
+            requestSession = session
+        } else {
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = 10
+            requestSession = Session(configuration: configuration)
+        }
+        requestSession.request(endPoint.url,
+                        method: endPoint.method,
+                        parameters: endPoint.parameters,
+                        encoding: encoding,
+                        headers: endPoint.headers)
+            .redirect(using: Redirector.doNotFollow)
+            .response { response in
+                if let http = response.response {
+                    completionHandler(http, nil)
+                    return
+                }
+                switch response.result {
+                case .success:
+                    completionHandler(nil, nil)
+                case .failure(let error):
+                    completionHandler(nil, error)
+                }
+            }
+    }
+    
     /// Method to get security certificate from bundle resource
     /// - Parameters:
     ///   - filename: name of the certificate file

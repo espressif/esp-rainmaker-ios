@@ -30,6 +30,7 @@ enum ESPEnablementStatus {
 
 enum ESPAlexaAPIStatus: Error {
     case unauthorized
+    case invalidAccountLinkingCredentials
     case alexaAccessTokenExpired
     case alexaAccessTokenFetched
     case apiEndpointFetched
@@ -41,6 +42,12 @@ enum ESPAlexaAPIStatus: Error {
     case serverError(Error)
     case errorMessage(message: String = "Unknown Error")
     case httpError(statusCode: Int)
+}
+
+enum ESPAlexaAuthCodeResult {
+    case success(code: String)
+    case fallbackToBrowser
+    case failure
 }
 
 protocol ESPAlexaAPIServiceDelegate {
@@ -58,6 +65,7 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
     static let linked = "linked"
     
     var apiWorker: ESPAlexaAPIWorker!
+    var worker: ESPAPIWorker = ESPAPIWorker()
     
     init() {
         self.apiWorker = ESPAlexaAPIWorker()
@@ -221,7 +229,7 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
         
         self.enableSkillForSingleEndpoint(code: code, endPoint: apiEndPoints[index], accessToken: accessToken) { status in
             switch status {
-            case .accountLinked, .alexaAccessTokenExpired, .accountNotLinked, .unauthorized:
+            case .accountLinked, .alexaAccessTokenExpired, .accountNotLinked, .unauthorized, .invalidAccountLinkingCredentials:
             completionHandler(status)
             default:
                 if index == apiEndPoints.count-1 {
@@ -273,10 +281,7 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
         }
     }
     
-    /// API to enable app to app linking
-    /// - Parameters:
-    ///   - code: rainmaker auth code
-    ///   - completionHandler: callback to be invoked with AlexaAPIStatus
+    /// Disables the skill on the first Alexa endpoint that accepts the request.
     func espDisableSkill(completionHandler: @escaping (ESPAlexaAPIStatus) -> Void) {
         
         if let accessToken = ESPAlexaTokenWorker.shared.getAccessToken, let urlEndPoints = ESPAlexaTokenWorker.shared.getAlexaURLEndPoints, urlEndPoints.count > 0 {
@@ -361,6 +366,57 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
         }
     }
     
+    /// Requests a RainMaker authorization code from `/app-link/authorize`. HTTP 4xx and 5xx, and missing configuration or session, ask the caller to open the hosted UI.
+    func getRainMakerAuthCode(redirectURI: String, completionHandler: @escaping (ESPAlexaAuthCodeResult) -> Void) {
+        let clientId = Configuration.shared.espAlexaConfiguration.clientId
+        let clientSecret = Configuration.shared.espAlexaConfiguration.rmClientSecret
+        let state = Configuration.shared.espAlexaConfiguration.state
+        // `/app-link/authorize` has no API version prefix.
+        let baseURL = Configuration.shared.awsConfiguration.baseURL ?? ""
+        guard !clientSecret.isEmpty,
+              !clientId.isEmpty,
+              !redirectURI.isEmpty,
+              !baseURL.isEmpty,
+              let accessToken = ESPTokenWorker.shared.accessTokenString else {
+            completionHandler(.fallbackToBrowser)
+            return
+        }
+        
+        let endPoint = ESPAPIEndPoint.alexaAppLinkAuthorize(url: baseURL,
+                                                            clientId: clientId,
+                                                            redirectURI: redirectURI,
+                                                            state: state,
+                                                            clientSecret: clientSecret,
+                                                            accessToken: accessToken)
+        self.worker.callAPIWithoutFollowingRedirects(endPoint: endPoint) { http, _ in
+            if let http = http, http.statusCode == 302 {
+                if let location = http.value(forHTTPHeaderField: "Location"),
+                   let code = ESPAlexaAPIService.authCode(fromLocation: location) {
+                    completionHandler(.success(code: code))
+                    return
+                }
+                completionHandler(.failure)
+                return
+            }
+            if let statusCode = http?.statusCode, (400...599).contains(statusCode) {
+                completionHandler(.fallbackToBrowser)
+                return
+            }
+            completionHandler(.failure)
+        }
+    }
+    
+    private static func authCode(fromLocation location: String) -> String? {
+        guard let components = URLComponents(string: location),
+              let items = components.queryItems else {
+            return nil
+        }
+        if let code = items.first(where: { $0.name == ESPAlexaServiceConstants.code })?.value, !code.isEmpty {
+            return code
+        }
+        return nil
+    }
+    
     /// Check API response status code for enablement APIs
     /// - Parameters:
     ///   - response: response from alexa enablement APIs
@@ -381,6 +437,9 @@ class ESPAlexaAPIService: ESPAlexaAPIServiceDelegate {
                 return false
             } else if statusCode == 401 {
                 completionHandler(.alexaAccessTokenExpired)
+                return false
+            } else if statusCode == 400, enablementStatus == .enable {
+                completionHandler(.invalidAccountLinkingCredentials)
                 return false
             } else if statusCode == 400 {
                 completionHandler(.unauthorized)

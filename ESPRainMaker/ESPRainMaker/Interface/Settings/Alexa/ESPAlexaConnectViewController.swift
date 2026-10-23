@@ -29,7 +29,7 @@ protocol ESPEnableAlexaSkillPresenter {
 }
 
 protocol ESPLinkSkillFromAlexaDelegate: AnyObject {
-    func launchCognitoURL()
+    func allowAlexaAppLinking(from viewController: UIViewController)
 }
 
 /// This viewcontroller is to show screen to allow user to connect to Alexa
@@ -73,9 +73,7 @@ class ESPAlexaConnectViewController: UIViewController {
     @IBOutlet weak var linkWithAlexaButton: UIButton!
     @IBAction func linkWithAlexa(_ sender: Any) {
         if self.isLaunchedFromAlexa {
-            self.dismiss(animated: true) {
-                self.espLinkSkillFromAlexaDelegate?.launchCognitoURL()
-            }
+            self.espLinkSkillFromAlexaDelegate?.allowAlexaAppLinking(from: self)
         } else {
             self.service.initiateEnableSkillFlow()
         }
@@ -145,7 +143,7 @@ extension ESPAlexaConnectViewController: ESPEnableAlexaSkillPresenter {
         }
     }
     
-    /// Act on URL that is retried from WKWebview
+    /// Handles the redirect returned by the web view or the Alexa app.
     /// - Parameters:
     ///   - url: URL retrieved from WKWebview or Alexa app
     ///   - state: state for which url is retrieved

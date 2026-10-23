@@ -28,8 +28,8 @@ extension AppDelegate {
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
             if let url = userActivity.webpageURL {
                 let appLinkFromAlexa = isAppLinkingFromAlexaApp(alexaURL: url)
-                if appLinkFromAlexa.0, let rainmakerURLString = appLinkFromAlexa.1 {
-                    self.launchAlexaApp(rainmakerURLString: rainmakerURLString)
+                if appLinkFromAlexa.0 {
+                    self.launchAlexaApp(rainmakerURLString: appLinkFromAlexa.1)
                     return false
                 }
                 var isRainmakerAuthCode = false
@@ -87,8 +87,13 @@ extension AppDelegate {
                     }
                 }
                 if clientId.count > 0, state.count > 0, redirectURL.count > 0, scope.count > 0, redirectURL.contains(ESPAlexaServiceConstants.alexaRedirectURI) {
-                    let rainmakerURL = "\(Configuration.shared.awsConfiguration.authURL!)/authorize?response_type=code&client_id=\(clientId)&redirect_uri=\(redirectURL)&state=\(state)&scope=\(scope)"
-                    return (true, rainmakerURL)
+                    self.alexaAppLinkRedirectURI = redirectURL
+                    self.alexaAppLinkState = state
+                    if let authURL = Configuration.shared.awsConfiguration.authURL {
+                        let rainmakerURL = "\(authURL)/authorize?response_type=code&client_id=\(clientId)&redirect_uri=\(redirectURL)&state=\(state)&scope=\(scope)"
+                        return (true, rainmakerURL)
+                    }
+                    return (true, nil)
                 }
             }
         }
@@ -97,18 +102,21 @@ extension AppDelegate {
     
     /// Launch alexa app
     /// - Parameter rainmakerURLString: rainmaker URL string
-    func launchAlexaApp(rainmakerURLString: String) {
-        if let rainmakerURL = URL(string: rainmakerURLString) {
-            if User.shared.isUserSessionActive {
-                if let controller = UIApplication.topViewController() {
-                    if let navBar = controller.navigationController, let tabBar = navBar.tabBarController {
-                        if let connectToAlexaVC = ESPEnableAlexaSkillService.getConnectToAlexaVC() {
-                            connectToAlexaVC.isLaunchedFromAlexa = true
-                            self.rainmakerURL = rainmakerURL
-                            connectToAlexaVC.espLinkSkillFromAlexaDelegate = self
-                            tabBar.present(connectToAlexaVC, animated: true)
-                        }
-                    }
+    func launchAlexaApp(rainmakerURLString: String?) {
+        guard User.shared.isUserSessionActive else { return }
+        self.rainmakerURL = rainmakerURLString.flatMap { URL(string: $0) }
+        if self.rainmakerURL == nil, Configuration.shared.espAlexaConfiguration.rmClientSecret.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if let view = UIApplication.topViewController()?.view {
+                Utility.showToastMessage(view: view, message: ESPAlexaServiceConstants.accountLinkingFailed, duration: 2.0)
+            }
+            return
+        }
+        if let controller = UIApplication.topViewController() {
+            if let navBar = controller.navigationController, let tabBar = navBar.tabBarController {
+                if let connectToAlexaVC = ESPEnableAlexaSkillService.getConnectToAlexaVC() {
+                    connectToAlexaVC.isLaunchedFromAlexa = true
+                    connectToAlexaVC.espLinkSkillFromAlexaDelegate = self
+                    tabBar.present(connectToAlexaVC, animated: true)
                 }
             }
         }
@@ -166,11 +174,68 @@ extension AppDelegate {
 
 extension AppDelegate: ESPLinkSkillFromAlexaDelegate {
     
-    /// Launch cognito hosted UI in browser
-    func launchCognitoURL() {
-        if UIApplication.shared.canOpenURL(self.rainmakerURL) {
-            UIApplication.shared.open(self.rainmakerURL, options: [.universalLinksOnly: false]) { _ in}
+    /// Continues linking started in the Alexa app. Uses the hosted UI when Alexa RM Client Secret is empty, and `/app-link/authorize` when it is set.
+    func allowAlexaAppLinking(from viewController: UIViewController) {
+        guard alexaAppLinkAuthService == nil else { return }
+        if Configuration.shared.espAlexaConfiguration.rmClientSecret.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            viewController.dismiss(animated: true) { [weak self] in
+                self?.launchCognitoURL()
+            }
+            return
         }
+        guard let redirectURI = alexaAppLinkRedirectURI, !redirectURI.isEmpty else {
+            viewController.dismiss(animated: true) { [weak self] in
+                self?.launchCognitoURL()
+            }
+            return
+        }
+        Utility.showLoader(message: "", view: viewController.view)
+        let service = ESPAlexaAPIService()
+        alexaAppLinkAuthService = service
+        service.getRainMakerAuthCode(redirectURI: redirectURI) { [weak self, weak viewController] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.alexaAppLinkAuthService = nil
+                guard let viewController = viewController else { return }
+                Utility.hideLoader(view: viewController.view)
+                switch result {
+                case .success(let code):
+                    viewController.dismiss(animated: true) {
+                        self.openAlexaRedirect(code: code, redirectURI: redirectURI, state: self.alexaAppLinkState)
+                    }
+                case .fallbackToBrowser:
+                    viewController.dismiss(animated: true) {
+                        self.launchCognitoURL()
+                    }
+                case .failure:
+                    Utility.showToastMessage(view: viewController.view, message: ESPAlexaServiceConstants.failedToGetAuthCode, duration: 2.0)
+                }
+            }
+        }
+    }
+    
+    /// Launch cognito hosted UI in browser. Shows a toast when the URL is missing or cannot be opened.
+    func launchCognitoURL() {
+        guard let cognitoURL = rainmakerURL, UIApplication.shared.canOpenURL(cognitoURL) else {
+            if let view = UIApplication.topViewController()?.view {
+                Utility.showToastMessage(view: view, message: ESPAlexaServiceConstants.accountLinkingFailed, duration: 2.0)
+            }
+            return
+        }
+        UIApplication.shared.open(cognitoURL, options: [.universalLinksOnly: false]) { _ in }
+    }
+    
+    private func openAlexaRedirect(code: String, redirectURI: String, state: String?) {
+        guard var components = URLComponents(string: redirectURI) else { return }
+        var items = components.queryItems ?? []
+        items.append(URLQueryItem(name: ESPAlexaServiceConstants.code, value: code))
+        if let state = state {
+            items.append(URLQueryItem(name: ESPAlexaServiceConstants.state, value: state))
+        }
+        items.append(URLQueryItem(name: "source", value: "app"))
+        components.queryItems = items
+        guard let url = components.url else { return }
+        UIApplication.shared.open(url, options: [.universalLinksOnly: false]) { _ in }
     }
 }
 
