@@ -20,6 +20,7 @@ For more details :
 
 - Signup/Signin using email id.
 - Third party login includes Apple login, GitHub and Google.
+- Native Sign in with Apple is enabled in the bundled `Configuration.plist` (`Enable Native Apple Sign In` under `App Configuration` is `YES`) and needs backend federated login support. Set it to `NO`, or remove the key, to use the RainMaker Hosted UI for Apple login. The app target always includes the Sign in with Apple entitlement, so the App ID needs the Sign in with Apple capability.
 - Forgot/reset password support.
 - Signing out.
 

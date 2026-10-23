@@ -133,6 +133,8 @@ struct Constants {
     static let github = "Github"
     static let google = "Google"
     static let googleFederatedProvider = "google"
+    static let appleSignIn = "SignInWithApple"
+    static let appleFederatedProvider = "apple"
 
     // UI types
     static let scanQRCode = "esp.ui.qr-scan"
