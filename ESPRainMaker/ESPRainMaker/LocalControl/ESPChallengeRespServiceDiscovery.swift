@@ -84,7 +84,7 @@ class ESPChallengeRespServiceDiscovery: NSObject {
     private func parseTXTRecord(_ txtRecord: [String: Data]) -> (nodeId: String?, secVersion: Int, popRequired: Bool, chRespEndpoint: String) {
         var nodeId: String?
         var secVersion = 0
-        var popRequired = false
+        var popRequiredValue: Bool?
         var chRespEndpoint = "ch_resp"
         
         for (key, value) in txtRecord {
@@ -94,10 +94,14 @@ class ESPChallengeRespServiceDiscovery: NSObject {
             case "node_id":
                 nodeId = stringValue
             case "sec_version":
-                secVersion = Int(stringValue) ?? 0
+                secVersion = Int(stringValue.trimmingCharacters(in: .whitespaces)) ?? 0
             case "pop_required":
-                let lowercased = stringValue.lowercased()
-                popRequired = lowercased == "true" || lowercased == "1" || lowercased == "yes"
+                let lowercased = stringValue.trimmingCharacters(in: .whitespaces).lowercased()
+                if ["true", "1", "yes"].contains(lowercased) {
+                    popRequiredValue = true
+                } else if ["false", "0", "no"].contains(lowercased) {
+                    popRequiredValue = false
+                }
             case "ch_resp":
                 chRespEndpoint = stringValue
             default:
@@ -105,6 +109,9 @@ class ESPChallengeRespServiceDiscovery: NSObject {
             }
         }
         
+        // Sec1 and Sec2 require a POP unless the device explicitly says it doesn't
+        let popRequired = popRequiredValue ?? (secVersion == 1 || secVersion == 2)
+
         return (nodeId, secVersion, popRequired, chRespEndpoint)
     }
 }
